@@ -23,8 +23,8 @@ export function BookmarksView({ phrases, bookmarks, notes, onToggleBookmark, onS
       if (!search.trim()) return true;
       const q = search.toLowerCase();
       return (
-        p.japanese.toLowerCase().includes(q) ||
-        p.hepburn.toLowerCase().includes(q) ||
+        p.target.toLowerCase().includes(q) ||
+        p.pronunciation.toLowerCase().includes(q) ||
         p.english.toLowerCase().includes(q) ||
         p.chinese_tc.toLowerCase().includes(q)
       );

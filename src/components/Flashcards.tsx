@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Phrase, SRSCard } from '../data/types';
-import { speak } from '../utils/tts';
+import { speak, getTtsLang } from '../utils/tts';
 import { getSRSCards, saveSRSCard } from '../db';
 import { createNewCard, reviewCard, isDueForReview } from '../utils/srs';
 
@@ -105,29 +105,29 @@ export function Flashcards({ phrases }: Props) {
         >
           {!showAnswer ? (
             <>
-              <p className="text-3xl font-bold text-slate-50 mb-3">{currentPhrase.japanese}</p>
+              <p className="text-3xl font-bold text-slate-50 mb-3">{currentPhrase.target}</p>
               <button
-                onClick={(e) => { e.stopPropagation(); speak(currentPhrase.japanese); }}
+                onClick={(e) => { e.stopPropagation(); speak(currentPhrase.target, getTtsLang(currentPhrase.lang)); }}
                 className="text-2xl mb-4 active:scale-110 transition-transform"
               >🔊</button>
               <p className="text-sm text-slate-500">Tap to reveal answer</p>
             </>
           ) : (
             <>
-              <p className="text-2xl font-bold text-slate-50 mb-2">{currentPhrase.japanese}</p>
-              <p className="text-lg text-sakura-300 mb-1">{currentPhrase.hepburn_chunks || currentPhrase.hepburn}</p>
-              {currentPhrase.hepburn_chunks && (
-                <p className="text-xs text-slate-500 mb-1">{currentPhrase.hepburn}</p>
+              <p className="text-2xl font-bold text-slate-50 mb-2">{currentPhrase.target}</p>
+              <p className="text-lg text-sakura-300 mb-1">{currentPhrase.pronunciation_chunks || currentPhrase.pronunciation}</p>
+              {currentPhrase.pronunciation_chunks && (
+                <p className="text-xs text-slate-500 mb-1">{currentPhrase.pronunciation}</p>
               )}
-              <p className="text-sm text-slate-300 mb-1">{currentPhrase.reading}</p>
+              <p className="text-sm text-slate-300 mb-1">{currentPhrase.romanization}</p>
               <div className="border-t border-slate-700 w-full my-3" />
               <p className="text-base text-slate-200 mb-1">{currentPhrase.english}</p>
               <p className="text-sm text-slate-400">{currentPhrase.chinese_tc}</p>
-              {currentPhrase.kanji_bridge && (
-                <p className="text-xs text-amber-400 mt-2">🌉 {currentPhrase.kanji_bridge}</p>
+              {currentPhrase.native_hint && (
+                <p className="text-xs text-amber-400 mt-2">🌉 {currentPhrase.native_hint}</p>
               )}
               <button
-                onClick={(e) => { e.stopPropagation(); speak(currentPhrase.japanese); }}
+                onClick={(e) => { e.stopPropagation(); speak(currentPhrase.target, getTtsLang(currentPhrase.lang)); }}
                 className="text-xl mt-3 active:scale-110 transition-transform"
               >🔊</button>
             </>

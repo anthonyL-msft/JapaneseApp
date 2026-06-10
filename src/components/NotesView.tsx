@@ -96,7 +96,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                     <div key={note.id} className="bg-slate-800/60 rounded-xl p-3">
                       {phrase && (
                         <p className="text-xs text-sakura-400 mb-1">
-                          {phrase.japanese} · {phrase.hepburn}
+                          {phrase.target} · {phrase.pronunciation}
                         </p>
                       )}
                       <div className="flex items-start gap-2">

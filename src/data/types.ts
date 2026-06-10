@@ -1,17 +1,33 @@
 export interface Phrase {
   id: string;
-  japanese: string;
-  reading: string;
-  hepburn: string;
-  hepburn_chunks?: string; // syllable-broken pronunciation: ku·u·kou
+  lang: string;
+  target: string;              // phrase in target language
+  romanization?: string;       // phonetic reading (hiragana for JP, not needed for Latin scripts)
+  pronunciation: string;       // romanized pronunciation guide
+  pronunciation_chunks?: string; // syllable-broken: ku·u·kou, por·fa·vor
   english: string;
   chinese_tc: string;
   category: Category;
   situation: string;
   difficulty: 1 | 2 | 3;
   notes: string;
-  kanji_bridge?: string; // Chinese kanji meaning hint
+  native_hint?: string;        // kanji bridge for JP, cognate hints for ES/FR
 }
+
+export interface LanguageConfig {
+  code: string;
+  name: string;
+  nameNative: string;
+  flag: string;
+  ttsLang: string;
+  hasRomanization: boolean;    // true for JP/KR, false for Latin-script languages
+}
+
+export const LANGUAGES: LanguageConfig[] = [
+  { code: 'ja', name: 'Japanese', nameNative: '日本語', flag: '🇯🇵', ttsLang: 'ja-JP', hasRomanization: true },
+  { code: 'es', name: 'Spanish', nameNative: 'Español', flag: '🇪🇸', ttsLang: 'es-ES', hasRomanization: false },
+  { code: 'fr', name: 'French', nameNative: 'Français', flag: '🇫🇷', ttsLang: 'fr-FR', hasRomanization: false },
+];
 
 export type Category =
   | 'greetings'

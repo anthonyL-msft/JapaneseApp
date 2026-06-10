@@ -1,14 +1,22 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { scenarios } from '../data/scenarios';
 import type { Scenario, ConversationLine } from '../data/scenarios';
+import type { LanguageConfig } from '../data/types';
 import { speak } from '../utils/tts';
 
-export function Scenarios() {
+interface Props {
+  lang: string;
+  langConfig: LanguageConfig;
+}
+
+export function Scenarios({ lang, langConfig }: Props) {
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const autoPlayRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const langScenarios = scenarios.filter(s => s.lang === lang);
 
   const handleSelect = (scenario: Scenario) => {
     setSelectedScenario(scenario);
@@ -65,17 +73,17 @@ export function Scenarios() {
       // Speak and wait
       await new Promise<void>((resolve) => {
         const line = selectedScenario.lines[i];
-        if (line.japanese.startsWith('（')) {
+        if (line.target.startsWith('（')) {
           // Action line, skip TTS
           setTimeout(resolve, 1500);
           return;
         }
-        const utterance = new SpeechSynthesisUtterance(line.japanese);
-        utterance.lang = 'ja-JP';
+        const utterance = new SpeechSynthesisUtterance(line.target);
+        utterance.lang = langConfig.ttsLang;
         utterance.rate = 0.85;
         const voices = window.speechSynthesis.getVoices();
-        const jaVoice = voices.find(v => v.lang.startsWith('ja'));
-        if (jaVoice) utterance.voice = jaVoice;
+        const voice = voices.find(v => v.lang.startsWith(langConfig.code));
+        if (voice) utterance.voice = voice;
         utterance.onend = () => setTimeout(resolve, 1200);
         utterance.onerror = () => resolve();
         window.speechSynthesis.cancel();
@@ -96,12 +104,21 @@ export function Scenarios() {
 
   // Scenario list
   if (!selectedScenario) {
+    if (langScenarios.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full px-6 text-center">
+          <p className="text-4xl mb-4">🎭</p>
+          <p className="text-lg font-semibold text-slate-200">No conversations yet for {langConfig.name}</p>
+          <p className="text-sm text-slate-400 mt-2">Conversations will be added soon! Try switching to Japanese 🇯🇵 to see examples.</p>
+        </div>
+      );
+    }
     return (
       <div className="scroll-area h-full p-4">
         <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
-        <p className="text-slate-400 text-sm mb-4">Practice real dialogues step-by-step</p>
+        <p className="text-slate-400 text-sm mb-4">Practice real {langConfig.name} dialogues step-by-step</p>
         <div className="space-y-2">
-          {scenarios.map(sc => (
+          {langScenarios.map(sc => (
             <button
               key={sc.id}
               onClick={() => handleSelect(sc)}
@@ -160,7 +177,7 @@ export function Scenarios() {
       {/* Conversation */}
       <div className="flex-1 scroll-area p-4 space-y-3" ref={scrollRef}>
         {selectedScenario.lines.slice(0, revealedCount).map((line, idx) => (
-          <ConversationBubble key={idx} line={line} index={idx} />
+          <ConversationBubble key={idx} line={line} index={idx} ttsLang={langConfig.ttsLang} />
         ))}
 
         {/* Tap to reveal next */}
@@ -199,14 +216,14 @@ export function Scenarios() {
   );
 }
 
-function ConversationBubble({ line, index }: { line: ConversationLine; index: number }) {
+function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; index: number; ttsLang: string }) {
   const isStaff = line.speaker === 'staff';
   const [showDetail, setShowDetail] = useState(false);
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!line.japanese.startsWith('（')) {
-      speak(line.japanese);
+    if (!line.target.startsWith('（')) {
+      speak(line.target, ttsLang);
     }
   };
 
@@ -229,10 +246,10 @@ function ConversationBubble({ line, index }: { line: ConversationLine; index: nu
         >
           <div className="flex items-start gap-2">
             <div className="flex-1 min-w-0">
-              <p className="text-base text-slate-50">{line.japanese}</p>
-              <p className="text-sm text-sakura-300 mt-0.5">{line.hepburn_chunks || line.hepburn}</p>
+              <p className="text-base text-slate-50">{line.target}</p>
+              <p className="text-sm text-sakura-300 mt-0.5">{line.pronunciation_chunks || line.pronunciation}</p>
             </div>
-            {!line.japanese.startsWith('（') && (
+            {!line.target.startsWith('（') && (
               <button onClick={handleSpeak} className="text-lg shrink-0 p-1 active:scale-110 transition-transform">
                 🔊
               </button>

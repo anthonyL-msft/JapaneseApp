@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Tab, Bookmark, UserNote } from './data/types';
+import { LANGUAGES } from './data/types';
 import { phrases as allPhrases } from './data/phrases';
 import { getBookmarks, addBookmark, removeBookmark, getNotes, saveNote, deleteNote } from './db';
 import { PhraseBook } from './components/PhraseBook';
@@ -21,8 +22,10 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 function App() {
   const [tab, setTab] = useState<Tab>('phrases');
   const [search, setSearch] = useState('');
+  const [lang, setLang] = useState('ja');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [notes, setNotes] = useState<UserNote[]>([]);
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   useEffect(() => {
     getBookmarks().then(setBookmarks);
@@ -60,28 +63,30 @@ function App() {
 
   const bookmarkedIds = new Set(bookmarks.map(b => b.phraseId));
 
+  const langPhrases = allPhrases.filter(p => p.lang === lang);
+
   const filteredPhrases = search.trim()
-    ? allPhrases.filter(p => {
+    ? langPhrases.filter(p => {
         const q = search.toLowerCase();
         return (
-          p.japanese.toLowerCase().includes(q) ||
-          p.reading.toLowerCase().includes(q) ||
-          p.hepburn.toLowerCase().includes(q) ||
+          p.target.toLowerCase().includes(q) ||
+          (p.romanization?.toLowerCase().includes(q) ?? false) ||
+          p.pronunciation.toLowerCase().includes(q) ||
           p.english.toLowerCase().includes(q) ||
           p.chinese_tc.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q) ||
           p.situation.toLowerCase().includes(q) ||
           p.notes.toLowerCase().includes(q) ||
-          (p.kanji_bridge?.toLowerCase().includes(q) ?? false) ||
+          (p.native_hint?.toLowerCase().includes(q) ?? false) ||
           notes.some(n => n.phraseId === p.id && n.text.toLowerCase().includes(q))
         );
       })
-    : allPhrases;
+    : langPhrases;
 
   return (
     <div className="flex flex-col h-full">
       {/* Search Bar */}
-      <SearchBar value={search} onChange={setSearch} />
+      <SearchBar value={search} onChange={setSearch} lang={lang} onLangChange={setLang} />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
@@ -96,11 +101,11 @@ function App() {
           />
         )}
         {tab === 'cards' && (
-          <Flashcards phrases={allPhrases} />
+          <Flashcards phrases={langPhrases} />
         )}
         {tab === 'bookmarks' && (
           <BookmarksView
-            phrases={allPhrases}
+            phrases={langPhrases}
             bookmarks={bookmarks}
             notes={notes}
             onToggleBookmark={toggleBookmark}
@@ -111,14 +116,14 @@ function App() {
         )}
         {tab === 'notes' && (
           <NotesView
-            phrases={allPhrases}
+            phrases={langPhrases}
             notes={notes}
             onSaveNote={handleSaveNote}
             onDeleteNote={handleDeleteNote}
           />
         )}
         {tab === 'reference' && <Reference />}
-        {tab === 'scenes' && <Scenarios />}
+        {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} />}
       </div>
 
       {/* Bottom Navigation */}

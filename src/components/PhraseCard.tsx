@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Phrase, UserNote } from '../data/types';
-import { speak } from '../utils/tts';
+import { speak, getTtsLang } from '../utils/tts';
 
 interface Props {
   phrase: Phrase;
@@ -19,7 +19,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
-    speak(phrase.japanese);
+    speak(phrase.target, getTtsLang(phrase.lang));
   };
 
   const handleSaveNote = () => {
@@ -40,8 +40,8 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
       <button onClick={onToggleExpand} className="w-full text-left p-3 active:bg-slate-700/50 transition">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <p className="text-base font-medium text-slate-50">{phrase.japanese}</p>
-            <p className="text-sm text-sakura-300 mt-0.5">{phrase.hepburn_chunks || phrase.hepburn}</p>
+            <p className="text-base font-medium text-slate-50">{phrase.target}</p>
+            <p className="text-sm text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
             <p className="text-sm text-slate-400 mt-0.5">{phrase.english}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
@@ -58,27 +58,29 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
       {/* Expanded details */}
       {expanded && (
         <div className="px-3 pb-3 border-t border-slate-700/50 space-y-3">
-          {phrase.hepburn_chunks && (
+          {phrase.pronunciation_chunks && (
             <div className="mt-3 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
               <span className="text-slate-500 text-xs">Pronunciation</span>
-              <p className="text-base text-indigo-300 font-mono tracking-wide">{phrase.hepburn_chunks}</p>
+              <p className="text-base text-indigo-300 font-mono tracking-wide">{phrase.pronunciation_chunks}</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
-            <div>
-              <span className="text-slate-500 text-xs">Reading</span>
-              <p className="text-slate-200">{phrase.reading}</p>
-            </div>
+            {phrase.romanization && (
+              <div>
+                <span className="text-slate-500 text-xs">Reading</span>
+                <p className="text-slate-200">{phrase.romanization}</p>
+              </div>
+            )}
             <div>
               <span className="text-slate-500 text-xs">繁體中文</span>
               <p className="text-slate-200">{phrase.chinese_tc}</p>
             </div>
           </div>
 
-          {phrase.kanji_bridge && (
+          {phrase.native_hint && (
             <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-              <p className="text-xs text-amber-400">🌉 Kanji Bridge — {phrase.kanji_bridge}</p>
+              <p className="text-xs text-amber-400">🌉 {phrase.native_hint}</p>
             </div>
           )}
 
