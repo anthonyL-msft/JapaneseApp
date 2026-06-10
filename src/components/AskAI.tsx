@@ -193,7 +193,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
                     setTimeout(() => setSaved(false), 2000);
                   }}
                   className="flex-1 bg-sakura-500/30 text-sakura-300 text-base py-2 rounded-lg active:bg-sakura-500/50 transition"
-                >{saved ? '✓ Saved' : '💾 Save'}</button>
+                >{saved ? '✓ Saved to Notes' : '📝 Save to Notes'}</button>
               )}
             </div>
           </div>
