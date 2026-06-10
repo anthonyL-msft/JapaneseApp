@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import type { Phrase, UserNote, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { PhraseCard } from './PhraseCard';
+import { Reference } from './Reference';
 
 interface Props {
   phrases: Phrase[];
@@ -16,16 +17,42 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [selectedSituation, setSelectedSituation] = useState<string>('all');
+  const [showReference, setShowReference] = useState(false);
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const categories = Object.entries(CATEGORY_INFO) as [Category, typeof CATEGORY_INFO[Category]][];
+
+  if (showReference) {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 pt-3 pb-2 border-b border-slate-800 bg-slate-950/95">
+          <button onClick={() => setShowReference(false)} className="text-sakura-400 text-sm flex items-center gap-1">
+            ← Back to Phrases
+          </button>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <Reference />
+        </div>
+      </div>
+    );
+  }
 
   if (!selectedCategory) {
     // Category grid
     return (
       <div className="scroll-area h-full p-4">
-        <h1 className="text-xl font-bold mb-1">📖 Phrase Book</h1>
-        <p className="text-slate-400 text-sm mb-4">Select a category to start learning</p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-xl font-bold mb-0.5">📖 Phrase Book</h1>
+            <p className="text-slate-400 text-sm">Select a category to start learning</p>
+          </div>
+          <button
+            onClick={() => setShowReference(true)}
+            className="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+          >
+            📚 Reference
+          </button>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {categories.map(([key, info]) => {
             const catPhrases = phrases.filter(p => p.category === key);

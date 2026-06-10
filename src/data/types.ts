@@ -58,4 +58,4 @@ export interface SRSCard {
   lastReview: number;
 }
 
-export type Tab = 'phrases' | 'cards' | 'bookmarks' | 'notes' | 'reference';
+export type Tab = 'phrases' | 'scenes' | 'cards' | 'bookmarks' | 'notes' | 'reference';

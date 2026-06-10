@@ -7,14 +7,15 @@ import { Flashcards } from './components/Flashcards';
 import { BookmarksView } from './components/BookmarksView';
 import { NotesView } from './components/NotesView';
 import { Reference } from './components/Reference';
+import { Scenarios } from './components/Scenarios';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'phrases', label: 'Phrases', icon: '📖' },
+  { id: 'scenes', label: 'Scenes', icon: '🎭' },
   { id: 'cards', label: 'Cards', icon: '🃏' },
   { id: 'bookmarks', label: 'Saved', icon: '⭐' },
   { id: 'notes', label: 'Notes', icon: '📝' },
-  { id: 'reference', label: 'Ref', icon: '📚' },
 ];
 
 function App() {
@@ -117,6 +118,7 @@ function App() {
           />
         )}
         {tab === 'reference' && <Reference />}
+        {tab === 'scenes' && <Scenarios />}
       </div>
 
       {/* Bottom Navigation */}
