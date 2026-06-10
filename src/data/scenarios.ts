@@ -61,7 +61,7 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'staff', target: 'いらっしゃいませ！', pronunciation: 'irasshaimase!', pronunciation_chunks: 'i·ras·shai·ma·se', english: 'Welcome!', chinese_tc: '歡迎光臨！', note: 'You\'ll hear this the moment you walk in. Just smile or nod.' },
       { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka?', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
-      { speaker: 'you', target: '二名です', pronunciation: 'nimei desu', pronunciation_chunks: 'ni·mei de·su', english: 'Two people', chinese_tc: '兩位' },
+      { speaker: 'you', target: 'ふたりです', pronunciation: 'futari desu', pronunciation_chunks: 'fu·ta·ri de·su', english: 'Two people', chinese_tc: '兩位' },
       { speaker: 'staff', target: 'ご予約はございますか？', pronunciation: 'go-yoyaku wa gozaimasu ka?', pronunciation_chunks: 'go·yo·ya·ku wa go·zai·ma·su ka', english: 'Do you have a reservation?', chinese_tc: '請問有預約嗎？' },
       { speaker: 'you', target: '予約していません', pronunciation: 'yoyaku shite imasen', pronunciation_chunks: 'yo·ya·ku shi·te i·ma·sen', english: 'No reservation', chinese_tc: '沒有預約' },
       { speaker: 'staff', target: '少々お待ちください', pronunciation: 'shoushou omachi kudasai', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai', english: 'Please wait a moment', chinese_tc: '請稍等', note: 'Wait patiently — they\'re preparing your table.' },
@@ -330,7 +330,7 @@ export const scenarios: Scenario[] = [
     description: 'Ordering drinks and sharing plates for 2',
     lines: [
       { speaker: 'staff', target: 'いらっしゃいませ！何名様ですか？', pronunciation: 'irasshaimase! nanmei sama desu ka?', pronunciation_chunks: 'i·ras·shai·ma·se! nan·mei sa·ma de·su ka', english: 'Welcome! How many?', chinese_tc: '歡迎光臨！幾位？' },
-      { speaker: 'you', target: '二名です', pronunciation: 'nimei desu', pronunciation_chunks: 'ni·mei de·su', english: 'Two people', chinese_tc: '兩位' },
+      { speaker: 'you', target: 'ふたりです', pronunciation: 'futari desu', pronunciation_chunks: 'fu·ta·ri de·su', english: 'Two people', chinese_tc: '兩位' },
       { speaker: 'staff', target: 'お飲み物からどうぞ', pronunciation: 'onomimono kara douzo', pronunciation_chunks: 'o·no·mi·mo·no ka·ra dou·zo', english: 'Drinks first, please', chinese_tc: '請先點飲料' },
       { speaker: 'you', target: 'とりあえず生ビールを二つお願いします', pronunciation: 'toriaezu nama biiru wo futatsu onegaishimasu', pronunciation_chunks: 'to·ri·a·e·zu na·ma bii·ru wo fu·ta·tsu o·ne·gai·shi·ma·su', english: 'Two draft beers to start', chinese_tc: '先來兩杯生啤酒', note: 'とりあえず生 = the classic Japanese first order at izakaya!' },
       { speaker: 'staff', target: 'かしこまりました。お通しをお持ちします', pronunciation: 'kashikomarimashita. otooshi wo omochi shimasu', pronunciation_chunks: 'ka·shi·ko·ma·ri·ma·shi·ta. o·too·shi wo o·mo·chi shi·ma·su', english: 'Certainly. I\'ll bring the appetizer', chinese_tc: '好的。我送小菜過來', note: 'お通し (otooshi) is a small appetizer automatically served — it\'s not free (usually ¥300-500)' },
@@ -605,7 +605,7 @@ export const scenarios: Scenario[] = [
     description: 'Ordering Nagoya\'s famous food — miso katsu, hitsumabushi, tebasaki',
     lines: [
       { speaker: 'staff', target: 'いらっしゃいませ！何名様ですか？', pronunciation: 'irasshaimase! nanmei sama desu ka?', pronunciation_chunks: 'i·ras·shai·ma·se! nan·mei sa·ma de·su ka', english: 'Welcome! How many?', chinese_tc: '歡迎光臨！幾位？' },
-      { speaker: 'you', target: '二名です。名古屋名物を食べたいのですが', pronunciation: 'nimei desu. nagoya meibutsu wo tabetai no desu ga', pronunciation_chunks: 'ni·mei de·su. na·go·ya mei·bu·tsu wo ta·be·tai no de·su ga', english: 'Two people. We\'d like to try Nagoya specialties.', chinese_tc: '兩位。我們想吃名古屋名物', note: '名物 (meibutsu) = local specialty. Nagoya is famous for unique food!' },
+      { speaker: 'you', target: 'ふたりです。名古屋名物を食べたいのですが', pronunciation: 'futari desu. nagoya meibutsu wo tabetai no desu ga', pronunciation_chunks: 'fu·ta·ri de·su. na·go·ya mei·bu·tsu wo ta·be·tai no de·su ga', english: 'Two people. We\'d like to try Nagoya specialties.', chinese_tc: '兩位。我們想吃名古屋名物', note: '名物 (meibutsu) = local specialty. Nagoya is famous for unique food!' },
       { speaker: 'staff', target: '名古屋名物でしたら、味噌カツ、ひつまぶし、手羽先がおすすめです', pronunciation: 'nagoya meibutsu deshitara, miso katsu, hitsumabushi, tebasaki ga osusume desu', pronunciation_chunks: 'na·go·ya mei·bu·tsu de·shi·ta·ra, mi·so ka·tsu, hi·tsu·ma·bu·shi, te·ba·sa·ki ga o·su·su·me de·su', english: 'For Nagoya specialties, I recommend miso katsu, hitsumabushi, and tebasaki wings.', chinese_tc: '名古屋名物的話，推薦味噌豬排、鰻魚三吃、和雞翅', note: '味噌カツ=miso pork cutlet, ひつまぶし=eel 3 ways, 手羽先=chicken wings' },
       { speaker: 'you', target: 'ひつまぶしを二人前お願いします', pronunciation: 'hitsumabushi wo futarimai onegaishimasu', pronunciation_chunks: 'hi·tsu·ma·bu·shi wo fu·ta·ri·mae o·ne·gai·shi·ma·su', english: 'Hitsumabushi for two please', chinese_tc: '請給我兩份鰻魚三吃', options: [
         { target: 'ひつまぶしを二人前お願いします', pronunciation: 'hitsumabushi wo futarimai onegaishimasu', pronunciation_chunks: 'hi·tsu·ma·bu·shi wo fu·ta·ri·mae o·ne·gai·shi·ma·su', english: 'Hitsumabushi for two please', chinese_tc: '兩份鰻魚三吃' },

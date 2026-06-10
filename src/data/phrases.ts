@@ -119,7 +119,7 @@ const japanesePhrases: Phrase[] = [
   // ============================================================
   // RESTAURANT & FOOD
   // ============================================================
-  { id: 'r01', lang: 'ja', target: '二名です', romanization: 'にめいです', pronunciation: 'nimei desu', pronunciation_chunks: 'ni·mei de·su', english: 'Two people (at restaurant)', chinese_tc: '兩位', category: 'restaurant', situation: 'Entering', difficulty: 1, notes: 'Say this when entering a restaurant. More formal than ふたり' },
+  { id: 'r01', lang: 'ja', target: 'ふたりです', romanization: 'ふたりです', pronunciation: 'futari desu', pronunciation_chunks: 'fu·ta·ri de·su', english: 'Two people (at restaurant)', chinese_tc: '兩位', category: 'restaurant', situation: 'Entering', difficulty: 1, notes: 'Casual polite — natural and easy. Formal version: 二名です (nimei desu)' },
   { id: 'r02', lang: 'ja', target: '予約していません', romanization: 'よやくしていません', pronunciation: 'yoyaku shite imasen', pronunciation_chunks: 'yo·ya·ku shi·te i·ma·se·n', english: "We don't have a reservation", chinese_tc: '我們沒有預約', category: 'restaurant', situation: 'Entering', difficulty: 1, notes: '' },
   { id: 'r03', lang: 'ja', target: '予約した○○です', romanization: 'よやくした○○です', pronunciation: 'yoyaku shita ○○ desu', pronunciation_chunks: 'yo·ya·ku shi·ta ○○ de·su', english: 'We have a reservation under ○○', chinese_tc: '我們有預約，姓○○', category: 'restaurant', situation: 'Entering', difficulty: 1, notes: '' },
   { id: 'r04', lang: 'ja', target: 'メニューをお願いします', romanization: 'メニューをおねがいします', pronunciation: 'menyuu wo onegaishimasu', pronunciation_chunks: 'me·nyu·u wo o·ne·gai·shi·ma·su', english: 'Menu please', chinese_tc: '請給我菜單', category: 'restaurant', situation: 'Ordering', difficulty: 1, notes: '' },
