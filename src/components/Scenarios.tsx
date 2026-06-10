@@ -220,11 +220,34 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
   const isStaff = line.speaker === 'staff';
   const [showDetail, setShowDetail] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [varSelections, setVarSelections] = useState<Record<string, number>>({});
 
   const hasOptions = line.options && line.options.length > 0;
-  const displayLine = hasOptions && selectedOption !== null
+  const hasVariables = line.variables && line.variables.length > 0;
+
+  // Apply variable substitutions to the display text
+  const applyVarSubstitutions = (text: string) => {
+    if (!hasVariables) return text;
+    let result = text;
+    for (const v of line.variables!) {
+      const selectedIdx = varSelections[v.placeholder];
+      if (selectedIdx !== undefined) {
+        result = result.replaceAll(v.placeholder, v.options[selectedIdx].value);
+      }
+    }
+    return result;
+  };
+
+  const baseDisplayLine = hasOptions && selectedOption !== null
     ? { ...line, ...line.options![selectedOption] }
     : line;
+
+  const displayLine = {
+    ...baseDisplayLine,
+    target: applyVarSubstitutions(baseDisplayLine.target),
+    english: applyVarSubstitutions(baseDisplayLine.english),
+    chinese_tc: applyVarSubstitutions(baseDisplayLine.chinese_tc),
+  };
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -291,6 +314,38 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
               <p className="text-sm text-slate-300">{displayLine.english}</p>
               <p className="text-xs text-slate-500">{displayLine.chinese_tc}</p>
             </div>
+
+            {/* Variable chips — swap places, times, etc. */}
+            {hasVariables && (
+              <div className="mt-2 pt-2 border-t border-slate-700/40 space-y-2">
+                {line.variables!.map(v => (
+                  <div key={v.placeholder}>
+                    <p className="text-[10px] text-slate-500 mb-1">🔄 {v.label}:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {v.options.map((opt, oi) => {
+                        const isSelected = (varSelections[v.placeholder] ?? 0) === oi;
+                        return (
+                          <button
+                            key={oi}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setVarSelections(prev => ({ ...prev, [v.placeholder]: oi }));
+                            }}
+                            className={`text-xs px-2 py-1 rounded-lg transition ${
+                              isSelected
+                                ? 'bg-sakura-500/60 text-white'
+                                : 'bg-slate-700/50 text-slate-300 active:bg-slate-600'
+                            }`}
+                          >
+                            {opt.value} <span className="text-slate-400">{opt.english}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Change selection */}
             {hasOptions && (
