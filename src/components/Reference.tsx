@@ -63,96 +63,119 @@ function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string
 }
 
 function NumbersRef() {
+  const [numTab, setNumTab] = useState<string>('basic');
+
+  const tabs = [
+    { id: 'basic', label: '1-10' },
+    { id: 'prices', label: 'Prices' },
+    { id: 'hours', label: 'Hours' },
+    { id: 'minutes', label: 'Minutes' },
+    { id: 'nights', label: 'Nights' },
+    { id: 'people', label: 'People' },
+  ];
+
   return (
-    <div className="mt-2 space-y-4">
-      {/* Basic 1-10 */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">Basic Numbers</p>
-        <RefRow jp="一" rom="i·chi" meaning="1" />
-        <RefRow jp="二" rom="ni" meaning="2" />
-        <RefRow jp="三" rom="san" meaning="3" />
-        <RefRow jp="四" rom="yon" meaning="4 (also shi)" />
-        <RefRow jp="五" rom="go" meaning="5" />
-        <RefRow jp="六" rom="ro·ku" meaning="6" />
-        <RefRow jp="七" rom="na·na" meaning="7 (also shichi)" />
-        <RefRow jp="八" rom="ha·chi" meaning="8" />
-        <RefRow jp="九" rom="kyuu" meaning="9 (also ku)" />
-        <RefRow jp="十" rom="juu" meaning="10" />
+    <div className="mt-2">
+      {/* Tab strip */}
+      <div className="flex gap-1 overflow-x-auto pb-2 mb-2">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setNumTab(t.id)}
+            className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+              numTab === t.id
+                ? 'bg-sakura-500/60 text-white'
+                : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+            }`}
+          >{t.label}</button>
+        ))}
       </div>
 
-      {/* Tens */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">Tens — just add じゅう (juu)</p>
-        <RefRow jp="二十" rom="ni·juu" meaning="20" />
-        <RefRow jp="三十" rom="san·juu" meaning="30" />
-        <RefRow jp="五十" rom="go·juu" meaning="50" />
-        <RefRow jp="百" rom="hya·ku" meaning="100" />
-        <RefRow jp="千" rom="sen" meaning="1,000" />
-        <RefRow jp="万" rom="man" meaning="10,000 (Japanese counts in 万!)" />
-      </div>
+      {numTab === 'basic' && (
+        <div>
+          <RefRow jp="一" rom="i·chi" meaning="1" />
+          <RefRow jp="二" rom="ni" meaning="2" />
+          <RefRow jp="三" rom="san" meaning="3" />
+          <RefRow jp="四" rom="yon" meaning="4 (also shi)" />
+          <RefRow jp="五" rom="go" meaning="5" />
+          <RefRow jp="六" rom="ro·ku" meaning="6" />
+          <RefRow jp="七" rom="na·na" meaning="7 (also shichi)" />
+          <RefRow jp="八" rom="ha·chi" meaning="8" />
+          <RefRow jp="九" rom="kyuu" meaning="9 (also ku)" />
+          <RefRow jp="十" rom="juu" meaning="10" />
+          <div className="mt-2 pt-2 border-t border-slate-700/30">
+            <RefRow jp="二十" rom="ni·juu" meaning="20" />
+            <RefRow jp="三十" rom="san·juu" meaning="30" />
+            <RefRow jp="五十" rom="go·juu" meaning="50" />
+            <RefRow jp="百" rom="hya·ku" meaning="100" />
+            <RefRow jp="千" rom="sen" meaning="1,000" />
+            <RefRow jp="万" rom="man" meaning="10,000 (Japanese counts in 万!)" />
+          </div>
+        </div>
+      )}
 
-      {/* Prices you'll see */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">Common Prices (practice reading!)</p>
-        <RefRow jp="150円" rom="hya·ku go·juu en" meaning="¥150 (convenience store onigiri)" />
-        <RefRow jp="500円" rom="go·hya·ku en" meaning="¥500 (lunch set, goshuin stamp)" />
-        <RefRow jp="800円" rom="hap·pya·ku en" meaning="¥800 (ramen bowl)" />
-        <RefRow jp="1,000円" rom="sen en" meaning="¥1,000 (one bill)" />
-        <RefRow jp="2,500円" rom="ni·sen go·hya·ku en" meaning="¥2,500 (nice dinner)" />
-        <RefRow jp="5,000円" rom="go·sen en" meaning="¥5,000 (tax-free minimum)" />
-        <RefRow jp="10,000円" rom="i·chi·man en" meaning="¥10,000 (one big bill)" />
-      </div>
+      {numTab === 'prices' && (
+        <div>
+          <RefRow jp="150円" rom="hya·ku go·juu en" meaning="¥150 (convenience store onigiri)" />
+          <RefRow jp="500円" rom="go·hya·ku en" meaning="¥500 (lunch set, goshuin stamp)" />
+          <RefRow jp="800円" rom="hap·pya·ku en" meaning="¥800 (ramen bowl)" />
+          <RefRow jp="1,000円" rom="sen en" meaning="¥1,000 (one bill)" />
+          <RefRow jp="2,500円" rom="ni·sen go·hya·ku en" meaning="¥2,500 (nice dinner)" />
+          <RefRow jp="5,000円" rom="go·sen en" meaning="¥5,000 (tax-free minimum)" />
+          <RefRow jp="10,000円" rom="i·chi·man en" meaning="¥10,000 (one big bill)" />
+        </div>
+      )}
 
-      {/* Time */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">Hours — 〜時 (ji)</p>
-        <RefRow jp="1時" rom="i·chi·ji" meaning="1 o'clock" />
-        <RefRow jp="2時" rom="ni·ji" meaning="2 o'clock" />
-        <RefRow jp="3時" rom="san·ji" meaning="3 o'clock" />
-        <RefRow jp="4時" rom="yo·ji" meaning="4 o'clock (NOT yon·ji)" />
-        <RefRow jp="5時" rom="go·ji" meaning="5 o'clock" />
-        <RefRow jp="6時" rom="ro·ku·ji" meaning="6 o'clock" />
-        <RefRow jp="7時" rom="shi·chi·ji" meaning="7 o'clock" />
-        <RefRow jp="8時" rom="ha·chi·ji" meaning="8 o'clock" />
-        <RefRow jp="9時" rom="ku·ji" meaning="9 o'clock (NOT kyuu·ji)" />
-        <RefRow jp="10時" rom="juu·ji" meaning="10 o'clock" />
-        <RefRow jp="11時" rom="juu·i·chi·ji" meaning="11 o'clock" />
-        <RefRow jp="12時" rom="juu·ni·ji" meaning="12 o'clock" />
-      </div>
+      {numTab === 'hours' && (
+        <div>
+          <RefRow jp="1時" rom="i·chi·ji" meaning="1 o'clock" />
+          <RefRow jp="2時" rom="ni·ji" meaning="2 o'clock" />
+          <RefRow jp="3時" rom="san·ji" meaning="3 o'clock" />
+          <RefRow jp="4時" rom="yo·ji" meaning="4 o'clock (NOT yon·ji)" />
+          <RefRow jp="5時" rom="go·ji" meaning="5 o'clock" />
+          <RefRow jp="6時" rom="ro·ku·ji" meaning="6 o'clock" />
+          <RefRow jp="7時" rom="shi·chi·ji" meaning="7 o'clock" />
+          <RefRow jp="8時" rom="ha·chi·ji" meaning="8 o'clock" />
+          <RefRow jp="9時" rom="ku·ji" meaning="9 o'clock (NOT kyuu·ji)" />
+          <RefRow jp="10時" rom="juu·ji" meaning="10 o'clock" />
+          <RefRow jp="11時" rom="juu·i·chi·ji" meaning="11 o'clock" />
+          <RefRow jp="12時" rom="juu·ni·ji" meaning="12 o'clock" />
+        </div>
+      )}
 
-      {/* Minutes */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">Minutes — 〜分 (fun/pun) — tricky!</p>
-        <RefRow jp="1分" rom="ip·pun" meaning="1 min ⚠️" />
-        <RefRow jp="2分" rom="ni·fun" meaning="2 min" />
-        <RefRow jp="3分" rom="san·pun" meaning="3 min ⚠️" />
-        <RefRow jp="4分" rom="yon·pun" meaning="4 min ⚠️" />
-        <RefRow jp="5分" rom="go·fun" meaning="5 min" />
-        <RefRow jp="10分" rom="jup·pun" meaning="10 min ⚠️" />
-        <RefRow jp="15分" rom="juu·go·fun" meaning="15 min" />
-        <RefRow jp="30分" rom="san·jup·pun" meaning="30 min (half)" />
-        <RefRow jp="半" rom="han" meaning="half (3時半 = 3:30)" />
-      </div>
+      {numTab === 'minutes' && (
+        <div>
+          <RefRow jp="1分" rom="ip·pun" meaning="1 min ⚠️" />
+          <RefRow jp="2分" rom="ni·fun" meaning="2 min" />
+          <RefRow jp="3分" rom="san·pun" meaning="3 min ⚠️" />
+          <RefRow jp="4分" rom="yon·pun" meaning="4 min ⚠️" />
+          <RefRow jp="5分" rom="go·fun" meaning="5 min" />
+          <RefRow jp="10分" rom="jup·pun" meaning="10 min ⚠️" />
+          <RefRow jp="15分" rom="juu·go·fun" meaning="15 min" />
+          <RefRow jp="30分" rom="san·jup·pun" meaning="30 min (half)" />
+          <RefRow jp="半" rom="han" meaning="half (3時半 = 3:30)" />
+        </div>
+      )}
 
-      {/* Days */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">Days of Stay — 〜泊 (haku/paku)</p>
-        <RefRow jp="一泊" rom="ip·pa·ku" meaning="1 night ⚠️" />
-        <RefRow jp="二泊" rom="ni·ha·ku" meaning="2 nights" />
-        <RefRow jp="三泊" rom="san·pa·ku" meaning="3 nights ⚠️" />
-        <RefRow jp="四泊" rom="yon·ha·ku" meaning="4 nights" />
-        <RefRow jp="五泊" rom="go·ha·ku" meaning="5 nights" />
-      </div>
+      {numTab === 'nights' && (
+        <div>
+          <RefRow jp="一泊" rom="ip·pa·ku" meaning="1 night ⚠️" />
+          <RefRow jp="二泊" rom="ni·ha·ku" meaning="2 nights" />
+          <RefRow jp="三泊" rom="san·pa·ku" meaning="3 nights ⚠️" />
+          <RefRow jp="四泊" rom="yon·ha·ku" meaning="4 nights" />
+          <RefRow jp="五泊" rom="go·ha·ku" meaning="5 nights" />
+        </div>
+      )}
 
-      {/* People */}
-      <div>
-        <p className="text-base text-slate-500 mb-1">People — 〜人 (special readings!)</p>
-        <RefRow jp="ひとり" rom="hi·to·ri" meaning="1 person (NOT ichi·nin)" />
-        <RefRow jp="ふたり" rom="fu·ta·ri" meaning="2 people (NOT ni·nin) ← your default!" />
-        <RefRow jp="三人" rom="san·nin" meaning="3 people" />
-        <RefRow jp="四人" rom="yo·nin" meaning="4 people (NOT yon·nin)" />
-        <RefRow jp="五人" rom="go·nin" meaning="5 people" />
-      </div>
+      {numTab === 'people' && (
+        <div>
+          <RefRow jp="ひとり" rom="hi·to·ri" meaning="1 person (NOT ichi·nin)" />
+          <RefRow jp="ふたり" rom="fu·ta·ri" meaning="2 people (NOT ni·nin) ← your default!" />
+          <RefRow jp="三人" rom="san·nin" meaning="3 people" />
+          <RefRow jp="四人" rom="yo·nin" meaning="4 people (NOT yon·nin)" />
+          <RefRow jp="五人" rom="go·nin" meaning="5 people" />
+        </div>
+      )}
     </div>
   );
 }
