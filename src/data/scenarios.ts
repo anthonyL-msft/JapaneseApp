@@ -1,3 +1,11 @@
+export interface ResponseOption {
+  target: string;
+  pronunciation: string;
+  pronunciation_chunks?: string;
+  english: string;
+  chinese_tc: string;
+}
+
 export interface ConversationLine {
   speaker: 'staff' | 'you';
   target: string;
@@ -6,6 +14,7 @@ export interface ConversationLine {
   english: string;
   chinese_tc: string;
   note?: string;
+  options?: ResponseOption[];  // multiple response choices for "you" lines
 }
 
 export interface Scenario {
@@ -83,7 +92,11 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: 'すみません、お会計お願いします', pronunciation: 'sumimasen, okaikei onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, o·kai·kei o·ne·gai·shi·ma·su', english: 'Excuse me, check please', chinese_tc: '不好意思，請結帳', note: 'Raise your hand to get attention' },
       { speaker: 'staff', target: 'はい、少々お待ちください', pronunciation: 'hai, shoushou omachi kudasai', pronunciation_chunks: 'hai, shou·shou o·ma·chi ku·da·sai', english: 'Yes, one moment please', chinese_tc: '好的，請稍等' },
       { speaker: 'staff', target: 'お会計は3,800円になります', pronunciation: 'okaikei wa sanzen happyaku en ni narimasu', pronunciation_chunks: 'o·kai·kei wa san·zen hap·pya·ku en ni na·ri·ma·su', english: 'The total is 3,800 yen', chinese_tc: '總共3,800日圓' },
-      { speaker: 'you', target: 'クレジットカードは使えますか？', pronunciation: 'kurejitto kaado wa tsukaemasu ka?', pronunciation_chunks: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', english: 'Can I use a credit card?', chinese_tc: '可以用信用卡嗎？' },
+      { speaker: 'you', target: 'クレジットカードは使えますか？', pronunciation: 'kurejitto kaado wa tsukaemasu ka?', pronunciation_chunks: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', english: 'Can I use a credit card?', chinese_tc: '可以用信用卡嗎？', options: [
+        { target: 'クレジットカードは使えますか？', pronunciation: 'kurejitto kaado wa tsukaemasu ka?', pronunciation_chunks: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', english: 'Can I use a credit card?', chinese_tc: '可以用信用卡嗎？' },
+        { target: '現金でお願いします', pronunciation: 'genkin de onegaishimasu', pronunciation_chunks: 'gen·kin de o·ne·gai·shi·ma·su', english: 'Cash please', chinese_tc: '用現金' },
+        { target: 'Suicaで払えますか？', pronunciation: 'suika de haraemasu ka?', pronunciation_chunks: 'sui·ka de ha·ra·e·ma·su ka', english: 'Can I pay with Suica?', chinese_tc: '可以用Suica付嗎？' },
+      ] },
       { speaker: 'staff', target: 'はい、大丈夫です', pronunciation: 'hai, daijoubu desu', pronunciation_chunks: 'hai, dai·jou·bu de·su', english: 'Yes, that\'s fine', chinese_tc: '可以的' },
       { speaker: 'you', target: 'ごちそうさまでした', pronunciation: 'gochisousama deshita', pronunciation_chunks: 'go·chi·sou·sa·ma de·shi·ta', english: 'Thank you for the meal', chinese_tc: '多謝款待', note: 'Always say this when leaving a restaurant!' },
       { speaker: 'staff', target: 'ありがとうございました！', pronunciation: 'arigatou gozaimashita!', pronunciation_chunks: 'a·ri·ga·tou go·zai·ma·shi·ta', english: 'Thank you very much!', chinese_tc: '非常感謝！' },
@@ -101,11 +114,21 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'ポイントカードはお持ちですか？', pronunciation: 'pointo kaado wa omochi desu ka?', pronunciation_chunks: 'poi·n·to kaa·do wa o·mo·chi de·su ka', english: 'Do you have a point card?', chinese_tc: '有集點卡嗎？' },
       { speaker: 'you', target: '持っていません', pronunciation: 'motte imasen', pronunciation_chunks: 'mot·te i·ma·sen', english: 'I don\'t have one', chinese_tc: '我沒有' },
       { speaker: 'staff', target: '温めますか？', pronunciation: 'atatamemasu ka?', pronunciation_chunks: 'a·ta·ta·me·ma·su ka', english: 'Shall I heat it up?', chinese_tc: '需要加熱嗎？', note: 'For bento or onigiri' },
-      { speaker: 'you', target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes, please', chinese_tc: '好的，麻煩了' },
+      { speaker: 'you', target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes, please', chinese_tc: '好的，麻煩了', options: [
+        { target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes, please', chinese_tc: '好的，麻煩了' },
+        { target: 'いいえ、大丈夫です', pronunciation: 'iie, daijoubu desu', pronunciation_chunks: 'ii·e, dai·jou·bu de·su', english: 'No, it\'s fine', chinese_tc: '不用了' },
+      ] },
       { speaker: 'staff', target: '袋はご利用ですか？', pronunciation: 'fukuro wa goriyou desu ka?', pronunciation_chunks: 'fu·ku·ro wa go·ri·you de·su ka', english: 'Would you like a bag?', chinese_tc: '需要袋子嗎？' },
-      { speaker: 'you', target: '大丈夫です', pronunciation: 'daijoubu desu', pronunciation_chunks: 'dai·jou·bu de·su', english: 'No thanks', chinese_tc: '不用了' },
+      { speaker: 'you', target: '大丈夫です', pronunciation: 'daijoubu desu', pronunciation_chunks: 'dai·jou·bu de·su', english: 'No thanks', chinese_tc: '不用了', options: [
+        { target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes, please', chinese_tc: '好的，麻煩了' },
+        { target: '大丈夫です', pronunciation: 'daijoubu desu', pronunciation_chunks: 'dai·jou·bu de·su', english: 'No thanks', chinese_tc: '不用了' },
+      ] },
       { speaker: 'staff', target: '370円になります', pronunciation: 'sanbyaku nanajuu en ni narimasu', pronunciation_chunks: 'san·bya·ku na·na·juu en ni na·ri·ma·su', english: 'That\'ll be 370 yen', chinese_tc: '370日圓' },
-      { speaker: 'you', target: 'Suicaで', pronunciation: 'suika de', pronunciation_chunks: 'sui·ka de', english: 'With Suica (IC card)', chinese_tc: '用Suica', note: 'Just tap your IC card on the reader' },
+      { speaker: 'you', target: 'Suicaで', pronunciation: 'suika de', pronunciation_chunks: 'sui·ka de', english: 'With Suica (IC card)', chinese_tc: '用Suica', note: 'Just tap your IC card on the reader', options: [
+        { target: 'Suicaで', pronunciation: 'suika de', pronunciation_chunks: 'sui·ka de', english: 'With Suica (IC card)', chinese_tc: '用Suica' },
+        { target: '現金で', pronunciation: 'genkin de', pronunciation_chunks: 'gen·kin de', english: 'Cash', chinese_tc: '用現金' },
+        { target: 'クレジットカードで', pronunciation: 'kurejitto kaado de', pronunciation_chunks: 'ku·re·jit·to kaa·do de', english: 'By credit card', chinese_tc: '用信用卡' },
+      ] },
       { speaker: 'staff', target: 'ありがとうございました！', pronunciation: 'arigatou gozaimashita!', pronunciation_chunks: 'a·ri·ga·tou go·zai·ma·shi·ta', english: 'Thank you!', chinese_tc: '謝謝！' },
     ],
   },
@@ -155,7 +178,10 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: 'すみません、京都までの新幹線の切符を二枚お願いします', pronunciation: 'sumimasen, kyouto made no shinkansen no kippu wo nimai onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, kyou·to ma·de no shin·kan·sen no kip·pu wo ni·mai o·ne·gai·shi·ma·su', english: 'Two Shinkansen tickets to Kyoto please', chinese_tc: '請給我兩張到京都的新幹線車票' },
       { speaker: 'staff', target: '指定席ですか、自由席ですか？', pronunciation: 'shiteiseki desu ka, jiyuuseki desu ka?', pronunciation_chunks: 'shi·tei·se·ki de·su ka, ji·yuu·se·ki de·su ka', english: 'Reserved or non-reserved seat?', chinese_tc: '對號座還是自由座？' },
-      { speaker: 'you', target: '指定席をお願いします', pronunciation: 'shiteiseki wo onegaishimasu', pronunciation_chunks: 'shi·tei·se·ki wo o·ne·gai·shi·ma·su', english: 'Reserved seats please', chinese_tc: '請給我對號座' },
+      { speaker: 'you', target: '指定席をお願いします', pronunciation: 'shiteiseki wo onegaishimasu', pronunciation_chunks: 'shi·tei·se·ki wo o·ne·gai·shi·ma·su', english: 'Reserved seats please', chinese_tc: '請給我對號座', options: [
+        { target: '指定席をお願いします', pronunciation: 'shiteiseki wo onegaishimasu', pronunciation_chunks: 'shi·tei·se·ki wo o·ne·gai·shi·ma·su', english: 'Reserved seats please', chinese_tc: '請給我對號座' },
+        { target: '自由席でお願いします', pronunciation: 'jiyuuseki de onegaishimasu', pronunciation_chunks: 'ji·yuu·se·ki de o·ne·gai·shi·ma·su', english: 'Non-reserved seats please', chinese_tc: '請給我自由座' },
+      ] },
       { speaker: 'staff', target: '何時ごろのご希望ですか？', pronunciation: 'nanji goro no go-kibou desu ka?', pronunciation_chunks: 'nan·ji go·ro no go·ki·bou de·su ka', english: 'Around what time would you like?', chinese_tc: '您希望大約幾點的？' },
       { speaker: 'you', target: '午前10時ごろでお願いします', pronunciation: 'gozen juuji goro de onegaishimasu', pronunciation_chunks: 'go·zen juu·ji go·ro de o·ne·gai·shi·ma·su', english: 'Around 10am please', chinese_tc: '請給我上午10點左右的' },
       { speaker: 'staff', target: '10時10分ののぞみ号がございます。隣同士のお席でよろしいですか？', pronunciation: 'juuji juppun no nozomi-gou ga gozaimasu. tonari doushi no oseki de yoroshii desu ka?', pronunciation_chunks: 'juu·ji jup·pun no no·zo·mi·gou ga go·zai·ma·su. to·na·ri dou·shi no o·se·ki de yo·ro·shii de·su ka', english: 'There\'s a Nozomi at 10:10. Seats next to each other OK?', chinese_tc: '有10點10分的希望號。相鄰座位可以嗎？' },
@@ -207,9 +233,16 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'いらっしゃいませ！食券をお願いします', pronunciation: 'irasshaimase! shokken wo onegaishimasu', pronunciation_chunks: 'i·ras·shai·ma·se! shok·ken wo o·ne·gai·shi·ma·su', english: 'Welcome! Meal tickets please.', chinese_tc: '歡迎光臨！請出示餐券', note: 'Many ramen shops use ticket machines at the entrance. Buy ticket first!' },
       { speaker: 'you', target: '（食券を渡す）', pronunciation: '(shokken wo watasu)', english: '(hand over meal tickets)', chinese_tc: '（遞出餐券）', note: 'Buy 2 tickets from the machine and hand them to the staff' },
       { speaker: 'staff', target: '麺の硬さはどうしますか？', pronunciation: 'men no katasa wa dou shimasu ka?', pronunciation_chunks: 'men no ka·ta·sa wa dou shi·ma·su ka', english: 'How firm would you like the noodles?', chinese_tc: '麵的硬度要怎樣？', note: 'Options: 硬め (katame/firm), 普通 (futsuu/normal), やわらかめ (yawarakame/soft)' },
-      { speaker: 'you', target: '普通でお願いします', pronunciation: 'futsuu de onegaishimasu', pronunciation_chunks: 'fu·tsuu de o·ne·gai·shi·ma·su', english: 'Normal please', chinese_tc: '普通的就好' },
+      { speaker: 'you', target: '普通でお願いします', pronunciation: 'futsuu de onegaishimasu', pronunciation_chunks: 'fu·tsuu de o·ne·gai·shi·ma·su', english: 'Normal please', chinese_tc: '普通的就好', options: [
+        { target: '硬めでお願いします', pronunciation: 'katame de onegaishimasu', pronunciation_chunks: 'ka·ta·me de o·ne·gai·shi·ma·su', english: 'Firm please', chinese_tc: '硬一點' },
+        { target: '普通でお願いします', pronunciation: 'futsuu de onegaishimasu', pronunciation_chunks: 'fu·tsuu de o·ne·gai·shi·ma·su', english: 'Normal please', chinese_tc: '普通的就好' },
+        { target: 'やわらかめでお願いします', pronunciation: 'yawarakame de onegaishimasu', pronunciation_chunks: 'ya·wa·ra·ka·me de o·ne·gai·shi·ma·su', english: 'Soft please', chinese_tc: '軟一點' },
+      ] },
       { speaker: 'staff', target: 'にんにくは入れますか？', pronunciation: 'ninniku wa iremasu ka?', pronunciation_chunks: 'nin·ni·ku wa i·re·ma·su ka', english: 'Would you like garlic?', chinese_tc: '要加蒜頭嗎？' },
-      { speaker: 'you', target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes please', chinese_tc: '好的，麻煩了' },
+      { speaker: 'you', target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes please', chinese_tc: '好的，麻煩了', options: [
+        { target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes please', chinese_tc: '好的，麻煩了' },
+        { target: 'いいえ、大丈夫です', pronunciation: 'iie, daijoubu desu', pronunciation_chunks: 'ii·e, dai·jou·bu de·su', english: 'No thanks', chinese_tc: '不用了' },
+      ] },
       { speaker: 'staff', target: 'お待たせしました、どうぞ', pronunciation: 'omatase shimashita, douzo', pronunciation_chunks: 'o·ma·ta·se shi·ma·shi·ta, dou·zo', english: 'Sorry for the wait, here you go', chinese_tc: '讓您久等了，請用' },
       { speaker: 'you', target: 'いただきます！', pronunciation: 'itadakimasu!', pronunciation_chunks: 'i·ta·da·ki·ma·su', english: 'Let\'s eat! (before eating)', chinese_tc: '我開動了！' },
       { speaker: 'you', target: 'ごちそうさまでした', pronunciation: 'gochisousama deshita', pronunciation_chunks: 'go·chi·sou·sa·ma de·shi·ta', english: 'Thank you for the meal', chinese_tc: '多謝款待', note: 'Say this when leaving' },

@@ -219,12 +219,23 @@ export function Scenarios({ lang, langConfig }: Props) {
 function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; index: number; ttsLang: string }) {
   const isStaff = line.speaker === 'staff';
   const [showDetail, setShowDetail] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
+  const hasOptions = line.options && line.options.length > 0;
+  const displayLine = hasOptions && selectedOption !== null
+    ? { ...line, ...line.options![selectedOption] }
+    : line;
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!line.target.startsWith('（')) {
-      speak(line.target, ttsLang);
+    if (!displayLine.target.startsWith('（')) {
+      speak(displayLine.target, ttsLang);
     }
+  };
+
+  const handleSelectOption = (idx: number) => {
+    setSelectedOption(idx);
+    speak(line.options![idx].target, ttsLang);
   };
 
   return (
@@ -235,40 +246,70 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
           {isStaff ? '🧑‍🍳 Staff' : '👤 You'}
         </p>
 
-        {/* Bubble */}
-        <div
-          onClick={() => setShowDetail(!showDetail)}
-          className={`rounded-2xl p-3 cursor-pointer active:opacity-80 transition ${
-            isStaff
-              ? 'bg-slate-800 rounded-tl-sm'
-              : 'bg-indigo-900/60 rounded-tr-sm'
-          }`}
-        >
-          <div className="flex items-start gap-2">
-            <div className="flex-1 min-w-0">
-              <p className="text-base text-slate-50">{line.target}</p>
-              <p className="text-sm text-sakura-300 mt-0.5">{line.pronunciation_chunks || line.pronunciation}</p>
+        {/* Options selector — show before the bubble when there are choices */}
+        {hasOptions && selectedOption === null && (
+          <div className="mb-2 space-y-1.5">
+            <p className="text-[10px] text-slate-500 text-right">Choose your response:</p>
+            {line.options!.map((opt, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSelectOption(idx)}
+                className="w-full bg-indigo-900/30 border border-indigo-700/40 rounded-xl p-2.5 text-left active:bg-indigo-800/50 transition"
+              >
+                <p className="text-sm text-slate-100">{opt.target}</p>
+                <p className="text-xs text-sakura-300 mt-0.5">{opt.pronunciation_chunks || opt.pronunciation}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{opt.english} · {opt.chinese_tc}</p>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Bubble — show after selection (or immediately if no options) */}
+        {(!hasOptions || selectedOption !== null) && (
+          <div
+            onClick={() => setShowDetail(!showDetail)}
+            className={`rounded-2xl p-3 cursor-pointer active:opacity-80 transition ${
+              isStaff
+                ? 'bg-slate-800 rounded-tl-sm'
+                : 'bg-indigo-900/60 rounded-tr-sm'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-base text-slate-50">{displayLine.target}</p>
+                <p className="text-sm text-sakura-300 mt-0.5">{displayLine.pronunciation_chunks || displayLine.pronunciation}</p>
+              </div>
+              {!displayLine.target.startsWith('（') && (
+                <button onClick={handleSpeak} className="text-lg shrink-0 p-1 active:scale-110 transition-transform">
+                  🔊
+                </button>
+              )}
             </div>
-            {!line.target.startsWith('（') && (
-              <button onClick={handleSpeak} className="text-lg shrink-0 p-1 active:scale-110 transition-transform">
-                🔊
+
+            {/* Always show translation */}
+            <div className="mt-2 pt-2 border-t border-slate-700/40">
+              <p className="text-sm text-slate-300">{displayLine.english}</p>
+              <p className="text-xs text-slate-500">{displayLine.chinese_tc}</p>
+            </div>
+
+            {/* Change selection */}
+            {hasOptions && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelectedOption(null); }}
+                className="mt-2 text-[10px] text-indigo-400 active:text-indigo-300"
+              >
+                ↻ Choose different response
               </button>
             )}
-          </div>
 
-          {/* Always show translation */}
-          <div className="mt-2 pt-2 border-t border-slate-700/40">
-            <p className="text-sm text-slate-300">{line.english}</p>
-            <p className="text-xs text-slate-500">{line.chinese_tc}</p>
+            {/* Expanded detail */}
+            {showDetail && line.note && (
+              <div className="mt-2 bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
+                <p className="text-xs text-amber-400">💡 {line.note}</p>
+              </div>
+            )}
           </div>
-
-          {/* Expanded detail */}
-          {showDetail && line.note && (
-            <div className="mt-2 bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-              <p className="text-xs text-amber-400">💡 {line.note}</p>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
