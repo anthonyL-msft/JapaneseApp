@@ -21,11 +21,11 @@
 html, body, #root {
   height: 100%;
   overflow: hidden;
+  background-color: #020617;
 }
 
 body {
   @apply bg-slate-950 text-slate-100 font-sans;
-  padding-bottom: var(--safe-bottom);
 }
 
 /* Scrollbar styling */
