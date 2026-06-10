@@ -78,19 +78,21 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
         {/* Quick Note Input */}
         <div className="bg-slate-800/60 rounded-xl p-3">
           <p className="text-base text-slate-400 mb-2">Quick Note</p>
-          <div className="flex gap-2">
-            <input
-              type="text"
+          <div className="flex gap-2 items-end">
+            <textarea
               value={newNoteText}
               onChange={e => setNewNoteText(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSaveStandalone()}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSaveStandalone(); } }}
               placeholder="WiFi password, restaurant name..."
-              className="flex-1 bg-slate-700/50 text-base text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-sakura-400/50"
+              rows={1}
+              className="flex-1 bg-slate-700/50 text-base text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-sakura-400/50 resize-none min-h-[44px] max-h-[120px]"
+              style={{ height: 'auto', overflow: 'hidden' }}
+              ref={el => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } }}
             />
             <button
               onClick={handleSaveStandalone}
               disabled={!newNoteText.trim()}
-              className="bg-sakura-500/80 text-base text-white px-4 py-2.5 rounded-xl disabled:opacity-30 active:bg-sakura-600 transition"
+              className="bg-sakura-500/80 text-base text-white px-4 py-2.5 rounded-xl disabled:opacity-30 active:bg-sakura-600 transition shrink-0"
             >
               Add
             </button>
@@ -151,7 +153,7 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
                   .sort((a, b) => b.updatedAt - a.updatedAt)
                   .map(note => (
                     <div key={note.id} className="bg-slate-700/30 rounded-xl p-3 flex items-start gap-2">
-                      <p className="text-base text-slate-200 flex-1">{note.text}</p>
+                      <p className="text-base text-slate-200 flex-1 whitespace-pre-wrap">{note.text}</p>
                       <button
                         onClick={() => onDeleteNote(note.id)}
                         className="text-base text-slate-500 hover:text-red-400 shrink-0"
@@ -186,24 +188,26 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
                     .map(note => (
                       <div key={note.id} className="bg-slate-700/30 rounded-xl p-3">
                         {editingId === note.id ? (
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
+                          <div className="space-y-2">
+                            <textarea
                               value={editText}
                               onChange={e => setEditText(e.target.value)}
                               onKeyDown={e => {
-                                if (e.key === 'Enter') handleSaveEdit();
+                                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSaveEdit(); }
                                 if (e.key === 'Escape') { setEditingId(null); setEditText(''); }
                               }}
                               autoFocus
-                              className="flex-1 bg-slate-600/50 text-base text-slate-200 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-sakura-400/50"
+                              rows={2}
+                              className="w-full bg-slate-600/50 text-base text-slate-200 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-sakura-400/50 resize-none min-h-[60px] max-h-[150px]"
                             />
-                            <button onClick={handleSaveEdit} className="text-base text-sakura-400 active:text-sakura-300 px-2">✓</button>
-                            <button onClick={() => { setEditingId(null); setEditText(''); }} className="text-base text-slate-500 active:text-slate-300 px-2">✕</button>
+                            <div className="flex gap-2 justify-end">
+                              <button onClick={() => { setEditingId(null); setEditText(''); }} className="text-base text-slate-500 active:text-slate-300 px-3 py-1 rounded-lg bg-slate-700/50">Cancel</button>
+                              <button onClick={handleSaveEdit} className="text-base text-white active:bg-sakura-600 px-3 py-1 rounded-lg bg-sakura-500/80">Save</button>
+                            </div>
                           </div>
                         ) : (
                           <div className="flex items-start gap-2">
-                            <p className="text-base text-slate-200 flex-1">{note.text}</p>
+                            <p className="text-base text-slate-200 flex-1 whitespace-pre-wrap">{note.text}</p>
                             <button
                               onClick={() => { setEditText(note.text); setEditingId(note.id); }}
                               className="text-base text-slate-500 hover:text-slate-300 shrink-0"
