@@ -33,7 +33,10 @@ export async function askHowToSay(query: string, lang: string): Promise<AIPhrase
 - "chinese_tc": Traditional Chinese translation
 - "notes": usage tips, politeness level, or context
 - "native_hint": kanji meaning bridge for Chinese speakers (if applicable)
-Use polite/travel-appropriate forms. Default to 2 people context.`,
+Use CASUAL POLITE (丁寧語/masu form) — NOT humble/honorific (謙譲語/尊敬語). 
+Keep phrases short and easy to say for beginners. 
+Prefer 〜てもらえますか over 〜ていただけますか, 〜でいいですか over 〜でよろしいでしょうか.
+Default to 2 people context. Avoid unnecessarily long or formal expressions.`,
     es: `Translate to Spanish. Include:
 - "target": the phrase in Spanish
 - "pronunciation": phonetic pronunciation guide
