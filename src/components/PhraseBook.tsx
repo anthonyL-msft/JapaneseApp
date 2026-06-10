@@ -64,12 +64,6 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                 🃏 Cards
               </button>
             )}
-            <button
-              onClick={() => setShowReference(true)}
-              className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
-            >
-              📚 Ref
-            </button>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">

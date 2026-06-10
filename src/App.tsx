@@ -16,6 +16,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'scenes', label: 'Scenes', icon: '🎭' },
   { id: 'ai', label: 'Ask AI', icon: '🤖' },
   { id: 'bookmarks', label: 'My Stuff', icon: '📌' },
+  { id: 'reference', label: 'Ref', icon: '📚' },
 ];
 
 function App() {
