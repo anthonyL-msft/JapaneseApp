@@ -24,9 +24,21 @@ export interface ConversationLine {
   variables?: Variable[];      // swappable placeholders (destinations, times, etc.)
 }
 
+export type ScenarioGroup = 'dining' | 'travel' | 'accommodation' | 'shopping' | 'sightseeing' | 'emergency';
+
+export const SCENARIO_GROUPS: Record<ScenarioGroup, { label: string; emoji: string }> = {
+  dining:        { label: 'Dining & Drinks', emoji: '🍽️' },
+  travel:        { label: 'Getting Around', emoji: '🚃' },
+  accommodation: { label: 'Accommodation', emoji: '🏨' },
+  shopping:      { label: 'Shopping & Daily', emoji: '🛍️' },
+  sightseeing:   { label: 'Sightseeing', emoji: '📸' },
+  emergency:     { label: 'Help & Emergency', emoji: '🆘' },
+};
+
 export interface Scenario {
   id: string;
   lang: string;
+  group: ScenarioGroup;
   title: string;
   titleTC: string;
   emoji: string;
@@ -41,6 +53,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc01',
     lang: 'ja',
+    group: 'dining',
     title: 'Entering a Restaurant',
     titleTC: '進入餐廳',
     emoji: '🚪',
@@ -59,6 +72,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc02',
     lang: 'ja',
+    group: 'dining',
     title: 'Entering with Reservation',
     titleTC: '有預約進入餐廳',
     emoji: '📋',
@@ -82,6 +96,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc03',
     lang: 'ja',
+    group: 'dining',
     title: 'Ordering Food',
     titleTC: '點餐',
     emoji: '📝',
@@ -99,6 +114,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc04',
     lang: 'ja',
+    group: 'dining',
     title: 'Paying the Bill',
     titleTC: '結帳',
     emoji: '💳',
@@ -120,6 +136,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc05',
     lang: 'ja',
+    group: 'shopping',
     title: 'Convenience Store',
     titleTC: '便利商店',
     emoji: '🏪',
@@ -150,6 +167,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc06',
     lang: 'ja',
+    group: 'accommodation',
     title: 'Hotel Check-in',
     titleTC: '飯店入住',
     emoji: '🏨',
@@ -177,6 +195,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc07',
     lang: 'ja',
+    group: 'travel',
     title: 'Taking a Taxi',
     titleTC: '搭計程車',
     emoji: '🚕',
@@ -194,6 +213,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc08',
     lang: 'ja',
+    group: 'travel',
     title: 'Buying Train Tickets',
     titleTC: '買車票',
     emoji: '🚃',
@@ -224,6 +244,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc09',
     lang: 'ja',
+    group: 'travel',
     title: 'Asking for Directions',
     titleTC: '問路',
     emoji: '🗺️',
@@ -252,6 +273,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc10',
     lang: 'ja',
+    group: 'shopping',
     title: 'Shopping — Tax Free',
     titleTC: '免稅購物',
     emoji: '🛍️',
@@ -269,6 +291,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc11',
     lang: 'ja',
+    group: 'dining',
     title: 'Ramen Shop',
     titleTC: '拉麵店',
     emoji: '🍜',
@@ -300,6 +323,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc12',
     lang: 'ja',
+    group: 'dining',
     title: 'Izakaya (Japanese Pub)',
     titleTC: '居酒屋',
     emoji: '🍶',
@@ -329,6 +353,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc13',
     lang: 'ja',
+    group: 'dining',
     title: 'Sushi Counter',
     titleTC: '壽司吧台',
     emoji: '🍣',
@@ -355,6 +380,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc14',
     lang: 'ja',
+    group: 'accommodation',
     title: 'Hotel Check-out & Luggage',
     titleTC: '退房寄放行李',
     emoji: '🧳',
@@ -384,6 +410,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc15',
     lang: 'ja',
+    group: 'sightseeing',
     title: 'Visiting a Temple / Shrine',
     titleTC: '參觀寺廟/神社',
     emoji: '⛩️',
@@ -403,6 +430,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc16',
     lang: 'ja',
+    group: 'sightseeing',
     title: 'Onsen (Hot Spring)',
     titleTC: '溫泉',
     emoji: '♨️',
@@ -420,6 +448,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc17',
     lang: 'ja',
+    group: 'emergency',
     title: 'Lost Item / Forgot Something',
     titleTC: '遺失物品',
     emoji: '😰',
@@ -453,6 +482,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc18',
     lang: 'ja',
+    group: 'dining',
     title: 'Café Order',
     titleTC: '咖啡廳點餐',
     emoji: '☕',
@@ -481,6 +511,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc19',
     lang: 'ja',
+    group: 'emergency',
     title: 'At the Pharmacy',
     titleTC: '藥局',
     emoji: '💊',
@@ -511,6 +542,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc20',
     lang: 'ja',
+    group: 'sightseeing',
     title: 'Taking Photos Together',
     titleTC: '請人拍照',
     emoji: '📸',
@@ -527,6 +559,117 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: 'もう一枚お願いしてもいいですか？', pronunciation: 'mou ichimai onegaishite mo ii desu ka?', pronunciation_chunks: 'mou i·chi·mai o·ne·gai·shi·te mo ii de·su ka', english: 'Could you take one more?', chinese_tc: '可以再拍一張嗎？' },
       { speaker: 'staff', target: 'はい、もちろん！', pronunciation: 'hai, mochiron!', pronunciation_chunks: 'hai, mo·chi·ron', english: 'Yes, of course!', chinese_tc: '好的，當然！' },
       { speaker: 'you', target: 'ありがとうございます！とても上手です', pronunciation: 'arigatou gozaimasu! totemo jouzu desu', pronunciation_chunks: 'a·ri·ga·tou go·zai·ma·su! to·te·mo jou·zu de·su', english: 'Thank you! You\'re very good (at taking photos)', chinese_tc: '謝謝！拍得好好', note: 'Japanese people love compliments — this will make their day!' },
+    ],
+  },
+
+  // ============================================================
+  // NAGOYA-TOKYO WINTER TRIP SCENARIOS
+  // ============================================================
+
+  {
+    id: 'sc21',
+    lang: 'ja',
+    group: 'travel',
+    title: 'Nagoya to Tokyo Shinkansen',
+    titleTC: '名古屋到東京新幹線',
+    emoji: '🚅',
+    description: 'Buying Nagoya→Tokyo Nozomi tickets at the counter',
+    lines: [
+      { speaker: 'you', target: 'すみません、名古屋から東京までの新幹線の切符を二枚お願いします', pronunciation: 'sumimasen, nagoya kara toukyou made no shinkansen no kippu wo nimai onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, na·go·ya ka·ra tou·kyou ma·de no shin·kan·sen no kip·pu wo ni·mai o·ne·gai·shi·ma·su', english: 'Two Shinkansen tickets from Nagoya to Tokyo please', chinese_tc: '請給我兩張名古屋到東京的新幹線車票', variables: [
+        { placeholder: '東京', label: 'Destination', options: [
+          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo' },
+          { value: '品川', pronunciation: 'shi·na·ga·wa', english: 'Shinagawa' },
+          { value: '新横浜', pronunciation: 'shin·yo·ko·ha·ma', english: 'Shin-Yokohama' },
+          { value: '京都', pronunciation: 'kyou·to', english: 'Kyoto' },
+          { value: '新大阪', pronunciation: 'shin·oo·sa·ka', english: 'Shin-Osaka' },
+        ] },
+      ] },
+      { speaker: 'staff', target: 'のぞみでよろしいですか？指定席と自由席、どちらにしますか？', pronunciation: 'nozomi de yoroshii desu ka? shiteiseki to jiyuuseki, dochira ni shimasu ka?', pronunciation_chunks: 'no·zo·mi de yo·ro·shii de·su ka? shi·tei·se·ki to ji·yuu·se·ki, do·chi·ra ni shi·ma·su ka', english: 'Nozomi OK? Reserved or non-reserved?', chinese_tc: '搭希望號可以嗎？對號座還是自由座？' },
+      { speaker: 'you', target: 'のぞみの指定席でお願いします。窓側がいいのですが', pronunciation: 'nozomi no shiteiseki de onegaishimasu. madogawa ga ii no desu ga', pronunciation_chunks: 'no·zo·mi no shi·tei·se·ki de o·ne·gai·shi·ma·su. ma·do·ga·wa ga ii no de·su ga', english: 'Nozomi reserved seats please. Window side would be nice.', chinese_tc: '請給我希望號對號座。希望靠窗', note: 'Nagoya→Tokyo is about 1h40m by Nozomi. 窓側=window, 通路側=aisle', options: [
+        { target: 'のぞみの指定席でお願いします。窓側がいいのですが', pronunciation: 'nozomi no shiteiseki de onegaishimasu. madogawa ga ii no desu ga', pronunciation_chunks: 'no·zo·mi no shi·tei·se·ki de o·ne·gai·shi·ma·su. ma·do·ga·wa ga ii no de·su ga', english: 'Reserved window seats please', chinese_tc: '對號座靠窗' },
+        { target: 'のぞみの指定席でお願いします。通路側がいいのですが', pronunciation: 'nozomi no shiteiseki de onegaishimasu. tsuurogawa ga ii no desu ga', pronunciation_chunks: 'no·zo·mi no shi·tei·se·ki de o·ne·gai·shi·ma·su. tsuu·ro·ga·wa ga ii no de·su ga', english: 'Reserved aisle seats please', chinese_tc: '對號座靠走道' },
+        { target: '自由席でお願いします', pronunciation: 'jiyuuseki de onegaishimasu', pronunciation_chunks: 'ji·yuu·se·ki de o·ne·gai·shi·ma·su', english: 'Non-reserved seats please', chinese_tc: '自由座' },
+      ] },
+      { speaker: 'staff', target: '次ののぞみは9時30分発です。お二人隣同士の窓側がございます', pronunciation: 'tsugi no nozomi wa kuji sanjuppun hatsu desu. ofutari tonari doushi no madogawa ga gozaimasu', pronunciation_chunks: 'tsu·gi no no·zo·mi wa ku·ji san·jup·pun ha·tsu de·su. o·fu·ta·ri to·na·ri dou·shi no ma·do·ga·wa ga go·zai·ma·su', english: 'Next Nozomi departs 9:30. Window seats together available.', chinese_tc: '下一班希望號9:30出發。有相鄰的靠窗座位' },
+      { speaker: 'you', target: 'それでお願いします', pronunciation: 'sore de onegaishimasu', pronunciation_chunks: 'so·re de o·ne·gai·shi·ma·su', english: 'That one please', chinese_tc: '就那個' },
+      { speaker: 'staff', target: '二枚で21,120円になります', pronunciation: 'nimai de niman sen hyaku nijuu en ni narimasu', pronunciation_chunks: 'ni·mai de ni·man sen hya·ku ni·juu en ni na·ri·ma·su', english: 'Two tickets, 21,120 yen.', chinese_tc: '兩張21,120日圓', note: 'Nagoya→Tokyo Nozomi reserved: ~¥10,560 per person' },
+    ],
+  },
+  {
+    id: 'sc22',
+    lang: 'ja',
+    group: 'dining',
+    title: 'Nagoya Specialties',
+    titleTC: '名古屋特色美食',
+    emoji: '🍤',
+    description: 'Ordering Nagoya\'s famous food — miso katsu, hitsumabushi, tebasaki',
+    lines: [
+      { speaker: 'staff', target: 'いらっしゃいませ！何名様ですか？', pronunciation: 'irasshaimase! nanmei sama desu ka?', pronunciation_chunks: 'i·ras·shai·ma·se! nan·mei sa·ma de·su ka', english: 'Welcome! How many?', chinese_tc: '歡迎光臨！幾位？' },
+      { speaker: 'you', target: '二名です。名古屋名物を食べたいのですが', pronunciation: 'nimei desu. nagoya meibutsu wo tabetai no desu ga', pronunciation_chunks: 'ni·mei de·su. na·go·ya mei·bu·tsu wo ta·be·tai no de·su ga', english: 'Two people. We\'d like to try Nagoya specialties.', chinese_tc: '兩位。我們想吃名古屋名物', note: '名物 (meibutsu) = local specialty. Nagoya is famous for unique food!' },
+      { speaker: 'staff', target: '名古屋名物でしたら、味噌カツ、ひつまぶし、手羽先がおすすめです', pronunciation: 'nagoya meibutsu deshitara, miso katsu, hitsumabushi, tebasaki ga osusume desu', pronunciation_chunks: 'na·go·ya mei·bu·tsu de·shi·ta·ra, mi·so ka·tsu, hi·tsu·ma·bu·shi, te·ba·sa·ki ga o·su·su·me de·su', english: 'For Nagoya specialties, I recommend miso katsu, hitsumabushi, and tebasaki wings.', chinese_tc: '名古屋名物的話，推薦味噌豬排、鰻魚三吃、和雞翅', note: '味噌カツ=miso pork cutlet, ひつまぶし=eel 3 ways, 手羽先=chicken wings' },
+      { speaker: 'you', target: 'ひつまぶしを二人前お願いします', pronunciation: 'hitsumabushi wo futarimai onegaishimasu', pronunciation_chunks: 'hi·tsu·ma·bu·shi wo fu·ta·ri·mae o·ne·gai·shi·ma·su', english: 'Hitsumabushi for two please', chinese_tc: '請給我兩份鰻魚三吃', options: [
+        { target: 'ひつまぶしを二人前お願いします', pronunciation: 'hitsumabushi wo futarimai onegaishimasu', pronunciation_chunks: 'hi·tsu·ma·bu·shi wo fu·ta·ri·mae o·ne·gai·shi·ma·su', english: 'Hitsumabushi for two please', chinese_tc: '兩份鰻魚三吃' },
+        { target: '味噌カツ定食を二つお願いします', pronunciation: 'miso katsu teishoku wo futatsu onegaishimasu', pronunciation_chunks: 'mi·so ka·tsu tei·sho·ku wo fu·ta·tsu o·ne·gai·shi·ma·su', english: 'Two miso katsu set meals please', chinese_tc: '兩份味噌豬排定食' },
+        { target: '手羽先と味噌カツをお願いします', pronunciation: 'tebasaki to miso katsu wo onegaishimasu', pronunciation_chunks: 'te·ba·sa·ki to mi·so ka·tsu wo o·ne·gai·shi·ma·su', english: 'Tebasaki wings and miso katsu please', chinese_tc: '雞翅和味噌豬排' },
+      ] },
+      { speaker: 'staff', target: 'ひつまぶしは三つの食べ方があります。まずそのまま、次に薬味を乗せて、最後にお茶漬けにしてください', pronunciation: 'hitsumabushi wa mittsu no tabekata ga arimasu. mazu sono mama, tsugi ni yakumi wo nosete, saigo ni ochazuke ni shite kudasai', pronunciation_chunks: 'hi·tsu·ma·bu·shi wa mit·tsu no ta·be·ka·ta ga a·ri·ma·su', english: 'Hitsumabushi has 3 ways to eat: first plain, then with condiments, finally as ochazuke (with tea).', chinese_tc: '鰻魚三吃有三種吃法：先原味，再加佐料，最後加茶泡飯', note: 'This is what makes hitsumabushi special — you eat the eel 3 different ways in one meal!' },
+      { speaker: 'you', target: 'わかりました、楽しみです！', pronunciation: 'wakarimashita, tanoshimi desu!', pronunciation_chunks: 'wa·ka·ri·ma·shi·ta, ta·no·shi·mi de·su', english: 'Understood, looking forward to it!', chinese_tc: '了解，好期待！' },
+    ],
+  },
+  {
+    id: 'sc23',
+    lang: 'ja',
+    group: 'sightseeing',
+    title: 'Nagoya Castle',
+    titleTC: '名古屋城',
+    emoji: '🏯',
+    description: 'Visiting Nagoya Castle and asking about exhibits',
+    lines: [
+      { speaker: 'you', target: '入場券を二枚お願いします', pronunciation: 'nyuujouken wo nimai onegaishimasu', pronunciation_chunks: 'nyuu·jou·ken wo ni·mai o·ne·gai·shi·ma·su', english: 'Two admission tickets please', chinese_tc: '請給我兩張入場券' },
+      { speaker: 'staff', target: '大人二枚で1,000円です', pronunciation: 'otona nimai de sen en desu', pronunciation_chunks: 'o·to·na ni·mai de sen en de·su', english: 'Two adults, 1,000 yen.', chinese_tc: '兩位大人1,000日圓' },
+      { speaker: 'you', target: '本丸御殿は見られますか？', pronunciation: 'honmaru goten wa miraremasu ka?', pronunciation_chunks: 'hon·ma·ru go·ten wa mi·ra·re·ma·su ka', english: 'Can we see the Honmaru Palace?', chinese_tc: '可以參觀本丸御殿嗎？', note: 'The Honmaru Palace is a beautifully reconstructed feudal palace inside the castle grounds.' },
+      { speaker: 'staff', target: 'はい、本丸御殿は無料でご覧いただけます。写真も撮れますよ', pronunciation: 'hai, honmaru goten wa muryou de goran itadakemasu. shashin mo toremasu yo', pronunciation_chunks: 'hai, hon·ma·ru go·ten wa mu·ryou de go·ran i·ta·da·ke·ma·su. sha·shin mo to·re·ma·su yo', english: 'Yes, the Honmaru Palace is free to view. You can take photos too.', chinese_tc: '可以的，本丸御殿免費參觀。也可以拍照' },
+      { speaker: 'you', target: '金シャチはどこで見られますか？', pronunciation: 'kinshachi wa doko de miraremasu ka?', pronunciation_chunks: 'kin·sha·chi wa do·ko de mi·ra·re·ma·su ka', english: 'Where can we see the golden shachihoko?', chinese_tc: '金鯱在哪裡看？', note: '金シャチ (kinshachi) = golden dolphin-fish — Nagoya\'s iconic symbol on top of the castle' },
+      { speaker: 'staff', target: '天守閣の上にございます。現在天守閣は閉館中ですが、外から見られます', pronunciation: 'tenshukaku no ue ni gozaimasu. genzai tenshukaku wa heikanchuu desu ga, soto kara miraremasu', pronunciation_chunks: 'ten·shu·ka·ku no u·e ni go·zai·ma·su. gen·zai ten·shu·ka·ku wa hei·kan·chuu de·su ga, so·to ka·ra mi·ra·re·ma·su', english: 'It\'s on top of the main keep. The keep is currently closed, but you can see it from outside.', chinese_tc: '在天守閣上面。目前天守閣閉館中，但可以從外面看', note: 'Nagoya Castle main keep has been closed for wooden reconstruction since 2018.' },
+    ],
+  },
+  {
+    id: 'sc24',
+    lang: 'ja',
+    group: 'sightseeing',
+    title: 'Winter Illumination',
+    titleTC: '冬季燈飾',
+    emoji: '✨',
+    description: 'Visiting a December illumination event',
+    lines: [
+      { speaker: 'you', target: 'すみません、このイルミネーションは何時までですか？', pronunciation: 'sumimasen, kono irumineeshon wa nanji made desu ka?', pronunciation_chunks: 'su·mi·ma·sen, ko·no i·ru·mi·nee·shon wa nan·ji ma·de de·su ka', english: 'Excuse me, until what time is this illumination?', chinese_tc: '不好意思，這個燈飾到幾點？', note: 'December illuminations are HUGE in Japan — every major area has one.' },
+      { speaker: 'staff', target: '夜10時までです。入場は無料ですよ', pronunciation: 'yoru juuji made desu. nyuujou wa muryou desu yo', pronunciation_chunks: 'yo·ru juu·ji ma·de de·su. nyuu·jou wa mu·ryou de·su yo', english: 'Until 10pm. Admission is free.', chinese_tc: '到晚上10點。免費入場' },
+      { speaker: 'you', target: 'いい撮影スポットはどこですか？', pronunciation: 'ii satsuei supotto wa doko desu ka?', pronunciation_chunks: 'ii sa·tsu·ei su·pot·to wa do·ko de·su ka', english: 'Where\'s a good photo spot?', chinese_tc: '好的拍照地點在哪？' },
+      { speaker: 'staff', target: 'あちらのメインツリーの前が一番きれいですよ', pronunciation: 'achira no mein tsurii no mae ga ichiban kirei desu yo', pronunciation_chunks: 'a·chi·ra no mein tsuu·rii no ma·e ga i·chi·ban ki·rei de·su yo', english: 'In front of the main tree over there is the most beautiful.', chinese_tc: '那邊主樹前面最漂亮' },
+      { speaker: 'you', target: 'きれいですね！寒いけど来てよかった', pronunciation: 'kirei desu ne! samui kedo kite yokatta', pronunciation_chunks: 'ki·rei de·su ne! sa·mui ke·do ki·te yo·kat·ta', english: 'It\'s beautiful! Cold but glad we came.', chinese_tc: '好漂亮！雖然冷但是來了真好', note: 'December average temp in Tokyo: 5-10°C. Nagoya is similar. Bring warm clothes!' },
+      { speaker: 'you', target: '近くに温かい飲み物を売っている場所はありますか？', pronunciation: 'chikaku ni atatakai nomimono wo utte iru basho wa arimasu ka?', pronunciation_chunks: 'chi·ka·ku ni a·ta·ta·kai no·mi·mo·no wo ut·te i·ru ba·sho wa a·ri·ma·su ka', english: 'Is there somewhere nearby selling hot drinks?', chinese_tc: '附近有賣熱飲的地方嗎？' },
+      { speaker: 'staff', target: '出口の横に屋台がありますよ。甘酒やホットチョコレートがあります', pronunciation: 'deguchi no yoko ni yatai ga arimasu yo. amazake ya hotto chokoreeto ga arimasu', pronunciation_chunks: 'de·gu·chi no yo·ko ni ya·tai ga a·ri·ma·su yo. a·ma·za·ke ya hot·to cho·ko·ree·to ga a·ri·ma·su', english: 'There are food stalls by the exit. They have amazake and hot chocolate.', chinese_tc: '出口旁邊有攤販。有甜酒和熱可可', note: '甘酒 (amazake) = sweet fermented rice drink, perfect for winter. Also try ホットワイン (hot wine)!' },
+    ],
+  },
+  {
+    id: 'sc25',
+    lang: 'ja',
+    group: 'travel',
+    title: 'Winter Weather Chat',
+    titleTC: '冬天氣候對話',
+    emoji: '🧣',
+    description: 'Talking about cold weather and finding warm places',
+    lines: [
+      { speaker: 'you', target: '今日はとても寒いですね', pronunciation: 'kyou wa totemo samui desu ne', pronunciation_chunks: 'kyou wa to·te·mo sa·mui de·su ne', english: 'It\'s very cold today, isn\'t it?', chinese_tc: '今天好冷呢' },
+      { speaker: 'staff', target: 'そうですね。今日は3度ぐらいです', pronunciation: 'sou desu ne. kyou wa sando gurai desu', pronunciation_chunks: 'sou de·su ne. kyou wa san·do gu·rai de·su', english: 'Yes, it\'s about 3 degrees today.', chinese_tc: '是啊。今天大概3度' },
+      { speaker: 'you', target: 'この近くに暖かい場所はありますか？カフェとか', pronunciation: 'kono chikaku ni atatakai basho wa arimasu ka? kafe toka', pronunciation_chunks: 'ko·no chi·ka·ku ni a·ta·ta·kai ba·sho wa a·ri·ma·su ka? ka·fe to·ka', english: 'Is there a warm place nearby? Like a café?', chinese_tc: '附近有暖和的地方嗎？像咖啡廳之類的' },
+      { speaker: 'staff', target: '駅の中にスタバがありますよ。地下も暖かいです', pronunciation: 'eki no naka ni sutaba ga arimasu yo. chika mo atatakai desu', pronunciation_chunks: 'e·ki no na·ka ni su·ta·ba ga a·ri·ma·su yo. chi·ka mo a·ta·ta·kai de·su', english: 'There\'s a Starbucks inside the station. Underground is warm too.', chinese_tc: '車站裡面有星巴克。地下也很暖和' },
+      { speaker: 'you', target: 'ホッカイロはどこで買えますか？', pronunciation: 'hokkairo wa doko de kaemasu ka?', pronunciation_chunks: 'hok·kai·ro wa do·ko de ka·e·ma·su ka', english: 'Where can I buy hand warmers?', chinese_tc: '暖暖包哪裡買？', note: 'ホッカイロ (hokkairo) — disposable hand warmers, essential for winter in Japan! Available at any convenience store or drugstore.' },
+      { speaker: 'staff', target: 'コンビニかドラッグストアで売っていますよ', pronunciation: 'konbini ka doraggu sutoa de utte imasu yo', pronunciation_chunks: 'kon·bi·ni ka do·rag·gu su·to·a de ut·te i·ma·su yo', english: 'They sell them at convenience stores or drugstores.', chinese_tc: '便利商店或藥妝店有賣' },
+      { speaker: 'you', target: '貼るタイプをください', pronunciation: 'haru taipu wo kudasai', pronunciation_chunks: 'ha·ru tai·pu wo ku·da·sai', english: 'The stick-on type please', chinese_tc: '請給我貼的那種', options: [
+        { target: '貼るタイプをください', pronunciation: 'haru taipu wo kudasai', pronunciation_chunks: 'ha·ru tai·pu wo ku·da·sai', english: 'Stick-on type please', chinese_tc: '貼的那種' },
+        { target: '手で持つタイプをください', pronunciation: 'te de motsu taipu wo kudasai', pronunciation_chunks: 'te de mo·tsu tai·pu wo ku·da·sai', english: 'Hand-held type please', chinese_tc: '手握的那種' },
+      ] },
     ],
   },
 ];

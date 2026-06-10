@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { scenarios } from '../data/scenarios';
-import type { Scenario, ConversationLine } from '../data/scenarios';
+import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
+import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';
 import { speak } from '../utils/tts';
 
@@ -117,23 +117,36 @@ export function Scenarios({ lang, langConfig }: Props) {
       <div className="scroll-area h-full p-4">
         <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
         <p className="text-slate-400 text-sm mb-4">Practice real {langConfig.name} dialogues step-by-step</p>
-        <div className="space-y-2">
-          {langScenarios.map(sc => (
-            <button
-              key={sc.id}
-              onClick={() => handleSelect(sc)}
-              className="w-full bg-slate-800/80 rounded-2xl p-4 text-left active:bg-slate-700 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{sc.emoji}</span>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-100">{sc.title}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{sc.titleTC}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{sc.description} · {sc.lines.length} lines</p>
+        <div className="space-y-5">
+          {(Object.entries(SCENARIO_GROUPS) as [ScenarioGroup, { label: string; emoji: string }][]).map(([groupKey, groupInfo]) => {
+            const groupScenarios = langScenarios.filter(s => s.group === groupKey);
+            if (groupScenarios.length === 0) return null;
+            return (
+              <div key={groupKey}>
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  {groupInfo.emoji} {groupInfo.label}
+                </h3>
+                <div className="space-y-2">
+                  {groupScenarios.map(sc => (
+                    <button
+                      key={sc.id}
+                      onClick={() => handleSelect(sc)}
+                      className="w-full bg-slate-800/80 rounded-2xl p-4 text-left active:bg-slate-700 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{sc.emoji}</span>
+                        <div>
+                          <h3 className="text-sm font-semibold text-slate-100">{sc.title}</h3>
+                          <p className="text-xs text-slate-400 mt-0.5">{sc.titleTC}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{sc.description} · {sc.lines.length} lines</p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
-            </button>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
