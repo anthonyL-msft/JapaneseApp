@@ -122,12 +122,13 @@ function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="flex border-t border-slate-800 bg-slate-900/95 backdrop-blur-sm" style={{ paddingBottom: 'var(--safe-bottom)' }}>
-        {TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`flex-1 flex flex-col items-center py-2.5 text-base transition-colors ${
+      <div className="bg-slate-900" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <nav className="flex border-t border-slate-800">
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex-1 flex flex-col items-center py-2.5 text-base transition-colors ${
               tab === t.id
                 ? 'text-sakura-400'
                 : 'text-slate-500 active:text-slate-300'
@@ -142,7 +143,8 @@ function App() {
             )}
           </button>
         ))}
-      </nav>
+        </nav>
+      </div>
     </div>
   );
 }

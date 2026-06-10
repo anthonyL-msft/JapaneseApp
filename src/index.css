@@ -18,14 +18,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  background-color: #0f172a;
+}
+
 html, body, #root {
   height: 100%;
   overflow: hidden;
-  background-color: #020617;
+  background-color: #0f172a;
 }
 
 body {
-  @apply bg-slate-950 text-slate-100 font-sans;
+  @apply bg-slate-900 text-slate-100 font-sans;
 }
 
 /* Scrollbar styling */
