@@ -32,14 +32,14 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
         <h2 className="text-lg font-bold">📝 My Notes</h2>
-        <p className="text-sm text-slate-400">{notes.length} total notes</p>
+        <p className="text-base text-slate-400">{notes.length} total notes</p>
       </div>
 
       <div className="p-4 space-y-6">
         {/* Add standalone note */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 mb-2">Quick Note</h3>
-          <p className="text-sm text-slate-500 mb-2">WiFi passwords, restaurant names, travel tips...</p>
+          <h3 className="text-base font-semibold text-slate-300 mb-2">Quick Note</h3>
+          <p className="text-base text-slate-500 mb-2">WiFi passwords, restaurant names, travel tips...</p>
           <div className="flex gap-2">
             <input
               type="text"
@@ -52,7 +52,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
             <button
               onClick={handleSaveStandalone}
               disabled={!newNoteText.trim()}
-              className="bg-sakura-500/80 text-white text-sm px-4 py-2.5 rounded-xl disabled:opacity-30 active:bg-sakura-600 transition"
+              className="bg-sakura-500/80 text-white text-base px-4 py-2.5 rounded-xl disabled:opacity-30 active:bg-sakura-600 transition"
             >
               {editingId ? 'Update' : 'Add'}
             </button>
@@ -62,7 +62,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
         {/* Standalone notes */}
         {standaloneNotes.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-slate-300 mb-2">📌 Personal Notes</h3>
+            <h3 className="text-base font-semibold text-slate-300 mb-2">📌 Personal Notes</h3>
             <div className="space-y-2">
               {standaloneNotes
                 .sort((a, b) => b.updatedAt - a.updatedAt)
@@ -86,7 +86,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
         {/* Phrase-attached notes */}
         {phraseNotes.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-slate-300 mb-2">💬 Phrase Notes</h3>
+            <h3 className="text-base font-semibold text-slate-300 mb-2">💬 Phrase Notes</h3>
             <div className="space-y-2">
               {phraseNotes
                 .sort((a, b) => b.updatedAt - a.updatedAt)
@@ -95,12 +95,12 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                   return (
                     <div key={note.id} className="bg-slate-800/60 rounded-xl p-3">
                       {phrase && (
-                        <p className="text-sm text-sakura-400 mb-1">
+                        <p className="text-base text-sakura-400 mb-1">
                           {phrase.target} · {phrase.pronunciation}
                         </p>
                       )}
                       <div className="flex items-start gap-2">
-                        <p className="text-sm text-slate-300 flex-1">{note.text}</p>
+                        <p className="text-base text-slate-300 flex-1">{note.text}</p>
                         <button
                           onClick={() => onDeleteNote(note.id)}
                           className="text-base text-slate-500 hover:text-red-400 shrink-0"
@@ -116,7 +116,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
         {notes.length === 0 && (
           <div className="text-center py-8">
             <p className="text-4xl mb-3">📝</p>
-            <p className="text-slate-400 text-sm">No notes yet. Add quick notes above or tap any phrase to add remarks.</p>
+            <p className="text-slate-400 text-base">No notes yet. Add quick notes above or tap any phrase to add remarks.</p>
           </div>
         )}
       </div>

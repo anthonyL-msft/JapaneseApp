@@ -136,7 +136,7 @@ function App() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex-1 flex flex-col items-center py-2.5 text-xs transition-colors ${
+            className={`flex-1 flex flex-col items-center py-2.5 text-base transition-colors ${
               tab === t.id
                 ? 'text-sakura-400'
                 : 'text-slate-500 active:text-slate-300'
@@ -145,7 +145,7 @@ function App() {
             <span className="text-xl mb-0.5">{t.icon}</span>
             <span>{t.label}</span>
             {t.id === 'bookmarks' && bookmarks.length > 0 && (
-              <span className="absolute -mt-1 ml-6 bg-sakura-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              <span className="absolute -mt-1 ml-6 bg-sakura-500 text-white text-base rounded-full w-4 h-4 flex items-center justify-center">
                 {bookmarks.length}
               </span>
             )}

@@ -44,7 +44,7 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
         <select
           value={lang}
           onChange={e => onLangChange(e.target.value)}
-          className="bg-slate-800 text-slate-100 rounded-xl py-2.5 px-2 text-sm outline-none border border-slate-700 focus:ring-2 focus:ring-sakura-400/50 transition shrink-0 appearance-none text-center"
+          className="bg-slate-800 text-slate-100 rounded-xl py-2.5 px-2 text-base outline-none border border-slate-700 focus:ring-2 focus:ring-sakura-400/50 transition shrink-0 appearance-none text-center"
           style={{ width: '54px' }}
         >
           {LANGUAGES.map(l => (
@@ -54,18 +54,18 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
 
         {/* Search Input */}
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-base">🔍</span>
           <input
             type="text"
             value={value}
             onChange={e => onChange(e.target.value)}
             placeholder={`Search ${currentLang.name} phrases...`}
-            className="w-full bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl py-2.5 pl-9 pr-8 text-sm outline-none focus:ring-2 focus:ring-sakura-400/50 transition"
+            className="w-full bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl py-2.5 pl-9 pr-8 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition"
           />
           {value && (
             <button
               onClick={() => onChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-sm"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-base"
             >
               ✕
             </button>
@@ -74,7 +74,7 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
 
         {/* Online/Offline indicator + Settings */}
         {!isOnline && (
-          <span className="shrink-0 text-xs bg-amber-900/50 text-amber-300 px-2 py-1 rounded-lg">
+          <span className="shrink-0 text-base bg-amber-900/50 text-amber-300 px-2 py-1 rounded-lg">
             Offline
           </span>
         )}
@@ -90,8 +90,8 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
       {showSettings && (
         <div className="mt-2 bg-slate-800/80 rounded-xl p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-400">🔊 Speech Speed</span>
-            <span className="text-sm text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
+            <span className="text-base text-slate-400">🔊 Speech Speed</span>
+            <span className="text-base text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
           </div>
           <input
             type="range"
@@ -102,7 +102,7 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
             onChange={e => handleRateChange(parseFloat(e.target.value))}
             className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sakura-400"
           />
-          <div className="flex justify-between text-xs text-slate-600">
+          <div className="flex justify-between text-base text-slate-600">
             <span>Slow</span>
             <span>Normal</span>
             <span>Native</span>

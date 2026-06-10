@@ -35,7 +35,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
     return (
       <div className="h-full flex flex-col">
         <div className="px-4 pt-3 pb-2 border-b border-slate-800 bg-slate-950/95">
-          <button onClick={() => setShowReference(false)} className="text-sakura-400 text-sm flex items-center gap-1">
+          <button onClick={() => setShowReference(false)} className="text-sakura-400 text-base flex items-center gap-1">
             ← Back to Phrases
           </button>
         </div>
@@ -53,20 +53,20 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold mb-0.5">📖 Phrase Book</h1>
-            <p className="text-slate-400 text-sm">Select a category to start learning</p>
+            <p className="text-slate-400 text-base">Select a category to start learning</p>
           </div>
           <div className="flex gap-2">
             {onShowCards && (
               <button
                 onClick={onShowCards}
-                className="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+                className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
               >
                 🃏 Cards
               </button>
             )}
             <button
               onClick={() => setShowReference(true)}
-              className="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+              className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
             >
               📚 Ref
             </button>
@@ -84,8 +84,8 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
               >
                 <span className="text-2xl">{info.emoji}</span>
                 <h3 className="text-base font-semibold mt-2 text-slate-100">{info.label}</h3>
-                <p className="text-sm text-slate-400 mt-0.5">{info.labelTC}</p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-base text-slate-400 mt-0.5">{info.labelTC}</p>
+                <p className="text-base text-slate-500 mt-1">
                   {catPhrases.length} phrases
                   {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
                 </p>
@@ -127,16 +127,16 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
           <div>
             <button
               onClick={() => { setSelectedCategory(null); setOpenSituations(new Set()); }}
-              className="text-sakura-400 text-sm mb-1 flex items-center gap-1"
+              className="text-sakura-400 text-base mb-1 flex items-center gap-1"
             >
               ← All Categories
             </button>
             <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
-            <p className="text-sm text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
+            <p className="text-base text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
           </div>
           <button
             onClick={toggleAll}
-            className="mt-5 text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
+            className="mt-5 text-base bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
           >
             {allOpen ? '▲ Close All' : '▼ Open All'}
           </button>
@@ -154,9 +154,9 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
               >
                 <div className="text-left">
                   <h3 className="text-base font-semibold text-slate-200">{situation}</h3>
-                  <p className="text-sm text-slate-500">{pList.length} phrases</p>
+                  <p className="text-base text-slate-500">{pList.length} phrases</p>
                 </div>
-                <span className="text-slate-500 text-xs shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
+                <span className="text-slate-500 text-base shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
               </button>
               {isOpen && (
                 <div className="px-1.5 pb-1.5 space-y-1">

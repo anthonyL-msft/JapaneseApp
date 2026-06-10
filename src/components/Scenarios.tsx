@@ -119,14 +119,14 @@ export function Scenarios({ lang, langConfig }: Props) {
         <div className="flex flex-col items-center justify-center h-full px-6 text-center">
           <p className="text-4xl mb-4">🎭</p>
           <p className="text-lg font-semibold text-slate-200">No conversations yet for {langConfig.name}</p>
-          <p className="text-sm text-slate-400 mt-2">Conversations will be added soon! Try switching to Japanese 🇯🇵 to see examples.</p>
+          <p className="text-base text-slate-400 mt-2">Conversations will be added soon! Try switching to Japanese 🇯🇵 to see examples.</p>
         </div>
       );
     }
     return (
       <div className="scroll-area h-full p-4">
         <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
-        <p className="text-slate-400 text-sm mb-4">Practice real {langConfig.name} dialogues step-by-step</p>
+        <p className="text-slate-400 text-base mb-4">Practice real {langConfig.name} dialogues step-by-step</p>
         <div className="space-y-2">
           {(Object.entries(SCENARIO_GROUPS) as [ScenarioGroup, { label: string; emoji: string }][]).map(([groupKey, groupInfo]) => {
             const groupScenarios = langScenarios.filter(s => s.group === groupKey);
@@ -142,10 +142,10 @@ export function Scenarios({ lang, langConfig }: Props) {
                     <span className="text-lg">{groupInfo.emoji}</span>
                     <div className="text-left">
                       <h3 className="text-base font-semibold text-slate-100">{groupInfo.label}</h3>
-                      <p className="text-sm text-slate-500">{groupScenarios.length} conversations</p>
+                      <p className="text-base text-slate-500">{groupScenarios.length} conversations</p>
                     </div>
                   </div>
-                  <span className="text-slate-500 text-xs">{isOpen ? '▲' : '▼'}</span>
+                  <span className="text-slate-500 text-base">{isOpen ? '▲' : '▼'}</span>
                 </button>
                 {isOpen && (
                   <div className="px-2 pb-2 space-y-1.5">
@@ -159,7 +159,7 @@ export function Scenarios({ lang, langConfig }: Props) {
                           <span className="text-lg">{sc.emoji}</span>
                           <div>
                             <h4 className="text-base font-medium text-slate-200">{sc.title}</h4>
-                            <p className="text-sm text-slate-500">{sc.titleTC} · {sc.lines.length} lines</p>
+                            <p className="text-base text-slate-500">{sc.titleTC} · {sc.lines.length} lines</p>
                           </div>
                         </div>
                       </button>
@@ -182,22 +182,22 @@ export function Scenarios({ lang, langConfig }: Props) {
       <div className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800">
         <div className="flex items-center justify-between">
           <div>
-            <button onClick={handleBack} className="text-sakura-400 text-sm mb-1 flex items-center gap-1">
+            <button onClick={handleBack} className="text-sakura-400 text-base mb-1 flex items-center gap-1">
               ← All Scenes
             </button>
             <h2 className="text-lg font-bold">{selectedScenario.emoji} {selectedScenario.title}</h2>
-            <p className="text-sm text-slate-400">{selectedScenario.titleTC} · {selectedScenario.description}</p>
+            <p className="text-base text-slate-400">{selectedScenario.titleTC} · {selectedScenario.description}</p>
           </div>
           <div className="flex gap-1.5 shrink-0">
             <button
               onClick={handleReset}
-              className="text-sm bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700"
+              className="text-base bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700"
             >
               ↺
             </button>
             <button
               onClick={handleAutoPlay}
-              className={`text-xs px-3 py-1.5 rounded-lg transition ${
+              className={`text-base px-3 py-1.5 rounded-lg transition ${
                 isAutoPlaying
                   ? 'bg-red-900/60 text-red-300 active:bg-red-800'
                   : 'bg-sakura-500/80 text-white active:bg-sakura-600'
@@ -233,13 +233,13 @@ export function Scenarios({ lang, langConfig }: Props) {
             <div className="flex gap-2 justify-center">
               <button
                 onClick={handleReset}
-                className="text-sm bg-slate-800 text-slate-300 px-4 py-2 rounded-xl active:bg-slate-700"
+                className="text-base bg-slate-800 text-slate-300 px-4 py-2 rounded-xl active:bg-slate-700"
               >
                 ↺ Start Over
               </button>
               <button
                 onClick={() => { handleReset(); handleAutoPlay(); }}
-                className="text-sm bg-sakura-500/80 text-white px-4 py-2 rounded-xl active:bg-sakura-600"
+                className="text-base bg-sakura-500/80 text-white px-4 py-2 rounded-xl active:bg-sakura-600"
               >
                 ▶ Auto Play
               </button>
@@ -300,14 +300,14 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
     <div data-line={index} className={`flex ${isStaff ? 'justify-start' : 'justify-end'}`}>
       <div className={`max-w-[85%] ${isStaff ? 'order-2' : 'order-1'}`}>
         {/* Speaker label */}
-        <p className={`text-xs font-semibold mb-1 ${isStaff ? 'text-blue-400' : 'text-emerald-400'} ${isStaff ? 'text-left' : 'text-right'}`}>
+        <p className={`text-base font-semibold mb-1 ${isStaff ? 'text-blue-400' : 'text-emerald-400'} ${isStaff ? 'text-left' : 'text-right'}`}>
           {isStaff ? '🧑‍🍳 Staff' : '👤 You'}
         </p>
 
         {/* Options selector — show before the bubble when there are choices */}
         {hasOptions && selectedOption === null && (
           <div className="mb-2 space-y-1.5">
-            <p className="text-sm text-slate-500 text-right">Choose your response:</p>
+            <p className="text-base text-slate-500 text-right">Choose your response:</p>
             {line.options!.map((opt, idx) => (
               <button
                 key={idx}
@@ -315,8 +315,8 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
                 className="w-full bg-indigo-900/30 border border-indigo-700/40 rounded-xl p-2.5 text-left active:bg-indigo-800/50 transition"
               >
                 <p className="text-base text-slate-100">{opt.target}</p>
-                <p className="text-sm text-sakura-300 mt-0.5">{opt.pronunciation_chunks || opt.pronunciation}</p>
-                <p className="text-sm text-slate-400 mt-0.5">{opt.english} · {opt.chinese_tc}</p>
+                <p className="text-base text-sakura-300 mt-0.5">{opt.pronunciation_chunks || opt.pronunciation}</p>
+                <p className="text-base text-slate-400 mt-0.5">{opt.english} · {opt.chinese_tc}</p>
               </button>
             ))}
           </div>
@@ -335,7 +335,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
             <div className="flex items-start gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-base text-slate-50">{displayLine.target}</p>
-                <p className="text-sm text-sakura-300 mt-0.5">{displayLine.pronunciation_chunks || displayLine.pronunciation}</p>
+                <p className="text-base text-sakura-300 mt-0.5">{displayLine.pronunciation_chunks || displayLine.pronunciation}</p>
               </div>
               {!displayLine.target.startsWith('（') && (
                 <button onClick={handleSpeak} className="text-lg shrink-0 p-1 active:scale-110 transition-transform">
@@ -346,8 +346,8 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
 
             {/* Always show translation */}
             <div className="mt-2 pt-2 border-t border-slate-700/40">
-              <p className="text-sm text-slate-300">{displayLine.english}</p>
-              <p className="text-sm text-slate-500">{displayLine.chinese_tc}</p>
+              <p className="text-base text-slate-300">{displayLine.english}</p>
+              <p className="text-base text-slate-500">{displayLine.chinese_tc}</p>
             </div>
 
             {/* Variable chips — swap places, times, etc. */}
@@ -355,7 +355,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
               <div className="mt-2 pt-2 border-t border-slate-700/40 space-y-2">
                 {line.variables!.map(v => (
                   <div key={v.placeholder}>
-                    <p className="text-sm text-slate-500 mb-1">🔄 {v.label}:</p>
+                    <p className="text-base text-slate-500 mb-1">🔄 {v.label}:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {v.options.map((opt, oi) => {
                         const isSelected = (varSelections[v.placeholder] ?? 0) === oi;
@@ -366,7 +366,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
                               e.stopPropagation();
                               setVarSelections(prev => ({ ...prev, [v.placeholder]: oi }));
                             }}
-                            className={`text-xs px-2 py-1 rounded-lg transition ${
+                            className={`text-base px-2 py-1 rounded-lg transition ${
                               isSelected
                                 ? 'bg-sakura-500/60 text-white'
                                 : 'bg-slate-700/50 text-slate-300 active:bg-slate-600'
@@ -386,7 +386,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
             {hasOptions && (
               <button
                 onClick={(e) => { e.stopPropagation(); setSelectedOption(null); }}
-                className="mt-2 text-xs text-indigo-400 active:text-indigo-300"
+                className="mt-2 text-base text-indigo-400 active:text-indigo-300"
               >
                 ↻ Choose different response
               </button>
@@ -395,7 +395,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
             {/* Expanded detail */}
             {showDetail && line.note && (
               <div className="mt-2 bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-                <p className="text-sm text-amber-400">💡 {line.note}</p>
+                <p className="text-base text-amber-400">💡 {line.note}</p>
               </div>
             )}
           </div>

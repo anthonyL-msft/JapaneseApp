@@ -49,7 +49,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
       <div className="scroll-area h-full flex flex-col items-center justify-center px-6 text-center">
         <p className="text-4xl mb-4">🤖</p>
         <p className="text-lg font-semibold text-slate-200">AI not configured</p>
-        <p className="text-sm text-slate-400 mt-2">Add your Azure OpenAI API key in <code className="text-sakura-300">.env.local</code> to enable "How do I say...?" feature.</p>
+        <p className="text-base text-slate-400 mt-2">Add your Azure OpenAI API key in <code className="text-sakura-300">.env.local</code> to enable "How do I say...?" feature.</p>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
         <h2 className="text-lg font-bold">🤖 How do I say...?</h2>
-        <p className="text-sm text-slate-400">Ask in English or 中文, get {currentLang.name} translation</p>
+        <p className="text-base text-slate-400">Ask in English or 中文, get {currentLang.name} translation</p>
       </div>
 
       <div className="p-4 space-y-4">
@@ -70,7 +70,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAsk()}
             placeholder="e.g., I want to split the bill"
-            className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-sakura-400/50 transition"
+            className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition"
             disabled={loading}
           />
           <button
@@ -85,7 +85,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
         {/* Quick suggestions */}
         {!result && !loading && history.length === 0 && (
           <div>
-            <p className="text-sm text-slate-500 mb-2">Try asking:</p>
+            <p className="text-base text-slate-500 mb-2">Try asking:</p>
             <div className="flex flex-wrap gap-1.5">
               {[
                 'I want to split the bill',
@@ -98,7 +98,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
                 <button
                   key={s}
                   onClick={() => { setQuery(s); }}
-                  className="text-sm bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700 transition"
+                  className="text-base bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700 transition"
                 >
                   {s}
                 </button>
@@ -110,14 +110,14 @@ export function AskAI({ lang, onSaveNote }: Props) {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-pulse text-slate-400 text-sm">Translating...</div>
+            <div className="animate-pulse text-slate-400 text-base">Translating...</div>
           </div>
         )}
 
         {/* Error */}
         {error && (
           <div className="bg-red-900/30 border border-red-700/40 rounded-xl p-3">
-            <p className="text-sm text-red-300">{error}</p>
+            <p className="text-base text-red-300">{error}</p>
           </div>
         )}
 
@@ -137,31 +137,31 @@ export function AskAI({ lang, onSaveNote }: Props) {
 
             {result.romanization && (
               <div>
-                <span className="text-slate-500 text-xs">Reading</span>
-                <p className="text-sm text-slate-300">{result.romanization}</p>
+                <span className="text-slate-500 text-base">Reading</span>
+                <p className="text-base text-slate-300">{result.romanization}</p>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="grid grid-cols-2 gap-2 text-base">
               <div>
-                <span className="text-slate-500 text-xs">English</span>
+                <span className="text-slate-500 text-base">English</span>
                 <p className="text-slate-200">{result.english}</p>
               </div>
               <div>
-                <span className="text-slate-500 text-xs">繁體中文</span>
+                <span className="text-slate-500 text-base">繁體中文</span>
                 <p className="text-slate-200">{result.chinese_tc}</p>
               </div>
             </div>
 
             {result.native_hint && (
               <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-                <p className="text-sm text-amber-400">🌉 {result.native_hint}</p>
+                <p className="text-base text-amber-400">🌉 {result.native_hint}</p>
               </div>
             )}
 
             {result.notes && (
               <div className="bg-slate-700/30 rounded-lg p-2">
-                <p className="text-sm text-slate-300">💡 {result.notes}</p>
+                <p className="text-base text-slate-300">💡 {result.notes}</p>
               </div>
             )}
 
@@ -169,7 +169,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={() => setShowBig(result.target)}
-                className="flex-1 bg-slate-700/50 text-slate-300 text-xs py-2 rounded-lg active:bg-slate-600 transition"
+                className="flex-1 bg-slate-700/50 text-slate-300 text-base py-2 rounded-lg active:bg-slate-600 transition"
               >📺 Show Big</button>
               <button
                 onClick={() => {
@@ -177,7 +177,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2000);
                 }}
-                className="flex-1 bg-slate-700/50 text-slate-300 text-xs py-2 rounded-lg active:bg-slate-600 transition"
+                className="flex-1 bg-slate-700/50 text-slate-300 text-base py-2 rounded-lg active:bg-slate-600 transition"
               >{copied ? '✓ Copied' : '📋 Copy'}</button>
               {onSaveNote && (
                 <button
@@ -192,7 +192,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
                     setSaved(true);
                     setTimeout(() => setSaved(false), 2000);
                   }}
-                  className="flex-1 bg-sakura-500/30 text-sakura-300 text-xs py-2 rounded-lg active:bg-sakura-500/50 transition"
+                  className="flex-1 bg-sakura-500/30 text-sakura-300 text-base py-2 rounded-lg active:bg-sakura-500/50 transition"
                 >{saved ? '✓ Saved' : '💾 Save'}</button>
               )}
             </div>
@@ -202,7 +202,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
         {/* History */}
         {history.length > 0 && (
           <div>
-            <h3 className="text-sm text-slate-500 mb-2">Recent translations</h3>
+            <h3 className="text-base text-slate-500 mb-2">Recent translations</h3>
             <div className="space-y-1.5">
               {history.map((h, i) => (
                 <div
@@ -212,12 +212,12 @@ export function AskAI({ lang, onSaveNote }: Props) {
                 >
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }}
-                    className="text-sm shrink-0"
+                    className="text-base shrink-0"
                   >🔊</button>
                   <div className="flex-1 min-w-0">
                     <p className="text-base text-slate-200 truncate">{h.target}</p>
-                    <p className="text-sm text-sakura-300 truncate">{h.pronunciation_chunks || h.pronunciation}</p>
-                    <p className="text-sm text-slate-500 truncate">{h.english}</p>
+                    <p className="text-base text-sakura-300 truncate">{h.pronunciation_chunks || h.pronunciation}</p>
+                    <p className="text-base text-slate-500 truncate">{h.english}</p>
                   </div>
                 </div>
               ))}
@@ -238,7 +238,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
             onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }}
             className="mt-6 text-4xl active:scale-110 transition-transform"
           >🔊</button>
-          <p className="text-sm text-slate-600 mt-8">Tap anywhere to close</p>
+          <p className="text-base text-slate-600 mt-8">Tap anywhere to close</p>
         </div>
       )}
     </div>

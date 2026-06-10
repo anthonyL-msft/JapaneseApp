@@ -18,7 +18,7 @@ export function Reference() {
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
         <h2 className="text-lg font-bold">📚 Quick Reference</h2>
-        <p className="text-sm text-slate-400">Grammar cheat sheet for travel</p>
+        <p className="text-base text-slate-400">Grammar cheat sheet for travel</p>
       </div>
 
       <div className="p-4 space-y-2">
@@ -28,10 +28,10 @@ export function Reference() {
               onClick={() => setOpen(open === sec.id ? null : sec.id)}
               className="w-full flex items-center justify-between p-3 active:bg-slate-700/50 transition"
             >
-              <span className="text-sm font-semibold">
+              <span className="text-base font-semibold">
                 {sec.emoji} {sec.label}
               </span>
-              <span className="text-slate-500 text-xs">{open === sec.id ? '▲' : '▼'}</span>
+              <span className="text-slate-500 text-base">{open === sec.id ? '▲' : '▼'}</span>
             </button>
             {open === sec.id && (
               <div className="px-3 pb-3 border-t border-slate-700/50">
@@ -55,9 +55,9 @@ function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string
     <div className="py-1.5 border-b border-slate-700/30 last:border-0">
       <div className="flex items-baseline gap-2">
         <span className="text-base font-medium text-slate-100 shrink-0">{jp}</span>
-        <span className="text-sm text-sakura-300">{rom}</span>
+        <span className="text-base text-sakura-300">{rom}</span>
       </div>
-      <p className="text-sm text-slate-400 mt-0.5">{meaning}</p>
+      <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
     </div>
   );
 }
@@ -67,7 +67,7 @@ function NumbersRef() {
     <div className="mt-2 space-y-4">
       {/* Basic 1-10 */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">Basic Numbers</p>
+        <p className="text-base text-slate-500 mb-1">Basic Numbers</p>
         <RefRow jp="一" rom="i·chi" meaning="1" />
         <RefRow jp="二" rom="ni" meaning="2" />
         <RefRow jp="三" rom="san" meaning="3" />
@@ -82,7 +82,7 @@ function NumbersRef() {
 
       {/* Tens */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">Tens — just add じゅう (juu)</p>
+        <p className="text-base text-slate-500 mb-1">Tens — just add じゅう (juu)</p>
         <RefRow jp="二十" rom="ni·juu" meaning="20" />
         <RefRow jp="三十" rom="san·juu" meaning="30" />
         <RefRow jp="五十" rom="go·juu" meaning="50" />
@@ -93,7 +93,7 @@ function NumbersRef() {
 
       {/* Prices you'll see */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">Common Prices (practice reading!)</p>
+        <p className="text-base text-slate-500 mb-1">Common Prices (practice reading!)</p>
         <RefRow jp="150円" rom="hya·ku go·juu en" meaning="¥150 (convenience store onigiri)" />
         <RefRow jp="500円" rom="go·hya·ku en" meaning="¥500 (lunch set, goshuin stamp)" />
         <RefRow jp="800円" rom="hap·pya·ku en" meaning="¥800 (ramen bowl)" />
@@ -105,7 +105,7 @@ function NumbersRef() {
 
       {/* Time */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">Hours — 〜時 (ji)</p>
+        <p className="text-base text-slate-500 mb-1">Hours — 〜時 (ji)</p>
         <RefRow jp="1時" rom="i·chi·ji" meaning="1 o'clock" />
         <RefRow jp="2時" rom="ni·ji" meaning="2 o'clock" />
         <RefRow jp="3時" rom="san·ji" meaning="3 o'clock" />
@@ -122,7 +122,7 @@ function NumbersRef() {
 
       {/* Minutes */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">Minutes — 〜分 (fun/pun) — tricky!</p>
+        <p className="text-base text-slate-500 mb-1">Minutes — 〜分 (fun/pun) — tricky!</p>
         <RefRow jp="1分" rom="ip·pun" meaning="1 min ⚠️" />
         <RefRow jp="2分" rom="ni·fun" meaning="2 min" />
         <RefRow jp="3分" rom="san·pun" meaning="3 min ⚠️" />
@@ -136,7 +136,7 @@ function NumbersRef() {
 
       {/* Days */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">Days of Stay — 〜泊 (haku/paku)</p>
+        <p className="text-base text-slate-500 mb-1">Days of Stay — 〜泊 (haku/paku)</p>
         <RefRow jp="一泊" rom="ip·pa·ku" meaning="1 night ⚠️" />
         <RefRow jp="二泊" rom="ni·ha·ku" meaning="2 nights" />
         <RefRow jp="三泊" rom="san·pa·ku" meaning="3 nights ⚠️" />
@@ -146,7 +146,7 @@ function NumbersRef() {
 
       {/* People */}
       <div>
-        <p className="text-sm text-slate-500 mb-1">People — 〜人 (special readings!)</p>
+        <p className="text-base text-slate-500 mb-1">People — 〜人 (special readings!)</p>
         <RefRow jp="ひとり" rom="hi·to·ri" meaning="1 person (NOT ichi·nin)" />
         <RefRow jp="ふたり" rom="fu·ta·ri" meaning="2 people (NOT ni·nin) ← your default!" />
         <RefRow jp="三人" rom="san·nin" meaning="3 people" />
@@ -179,7 +179,7 @@ function ParticlesRef() {
 function CountersRef() {
   return (
     <div className="mt-2">
-      <p className="text-sm text-slate-500 mb-2">Japanese uses different counters for different objects (like Chinese 量詞)</p>
+      <p className="text-base text-slate-500 mb-2">Japanese uses different counters for different objects (like Chinese 量詞)</p>
       <RefRow jp="〜つ" rom="-tsu" meaning="General counter: ひとつ(1), ふたつ(2), みっつ(3)" />
       <RefRow jp="〜人" rom="-nin" meaning="People: ひとり(1), ふたり(2), さんにん(3)" />
       <RefRow jp="〜枚" rom="-mai" meaning="Flat objects: tickets, plates, shirts" />
@@ -198,39 +198,39 @@ function PatternsRef() {
   return (
     <div className="mt-2 space-y-3">
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○をお願いします</p>
-        <p className="text-sm text-sakura-300">○○ wo o·ne·gai·shi·ma·su</p>
-        <p className="text-sm text-slate-400 mt-1">○○ please — works for anything! Water, menu, bill...</p>
+        <p className="text-base text-slate-200 font-medium">○○をお願いします</p>
+        <p className="text-base text-sakura-300">○○ wo o·ne·gai·shi·ma·su</p>
+        <p className="text-base text-slate-400 mt-1">○○ please — works for anything! Water, menu, bill...</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○はありますか</p>
-        <p className="text-sm text-sakura-300">○○ wa a·ri·ma·su ka</p>
-        <p className="text-sm text-slate-400 mt-1">Is there ○○? / Do you have ○○?</p>
+        <p className="text-base text-slate-200 font-medium">○○はありますか</p>
+        <p className="text-base text-sakura-300">○○ wa a·ri·ma·su ka</p>
+        <p className="text-base text-slate-400 mt-1">Is there ○○? / Do you have ○○?</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○はどこですか</p>
-        <p className="text-sm text-sakura-300">○○ wa do·ko de·su ka</p>
-        <p className="text-sm text-slate-400 mt-1">Where is ○○?</p>
+        <p className="text-base text-slate-200 font-medium">○○はどこですか</p>
+        <p className="text-base text-sakura-300">○○ wa do·ko de·su ka</p>
+        <p className="text-base text-slate-400 mt-1">Where is ○○?</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○してもいいですか</p>
-        <p className="text-sm text-sakura-300">○○ shi·te mo ii de·su ka</p>
-        <p className="text-sm text-slate-400 mt-1">May I ○○? (asking permission)</p>
+        <p className="text-base text-slate-200 font-medium">○○してもいいですか</p>
+        <p className="text-base text-sakura-300">○○ shi·te mo ii de·su ka</p>
+        <p className="text-base text-slate-400 mt-1">May I ○○? (asking permission)</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○てください</p>
-        <p className="text-sm text-sakura-300">○○ te ku·da·sai</p>
-        <p className="text-sm text-slate-400 mt-1">Please do ○○ (polite request)</p>
+        <p className="text-base text-slate-200 font-medium">○○てください</p>
+        <p className="text-base text-sakura-300">○○ te ku·da·sai</p>
+        <p className="text-base text-slate-400 mt-1">Please do ○○ (polite request)</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○がわかりません</p>
-        <p className="text-sm text-sakura-300">○○ ga wa·ka·ri·ma·sen</p>
-        <p className="text-sm text-slate-400 mt-1">I don't understand ○○</p>
+        <p className="text-base text-slate-200 font-medium">○○がわかりません</p>
+        <p className="text-base text-sakura-300">○○ ga wa·ka·ri·ma·sen</p>
+        <p className="text-base text-slate-400 mt-1">I don't understand ○○</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
-        <p className="text-sm text-slate-200 font-medium">○○たいです</p>
-        <p className="text-sm text-sakura-300">○○ tai de·su</p>
-        <p className="text-sm text-slate-400 mt-1">I want to ○○ (desire)</p>
+        <p className="text-base text-slate-200 font-medium">○○たいです</p>
+        <p className="text-base text-sakura-300">○○ tai de·su</p>
+        <p className="text-base text-slate-400 mt-1">I want to ○○ (desire)</p>
       </div>
     </div>
   );
@@ -239,39 +239,39 @@ function PatternsRef() {
 function PoliteRef() {
   return (
     <div className="mt-2">
-      <p className="text-sm text-slate-500 mb-2">Japanese has different politeness levels. Use ます (masu) form for all travel situations.</p>
+      <p className="text-base text-slate-500 mb-2">Japanese has different politeness levels. Use ます (masu) form for all travel situations.</p>
       <div className="space-y-2">
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
-            <span className="text-sm text-slate-200">〜ます</span>
-            <span className="text-sm text-slate-500">Polite positive</span>
+            <span className="text-base text-slate-200">〜ます</span>
+            <span className="text-base text-slate-500">Polite positive</span>
           </div>
-          <p className="text-sm text-sakura-300">ma·su</p>
-          <p className="text-sm text-slate-400">行きます (i·ki·ma·su) = I go</p>
+          <p className="text-base text-sakura-300">ma·su</p>
+          <p className="text-base text-slate-400">行きます (i·ki·ma·su) = I go</p>
         </div>
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
-            <span className="text-sm text-slate-200">〜ません</span>
-            <span className="text-sm text-slate-500">Polite negative</span>
+            <span className="text-base text-slate-200">〜ません</span>
+            <span className="text-base text-slate-500">Polite negative</span>
           </div>
-          <p className="text-sm text-sakura-300">ma·sen</p>
-          <p className="text-sm text-slate-400">行きません (i·ki·ma·sen) = I don't go</p>
+          <p className="text-base text-sakura-300">ma·sen</p>
+          <p className="text-base text-slate-400">行きません (i·ki·ma·sen) = I don't go</p>
         </div>
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
-            <span className="text-sm text-slate-200">〜ました</span>
-            <span className="text-sm text-slate-500">Polite past</span>
+            <span className="text-base text-slate-200">〜ました</span>
+            <span className="text-base text-slate-500">Polite past</span>
           </div>
-          <p className="text-sm text-sakura-300">ma·shi·ta</p>
-          <p className="text-sm text-slate-400">行きました (i·ki·ma·shi·ta) = I went</p>
+          <p className="text-base text-sakura-300">ma·shi·ta</p>
+          <p className="text-base text-slate-400">行きました (i·ki·ma·shi·ta) = I went</p>
         </div>
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
-            <span className="text-sm text-slate-200">〜です</span>
-            <span className="text-sm text-slate-500">Polite copula (is/am)</span>
+            <span className="text-base text-slate-200">〜です</span>
+            <span className="text-base text-slate-500">Polite copula (is/am)</span>
           </div>
-          <p className="text-sm text-sakura-300">de·su</p>
-          <p className="text-sm text-slate-400">ふたりです (fu·ta·ri de·su) = There are two of us</p>
+          <p className="text-base text-sakura-300">de·su</p>
+          <p className="text-base text-slate-400">ふたりです (fu·ta·ri de·su) = There are two of us</p>
         </div>
       </div>
     </div>
@@ -281,7 +281,7 @@ function PoliteRef() {
 function SignsRef() {
   return (
     <div className="mt-2">
-      <p className="text-sm text-slate-500 mb-2">Common signs you'll see everywhere — your Chinese kanji knowledge helps!</p>
+      <p className="text-base text-slate-500 mb-2">Common signs you'll see everywhere — your Chinese kanji knowledge helps!</p>
       <RefRow jp="入口" rom="i·ri·gu·chi" meaning="Entrance 入口" />
       <RefRow jp="出口" rom="de·gu·chi" meaning="Exit 出口" />
       <RefRow jp="非常口" rom="hi·jou·gu·chi" meaning="Emergency exit 緊急出口" />

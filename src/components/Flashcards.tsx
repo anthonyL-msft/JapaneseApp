@@ -60,10 +60,10 @@ export function Flashcards({ phrases }: Props) {
       <div className="flex flex-col items-center justify-center h-full px-6 text-center">
         <p className="text-4xl mb-4">🎉</p>
         <p className="text-lg font-semibold text-slate-200">No cards due for review!</p>
-        <p className="text-sm text-slate-400 mt-2">Come back later or switch to "All Cards" mode.</p>
+        <p className="text-base text-slate-400 mt-2">Come back later or switch to "All Cards" mode.</p>
         <button
           onClick={() => setMode('all')}
-          className="mt-4 bg-sakura-500/80 text-white px-4 py-2 rounded-xl text-sm active:bg-sakura-600"
+          className="mt-4 bg-sakura-500/80 text-white px-4 py-2 rounded-xl text-base active:bg-sakura-600"
         >
           Study All Cards
         </button>
@@ -79,25 +79,25 @@ export function Flashcards({ phrases }: Props) {
       <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold">🃏 Flashcards</h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-base text-slate-400">
             {mode === 'review' ? `${dueCards.length} due for review` : `${activePhrases.length} total cards`}
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => { setMode('review'); setCurrentIndex(0); setShowAnswer(false); }}
-            className={`text-xs px-3 py-1.5 rounded-lg ${mode === 'review' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
+            className={`text-base px-3 py-1.5 rounded-lg ${mode === 'review' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
           >Due ({dueCards.length})</button>
           <button
             onClick={() => { setMode('all'); setCurrentIndex(0); setShowAnswer(false); }}
-            className={`text-xs px-3 py-1.5 rounded-lg ${mode === 'all' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
+            className={`text-base px-3 py-1.5 rounded-lg ${mode === 'all' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
           >All</button>
         </div>
       </div>
 
       {/* Card */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <p className="text-sm text-slate-500 mb-4">{idx + 1} / {activePhrases.length}</p>
+        <p className="text-base text-slate-500 mb-4">{idx + 1} / {activePhrases.length}</p>
 
         <div
           onClick={() => setShowAnswer(!showAnswer)}
@@ -117,14 +117,14 @@ export function Flashcards({ phrases }: Props) {
               <p className="text-2xl font-bold text-slate-50 mb-2">{currentPhrase.target}</p>
               <p className="text-lg text-sakura-300 mb-1">{currentPhrase.pronunciation_chunks || currentPhrase.pronunciation}</p>
               {currentPhrase.pronunciation_chunks && (
-                <p className="text-sm text-slate-500 mb-1">{currentPhrase.pronunciation}</p>
+                <p className="text-base text-slate-500 mb-1">{currentPhrase.pronunciation}</p>
               )}
-              <p className="text-sm text-slate-300 mb-1">{currentPhrase.romanization}</p>
+              <p className="text-base text-slate-300 mb-1">{currentPhrase.romanization}</p>
               <div className="border-t border-slate-700 w-full my-3" />
               <p className="text-base text-slate-200 mb-1">{currentPhrase.english}</p>
-              <p className="text-sm text-slate-400">{currentPhrase.chinese_tc}</p>
+              <p className="text-base text-slate-400">{currentPhrase.chinese_tc}</p>
               {currentPhrase.native_hint && (
-                <p className="text-sm text-amber-400 mt-2">🌉 {currentPhrase.native_hint}</p>
+                <p className="text-base text-amber-400 mt-2">🌉 {currentPhrase.native_hint}</p>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); speak(currentPhrase.target, getTtsLang(currentPhrase.lang)); }}
@@ -137,16 +137,16 @@ export function Flashcards({ phrases }: Props) {
         {/* Rating buttons */}
         {showAnswer && (
           <div className="flex gap-2 mt-4 w-full max-w-sm">
-            <button onClick={() => handleRate(1)} className="flex-1 bg-red-900/40 text-red-300 py-2.5 rounded-xl text-sm active:bg-red-800/60 transition">
+            <button onClick={() => handleRate(1)} className="flex-1 bg-red-900/40 text-red-300 py-2.5 rounded-xl text-base active:bg-red-800/60 transition">
               Again
             </button>
-            <button onClick={() => handleRate(3)} className="flex-1 bg-amber-900/40 text-amber-300 py-2.5 rounded-xl text-sm active:bg-amber-800/60 transition">
+            <button onClick={() => handleRate(3)} className="flex-1 bg-amber-900/40 text-amber-300 py-2.5 rounded-xl text-base active:bg-amber-800/60 transition">
               Hard
             </button>
-            <button onClick={() => handleRate(4)} className="flex-1 bg-green-900/40 text-green-300 py-2.5 rounded-xl text-sm active:bg-green-800/60 transition">
+            <button onClick={() => handleRate(4)} className="flex-1 bg-green-900/40 text-green-300 py-2.5 rounded-xl text-base active:bg-green-800/60 transition">
               Good
             </button>
-            <button onClick={() => handleRate(5)} className="flex-1 bg-emerald-900/40 text-emerald-300 py-2.5 rounded-xl text-sm active:bg-emerald-800/60 transition">
+            <button onClick={() => handleRate(5)} className="flex-1 bg-emerald-900/40 text-emerald-300 py-2.5 rounded-xl text-base active:bg-emerald-800/60 transition">
               Easy
             </button>
           </div>
@@ -155,10 +155,10 @@ export function Flashcards({ phrases }: Props) {
         {/* Nav */}
         {!showAnswer && (
           <div className="flex gap-4 mt-4">
-            <button onClick={handlePrev} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-sm" disabled={idx === 0}>
+            <button onClick={handlePrev} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-base" disabled={idx === 0}>
               ← Prev
             </button>
-            <button onClick={handleNext} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-sm">
+            <button onClick={handleNext} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-base">
               Next →
             </button>
           </div>
