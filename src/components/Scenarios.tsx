@@ -13,10 +13,20 @@ export function Scenarios({ lang, langConfig }: Props) {
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const autoPlayRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const langScenarios = scenarios.filter(s => s.lang === lang);
+
+  const toggleGroup = (key: string) => {
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const handleSelect = (scenario: Scenario) => {
     setSelectedScenario(scenario);
@@ -117,33 +127,45 @@ export function Scenarios({ lang, langConfig }: Props) {
       <div className="scroll-area h-full p-4">
         <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
         <p className="text-slate-400 text-sm mb-4">Practice real {langConfig.name} dialogues step-by-step</p>
-        <div className="space-y-5">
+        <div className="space-y-2">
           {(Object.entries(SCENARIO_GROUPS) as [ScenarioGroup, { label: string; emoji: string }][]).map(([groupKey, groupInfo]) => {
             const groupScenarios = langScenarios.filter(s => s.group === groupKey);
             if (groupScenarios.length === 0) return null;
+            const isOpen = openGroups.has(groupKey);
             return (
-              <div key={groupKey}>
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  {groupInfo.emoji} {groupInfo.label}
-                </h3>
-                <div className="space-y-2">
-                  {groupScenarios.map(sc => (
-                    <button
-                      key={sc.id}
-                      onClick={() => handleSelect(sc)}
-                      className="w-full bg-slate-800/80 rounded-2xl p-4 text-left active:bg-slate-700 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{sc.emoji}</span>
-                        <div>
-                          <h3 className="text-sm font-semibold text-slate-100">{sc.title}</h3>
-                          <p className="text-xs text-slate-400 mt-0.5">{sc.titleTC}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{sc.description} · {sc.lines.length} lines</p>
+              <div key={groupKey} className="bg-slate-800/60 rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => toggleGroup(groupKey)}
+                  className="w-full flex items-center justify-between p-3.5 active:bg-slate-700/50 transition"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-lg">{groupInfo.emoji}</span>
+                    <div className="text-left">
+                      <h3 className="text-sm font-semibold text-slate-100">{groupInfo.label}</h3>
+                      <p className="text-[10px] text-slate-500">{groupScenarios.length} conversations</p>
+                    </div>
+                  </div>
+                  <span className="text-slate-500 text-xs">{isOpen ? '▲' : '▼'}</span>
+                </button>
+                {isOpen && (
+                  <div className="px-2 pb-2 space-y-1.5">
+                    {groupScenarios.map(sc => (
+                      <button
+                        key={sc.id}
+                        onClick={() => handleSelect(sc)}
+                        className="w-full bg-slate-700/40 rounded-xl p-3 text-left active:bg-slate-600/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-lg">{sc.emoji}</span>
+                          <div>
+                            <h4 className="text-sm font-medium text-slate-200">{sc.title}</h4>
+                            <p className="text-[10px] text-slate-500">{sc.titleTC} · {sc.lines.length} lines</p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}

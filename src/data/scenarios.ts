@@ -672,4 +672,42 @@ export const scenarios: Scenario[] = [
       ] },
     ],
   },
+  {
+    id: 'sc26',
+    lang: 'ja',
+    group: 'travel',
+    title: 'Luggage Forwarding (Takkyubin)',
+    titleTC: '行李宅配（宅急便）',
+    emoji: '📦',
+    description: 'Send luggage from Hotel A to Hotel B — travel light on the Shinkansen!',
+    lines: [
+      { speaker: 'you', target: 'すみません、荷物を次のホテルに送りたいのですが', pronunciation: 'sumimasen, nimotsu wo tsugi no hoteru ni okuritai no desu ga', pronunciation_chunks: 'su·mi·ma·sen, ni·mo·tsu wo tsu·gi no ho·te·ru ni o·ku·ri·tai no de·su ga', english: 'Excuse me, I\'d like to send luggage to my next hotel.', chinese_tc: '不好意思，我想把行李寄到下一間飯店', note: '宅急便 (takkyubin) — Japan\'s amazing luggage forwarding service. Send from hotel/convenience store, arrives next day!' },
+      { speaker: 'staff', target: 'はい、宅急便ですね。伝票をご記入ください', pronunciation: 'hai, takkyuubin desu ne. denpyou wo gokinyuu kudasai', pronunciation_chunks: 'hai, tak·kyuu·bin de·su ne. den·pyou wo go·ki·nyuu ku·da·sai', english: 'Yes, takkyubin. Please fill out the slip.', chinese_tc: '好的，宅急便。請填寫單子' },
+      { speaker: 'you', target: '送り先の住所を書けばいいですか？', pronunciation: 'okurisaki no juusho wo kakeba ii desu ka?', pronunciation_chunks: 'o·ku·ri·sa·ki no juu·sho wo ka·ke·ba ii de·su ka', english: 'I just write the destination address?', chinese_tc: '寫收件地址就好嗎？' },
+      { speaker: 'staff', target: 'はい、届け先のホテル名と住所をお願いします。お届け日はいつがよろしいですか？', pronunciation: 'hai, todokesaki no hoteru mei to juusho wo onegaishimasu. otodoke bi wa itsu ga yoroshii desu ka?', pronunciation_chunks: 'hai, to·do·ke·sa·ki no ho·te·ru mei to juu·sho wo o·ne·gai·shi·ma·su. o·to·do·ke bi wa i·tsu ga yo·ro·shii de·su ka', english: 'Yes, the destination hotel name and address please. What delivery date would you like?', chinese_tc: '是的，請寫收件飯店名稱和地址。希望哪天送到？' },
+      { speaker: 'you', target: '明後日の午前中にお願いします', pronunciation: 'asatte no gozenchuu ni onegaishimasu', pronunciation_chunks: 'a·sat·te no go·zen·chuu ni o·ne·gai·shi·ma·su', english: 'Day after tomorrow morning please', chinese_tc: '請後天上午送到', variables: [
+        { placeholder: '明後日', label: 'Delivery day', options: [
+          { value: '明日', pronunciation: 'a·shi·ta', english: 'Tomorrow' },
+          { value: '明後日', pronunciation: 'a·sat·te', english: 'Day after tomorrow' },
+        ] },
+        { placeholder: '午前中', label: 'Time', options: [
+          { value: '午前中', pronunciation: 'go·zen·chuu', english: 'Morning' },
+          { value: '午後', pronunciation: 'go·go', english: 'Afternoon' },
+          { value: '夕方', pronunciation: 'yuu·ga·ta', english: 'Evening' },
+        ] },
+      ] },
+      { speaker: 'staff', target: 'スーツケース一つですか？', pronunciation: 'suutsukeesu hitotsu desu ka?', pronunciation_chunks: 'suu·tsu·kee·su hi·to·tsu de·su ka', english: 'One suitcase?', chinese_tc: '一個行李箱嗎？' },
+      { speaker: 'you', target: 'はい、スーツケース二つです', pronunciation: 'hai, suutsukeesu futatsu desu', pronunciation_chunks: 'hai, suu·tsu·kee·su fu·ta·tsu de·su', english: 'Two suitcases', chinese_tc: '兩個行李箱', options: [
+        { target: 'はい、スーツケース一つです', pronunciation: 'hai, suutsukeesu hitotsu desu', pronunciation_chunks: 'hai, suu·tsu·kee·su hi·to·tsu de·su', english: 'One suitcase', chinese_tc: '一個行李箱' },
+        { target: 'はい、スーツケース二つです', pronunciation: 'hai, suutsukeesu futatsu desu', pronunciation_chunks: 'hai, suu·tsu·kee·su fu·ta·tsu de·su', english: 'Two suitcases', chinese_tc: '兩個行李箱' },
+      ] },
+      { speaker: 'staff', target: '合計で3,500円になります。中に壊れやすいものはございますか？', pronunciation: 'goukei de sanzen gohyaku en ni narimasu. naka ni kowareyasui mono wa gozaimasu ka?', pronunciation_chunks: 'gou·kei de san·zen go·hya·ku en ni na·ri·ma·su. na·ka ni ko·wa·re·ya·sui mo·no wa go·zai·ma·su ka', english: 'Total 3,500 yen. Are there any fragile items inside?', chinese_tc: '共3,500日圓。裡面有易碎物品嗎？' },
+      { speaker: 'you', target: 'いいえ、大丈夫です。洋服だけです', pronunciation: 'iie, daijoubu desu. youfuku dake desu', pronunciation_chunks: 'ii·e, dai·jou·bu de·su. you·fu·ku da·ke de·su', english: 'No, just clothes.', chinese_tc: '沒有，只有衣服', options: [
+        { target: 'いいえ、大丈夫です。洋服だけです', pronunciation: 'iie, daijoubu desu. youfuku dake desu', pronunciation_chunks: 'ii·e, dai·jou·bu de·su. you·fu·ku da·ke de·su', english: 'No, just clothes', chinese_tc: '沒有，只有衣服' },
+        { target: 'はい、お土産のお菓子が入っています', pronunciation: 'hai, omiyage no okashi ga haitte imasu', pronunciation_chunks: 'hai, o·mi·ya·ge no o·ka·shi ga hai·tte i·ma·su', english: 'Yes, there are souvenir snacks', chinese_tc: '有，有伴手禮零食' },
+      ] },
+      { speaker: 'staff', target: 'かしこまりました。控えをお渡しします。追跡番号はこちらです', pronunciation: 'kashikomarimashita. hikae wo owatashi shimasu. tsuiseki bangou wa kochira desu', pronunciation_chunks: 'ka·shi·ko·ma·ri·ma·shi·ta. hi·ka·e wo o·wa·ta·shi shi·ma·su. tsui·se·ki ban·gou wa ko·chi·ra de·su', english: 'Certainly. Here\'s your receipt. This is the tracking number.', chinese_tc: '好的。給您收據。這是追蹤號碼', note: 'Keep this receipt! You can track delivery at yamato-hd.co.jp or sagawa-exp.co.jp' },
+      { speaker: 'you', target: 'ありがとうございます。これで身軽に移動できます！', pronunciation: 'arigatou gozaimasu. kore de migaru ni idou dekimasu!', pronunciation_chunks: 'a·ri·ga·tou go·zai·ma·su. ko·re de mi·ga·ru ni i·dou de·ki·ma·su', english: 'Thank you! Now we can travel light!', chinese_tc: '謝謝！這樣就能輕鬆移動了！', note: 'Pro tip: Send luggage the morning of checkout → take Shinkansen with just a day bag → luggage waiting at next hotel!' },
+    ],
+  },
 ];
