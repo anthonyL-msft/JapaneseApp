@@ -3,16 +3,21 @@ import { askHowToSay, isAIConfigured } from '../utils/ai';
 import type { AIPhrase } from '../utils/ai';
 import { speak } from '../utils/tts';
 import { LANGUAGES } from '../data/types';
+import type { UserNote } from '../data/types';
 
 interface Props {
   lang: string;
+  onSaveNote?: (note: UserNote) => void;
 }
 
-export function AskAI({ lang }: Props) {
+export function AskAI({ lang, onSaveNote }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showBig, setShowBig] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [history, setHistory] = useState<AIPhrase[]>([]);
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
@@ -159,6 +164,38 @@ export function AskAI({ lang }: Props) {
                 <p className="text-xs text-slate-300">💡 {result.notes}</p>
               </div>
             )}
+
+            {/* Action buttons */}
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => setShowBig(result.target)}
+                className="flex-1 bg-slate-700/50 text-slate-300 text-xs py-2 rounded-lg active:bg-slate-600 transition"
+              >📺 Show Big</button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${result.target}\n${result.pronunciation_chunks || result.pronunciation}\n${result.english}`);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="flex-1 bg-slate-700/50 text-slate-300 text-xs py-2 rounded-lg active:bg-slate-600 transition"
+              >{copied ? '✓ Copied' : '📋 Copy'}</button>
+              {onSaveNote && (
+                <button
+                  onClick={() => {
+                    const now = Date.now();
+                    onSaveNote({
+                      id: `ai_${now}`,
+                      text: `🤖 ${result.target} (${result.pronunciation_chunks || result.pronunciation}) — ${result.english} / ${result.chinese_tc}`,
+                      createdAt: now,
+                      updatedAt: now,
+                    });
+                    setSaved(true);
+                    setTimeout(() => setSaved(false), 2000);
+                  }}
+                  className="flex-1 bg-sakura-500/30 text-sakura-300 text-xs py-2 rounded-lg active:bg-sakura-500/50 transition"
+                >{saved ? '✓ Saved' : '💾 Save'}</button>
+              )}
+            </div>
           </div>
         )}
 
@@ -188,6 +225,22 @@ export function AskAI({ lang }: Props) {
           </div>
         )}
       </div>
+
+      {/* Show Big Overlay */}
+      {showBig && (
+        <div
+          onClick={() => setShowBig(null)}
+          className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer"
+        >
+          <p className="text-4xl font-bold text-white text-center leading-relaxed">{showBig}</p>
+          <p className="text-lg text-sakura-300 mt-4 text-center">{result?.pronunciation_chunks || result?.pronunciation}</p>
+          <button
+            onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }}
+            className="mt-6 text-4xl active:scale-110 transition-transform"
+          >🔊</button>
+          <p className="text-xs text-slate-600 mt-8">Tap anywhere to close</p>
+        </div>
+      )}
     </div>
   );
 }

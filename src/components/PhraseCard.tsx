@@ -16,10 +16,19 @@ interface Props {
 export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpand, onToggleBookmark, onSaveNote, onDeleteNote }: Props) {
   const [noteText, setNoteText] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [showBig, setShowBig] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
     speak(phrase.target, getTtsLang(phrase.lang));
+  };
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleSaveNote = () => {
@@ -129,6 +138,18 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
             </button>
           </div>
 
+          {/* Quick actions */}
+          <div className="flex gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowBig(true); }}
+              className="flex-1 bg-slate-700/50 text-slate-300 text-xs py-1.5 rounded-lg active:bg-slate-600 transition"
+            >📺 Show Big</button>
+            <button
+              onClick={handleCopy}
+              className="flex-1 bg-slate-700/50 text-slate-300 text-xs py-1.5 rounded-lg active:bg-slate-600 transition"
+            >{copied ? '✓ Copied' : '📋 Copy'}</button>
+          </div>
+
           {/* Difficulty indicator */}
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <span>Difficulty:</span>
@@ -136,6 +157,24 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
               <span key={d} className={d <= phrase.difficulty ? 'text-sakura-400' : 'text-slate-700'}>●</span>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Show Big Overlay */}
+      {showBig && (
+        <div
+          onClick={() => setShowBig(false)}
+          className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer"
+        >
+          <p className="text-4xl font-bold text-white text-center leading-relaxed">{phrase.target}</p>
+          <p className="text-lg text-sakura-300 mt-4 text-center">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
+          <p className="text-base text-slate-400 mt-2 text-center">{phrase.english}</p>
+          <p className="text-sm text-slate-500 mt-1 text-center">{phrase.chinese_tc}</p>
+          <button
+            onClick={(e) => { e.stopPropagation(); speak(phrase.target, getTtsLang(phrase.lang)); }}
+            className="mt-6 text-4xl active:scale-110 transition-transform"
+          >🔊</button>
+          <p className="text-xs text-slate-600 mt-8">Tap anywhere to close</p>
         </div>
       )}
     </div>

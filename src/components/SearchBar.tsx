@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LANGUAGES } from '../data/types';
 import { getTtsRate, setTtsRate, speak } from '../utils/tts';
 
@@ -21,6 +21,15 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [showSettings, setShowSettings] = useState(false);
   const [rate, setRate] = useState(getTtsRate);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
+  }, []);
 
   const handleRateChange = (newRate: number) => {
     setRate(newRate);
@@ -63,7 +72,12 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
           )}
         </div>
 
-        {/* Settings */}
+        {/* Online/Offline indicator + Settings */}
+        {!isOnline && (
+          <span className="shrink-0 text-[10px] bg-amber-900/50 text-amber-300 px-2 py-1 rounded-lg">
+            Offline
+          </span>
+        )}
         <button
           onClick={() => setShowSettings(!showSettings)}
           className={`shrink-0 text-lg p-1.5 rounded-lg transition ${showSettings ? 'bg-slate-700 text-slate-200' : 'text-slate-500 active:text-slate-300'}`}
