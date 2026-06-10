@@ -86,5 +86,24 @@ Respond ONLY with a valid JSON object. No markdown, no explanation, just the JSO
 
   // Parse JSON — strip markdown fences if present
   const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
-  return JSON.parse(jsonStr);
+  const parsed = JSON.parse(jsonStr);
+
+  // Safety: ensure all values are strings (AI sometimes returns objects)
+  const safeStr = (v: unknown): string => {
+    if (typeof v === 'string') return v;
+    if (v == null) return '';
+    if (typeof v === 'object') return Object.values(v as Record<string, unknown>).map(safeStr).join('');
+    return String(v);
+  };
+
+  return {
+    target: safeStr(parsed.target),
+    romanization: parsed.romanization ? safeStr(parsed.romanization) : undefined,
+    pronunciation: safeStr(parsed.pronunciation),
+    pronunciation_chunks: safeStr(parsed.pronunciation_chunks),
+    english: safeStr(parsed.english),
+    chinese_tc: safeStr(parsed.chinese_tc),
+    notes: safeStr(parsed.notes),
+    native_hint: parsed.native_hint ? safeStr(parsed.native_hint) : undefined,
+  };
 }
