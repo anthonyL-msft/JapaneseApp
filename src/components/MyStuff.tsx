@@ -18,6 +18,7 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [newNoteText, setNewNoteText] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
   const [openSections, setOpenSections] = useState<Set<Section>>(new Set(['bookmarks']));
 
   const toggleSection = (s: Section) => {
@@ -51,14 +52,17 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
   const handleSaveStandalone = () => {
     if (!newNoteText.trim()) return;
     const now = Date.now();
-    if (editingId) {
-      const existing = notes.find(n => n.id === editingId);
-      onSaveNote({ id: editingId, text: newNoteText.trim(), createdAt: existing?.createdAt || now, updatedAt: now });
-      setEditingId(null);
-    } else {
-      onSaveNote({ id: `sn_${now}`, text: newNoteText.trim(), createdAt: now, updatedAt: now });
-    }
+    onSaveNote({ id: `sn_${now}`, text: newNoteText.trim(), createdAt: now, updatedAt: now });
     setNewNoteText('');
+  };
+
+  const handleSaveEdit = () => {
+    if (!editText.trim() || !editingId) return;
+    const now = Date.now();
+    const existing = notes.find(n => n.id === editingId);
+    onSaveNote({ id: editingId, text: editText.trim(), createdAt: existing?.createdAt || now, updatedAt: now });
+    setEditingId(null);
+    setEditText('');
   };
 
   const totalItems = bookmarks.length + notes.length;
@@ -88,7 +92,7 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
               disabled={!newNoteText.trim()}
               className="bg-sakura-500/80 text-base text-white px-4 py-2.5 rounded-xl disabled:opacity-30 active:bg-sakura-600 transition"
             >
-              {editingId ? 'Update' : 'Add'}
+              Add
             </button>
           </div>
         </div>
@@ -180,16 +184,36 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
                   {standaloneNotes
                     .sort((a, b) => b.updatedAt - a.updatedAt)
                     .map(note => (
-                      <div key={note.id} className="bg-slate-700/30 rounded-xl p-3 flex items-start gap-2">
-                        <p className="text-base text-slate-200 flex-1">{note.text}</p>
-                        <button
-                          onClick={() => { setNewNoteText(note.text); setEditingId(note.id); }}
-                          className="text-base text-slate-500 hover:text-slate-300 shrink-0"
-                        >✏️</button>
-                        <button
-                          onClick={() => onDeleteNote(note.id)}
-                          className="text-base text-slate-500 hover:text-red-400 shrink-0"
-                        >🗑️</button>
+                      <div key={note.id} className="bg-slate-700/30 rounded-xl p-3">
+                        {editingId === note.id ? (
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={editText}
+                              onChange={e => setEditText(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') handleSaveEdit();
+                                if (e.key === 'Escape') { setEditingId(null); setEditText(''); }
+                              }}
+                              autoFocus
+                              className="flex-1 bg-slate-600/50 text-base text-slate-200 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-sakura-400/50"
+                            />
+                            <button onClick={handleSaveEdit} className="text-base text-sakura-400 active:text-sakura-300 px-2">✓</button>
+                            <button onClick={() => { setEditingId(null); setEditText(''); }} className="text-base text-slate-500 active:text-slate-300 px-2">✕</button>
+                          </div>
+                        ) : (
+                          <div className="flex items-start gap-2">
+                            <p className="text-base text-slate-200 flex-1">{note.text}</p>
+                            <button
+                              onClick={() => { setEditText(note.text); setEditingId(note.id); }}
+                              className="text-base text-slate-500 hover:text-slate-300 shrink-0"
+                            >✏️</button>
+                            <button
+                              onClick={() => onDeleteNote(note.id)}
+                              className="text-base text-slate-500 hover:text-red-400 shrink-0"
+                            >🗑️</button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   {phraseNotes
