@@ -111,7 +111,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
         <p className="text-xs text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
       </div>
 
-      <div className="p-4 space-y-2">
+      <div className="px-3 py-3 space-y-2">
         {Array.from(situations.entries()).map(([situation, pList]) => {
           const isOpen = openSituations.has(situation);
           return (
