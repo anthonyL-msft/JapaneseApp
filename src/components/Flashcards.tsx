@@ -110,7 +110,7 @@ export function Flashcards({ phrases }: Props) {
                 onClick={(e) => { e.stopPropagation(); speak(currentPhrase.target, getTtsLang(currentPhrase.lang)); }}
                 className="text-2xl mb-4 active:scale-110 transition-transform"
               >🔊</button>
-              <p className="text-sm text-slate-500">Tap to reveal answer</p>
+              <p className="text-base text-slate-500">Tap to reveal answer</p>
             </>
           ) : (
             <>
@@ -124,7 +124,7 @@ export function Flashcards({ phrases }: Props) {
               <p className="text-base text-slate-200 mb-1">{currentPhrase.english}</p>
               <p className="text-sm text-slate-400">{currentPhrase.chinese_tc}</p>
               {currentPhrase.native_hint && (
-                <p className="text-xs text-amber-400 mt-2">🌉 {currentPhrase.native_hint}</p>
+                <p className="text-sm text-amber-400 mt-2">🌉 {currentPhrase.native_hint}</p>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); speak(currentPhrase.target, getTtsLang(currentPhrase.lang)); }}

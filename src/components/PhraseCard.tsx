@@ -89,13 +89,13 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
 
           {phrase.native_hint && (
             <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-              <p className="text-xs text-amber-400">🌉 {phrase.native_hint}</p>
+              <p className="text-sm text-amber-400">🌉 {phrase.native_hint}</p>
             </div>
           )}
 
           {phrase.notes && (
             <div className="bg-slate-700/30 rounded-lg p-2">
-              <p className="text-xs text-slate-300">💡 {phrase.notes}</p>
+              <p className="text-sm text-slate-300">💡 {phrase.notes}</p>
             </div>
           )}
 
@@ -105,7 +105,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
               <p className="text-xs text-slate-500">Your notes:</p>
               {notes.map(n => (
                 <div key={n.id} className="flex items-start gap-2 bg-slate-700/20 rounded-lg p-2">
-                  <p className="text-xs text-slate-300 flex-1">{n.text}</p>
+                  <p className="text-sm text-slate-300 flex-1">{n.text}</p>
                   <button
                     onClick={() => { setNoteText(n.text); setEditingNoteId(n.id); }}
                     className="text-xs text-slate-500 hover:text-slate-300"

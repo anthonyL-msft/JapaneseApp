@@ -141,7 +141,7 @@ export function Scenarios({ lang, langConfig }: Props) {
                   <div className="flex items-center gap-2.5">
                     <span className="text-lg">{groupInfo.emoji}</span>
                     <div className="text-left">
-                      <h3 className="text-sm font-semibold text-slate-100">{groupInfo.label}</h3>
+                      <h3 className="text-base font-semibold text-slate-100">{groupInfo.label}</h3>
                       <p className="text-[10px] text-slate-500">{groupScenarios.length} conversations</p>
                     </div>
                   </div>
@@ -158,7 +158,7 @@ export function Scenarios({ lang, langConfig }: Props) {
                         <div className="flex items-center gap-2.5">
                           <span className="text-lg">{sc.emoji}</span>
                           <div>
-                            <h4 className="text-sm font-medium text-slate-200">{sc.title}</h4>
+                            <h4 className="text-base font-medium text-slate-200">{sc.title}</h4>
                             <p className="text-[10px] text-slate-500">{sc.titleTC} · {sc.lines.length} lines</p>
                           </div>
                         </div>
@@ -229,7 +229,7 @@ export function Scenarios({ lang, langConfig }: Props) {
 
         {allRevealed && (
           <div className="text-center py-4">
-            <p className="text-sm text-slate-500 mb-3">🎉 Conversation complete!</p>
+            <p className="text-base text-slate-500 mb-3">🎉 Conversation complete!</p>
             <div className="flex gap-2 justify-center">
               <button
                 onClick={handleReset}
@@ -314,8 +314,8 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
                 onClick={() => handleSelectOption(idx)}
                 className="w-full bg-indigo-900/30 border border-indigo-700/40 rounded-xl p-2.5 text-left active:bg-indigo-800/50 transition"
               >
-                <p className="text-sm text-slate-100">{opt.target}</p>
-                <p className="text-xs text-sakura-300 mt-0.5">{opt.pronunciation_chunks || opt.pronunciation}</p>
+                <p className="text-base text-slate-100">{opt.target}</p>
+                <p className="text-sm text-sakura-300 mt-0.5">{opt.pronunciation_chunks || opt.pronunciation}</p>
                 <p className="text-xs text-slate-400 mt-0.5">{opt.english} · {opt.chinese_tc}</p>
               </button>
             ))}
@@ -395,7 +395,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
             {/* Expanded detail */}
             {showDetail && line.note && (
               <div className="mt-2 bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-                <p className="text-xs text-amber-400">💡 {line.note}</p>
+                <p className="text-sm text-amber-400">💡 {line.note}</p>
               </div>
             )}
           </div>

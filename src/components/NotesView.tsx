@@ -68,14 +68,14 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                 .sort((a, b) => b.updatedAt - a.updatedAt)
                 .map(note => (
                   <div key={note.id} className="bg-slate-800/60 rounded-xl p-3 flex items-start gap-2">
-                    <p className="text-sm text-slate-200 flex-1">{note.text}</p>
+                    <p className="text-base text-slate-200 flex-1">{note.text}</p>
                     <button
                       onClick={() => { setNewNoteText(note.text); setEditingId(note.id); }}
-                      className="text-sm text-slate-500 hover:text-slate-300 shrink-0"
+                      className="text-base text-slate-500 hover:text-slate-300 shrink-0"
                     >✏️</button>
                     <button
                       onClick={() => onDeleteNote(note.id)}
-                      className="text-sm text-slate-500 hover:text-red-400 shrink-0"
+                      className="text-base text-slate-500 hover:text-red-400 shrink-0"
                     >🗑️</button>
                   </div>
                 ))}
@@ -95,7 +95,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                   return (
                     <div key={note.id} className="bg-slate-800/60 rounded-xl p-3">
                       {phrase && (
-                        <p className="text-xs text-sakura-400 mb-1">
+                        <p className="text-sm text-sakura-400 mb-1">
                           {phrase.target} · {phrase.pronunciation}
                         </p>
                       )}
@@ -103,7 +103,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                         <p className="text-sm text-slate-300 flex-1">{note.text}</p>
                         <button
                           onClick={() => onDeleteNote(note.id)}
-                          className="text-sm text-slate-500 hover:text-red-400 shrink-0"
+                          className="text-base text-slate-500 hover:text-red-400 shrink-0"
                         >🗑️</button>
                       </div>
                     </div>

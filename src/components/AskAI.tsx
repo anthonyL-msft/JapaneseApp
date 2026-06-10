@@ -155,13 +155,13 @@ export function AskAI({ lang, onSaveNote }: Props) {
 
             {result.native_hint && (
               <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-                <p className="text-xs text-amber-400">🌉 {result.native_hint}</p>
+                <p className="text-sm text-amber-400">🌉 {result.native_hint}</p>
               </div>
             )}
 
             {result.notes && (
               <div className="bg-slate-700/30 rounded-lg p-2">
-                <p className="text-xs text-slate-300">💡 {result.notes}</p>
+                <p className="text-sm text-slate-300">💡 {result.notes}</p>
               </div>
             )}
 
@@ -215,8 +215,8 @@ export function AskAI({ lang, onSaveNote }: Props) {
                     className="text-sm shrink-0"
                   >🔊</button>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-slate-200 truncate">{h.target}</p>
-                    <p className="text-xs text-sakura-300 truncate">{h.pronunciation_chunks || h.pronunciation}</p>
+                    <p className="text-base text-slate-200 truncate">{h.target}</p>
+                    <p className="text-sm text-sakura-300 truncate">{h.pronunciation_chunks || h.pronunciation}</p>
                     <p className="text-xs text-slate-500 truncate">{h.english}</p>
                   </div>
                 </div>
