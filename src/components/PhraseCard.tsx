@@ -37,7 +37,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
   return (
     <div className={`bg-slate-700/40 rounded-xl overflow-hidden transition-all ${expanded ? 'ring-1 ring-sakura-400/30' : ''}`}>
       {/* Compact view */}
-      <button onClick={onToggleExpand} className="w-full text-left p-3 active:bg-slate-700/50 transition">
+      <div onClick={onToggleExpand} className="w-full text-left p-3 active:bg-slate-700/50 transition cursor-pointer">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-slate-50">{phrase.target}</p>
@@ -53,7 +53,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
             </button>
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Expanded details */}
       {expanded && (
