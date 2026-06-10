@@ -16,7 +16,7 @@ export default defineConfig({
         short_name: '日本語トラベル',
         description: 'Learn Japanese for travel — offline phrase book with TTS',
         theme_color: '#1e293b',
-        background_color: '#0f172a',
+        background_color: '#020617',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/JapaneseApp/',
