@@ -83,9 +83,9 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                 className="bg-slate-800/80 rounded-2xl p-4 text-left active:bg-slate-700 transition-colors"
               >
                 <span className="text-2xl">{info.emoji}</span>
-                <h3 className="text-sm font-semibold mt-2 text-slate-100">{info.label}</h3>
-                <p className="text-xs text-slate-400 mt-0.5">{info.labelTC}</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <h3 className="text-base font-semibold mt-2 text-slate-100">{info.label}</h3>
+                <p className="text-sm text-slate-400 mt-0.5">{info.labelTC}</p>
+                <p className="text-sm text-slate-500 mt-1">
                   {catPhrases.length} phrases
                   {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
                 </p>
@@ -153,8 +153,8 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                 className="w-full flex items-center justify-between px-3 py-2.5 text-left active:bg-slate-700/50 transition"
               >
                 <div className="text-left">
-                  <h3 className="text-sm font-semibold text-slate-200">{situation}</h3>
-                  <p className="text-[10px] text-slate-500">{pList.length} phrases</p>
+                  <h3 className="text-base font-semibold text-slate-200">{situation}</h3>
+                  <p className="text-xs text-slate-500">{pList.length} phrases</p>
                 </div>
                 <span className="text-slate-500 text-xs shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
               </button>
