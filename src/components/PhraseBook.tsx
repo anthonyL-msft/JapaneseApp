@@ -11,9 +11,10 @@ interface Props {
   onToggleBookmark: (id: string) => void;
   onSaveNote: (note: UserNote) => void;
   onDeleteNote: (id: string) => void;
+  onShowCards?: () => void;
 }
 
-export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, onSaveNote, onDeleteNote }: Props) {
+export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, onSaveNote, onDeleteNote, onShowCards }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [openSituations, setOpenSituations] = useState<Set<string>>(new Set());
@@ -54,12 +55,22 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
             <h1 className="text-xl font-bold mb-0.5">📖 Phrase Book</h1>
             <p className="text-slate-400 text-sm">Select a category to start learning</p>
           </div>
-          <button
-            onClick={() => setShowReference(true)}
-            className="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
-          >
-            📚 Reference
-          </button>
+          <div className="flex gap-2">
+            {onShowCards && (
+              <button
+                onClick={onShowCards}
+                className="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+              >
+                🃏 Cards
+              </button>
+            )}
+            <button
+              onClick={() => setShowReference(true)}
+              className="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+            >
+              📚 Ref
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {categories.map(([key, info]) => {

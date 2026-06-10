@@ -9,12 +9,13 @@ import { BookmarksView } from './components/BookmarksView';
 import { NotesView } from './components/NotesView';
 import { Reference } from './components/Reference';
 import { Scenarios } from './components/Scenarios';
+import { AskAI } from './components/AskAI';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'phrases', label: 'Phrases', icon: '📖' },
   { id: 'scenes', label: 'Scenes', icon: '🎭' },
-  { id: 'cards', label: 'Cards', icon: '🃏' },
+  { id: 'ai', label: 'Ask AI', icon: '🤖' },
   { id: 'bookmarks', label: 'Saved', icon: '⭐' },
   { id: 'notes', label: 'Notes', icon: '📝' },
 ];
@@ -98,6 +99,7 @@ function App() {
             onToggleBookmark={toggleBookmark}
             onSaveNote={handleSaveNote}
             onDeleteNote={handleDeleteNote}
+            onShowCards={() => setTab('cards')}
           />
         )}
         {tab === 'cards' && (
@@ -124,6 +126,8 @@ function App() {
         )}
         {tab === 'reference' && <Reference />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} />}
+        {tab === 'ai' && <AskAI lang={lang} />}
+        {tab === 'cards' && <Flashcards phrases={langPhrases} />}
       </div>
 
       {/* Bottom Navigation */}
