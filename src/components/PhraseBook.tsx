@@ -98,17 +98,38 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
     situations.set(p.situation, list);
   });
 
+  const situationKeys = Array.from(situations.keys());
+  const allOpen = situationKeys.length > 0 && situationKeys.every(k => openSituations.has(k));
+
+  const toggleAll = () => {
+    if (allOpen) {
+      setOpenSituations(new Set());
+    } else {
+      setOpenSituations(new Set(situationKeys));
+    }
+  };
+
   return (
     <div className="scroll-area h-full">
       <div className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800">
-        <button
-          onClick={() => { setSelectedCategory(null); setOpenSituations(new Set()); }}
-          className="text-sakura-400 text-sm mb-1 flex items-center gap-1"
-        >
-          ← All Categories
-        </button>
-        <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
-        <p className="text-xs text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <button
+              onClick={() => { setSelectedCategory(null); setOpenSituations(new Set()); }}
+              className="text-sakura-400 text-sm mb-1 flex items-center gap-1"
+            >
+              ← All Categories
+            </button>
+            <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
+            <p className="text-xs text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
+          </div>
+          <button
+            onClick={toggleAll}
+            className="mt-5 text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
+          >
+            {allOpen ? '▲ Close All' : '▼ Open All'}
+          </button>
+        </div>
       </div>
 
       <div className="px-2 py-2 space-y-1.5">
