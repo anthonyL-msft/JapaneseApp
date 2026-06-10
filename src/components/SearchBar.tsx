@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { LANGUAGES } from '../data/types';
+import { getTtsRate, setTtsRate, speak } from '../utils/tts';
 
 interface Props {
   value: string;
@@ -7,8 +9,24 @@ interface Props {
   onLangChange: (lang: string) => void;
 }
 
+const SPEED_LABELS: Record<string, string> = {
+  '0.5': 'Very Slow',
+  '0.6': 'Slow',
+  '0.7': 'Normal',
+  '0.85': 'Fast',
+  '1': 'Native',
+};
+
 export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+  const [showSettings, setShowSettings] = useState(false);
+  const [rate, setRate] = useState(getTtsRate);
+
+  const handleRateChange = (newRate: number) => {
+    setRate(newRate);
+    setTtsRate(newRate);
+    speak('こんにちは', currentLang.ttsLang);
+  };
 
   return (
     <div className="bg-slate-900 border-b border-slate-800 px-4 pt-3 pb-2" style={{ paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
@@ -44,7 +62,39 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
             </button>
           )}
         </div>
+
+        {/* Settings */}
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className={`shrink-0 text-lg p-1.5 rounded-lg transition ${showSettings ? 'bg-slate-700 text-slate-200' : 'text-slate-500 active:text-slate-300'}`}
+        >
+          ⚙️
+        </button>
       </div>
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <div className="mt-2 bg-slate-800/80 rounded-xl p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400">🔊 Speech Speed</span>
+            <span className="text-xs text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
+          </div>
+          <input
+            type="range"
+            min="0.5"
+            max="1"
+            step="0.05"
+            value={rate}
+            onChange={e => handleRateChange(parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sakura-400"
+          />
+          <div className="flex justify-between text-[10px] text-slate-600">
+            <span>Slow</span>
+            <span>Normal</span>
+            <span>Native</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

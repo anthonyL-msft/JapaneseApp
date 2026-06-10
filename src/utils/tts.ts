@@ -1,11 +1,22 @@
 import { LANGUAGES } from '../data/types';
 
+const RATE_KEY = 'tts-rate';
+
+export function getTtsRate(): number {
+  const stored = localStorage.getItem(RATE_KEY);
+  return stored ? parseFloat(stored) : 0.7;
+}
+
+export function setTtsRate(rate: number): void {
+  localStorage.setItem(RATE_KEY, String(rate));
+}
+
 export function speak(text: string, lang = 'ja-JP'): void {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
-  utterance.rate = 0.7;
+  utterance.rate = getTtsRate();
   utterance.pitch = 1;
 
   // Try to find a matching voice
