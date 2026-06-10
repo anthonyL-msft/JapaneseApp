@@ -52,10 +52,12 @@ export function Reference() {
 
 function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string }) {
   return (
-    <div className="flex items-baseline gap-2 py-1.5 border-b border-slate-700/30 last:border-0">
-      <span className="text-base font-medium text-slate-100 w-10 shrink-0">{jp}</span>
-      <span className="text-xs text-sakura-300 w-12 shrink-0">{rom}</span>
-      <span className="text-xs text-slate-400 flex-1">{meaning}</span>
+    <div className="py-1.5 border-b border-slate-700/30 last:border-0">
+      <div className="flex items-baseline gap-2">
+        <span className="text-base font-medium text-slate-100 shrink-0">{jp}</span>
+        <span className="text-xs text-sakura-300">{rom}</span>
+      </div>
+      <p className="text-xs text-slate-400 mt-0.5">{meaning}</p>
     </div>
   );
 }
@@ -168,8 +170,8 @@ function ParticlesRef() {
       <RefRow jp="と" rom="to" meaning="And, with (listing/companion)" />
       <RefRow jp="も" rom="mo" meaning="Also, too" />
       <RefRow jp="か" rom="ka" meaning="Question marker (end of sentence)" />
-      <RefRow jp="から" rom="kara" meaning="From (place/time)" />
-      <RefRow jp="まで" rom="made" meaning="Until, to (endpoint)" />
+      <RefRow jp="から" rom="ka·ra" meaning="From (place/time)" />
+      <RefRow jp="まで" rom="ma·de" meaning="Until, to (endpoint)" />
     </div>
   );
 }
@@ -185,7 +187,7 @@ function CountersRef() {
       <RefRow jp="〜杯" rom="-hai" meaning="Cups/glasses: いっぱい(1), にはい(2)" />
       <RefRow jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples" />
       <RefRow jp="〜台" rom="-dai" meaning="Machines/vehicles: cars, computers" />
-      <RefRow jp="〜泊" rom="-haku" meaning="Nights (hotel): いっぱく(1), にはく(2)" />
+      <RefRow jp="〜泊" rom="-ha·ku" meaning="Nights (hotel): いっぱく(1), にはく(2)" />
       <RefRow jp="〜名" rom="-mei" meaning="People (formal): にめい(2), さんめい(3)" />
       <RefRow jp="〜階" rom="-kai" meaning="Floors: いっかい(1F), にかい(2F)" />
     </div>
@@ -276,24 +278,24 @@ function SignsRef() {
   return (
     <div className="mt-2">
       <p className="text-xs text-slate-500 mb-2">Common signs you'll see everywhere — your Chinese kanji knowledge helps!</p>
-      <RefRow jp="入口" rom="iriguchi" meaning="Entrance 入口" />
-      <RefRow jp="出口" rom="deguchi" meaning="Exit 出口" />
-      <RefRow jp="非常口" rom="hijōguchi" meaning="Emergency exit 緊急出口" />
-      <RefRow jp="禁煙" rom="kinen" meaning="No smoking 禁菸" />
-      <RefRow jp="立入禁止" rom="tachiiri kinshi" meaning="No entry 禁止進入" />
-      <RefRow jp="撮影禁止" rom="satsuei kinshi" meaning="No photography 禁止攝影" />
-      <RefRow jp="営業中" rom="eigyōchū" meaning="Open for business 營業中" />
-      <RefRow jp="準備中" rom="junbichū" meaning="Preparing (not open yet) 準備中" />
-      <RefRow jp="定休日" rom="teikyūbi" meaning="Regular holiday/closed day 定休日" />
-      <RefRow jp="男" rom="otoko" meaning="Male (bathroom) 男" />
-      <RefRow jp="女" rom="onna" meaning="Female (bathroom) 女" />
+      <RefRow jp="入口" rom="i·ri·gu·chi" meaning="Entrance 入口" />
+      <RefRow jp="出口" rom="de·gu·chi" meaning="Exit 出口" />
+      <RefRow jp="非常口" rom="hi·jou·gu·chi" meaning="Emergency exit 緊急出口" />
+      <RefRow jp="禁煙" rom="ki·nen" meaning="No smoking 禁菸" />
+      <RefRow jp="立入禁止" rom="ta·chi·i·ri kin·shi" meaning="No entry 禁止進入" />
+      <RefRow jp="撮影禁止" rom="sa·tsu·ei kin·shi" meaning="No photography 禁止攝影" />
+      <RefRow jp="営業中" rom="ei·gyou·chuu" meaning="Open for business 營業中" />
+      <RefRow jp="準備中" rom="jun·bi·chuu" meaning="Preparing (not open yet) 準備中" />
+      <RefRow jp="定休日" rom="tei·kyuu·bi" meaning="Regular holiday/closed day 定休日" />
+      <RefRow jp="男" rom="o·to·ko" meaning="Male (bathroom) 男" />
+      <RefRow jp="女" rom="on·na" meaning="Female (bathroom) 女" />
       <RefRow jp="押" rom="osu" meaning="Push 推" />
-      <RefRow jp="引" rom="hiku" meaning="Pull 拉" />
-      <RefRow jp="無料" rom="muryō" meaning="Free (no charge) 免費" />
-      <RefRow jp="有料" rom="yūryō" meaning="Paid 收費" />
-      <RefRow jp="割引" rom="waribiki" meaning="Discount 折扣" />
-      <RefRow jp="税込" rom="zeikomi" meaning="Tax included 含稅" />
-      <RefRow jp="税抜" rom="zeinuki" meaning="Tax excluded 未稅" />
+      <RefRow jp="引" rom="hi·ku" meaning="Pull 拉" />
+      <RefRow jp="無料" rom="mu·ryou" meaning="Free (no charge) 免費" />
+      <RefRow jp="有料" rom="yuu·ryou" meaning="Paid 收費" />
+      <RefRow jp="割引" rom="wa·ri·bi·ki" meaning="Discount 折扣" />
+      <RefRow jp="税込" rom="zei·ko·mi" meaning="Tax included 含稅" />
+      <RefRow jp="税抜" rom="zei·nu·ki" meaning="Tax excluded 未稅" />
     </div>
   );
 }
