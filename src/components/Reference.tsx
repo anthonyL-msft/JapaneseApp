@@ -199,37 +199,37 @@ function PatternsRef() {
     <div className="mt-2 space-y-3">
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○をお願いします</p>
-        <p className="text-xs text-sakura-300">○○ wo onegaishimasu</p>
+        <p className="text-xs text-sakura-300">○○ wo o·ne·gai·shi·ma·su</p>
         <p className="text-xs text-slate-400 mt-1">○○ please — works for anything! Water, menu, bill...</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○はありますか</p>
-        <p className="text-xs text-sakura-300">○○ wa arimasu ka</p>
+        <p className="text-xs text-sakura-300">○○ wa a·ri·ma·su ka</p>
         <p className="text-xs text-slate-400 mt-1">Is there ○○? / Do you have ○○?</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○はどこですか</p>
-        <p className="text-xs text-sakura-300">○○ wa doko desu ka</p>
+        <p className="text-xs text-sakura-300">○○ wa do·ko de·su ka</p>
         <p className="text-xs text-slate-400 mt-1">Where is ○○?</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○してもいいですか</p>
-        <p className="text-xs text-sakura-300">○○ shite mo ii desu ka</p>
+        <p className="text-xs text-sakura-300">○○ shi·te mo ii de·su ka</p>
         <p className="text-xs text-slate-400 mt-1">May I ○○? (asking permission)</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○てください</p>
-        <p className="text-xs text-sakura-300">○○ te kudasai</p>
+        <p className="text-xs text-sakura-300">○○ te ku·da·sai</p>
         <p className="text-xs text-slate-400 mt-1">Please do ○○ (polite request)</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○がわかりません</p>
-        <p className="text-xs text-sakura-300">○○ ga wakarimasen</p>
+        <p className="text-xs text-sakura-300">○○ ga wa·ka·ri·ma·sen</p>
         <p className="text-xs text-slate-400 mt-1">I don't understand ○○</p>
       </div>
       <div className="bg-slate-700/30 rounded-lg p-2">
         <p className="text-sm text-slate-200 font-medium">○○たいです</p>
-        <p className="text-xs text-sakura-300">○○ tai desu</p>
+        <p className="text-xs text-sakura-300">○○ tai de·su</p>
         <p className="text-xs text-slate-400 mt-1">I want to ○○ (desire)</p>
       </div>
     </div>
@@ -246,28 +246,32 @@ function PoliteRef() {
             <span className="text-sm text-slate-200">〜ます</span>
             <span className="text-xs text-slate-500">Polite positive</span>
           </div>
-          <p className="text-xs text-slate-400">行きます (ikimasu) = I go</p>
+          <p className="text-xs text-sakura-300">ma·su</p>
+          <p className="text-xs text-slate-400">行きます (i·ki·ma·su) = I go</p>
         </div>
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
             <span className="text-sm text-slate-200">〜ません</span>
             <span className="text-xs text-slate-500">Polite negative</span>
           </div>
-          <p className="text-xs text-slate-400">行きません (ikimasen) = I don't go</p>
+          <p className="text-xs text-sakura-300">ma·sen</p>
+          <p className="text-xs text-slate-400">行きません (i·ki·ma·sen) = I don't go</p>
         </div>
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
             <span className="text-sm text-slate-200">〜ました</span>
             <span className="text-xs text-slate-500">Polite past</span>
           </div>
-          <p className="text-xs text-slate-400">行きました (ikimashita) = I went</p>
+          <p className="text-xs text-sakura-300">ma·shi·ta</p>
+          <p className="text-xs text-slate-400">行きました (i·ki·ma·shi·ta) = I went</p>
         </div>
         <div className="bg-slate-700/30 rounded-lg p-2">
           <div className="flex justify-between">
             <span className="text-sm text-slate-200">〜です</span>
             <span className="text-xs text-slate-500">Polite copula (is/am)</span>
           </div>
-          <p className="text-xs text-slate-400">二人です (futari desu) = There are two of us</p>
+          <p className="text-xs text-sakura-300">de·su</p>
+          <p className="text-xs text-slate-400">ふたりです (fu·ta·ri de·su) = There are two of us</p>
         </div>
       </div>
     </div>
