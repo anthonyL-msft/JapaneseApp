@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/JapaneseApp/',
   plugins: [
     react(),
     tailwindcss(),
@@ -18,11 +19,12 @@ export default defineConfig({
         background_color: '#0f172a',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: '/JapaneseApp/',
+        scope: '/JapaneseApp/',
         icons: [
-          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/JapaneseApp/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/JapaneseApp/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/JapaneseApp/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
