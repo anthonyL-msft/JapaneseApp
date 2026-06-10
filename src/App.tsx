@@ -116,7 +116,7 @@ function App() {
           />
         )}
         {tab === 'reference' && <Reference />}
-        {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} />}
+        {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
         {tab === 'cards' && <Flashcards phrases={langPhrases} />}
       </div>

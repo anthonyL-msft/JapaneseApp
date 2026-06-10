@@ -7,9 +7,10 @@ import { speak } from '../utils/tts';
 interface Props {
   lang: string;
   langConfig: LanguageConfig;
+  search?: string;
 }
 
-export function Scenarios({ lang, langConfig }: Props) {
+export function Scenarios({ lang, langConfig, search = '' }: Props) {
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
@@ -17,7 +18,25 @@ export function Scenarios({ lang, langConfig }: Props) {
   const autoPlayRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const langScenarios = scenarios.filter(s => s.lang === lang);
+  const allLangScenarios = scenarios.filter(s => s.lang === lang);
+
+  // Filter scenarios by search query
+  const langScenarios = search.trim()
+    ? allLangScenarios.filter(sc => {
+        const q = search.toLowerCase();
+        return (
+          sc.title.toLowerCase().includes(q) ||
+          sc.titleTC.toLowerCase().includes(q) ||
+          sc.description.toLowerCase().includes(q) ||
+          sc.lines.some(line =>
+            line.target.toLowerCase().includes(q) ||
+            line.pronunciation.toLowerCase().includes(q) ||
+            line.english.toLowerCase().includes(q) ||
+            line.chinese_tc.toLowerCase().includes(q)
+          )
+        );
+      })
+    : allLangScenarios;
 
   const toggleGroup = (key: string) => {
     setOpenGroups(prev => {
@@ -117,21 +136,34 @@ export function Scenarios({ lang, langConfig }: Props) {
     if (langScenarios.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-          <p className="text-4xl mb-4">🎭</p>
-          <p className="text-lg font-semibold text-slate-200">No conversations yet for {langConfig.name}</p>
-          <p className="text-base text-slate-400 mt-2">Conversations will be added soon! Try switching to Japanese 🇯🇵 to see examples.</p>
+          <p className="text-4xl mb-4">{search.trim() ? '🔍' : '🎭'}</p>
+          <p className="text-lg font-semibold text-slate-200">
+            {search.trim() ? `No conversations matching "${search}"` : `No conversations yet for ${langConfig.name}`}
+          </p>
+          <p className="text-base text-slate-400 mt-2">
+            {search.trim() ? 'Try a different search term' : 'Conversations will be added soon! Try switching to Japanese 🇯🇵 to see examples.'}
+          </p>
         </div>
       );
     }
+
+    // Auto-expand all groups when searching
+    const isSearching = !!search.trim();
+
     return (
       <div className="scroll-area h-full p-4">
         <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
-        <p className="text-slate-400 text-base mb-4">Practice real {langConfig.name} dialogues step-by-step</p>
+        <p className="text-slate-400 text-base mb-4">
+          {isSearching
+            ? `${langScenarios.length} conversations matching "${search}"`
+            : `Practice real ${langConfig.name} dialogues step-by-step`
+          }
+        </p>
         <div className="space-y-2">
           {(Object.entries(SCENARIO_GROUPS) as [ScenarioGroup, { label: string; emoji: string }][]).map(([groupKey, groupInfo]) => {
             const groupScenarios = langScenarios.filter(s => s.group === groupKey);
             if (groupScenarios.length === 0) return null;
-            const isOpen = openGroups.has(groupKey);
+            const isOpen = isSearching || openGroups.has(groupKey);
             return (
               <div key={groupKey} className="bg-slate-800/60 rounded-2xl overflow-hidden">
                 <button
