@@ -5,7 +5,7 @@ export function speak(text: string, lang = 'ja-JP'): void {
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
-  utterance.rate = 0.85;
+  utterance.rate = 0.7;
   utterance.pitch = 1;
 
   // Try to find a matching voice
