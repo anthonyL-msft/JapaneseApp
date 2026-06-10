@@ -111,23 +111,23 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
         <p className="text-xs text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
       </div>
 
-      <div className="px-3 py-3 space-y-2">
+      <div className="px-2 py-2 space-y-1.5">
         {Array.from(situations.entries()).map(([situation, pList]) => {
           const isOpen = openSituations.has(situation);
           return (
-            <div key={situation} className="bg-slate-800/60 rounded-2xl overflow-hidden">
+            <div key={situation} className="bg-slate-800/60 rounded-xl overflow-hidden">
               <button
                 onClick={() => toggleSituation(situation)}
-                className="w-full flex items-center justify-between p-3.5 active:bg-slate-700/50 transition"
+                className="w-full flex items-center justify-between px-3 py-2.5 text-left active:bg-slate-700/50 transition"
               >
-                <div>
+                <div className="text-left">
                   <h3 className="text-sm font-semibold text-slate-200">{situation}</h3>
                   <p className="text-[10px] text-slate-500">{pList.length} phrases</p>
                 </div>
-                <span className="text-slate-500 text-xs">{isOpen ? '▲' : '▼'}</span>
+                <span className="text-slate-500 text-xs shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
               </button>
               {isOpen && (
-                <div className="px-2 pb-2 space-y-1.5">
+                <div className="px-1.5 pb-1.5 space-y-1">
                   {pList.map(phrase => (
                     <PhraseCard
                       key={phrase.id}
