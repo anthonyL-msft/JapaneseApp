@@ -32,14 +32,14 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
         <h2 className="text-lg font-bold">📝 My Notes</h2>
-        <p className="text-xs text-slate-400">{notes.length} total notes</p>
+        <p className="text-sm text-slate-400">{notes.length} total notes</p>
       </div>
 
       <div className="p-4 space-y-6">
         {/* Add standalone note */}
         <div>
           <h3 className="text-sm font-semibold text-slate-300 mb-2">Quick Note</h3>
-          <p className="text-xs text-slate-500 mb-2">WiFi passwords, restaurant names, travel tips...</p>
+          <p className="text-sm text-slate-500 mb-2">WiFi passwords, restaurant names, travel tips...</p>
           <div className="flex gap-2">
             <input
               type="text"
@@ -47,7 +47,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
               onChange={e => setNewNoteText(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSaveStandalone()}
               placeholder="Add a note..."
-              className="flex-1 bg-slate-800 text-sm text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-sakura-400/50"
+              className="flex-1 bg-slate-800 text-base text-slate-200 placeholder-slate-500 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-sakura-400/50"
             />
             <button
               onClick={handleSaveStandalone}

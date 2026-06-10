@@ -79,7 +79,7 @@ export function Flashcards({ phrases }: Props) {
       <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold">🃏 Flashcards</h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-sm text-slate-400">
             {mode === 'review' ? `${dueCards.length} due for review` : `${activePhrases.length} total cards`}
           </p>
         </div>
@@ -97,7 +97,7 @@ export function Flashcards({ phrases }: Props) {
 
       {/* Card */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <p className="text-xs text-slate-500 mb-4">{idx + 1} / {activePhrases.length}</p>
+        <p className="text-sm text-slate-500 mb-4">{idx + 1} / {activePhrases.length}</p>
 
         <div
           onClick={() => setShowAnswer(!showAnswer)}
@@ -117,7 +117,7 @@ export function Flashcards({ phrases }: Props) {
               <p className="text-2xl font-bold text-slate-50 mb-2">{currentPhrase.target}</p>
               <p className="text-lg text-sakura-300 mb-1">{currentPhrase.pronunciation_chunks || currentPhrase.pronunciation}</p>
               {currentPhrase.pronunciation_chunks && (
-                <p className="text-xs text-slate-500 mb-1">{currentPhrase.pronunciation}</p>
+                <p className="text-sm text-slate-500 mb-1">{currentPhrase.pronunciation}</p>
               )}
               <p className="text-sm text-slate-300 mb-1">{currentPhrase.romanization}</p>
               <div className="border-t border-slate-700 w-full my-3" />

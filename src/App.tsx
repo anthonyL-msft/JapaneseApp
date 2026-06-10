@@ -145,7 +145,7 @@ function App() {
             <span className="text-xl mb-0.5">{t.icon}</span>
             <span>{t.label}</span>
             {t.id === 'bookmarks' && bookmarks.length > 0 && (
-              <span className="absolute -mt-1 ml-6 bg-sakura-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+              <span className="absolute -mt-1 ml-6 bg-sakura-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                 {bookmarks.length}
               </span>
             )}

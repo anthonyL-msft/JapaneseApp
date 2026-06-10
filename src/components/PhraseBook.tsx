@@ -132,7 +132,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
               ← All Categories
             </button>
             <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
-            <p className="text-xs text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
+            <p className="text-sm text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
           </div>
           <button
             onClick={toggleAll}
@@ -154,7 +154,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
               >
                 <div className="text-left">
                   <h3 className="text-base font-semibold text-slate-200">{situation}</h3>
-                  <p className="text-xs text-slate-500">{pList.length} phrases</p>
+                  <p className="text-sm text-slate-500">{pList.length} phrases</p>
                 </div>
                 <span className="text-slate-500 text-xs shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
               </button>

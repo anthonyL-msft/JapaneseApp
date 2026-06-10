@@ -58,7 +58,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
         <h2 className="text-lg font-bold">🤖 How do I say...?</h2>
-        <p className="text-xs text-slate-400">Ask in English or 中文, get {currentLang.name} translation</p>
+        <p className="text-sm text-slate-400">Ask in English or 中文, get {currentLang.name} translation</p>
       </div>
 
       <div className="p-4 space-y-4">
@@ -76,7 +76,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
           <button
             onClick={handleAsk}
             disabled={loading || !query.trim()}
-            className="bg-sakura-500/80 text-white px-4 py-3 rounded-xl text-sm font-medium disabled:opacity-30 active:bg-sakura-600 transition shrink-0"
+            className="bg-sakura-500/80 text-white px-4 py-3 rounded-xl text-base font-medium disabled:opacity-30 active:bg-sakura-600 transition shrink-0"
           >
             {loading ? '...' : 'Ask'}
           </button>
@@ -85,7 +85,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
         {/* Quick suggestions */}
         {!result && !loading && history.length === 0 && (
           <div>
-            <p className="text-xs text-slate-500 mb-2">Try asking:</p>
+            <p className="text-sm text-slate-500 mb-2">Try asking:</p>
             <div className="flex flex-wrap gap-1.5">
               {[
                 'I want to split the bill',
@@ -98,7 +98,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
                 <button
                   key={s}
                   onClick={() => { setQuery(s); }}
-                  className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700 transition"
+                  className="text-sm bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700 transition"
                 >
                   {s}
                 </button>
@@ -202,7 +202,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
         {/* History */}
         {history.length > 0 && (
           <div>
-            <h3 className="text-xs text-slate-500 mb-2">Recent translations</h3>
+            <h3 className="text-sm text-slate-500 mb-2">Recent translations</h3>
             <div className="space-y-1.5">
               {history.map((h, i) => (
                 <div
@@ -217,7 +217,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
                   <div className="flex-1 min-w-0">
                     <p className="text-base text-slate-200 truncate">{h.target}</p>
                     <p className="text-sm text-sakura-300 truncate">{h.pronunciation_chunks || h.pronunciation}</p>
-                    <p className="text-xs text-slate-500 truncate">{h.english}</p>
+                    <p className="text-sm text-slate-500 truncate">{h.english}</p>
                   </div>
                 </div>
               ))}
@@ -238,7 +238,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
             onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }}
             className="mt-6 text-4xl active:scale-110 transition-transform"
           >🔊</button>
-          <p className="text-xs text-slate-600 mt-8">Tap anywhere to close</p>
+          <p className="text-sm text-slate-600 mt-8">Tap anywhere to close</p>
         </div>
       )}
     </div>

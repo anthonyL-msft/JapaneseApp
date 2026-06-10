@@ -74,7 +74,7 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
 
         {/* Online/Offline indicator + Settings */}
         {!isOnline && (
-          <span className="shrink-0 text-[10px] bg-amber-900/50 text-amber-300 px-2 py-1 rounded-lg">
+          <span className="shrink-0 text-xs bg-amber-900/50 text-amber-300 px-2 py-1 rounded-lg">
             Offline
           </span>
         )}
@@ -90,8 +90,8 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
       {showSettings && (
         <div className="mt-2 bg-slate-800/80 rounded-xl p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">🔊 Speech Speed</span>
-            <span className="text-xs text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
+            <span className="text-sm text-slate-400">🔊 Speech Speed</span>
+            <span className="text-sm text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
           </div>
           <input
             type="range"
@@ -102,7 +102,7 @@ export function SearchBar({ value, onChange, lang, onLangChange }: Props) {
             onChange={e => handleRateChange(parseFloat(e.target.value))}
             className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sakura-400"
           />
-          <div className="flex justify-between text-[10px] text-slate-600">
+          <div className="flex justify-between text-xs text-slate-600">
             <span>Slow</span>
             <span>Normal</span>
             <span>Native</span>

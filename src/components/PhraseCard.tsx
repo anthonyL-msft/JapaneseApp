@@ -102,17 +102,17 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
           {/* User notes */}
           {notes.length > 0 && (
             <div className="space-y-1">
-              <p className="text-xs text-slate-500">Your notes:</p>
+              <p className="text-sm text-slate-500">Your notes:</p>
               {notes.map(n => (
                 <div key={n.id} className="flex items-start gap-2 bg-slate-700/20 rounded-lg p-2">
                   <p className="text-sm text-slate-300 flex-1">{n.text}</p>
                   <button
                     onClick={() => { setNoteText(n.text); setEditingNoteId(n.id); }}
-                    className="text-xs text-slate-500 hover:text-slate-300"
+                    className="text-sm text-slate-500 hover:text-slate-300"
                   >✏️</button>
                   <button
                     onClick={() => onDeleteNote(n.id)}
-                    className="text-xs text-slate-500 hover:text-red-400"
+                    className="text-sm text-slate-500 hover:text-red-400"
                   >🗑️</button>
                 </div>
               ))}
@@ -127,7 +127,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
               onChange={e => setNoteText(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSaveNote()}
               placeholder="Add a note or remark..."
-              className="flex-1 bg-slate-700/50 text-sm text-slate-200 placeholder-slate-500 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-sakura-400/50"
+              className="flex-1 bg-slate-700/50 text-base text-slate-200 placeholder-slate-500 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-sakura-400/50"
             />
             <button
               onClick={handleSaveNote}
@@ -174,7 +174,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
             onClick={(e) => { e.stopPropagation(); speak(phrase.target, getTtsLang(phrase.lang)); }}
             className="mt-6 text-4xl active:scale-110 transition-transform"
           >🔊</button>
-          <p className="text-xs text-slate-600 mt-8">Tap anywhere to close</p>
+          <p className="text-sm text-slate-600 mt-8">Tap anywhere to close</p>
         </div>
       )}
     </div>
