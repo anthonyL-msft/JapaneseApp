@@ -856,7 +856,7 @@ function PoliteRef() {
 // Sentence Structure (Step 2)
 // ============================================================
 function GrammarRef() {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['S は V ます','S は O を V ます','S は Place で V ます','S は Place に V ます']);
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['O を V ます','V ます','Place で V ます','Place に V ます','S は ... です']);
   return (
     <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
@@ -864,49 +864,57 @@ function GrammarRef() {
       <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
         <p className="text-base text-slate-400 mb-2 text-center">Basic Pattern:</p>
         <div className="flex items-center justify-center gap-1 flex-wrap">
-          <span className="bg-blue-500/30 text-blue-300 px-2 py-1 rounded text-base font-medium">Subject</span>
-          <span className="text-slate-500 text-base">は</span>
+          <span className="bg-blue-500/20 text-blue-400/60 px-2 py-1 rounded text-base border border-dashed border-blue-500/30">(Subject)</span>
           <span className="bg-green-500/30 text-green-300 px-2 py-1 rounded text-base font-medium">Object</span>
           <span className="text-slate-500 text-base">を</span>
           <span className="bg-purple-500/30 text-purple-300 px-2 py-1 rounded text-base font-medium">Verb</span>
           <span className="text-slate-500 text-base">ます</span>
         </div>
-        <p className="text-base text-sakura-300 text-center mt-1">S wa O wo V ma·su</p>
+        <p className="text-base text-sakura-300 text-center mt-1">O wo V ma·su</p>
+        <p className="text-base text-slate-500 text-center mt-1">Subject (I/you) is usually dropped — it's understood!</p>
       </div>
 
       <AccordionHeader label="Tap to see examples of each structure" allOpen={allOpen} toggleAll={toggleAll} />
 
-      <AccordionRow id="S は V ます" jp="S は V ます" rom="S wa V ma·su" meaning="Simple: Subject does something"
+      <AccordionRow id="O を V ます" jp="O を V ます" rom="O wo V ma·su" meaning="Most common: Object + Verb (subject dropped)"
         openSet={openSet} toggle={toggle} items={[
-          { jp: '私は行きます', hep: 'wa·ta·shi wa i·ki·ma·su', en: 'I go' },
-          { jp: '電車が来ます', hep: 'den·sha ga ki·ma·su', en: 'The train comes' },
-          { jp: '友達が待っています', hep: 'to·mo·da·chi ga mat·te i·ma·su', en: 'My friend is waiting' },
+          { jp: 'ラーメンを食べます', hep: 'raa·men wo ta·be·ma·su', en: 'I eat ramen' },
+          { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
+          { jp: '写真を撮ります', hep: 'sha·shin wo to·ri·ma·su', en: 'I take a photo' },
         ]} />
-      <AccordionRow id="S は O を V ます" jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full: Subject does something to Object"
+      <AccordionRow id="V ます" jp="V ます" rom="V ma·su" meaning="Simplest: just the verb"
         openSet={openSet} toggle={toggle} items={[
-          { jp: '私はラーメンを食べます', hep: 'wa·ta·shi wa raa·men wo ta·be·ma·su', en: 'I eat ramen' },
-          { jp: '私は切符を買います', hep: 'wa·ta·shi wa kip·pu wo kai·ma·su', en: 'I buy a ticket' },
-          { jp: '私は写真を撮ります', hep: 'wa·ta·shi wa sha·shin wo to·ri·ma·su', en: 'I take a photo' },
+          { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
+          { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
+          { jp: 'わかりました', hep: 'wa·ka·ri·ma·shi·ta', en: 'I understood / Got it' },
         ]} />
-      <AccordionRow id="S は Place で V ます" jp="S は Place で V ます" rom="S wa Place de V ma·su" meaning="Where: Subject does something AT a place"
+      <AccordionRow id="Place で V ます" jp="Place で V ます" rom="Place de V ma·su" meaning="Where: do something AT a place"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: 'コンビニでコーヒーを買います', hep: 'kon·bi·ni de koo·hii wo kai·ma·su', en: 'I buy coffee at the convenience store' },
           { jp: 'ホテルで休みます', hep: 'ho·te·ru de ya·su·mi·ma·su', en: 'I rest at the hotel' },
         ]} />
-      <AccordionRow id="S は Place に V ます" jp="S は Place に V ます" rom="S wa Place ni V ma·su" meaning="Direction: Subject goes TO a place"
+      <AccordionRow id="Place に V ます" jp="Place に V ます" rom="Place ni V ma·su" meaning="Direction: go TO a place"
         openSet={openSet} toggle={toggle} items={[
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに帰ります', hep: 'ho·te·ru ni ka·e·ri·ma·su', en: 'I return to the hotel' },
           { jp: '駅に着きました', hep: 'e·ki ni tsu·ki·ma·shi·ta', en: 'I arrived at the station' },
         ]} />
+      <AccordionRow id="S は ... です" jp="S は ... です" rom="S wa ... de·su" meaning="When you DO need to name the subject"
+        openSet={openSet} toggle={toggle} items={[
+          { jp: '電車が来ます', hep: 'den·sha ga ki·ma·su', en: 'The train comes (it, not me)' },
+          { jp: '友達が待っています', hep: 'to·mo·da·chi ga mat·te i·ma·su', en: 'My friend is waiting (they, not me)' },
+          { jp: 'このお店は人気です', hep: 'ko·no o·mi·se wa nin·ki de·su', en: 'This shop is popular' },
+        ]} />
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-3 mt-3">
-        <p className="text-base text-indigo-300 font-medium">💡 Shortcut for travelers</p>
-        <p className="text-base text-slate-400 mt-1">You can often drop 私は (I) — it's understood from context. Just say the object + verb!</p>
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-3 mt-1">
+        <p className="text-base text-indigo-300 font-medium">💡 When to say 私は?</p>
+        <p className="text-base text-slate-400 mt-1">Only when introducing yourself or contrasting with someone else:</p>
         <div className="mt-2 space-y-1">
-          <p className="text-base text-slate-300">❌ 私はラーメンを食べます</p>
-          <p className="text-base text-slate-300">✅ ラーメンを食べます <span className="text-slate-500">(same meaning, more natural)</span></p>
+          <p className="text-base text-slate-300">✅ 私はアンソニーです <span className="text-slate-500">(I am Anthony — introduction)</span></p>
+          <p className="text-base text-slate-300">✅ 私はラーメン、彼女はうどん <span className="text-slate-500">(I'll have ramen, she'll have udon)</span></p>
+          <p className="text-base text-slate-300">❌ 私はラーメンを食べます <span className="text-slate-500">(sounds textbook-ish)</span></p>
+          <p className="text-base text-slate-300">✅ ラーメンを食べます <span className="text-slate-500">(natural!)</span></p>
         </div>
       </div>
     </div>
