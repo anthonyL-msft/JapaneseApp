@@ -305,6 +305,42 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
     return result;
   };
 
+  // Apply variable substitutions to pronunciation (swap default option's pron with selected)
+  const applyPronSubstitutions = (text: string) => {
+    if (!hasVariables) return text;
+    let result = text;
+    for (const v of line.variables!) {
+      const selectedIdx = varSelections[v.placeholder];
+      if (selectedIdx !== undefined) {
+        const defaultPron = v.options[0].pronunciation;
+        const selectedPron = v.options[selectedIdx].pronunciation;
+        if (defaultPron !== selectedPron) {
+          result = result.replaceAll(defaultPron, selectedPron);
+        }
+        result = result.replaceAll(v.placeholder, v.options[selectedIdx].value);
+      }
+    }
+    return result;
+  };
+
+  // Apply variable substitutions to English
+  const applyEngSubstitutions = (text: string) => {
+    if (!hasVariables) return text;
+    let result = text;
+    for (const v of line.variables!) {
+      const selectedIdx = varSelections[v.placeholder];
+      if (selectedIdx !== undefined) {
+        const defaultEng = v.options[0].english;
+        const selectedEng = v.options[selectedIdx].english;
+        if (defaultEng !== selectedEng) {
+          result = result.replaceAll(defaultEng, selectedEng);
+        }
+        result = result.replaceAll(v.placeholder, v.options[selectedIdx].value);
+      }
+    }
+    return result;
+  };
+
   const baseDisplayLine = hasOptions && selectedOption !== null
     ? { ...line, ...line.options![selectedOption] }
     : line;
@@ -312,7 +348,11 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
   const displayLine = {
     ...baseDisplayLine,
     target: applyVarSubstitutions(baseDisplayLine.target),
-    english: applyVarSubstitutions(baseDisplayLine.english),
+    pronunciation: applyPronSubstitutions(baseDisplayLine.pronunciation),
+    pronunciation_chunks: baseDisplayLine.pronunciation_chunks
+      ? applyPronSubstitutions(baseDisplayLine.pronunciation_chunks)
+      : undefined,
+    english: applyEngSubstitutions(baseDisplayLine.english),
     chinese_tc: applyVarSubstitutions(baseDisplayLine.chinese_tc),
   };
 
