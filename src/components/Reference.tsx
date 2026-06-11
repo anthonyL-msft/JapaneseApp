@@ -154,15 +154,15 @@ export function Reference() {
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
             {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
-            {panel.value === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
+            {panel.value === 'grammar' && <GrammarRef />}
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'converter' && <NumberConverter />}
-            {panel.value === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
-            {panel.value === 'counters' && <CountersRef openDrawer={openDrawer} />}
-            {panel.value === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
-            {panel.value === 'polite' && <PoliteRef openDrawer={openDrawer} />}
-            {panel.value === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
-            {panel.value === 'whquestions' && <WHQuestionsRef openDrawer={openDrawer} />}
+            {panel.value === 'particles' && <ParticlesRef />}
+            {panel.value === 'counters' && <CountersRef />}
+            {panel.value === 'patterns' && <PatternsRef />}
+            {panel.value === 'polite' && <PoliteRef />}
+            {panel.value === 'yesno' && <YesNoRef />}
+            {panel.value === 'whquestions' && <WHQuestionsRef />}
             {panel.value === 'signs' && <SignsRef />}
           </div>
         </div>
@@ -538,93 +538,140 @@ function NumbersRef() {
 
 type DrawerOpener = (d: DrawerData) => void;
 
-function DrawerRow({ jp, rom, meaning, items, openDrawer }: { jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openDrawer: DrawerOpener }) {
+function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void }) {
+  const isOpen = openSet.has(id);
   return (
-    <div className="py-2 border-b border-slate-700/30 last:border-0">
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => openDrawer({ title: jp, titleRom: rom, subtitle: meaning, items })}
-          className="flex-1 text-left"
-        >
+    <div className="border-b border-slate-700/40 last:border-0">
+      <div className="flex items-center gap-2 py-2">
+        <button onClick={() => toggle(id)} className="flex-1 text-left">
           <p className="text-base font-medium text-slate-100">{jp}</p>
           <p className="text-base text-sakura-300">{rom}</p>
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </button>
         <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
-        <span className="text-base text-slate-500 shrink-0">›</span>
+        <button onClick={() => toggle(id)} className="text-base text-slate-500 shrink-0">{isOpen ? '▲' : '▼'}</button>
       </div>
+      {isOpen && (
+        <div className="pb-2 space-y-1.5">
+          {items.map((ex, i) => (
+            <div key={i} className="bg-slate-700/20 rounded-lg p-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <p className="text-base text-slate-200">{ex.jp}</p>
+                  <p className="text-base text-sakura-300">{ex.hep}</p>
+                </div>
+                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
+              </div>
+              <p className="text-base text-slate-400">{ex.en}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function ParticlesRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function useAccordion(keys: string[]) {
+  const [openSet, setOpenSet] = useState<Set<string>>(new Set());
+  const allOpen = keys.length > 0 && keys.every(k => openSet.has(k));
+
+  const toggle = (key: string) => {
+    setOpenSet(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (allOpen) setOpenSet(new Set());
+    else setOpenSet(new Set(keys));
+  };
+
+  return { openSet, allOpen, toggle, toggleAll };
+}
+
+function AccordionHeader({ label, allOpen, toggleAll }: { label: string; allOpen: boolean; toggleAll: () => void }) {
+  return (
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-base text-slate-500">{label}</p>
+      <button onClick={toggleAll} className="text-base bg-slate-700/40 text-slate-400 px-2.5 py-1 rounded-lg active:bg-slate-600 transition">
+        {allOpen ? '▲ Close All' : '▼ Open All'}
+      </button>
+    </div>
+  );
+}
+
+function ParticlesRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで']);
   return (
     <div className="mt-2">
-      <p className="text-base text-slate-500 mb-2">Tap a particle to see examples</p>
-      <DrawerRow jp="は" rom="wa" meaning="Topic marker — marks what you're talking about" openDrawer={openDrawer}
-        items={[
+      <AccordionHeader label="Tap a particle to see examples" allOpen={allOpen} toggleAll={toggleAll} />
+      <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
           { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
         ]} />
-      <DrawerRow jp="が" rom="ga" meaning="Subject marker — marks who/what does the action" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="が" jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
         ]} />
-      <DrawerRow jp="を" rom="wo" meaning="Object marker — marks what receives the action" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="を" jp="を" rom="wo" meaning="Object marker — marks what receives the action"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
           { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
         ]} />
-      <DrawerRow jp="に" rom="ni" meaning="Direction/time — to, at, in, on" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="に" jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'I send luggage to the hotel' },
         ]} />
-      <DrawerRow jp="で" rom="de" meaning="Location of action / by means of" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="で" jp="で" rom="de" meaning="Location of action / by means of"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica' },
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train' },
         ]} />
-      <DrawerRow jp="へ" rom="e" meaning="Towards (direction)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="へ" jp="へ" rom="e" meaning="Towards (direction)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo' },
           { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
         ]} />
-      <DrawerRow jp="の" rom="no" meaning="Possessive / connecting — 's, of" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
           { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
           { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
         ]} />
-      <DrawerRow jp="と" rom="to" meaning="And, with (listing/companion)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="と" jp="と" rom="to" meaning="And, with (listing/companion)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
           { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
         ]} />
-      <DrawerRow jp="も" rom="mo" meaning="Also, too" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
           { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
         ]} />
-      <DrawerRow jp="か" rom="ka" meaning="Question marker (end of sentence)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
           { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
           { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
         ]} />
-      <DrawerRow jp="から" rom="ka·ra" meaning="From (place/time)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="から" jp="から" rom="ka·ra" meaning="From (place/time)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
           { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
         ]} />
-      <DrawerRow jp="まで" rom="ma·de" meaning="Until, to (endpoint)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="まで" jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
           { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
         ]} />
@@ -632,59 +679,60 @@ function ParticlesRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   );
 }
 
-function CountersRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function CountersRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜つ','〜人','〜枚','〜本','〜杯','〜個','〜台','〜泊','〜名','〜階']);
   return (
     <div className="mt-2">
-      <p className="text-base text-slate-500 mb-2">Japanese uses different counters for different objects (like Chinese 量詞)</p>
-      <DrawerRow jp="〜つ" rom="-tsu" meaning="General counter (1-10)" openDrawer={openDrawer}
-        items={[
+      <AccordionHeader label="Counters (like Chinese 量詞)" allOpen={allOpen} toggleAll={toggleAll} />
+      <AccordionRow id="〜つ" jp="〜つ" rom="-tsu" meaning="General counter (1-10)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ひとつください', hep: 'hi·to·tsu ku·da·sai', en: 'One please' },
           { jp: 'ふたつお願いします', hep: 'fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two please' },
           { jp: 'みっつあります', hep: 'mit·tsu a·ri·ma·su', en: 'There are three' },
         ]} />
-      <DrawerRow jp="〜人" rom="-nin" meaning="People" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜人" jp="〜人" rom="-nin" meaning="People"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people' },
           { jp: 'さんにんで予約しました', hep: 'san·nin de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for three people' },
           { jp: 'ひとりです', hep: 'hi·to·ri de·su', en: 'Just one person' },
         ]} />
-      <DrawerRow jp="〜枚" rom="-mai" meaning="Flat objects: tickets, plates, shirts" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜枚" jp="〜枚" rom="-mai" meaning="Flat objects: tickets, plates, shirts"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '切符を二枚ください', hep: 'kip·pu wo ni·mai ku·da·sai', en: 'Two tickets please' },
           { jp: 'Tシャツを一枚お願いします', hep: 'tii·sha·tsu wo i·chi·mai o·ne·gai·shi·ma·su', en: 'One T-shirt please' },
         ]} />
-      <DrawerRow jp="〜本" rom="-hon" meaning="Long objects: bottles, pens, umbrellas" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜本" jp="〜本" rom="-hon" meaning="Long objects: bottles, pens, umbrellas"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '水を一本ください', hep: 'mi·zu wo ip·pon ku·da·sai', en: 'One bottle of water please' },
           { jp: 'ビールを二本お願いします', hep: 'bii·ru wo ni·hon o·ne·gai·shi·ma·su', en: 'Two beers please' },
         ]} />
-      <DrawerRow jp="〜杯" rom="-hai" meaning="Cups / glasses / bowls" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜杯" jp="〜杯" rom="-hai" meaning="Cups / glasses / bowls"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'コーヒーを一杯ください', hep: 'koo·hii wo ip·pai ku·da·sai', en: 'One coffee please' },
           { jp: 'お茶を二杯お願いします', hep: 'o·cha wo ni·hai o·ne·gai·shi·ma·su', en: 'Two teas please' },
         ]} />
-      <DrawerRow jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples, onigiri" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜個" jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples, onigiri"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'おにぎりを三個ください', hep: 'o·ni·gi·ri wo san·ko ku·da·sai', en: 'Three onigiri please' },
           { jp: 'りんごを一個お願いします', hep: 'rin·go wo ik·ko o·ne·gai·shi·ma·su', en: 'One apple please' },
         ]} />
-      <DrawerRow jp="〜台" rom="-dai" meaning="Machines / vehicles" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜台" jp="〜台" rom="-dai" meaning="Machines / vehicles"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'タクシーを一台お願いします', hep: 'ta·ku·shii wo i·chi·dai o·ne·gai·shi·ma·su', en: 'One taxi please' },
         ]} />
-      <DrawerRow jp="〜泊" rom="-ha·ku" meaning="Nights (hotel stay)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜泊" jp="〜泊" rom="-ha·ku" meaning="Nights (hotel stay)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '二泊お願いします', hep: 'ni·ha·ku o·ne·gai·shi·ma·su', en: 'Two nights please' },
           { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
           { jp: '三泊四日です', hep: 'san·pa·ku yok·ka de·su', en: 'Three nights, four days' },
         ]} />
-      <DrawerRow jp="〜名" rom="-mei" meaning="People (formal, restaurants)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜名" jp="〜名" rom="-mei" meaning="People (formal, restaurants)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '二名で予約しました', hep: 'ni·mei de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for two (formal)' },
           { jp: '三名様でございますか？', hep: 'san·mei·sa·ma de go·zai·ma·su ka', en: 'Party of three? (staff may ask)' },
         ]} />
-      <DrawerRow jp="〜階" rom="-kai" meaning="Floors / stories" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜階" jp="〜階" rom="-kai" meaning="Floors / stories"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'トイレは二階です', hep: 'toi·re wa ni·kai de·su', en: 'The toilet is on the 2nd floor' },
           { jp: '三階に行きたいです', hep: 'san·gai ni i·ki·tai de·su', en: 'I want to go to the 3rd floor' },
         ]} />
@@ -692,48 +740,49 @@ function CountersRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   );
 }
 
-function PatternsRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function PatternsRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○をお願いします','○○はありますか','○○はどこですか','○○してもいいですか','○○てください','○○がわかりません','○○たいです']);
   return (
     <div className="mt-2 space-y-2">
-      <p className="text-base text-slate-500">Tap a pattern to see real examples</p>
-      <DrawerRow jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!" openDrawer={openDrawer}
-        items={[
+      <AccordionHeader label="Tap a pattern to see real examples" allOpen={allOpen} toggleAll={toggleAll} />
+      <AccordionRow id="○○をお願いします" jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '水をお願いします', hep: 'mi·zu wo o·ne·gai·shi·ma·su', en: 'Water please' },
           { jp: 'メニューをお願いします', hep: 'me·nyuu wo o·ne·gai·shi·ma·su', en: 'Menu please' },
           { jp: 'お会計をお願いします', hep: 'o·kai·kei wo o·ne·gai·shi·ma·su', en: 'Check please' },
           { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
         ]} />
-      <DrawerRow jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○はありますか" jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
           { jp: '英語のメニューはありますか？', hep: 'ei·go no me·nyuu wa a·ri·ma·su ka', en: 'Do you have an English menu?' },
           { jp: '空いている席はありますか？', hep: 'ai·te i·ru se·ki wa a·ri·ma·su ka', en: 'Is there an empty seat?' },
         ]} />
-      <DrawerRow jp="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○はどこですか" jp="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
           { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
           { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
         ]} />
-      <DrawerRow jp="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○してもいいですか" jp="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
           { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
-      <DrawerRow jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○てください" jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
           { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
         ]} />
-      <DrawerRow jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○がわかりません" jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
         ]} />
-      <DrawerRow jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○たいです" jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
           { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
           { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
@@ -742,44 +791,45 @@ function PatternsRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   );
 }
 
-function PoliteRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function PoliteRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜ます','〜ません','〜ました','〜です','〜てください','〜てもいいですか']);
   return (
     <div className="mt-2">
-      <p className="text-base text-slate-500 mb-2">Use ます (masu) form for all travel situations — it's polite and always safe.</p>
-      <DrawerRow jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating" openDrawer={openDrawer}
-        items={[
+      <AccordionHeader label="Use ます form — polite and always safe" allOpen={allOpen} toggleAll={toggleAll} />
+      <AccordionRow id="〜ます" jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
           { jp: 'わかります', hep: 'wa·ka·ri·ma·su', en: 'I understand' },
           { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
           { jp: '払います', hep: 'ha·rai·ma·su', en: 'I pay' },
         ]} />
-      <DrawerRow jp="〜ません" rom="ma·sen" meaning="🕐 Saying you can't / don't — declining, limitations" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜ません" jp="〜ません" rom="ma·sen" meaning="🕐 Saying you can't / don't — declining, limitations"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '食べられません', hep: 'ta·be·ra·re·ma·sen', en: "I can't eat (allergies)" },
           { jp: 'いりません', hep: 'i·ri·ma·sen', en: "I don't need it" },
         ]} />
-      <DrawerRow jp="〜ました" rom="ma·shi·ta" meaning="🕐 Already done — reservations, things you saw" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜ました" jp="〜ました" rom="ma·shi·ta" meaning="🕐 Already done — reservations, things you saw"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '予約しました', hep: 'yo·ya·ku shi·ma·shi·ta', en: 'I made a reservation' },
           { jp: 'もう払いました', hep: 'mou ha·rai·ma·shi·ta', en: 'I already paid' },
           { jp: '荷物をなくしました', hep: 'ni·mo·tsu wo na·ku·shi·ma·shi·ta', en: 'I lost my luggage' },
         ]} />
-      <DrawerRow jp="〜です" rom="de·su" meaning='🕐 Stating what something IS — identity, quantities' openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜です" jp="〜です" rom="de·su" meaning='🕐 Stating what something IS — identity, quantities'
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people (party size)' },
           { jp: 'アレルギーです', hep: 'a·re·ru·gii de·su', en: "It's an allergy" },
           { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
           { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
         ]} />
-      <DrawerRow jp="〜てください" rom="te ku·da·sai" meaning='🕐 Asking someone to do something — "please do ○○"' openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜てください" jp="〜てください" rom="te ku·da·sai" meaning='🕐 Asking someone to do something — "please do ○○"'
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
           { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
           { jp: 'もう一度お願いします', hep: 'mou i·chi·do o·ne·gai·shi·ma·su', en: 'One more time please' },
         ]} />
-      <DrawerRow jp="〜てもいいですか" rom="te mo ii de·su ka" meaning='🕐 Asking "may I?" — photos, trying on, sitting' openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="〜てもいいですか" jp="〜てもいいですか" rom="te mo ii de·su ka" meaning='🕐 Asking "may I?" — photos, trying on, sitting'
+        openSet={openSet} toggle={toggle} items={[
           { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
           { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
@@ -791,7 +841,8 @@ function PoliteRef({ openDrawer }: { openDrawer: DrawerOpener }) {
 // ============================================================
 // Sentence Structure (Step 2)
 // ============================================================
-function GrammarRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function GrammarRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['S は V ます','S は O を V ます','S は Place で V ます','S は Place に V ます']);
   return (
     <div className="mt-2">
       <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
@@ -809,28 +860,28 @@ function GrammarRef({ openDrawer }: { openDrawer: DrawerOpener }) {
         <p className="text-base text-sakura-300 text-center mt-1">S wa O wo V ma·su</p>
       </div>
 
-      <p className="text-base text-slate-400 mb-2">Tap to see examples of each structure:</p>
+      <AccordionHeader label="Tap to see examples of each structure" allOpen={allOpen} toggleAll={toggleAll} />
 
-      <DrawerRow jp="S は V ます" rom="S wa V ma·su" meaning="Simple: Subject does something" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="S は V ます" jp="S は V ます" rom="S wa V ma·su" meaning="Simple: Subject does something"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '私は行きます', hep: 'wa·ta·shi wa i·ki·ma·su', en: 'I go' },
           { jp: '電車が来ます', hep: 'den·sha ga ki·ma·su', en: 'The train comes' },
           { jp: '友達が待っています', hep: 'to·mo·da·chi ga mat·te i·ma·su', en: 'My friend is waiting' },
         ]} />
-      <DrawerRow jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full: Subject does something to Object" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="S は O を V ます" jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full: Subject does something to Object"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '私はラーメンを食べます', hep: 'wa·ta·shi wa raa·men wo ta·be·ma·su', en: 'I eat ramen' },
           { jp: '私は切符を買います', hep: 'wa·ta·shi wa kip·pu wo kai·ma·su', en: 'I buy a ticket' },
           { jp: '私は写真を撮ります', hep: 'wa·ta·shi wa sha·shin wo to·ri·ma·su', en: 'I take a photo' },
         ]} />
-      <DrawerRow jp="S は Place で V ます" rom="S wa Place de V ma·su" meaning="Where: Subject does something AT a place" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="S は Place で V ます" jp="S は Place で V ます" rom="S wa Place de V ma·su" meaning="Where: Subject does something AT a place"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: 'コンビニでコーヒーを買います', hep: 'kon·bi·ni de koo·hii wo kai·ma·su', en: 'I buy coffee at the convenience store' },
           { jp: 'ホテルで休みます', hep: 'ho·te·ru de ya·su·mi·ma·su', en: 'I rest at the hotel' },
         ]} />
-      <DrawerRow jp="S は Place に V ます" rom="S wa Place ni V ma·su" meaning="Direction: Subject goes TO a place" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="S は Place に V ます" jp="S は Place に V ます" rom="S wa Place ni V ma·su" meaning="Direction: Subject goes TO a place"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに帰ります', hep: 'ho·te·ru ni ka·e·ri·ma·su', en: 'I return to the hotel' },
           { jp: '駅に着きました', hep: 'e·ki ni tsu·ki·ma·shi·ta', en: 'I arrived at the station' },
@@ -851,7 +902,8 @@ function GrammarRef({ openDrawer }: { openDrawer: DrawerOpener }) {
 // ============================================================
 // Yes/No Questions (Step 6)
 // ============================================================
-function YesNoRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function YesNoRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○ですか？','○○ますか？','○○ありますか？']);
   return (
     <div className="mt-2">
       <p className="text-base text-slate-500 mb-3">Take any statement, add か (ka) at the end = question. That's it!</p>
@@ -889,22 +941,22 @@ function YesNoRef({ openDrawer }: { openDrawer: DrawerOpener }) {
         </div>
       </div>
 
-      <p className="text-base text-slate-400 mb-2">Tap to see examples:</p>
+      <AccordionHeader label="Tap to see examples" allOpen={allOpen} toggleAll={toggleAll} />
 
-      <DrawerRow jp="○○ですか？" rom="○○ de·su ka" meaning="Is it ○○? / Are you ○○?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○ですか？" jp="○○ですか？" rom="○○ de·su ka" meaning="Is it ○○? / Are you ○○?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'これは味噌ラーメンですか？', hep: 'ko·re wa mi·so raa·men de·su ka', en: 'Is this miso ramen?' },
           { jp: '無料ですか？', hep: 'mu·ryou de·su ka', en: 'Is it free?' },
           { jp: 'ここですか？', hep: 'ko·ko de·su ka', en: 'Is it here?' },
         ]} />
-      <DrawerRow jp="○○ますか？" rom="○○ ma·su ka" meaning="Do you ○○? / Can you ○○?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○ますか？" jp="○○ますか？" rom="○○ ma·su ka" meaning="Do you ○○? / Can you ○○?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: '英語を話しますか？', hep: 'ei·go wo ha·na·shi·ma·su ka', en: 'Do you speak English?' },
           { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
           { jp: '配達しますか？', hep: 'hai·ta·tsu shi·ma·su ka', en: 'Do you deliver?' },
         ]} />
-      <DrawerRow jp="○○ありますか？" rom="○○ a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="○○ありますか？" jp="○○ありますか？" rom="○○ a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
           { jp: '空いている部屋はありますか？', hep: 'ai·te i·ru he·ya wa a·ri·ma·su ka', en: 'Do you have a vacant room?' },
           { jp: 'おすすめはありますか？', hep: 'o·su·su·me wa a·ri·ma·su ka', en: 'Do you have any recommendations?' },
@@ -926,58 +978,59 @@ function YesNoRef({ openDrawer }: { openDrawer: DrawerOpener }) {
 // ============================================================
 // WH Question Words (Step 7)
 // ============================================================
-function WHQuestionsRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+function WHQuestionsRef() {
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['何 / なに','どこ','いつ','だれ','どう','いくら','どれ','どっち / どちら','なぜ / どうして']);
   return (
     <div className="mt-2">
-      <p className="text-base text-slate-500 mb-2">Question word goes where the answer would be, then add か (ka)</p>
-      <DrawerRow jp="何 / なに" rom="na·ni" meaning="What?" openDrawer={openDrawer}
-        items={[
+      <AccordionHeader label="Question words + か (ka)" allOpen={allOpen} toggleAll={toggleAll} />
+      <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
           { jp: '何がおすすめですか？', hep: 'na·ni ga o·su·su·me de·su ka', en: 'What do you recommend?' },
           { jp: '何時ですか？', hep: 'nan·ji de·su ka', en: 'What time is it?' },
         ]} />
-      <DrawerRow jp="どこ" rom="do·ko" meaning="Where?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="どこ" jp="どこ" rom="do·ko" meaning="Where?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
           { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
           { jp: 'どこで食べますか？', hep: 'do·ko de ta·be·ma·su ka', en: 'Where shall we eat?' },
         ]} />
-      <DrawerRow jp="いつ" rom="i·tsu" meaning="When?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="いつ" jp="いつ" rom="i·tsu" meaning="When?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'いつ開きますか？', hep: 'i·tsu a·ki·ma·su ka', en: 'When does it open?' },
           { jp: 'いつ出発しますか？', hep: 'i·tsu shup·pa·tsu shi·ma·su ka', en: 'When does it depart?' },
           { jp: 'チェックアウトはいつですか？', hep: 'chek·ku au·to wa i·tsu de·su ka', en: 'When is checkout?' },
         ]} />
-      <DrawerRow jp="だれ" rom="da·re" meaning="Who?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="だれ" jp="だれ" rom="da·re" meaning="Who?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'だれに聞けばいいですか？', hep: 'da·re ni ki·ke·ba ii de·su ka', en: 'Who should I ask?' },
           { jp: 'だれが案内してくれますか？', hep: 'da·re ga an·nai shi·te ku·re·ma·su ka', en: 'Who will guide us?' },
         ]} />
-      <DrawerRow jp="どう" rom="dou" meaning="How? (method/manner)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="どう" jp="どう" rom="dou" meaning="How? (method/manner)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'どう行きますか？', hep: 'dou i·ki·ma·su ka', en: 'How do I get there?' },
           { jp: 'これはどう使いますか？', hep: 'ko·re wa dou tsu·kai·ma·su ka', en: 'How do I use this?' },
           { jp: 'どうですか？', hep: 'dou de·su ka', en: 'How is it? / What do you think?' },
         ]} />
-      <DrawerRow jp="いくら" rom="i·ku·ra" meaning="How much? (price)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="いくら" jp="いくら" rom="i·ku·ra" meaning="How much? (price)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much is it?' },
           { jp: '全部でいくらですか？', hep: 'zen·bu de i·ku·ra de·su ka', en: 'How much is it in total?' },
           { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
         ]} />
-      <DrawerRow jp="どれ" rom="do·re" meaning="Which one? (of 3+)" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="どれ" jp="どれ" rom="do·re" meaning="Which one? (of 3+)"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'どれがおすすめですか？', hep: 'do·re ga o·su·su·me de·su ka', en: 'Which one do you recommend?' },
           { jp: 'どれにしますか？', hep: 'do·re ni shi·ma·su ka', en: 'Which one will you have?' },
         ]} />
-      <DrawerRow jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="どっち / どちら" jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'どちらがいいですか？', hep: 'do·chi·ra ga ii de·su ka', en: 'Which is better?' },
           { jp: '出口はどちらですか？', hep: 'de·gu·chi wa do·chi·ra de·su ka', en: 'Which way is the exit?' },
           { jp: 'どっちが大きいですか？', hep: 'dot·chi ga oo·kii de·su ka', en: 'Which one is bigger?' },
         ]} />
-      <DrawerRow jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?" openDrawer={openDrawer}
-        items={[
+      <AccordionRow id="なぜ / どうして" jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?"
+        openSet={openSet} toggle={toggle} items={[
           { jp: 'どうして閉まっていますか？', hep: 'dou·shi·te shi·mat·te i·ma·su ka', en: 'Why is it closed?' },
           { jp: 'どうしてだめですか？', hep: 'dou·shi·te da·me de·su ka', en: 'Why is it not allowed?' },
         ]} />
