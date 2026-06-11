@@ -146,7 +146,7 @@ export function Reference() {
             {activeSection === 'numbers' && <NumbersRef />}
             {activeSection === 'converter' && <NumberConverter />}
             {activeSection === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
-            {activeSection === 'counters' && <CountersRef />}
+            {activeSection === 'counters' && <CountersRef openDrawer={openDrawer} />}
             {activeSection === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
             {activeSection === 'polite' && <PoliteRef openDrawer={openDrawer} />}
             {activeSection === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
@@ -557,20 +557,62 @@ function ParticlesRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   );
 }
 
-function CountersRef() {
+function CountersRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   return (
     <div className="mt-2">
       <p className="text-base text-slate-500 mb-2">Japanese uses different counters for different objects (like Chinese 量詞)</p>
-      <RefRow jp="〜つ" rom="-tsu" meaning="General counter: ひとつ(1), ふたつ(2), みっつ(3)" />
-      <RefRow jp="〜人" rom="-nin" meaning="People: ひとり(1), ふたり(2), さんにん(3)" />
-      <RefRow jp="〜枚" rom="-mai" meaning="Flat objects: tickets, plates, shirts" />
-      <RefRow jp="〜本" rom="-hon" meaning="Long objects: bottles, pens, umbrellas" />
-      <RefRow jp="〜杯" rom="-hai" meaning="Cups/glasses: いっぱい(1), にはい(2)" />
-      <RefRow jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples" />
-      <RefRow jp="〜台" rom="-dai" meaning="Machines/vehicles: cars, computers" />
-      <RefRow jp="〜泊" rom="-ha·ku" meaning="Nights (hotel): いっぱく(1), にはく(2)" />
-      <RefRow jp="〜名" rom="-mei" meaning="People (formal): にめい(2), さんめい(3)" />
-      <RefRow jp="〜階" rom="-kai" meaning="Floors: いっかい(1F), にかい(2F)" />
+      <DrawerRow jp="〜つ" rom="-tsu" meaning="General counter (1-10)" openDrawer={openDrawer}
+        items={[
+          { jp: 'ひとつください', hep: 'hi·to·tsu ku·da·sai', en: 'One please' },
+          { jp: 'ふたつお願いします', hep: 'fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two please' },
+          { jp: 'みっつあります', hep: 'mit·tsu a·ri·ma·su', en: 'There are three' },
+        ]} />
+      <DrawerRow jp="〜人" rom="-nin" meaning="People" openDrawer={openDrawer}
+        items={[
+          { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people' },
+          { jp: 'さんにんで予約しました', hep: 'san·nin de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for three people' },
+          { jp: 'ひとりです', hep: 'hi·to·ri de·su', en: 'Just one person' },
+        ]} />
+      <DrawerRow jp="〜枚" rom="-mai" meaning="Flat objects: tickets, plates, shirts" openDrawer={openDrawer}
+        items={[
+          { jp: '切符を二枚ください', hep: 'kip·pu wo ni·mai ku·da·sai', en: 'Two tickets please' },
+          { jp: 'Tシャツを一枚お願いします', hep: 'tii·sha·tsu wo i·chi·mai o·ne·gai·shi·ma·su', en: 'One T-shirt please' },
+        ]} />
+      <DrawerRow jp="〜本" rom="-hon" meaning="Long objects: bottles, pens, umbrellas" openDrawer={openDrawer}
+        items={[
+          { jp: '水を一本ください', hep: 'mi·zu wo ip·pon ku·da·sai', en: 'One bottle of water please' },
+          { jp: 'ビールを二本お願いします', hep: 'bii·ru wo ni·hon o·ne·gai·shi·ma·su', en: 'Two beers please' },
+        ]} />
+      <DrawerRow jp="〜杯" rom="-hai" meaning="Cups / glasses / bowls" openDrawer={openDrawer}
+        items={[
+          { jp: 'コーヒーを一杯ください', hep: 'koo·hii wo ip·pai ku·da·sai', en: 'One coffee please' },
+          { jp: 'お茶を二杯お願いします', hep: 'o·cha wo ni·hai o·ne·gai·shi·ma·su', en: 'Two teas please' },
+        ]} />
+      <DrawerRow jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples, onigiri" openDrawer={openDrawer}
+        items={[
+          { jp: 'おにぎりを三個ください', hep: 'o·ni·gi·ri wo san·ko ku·da·sai', en: 'Three onigiri please' },
+          { jp: 'りんごを一個お願いします', hep: 'rin·go wo ik·ko o·ne·gai·shi·ma·su', en: 'One apple please' },
+        ]} />
+      <DrawerRow jp="〜台" rom="-dai" meaning="Machines / vehicles" openDrawer={openDrawer}
+        items={[
+          { jp: 'タクシーを一台お願いします', hep: 'ta·ku·shii wo i·chi·dai o·ne·gai·shi·ma·su', en: 'One taxi please' },
+        ]} />
+      <DrawerRow jp="〜泊" rom="-ha·ku" meaning="Nights (hotel stay)" openDrawer={openDrawer}
+        items={[
+          { jp: '二泊お願いします', hep: 'ni·ha·ku o·ne·gai·shi·ma·su', en: 'Two nights please' },
+          { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
+          { jp: '三泊四日です', hep: 'san·pa·ku yok·ka de·su', en: 'Three nights, four days' },
+        ]} />
+      <DrawerRow jp="〜名" rom="-mei" meaning="People (formal, restaurants)" openDrawer={openDrawer}
+        items={[
+          { jp: '二名で予約しました', hep: 'ni·mei de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for two (formal)' },
+          { jp: '三名様でございますか？', hep: 'san·mei·sa·ma de go·zai·ma·su ka', en: 'Party of three? (staff may ask)' },
+        ]} />
+      <DrawerRow jp="〜階" rom="-kai" meaning="Floors / stories" openDrawer={openDrawer}
+        items={[
+          { jp: 'トイレは二階です', hep: 'toi·re wa ni·kai de·su', en: 'The toilet is on the 2nd floor' },
+          { jp: '三階に行きたいです', hep: 'san·gai ni i·ki·tai de·su', en: 'I want to go to the 3rd floor' },
+        ]} />
     </div>
   );
 }
