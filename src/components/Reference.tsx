@@ -469,10 +469,8 @@ function DrawerRow({ jp, rom, meaning, items, openDrawer }: { jp: string; rom: s
           onClick={() => openDrawer({ title: jp, titleRom: rom, subtitle: meaning, items })}
           className="flex-1 text-left"
         >
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-medium text-slate-100">{jp}</span>
-            <span className="text-base text-sakura-300">{rom}</span>
-          </div>
+          <p className="text-base font-medium text-slate-100">{jp}</p>
+          <p className="text-base text-sakura-300">{rom}</p>
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </button>
         <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
