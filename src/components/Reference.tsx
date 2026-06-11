@@ -856,7 +856,7 @@ function PoliteRef() {
 // Sentence Structure (Step 2)
 // ============================================================
 function GrammarRef() {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['O を V ます','V ます','Place で V ます','Place に V ます','S は ... です']);
+  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['O を V ます','V ます','S は O を V ます','Place で V ます','Place に V ます','S は ... です']);
   return (
     <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
@@ -887,6 +887,12 @@ function GrammarRef() {
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
           { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
           { jp: 'わかりました', hep: 'wa·ka·ri·ma·shi·ta', en: 'I understood / Got it' },
+        ]} />
+      <AccordionRow id="S は O を V ます" jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full sentence with subject (when it's not 'I')"
+        openSet={openSet} toggle={toggle} items={[
+          { jp: 'このバスは東京駅を通ります', hep: 'ko·no ba·su wa tou·kyou·e·ki wo too·ri·ma·su', en: 'This bus passes Tokyo Station' },
+          { jp: 'お店は朝食を出します', hep: 'o·mi·se wa chou·sho·ku wo da·shi·ma·su', en: 'The restaurant serves breakfast' },
+          { jp: '友達はお土産を買います', hep: 'to·mo·da·chi wa o·mi·ya·ge wo kai·ma·su', en: 'My friend buys souvenirs' },
         ]} />
       <AccordionRow id="Place で V ます" jp="Place で V ます" rom="Place de V ma·su" meaning="Where: do something AT a place"
         openSet={openSet} toggle={toggle} items={[
