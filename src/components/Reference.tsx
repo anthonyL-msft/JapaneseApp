@@ -153,7 +153,7 @@ export function Reference() {
             <h2 className="text-lg font-bold flex-1">{activeMeta?.emoji} {activeMeta?.label}</h2>
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
-            {panel.value === 'gojuon' && <GojuonRef />}
+            {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
             {panel.value === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'converter' && <NumberConverter />}
@@ -194,7 +194,57 @@ function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string
 // ============================================================
 // 50-Sound Chart (Gojūon)
 // ============================================================
-function GojuonRef() {
+// Vocab examples keyed by romanization — travel-useful words featuring each sound
+const KANA_VOCAB: Record<string, { jp: string; hep: string; en: string }[]> = {
+  a: [{ jp: 'ありがとう', hep: 'a·ri·ga·tou', en: 'Thank you' }, { jp: 'あさ', hep: 'a·sa', en: 'Morning' }, { jp: 'あつい', hep: 'a·tsu·i', en: 'Hot (weather)' }],
+  i: [{ jp: 'いくら', hep: 'i·ku·ra', en: 'How much?' }, { jp: 'いち', hep: 'i·chi', en: 'One (1)' }, { jp: 'いりません', hep: 'i·ri·ma·sen', en: "I don't need it" }],
+  u: [{ jp: 'うどん', hep: 'u·don', en: 'Udon noodles' }, { jp: 'うえ', hep: 'u·e', en: 'Up / above' }],
+  e: [{ jp: 'えき', hep: 'e·ki', en: 'Station' }, { jp: '円', hep: 'en', en: 'Yen (¥)' }, { jp: 'エレベーター', hep: 'e·re·bee·taa', en: 'Elevator' }],
+  o: [{ jp: 'おいしい', hep: 'o·i·shii', en: 'Delicious' }, { jp: 'お願いします', hep: 'o·ne·gai·shi·ma·su', en: 'Please' }, { jp: 'おはよう', hep: 'o·ha·you', en: 'Good morning' }],
+  ka: [{ jp: 'かわいい', hep: 'ka·wa·ii', en: 'Cute' }, { jp: '会計', hep: 'kai·kei', en: 'Bill/check' }, { jp: 'かさ', hep: 'ka·sa', en: 'Umbrella' }],
+  ki: [{ jp: '切符', hep: 'kip·pu', en: 'Ticket' }, { jp: 'きれい', hep: 'ki·rei', en: 'Beautiful/clean' }, { jp: '昨日', hep: 'ki·nou', en: 'Yesterday' }],
+  ku: [{ jp: '空港', hep: 'kuu·kou', en: 'Airport' }, { jp: 'ください', hep: 'ku·da·sai', en: 'Please (give me)' }, { jp: '薬', hep: 'ku·su·ri', en: 'Medicine' }],
+  ke: [{ jp: '今朝', hep: 'ke·sa', en: 'This morning' }, { jp: '携帯', hep: 'kei·tai', en: 'Mobile phone' }],
+  ko: [{ jp: 'ここ', hep: 'ko·ko', en: 'Here' }, { jp: 'これ', hep: 'ko·re', en: 'This' }, { jp: 'コンビニ', hep: 'kon·bi·ni', en: 'Convenience store' }],
+  sa: [{ jp: 'さむい', hep: 'sa·mu·i', en: 'Cold (weather)' }, { jp: 'さかな', hep: 'sa·ka·na', en: 'Fish' }, { jp: 'さくら', hep: 'sa·ku·ra', en: 'Cherry blossom' }],
+  shi: [{ jp: '新幹線', hep: 'shin·kan·sen', en: 'Bullet train' }, { jp: '写真', hep: 'sha·shin', en: 'Photo' }, { jp: 'しお', hep: 'shi·o', en: 'Salt' }],
+  su: [{ jp: 'すみません', hep: 'su·mi·ma·sen', en: 'Excuse me / Sorry' }, { jp: 'すし', hep: 'su·shi', en: 'Sushi' }, { jp: 'すき', hep: 'su·ki', en: 'Like / favorite' }],
+  se: [{ jp: 'せき', hep: 'se·ki', en: 'Seat' }, { jp: '先生', hep: 'sen·sei', en: 'Teacher' }],
+  so: [{ jp: 'そこ', hep: 'so·ko', en: 'There' }, { jp: 'そば', hep: 'so·ba', en: 'Soba noodles' }],
+  ta: [{ jp: '食べます', hep: 'ta·be·ma·su', en: 'Eat' }, { jp: 'タクシー', hep: 'ta·ku·shii', en: 'Taxi' }, { jp: 'たかい', hep: 'ta·kai', en: 'Expensive / tall' }],
+  chi: [{ jp: '地下鉄', hep: 'chi·ka·te·tsu', en: 'Subway' }, { jp: 'ちかい', hep: 'chi·kai', en: 'Near / close' }, { jp: 'チェックイン', hep: 'chek·ku·in', en: 'Check-in' }],
+  tsu: [{ jp: 'つめたい', hep: 'tsu·me·tai', en: 'Cold (drink/food)' }, { jp: 'ひとつ', hep: 'hi·to·tsu', en: 'One (counter)' }],
+  te: [{ jp: '天気', hep: 'ten·ki', en: 'Weather' }, { jp: '手', hep: 'te', en: 'Hand' }, { jp: 'てんぷら', hep: 'ten·pu·ra', en: 'Tempura' }],
+  to: [{ jp: 'トイレ', hep: 'toi·re', en: 'Toilet' }, { jp: '東京', hep: 'tou·kyou', en: 'Tokyo' }, { jp: 'とりにく', hep: 'to·ri·ni·ku', en: 'Chicken meat' }],
+  na: [{ jp: '名古屋', hep: 'na·go·ya', en: 'Nagoya' }, { jp: '名前', hep: 'na·ma·e', en: 'Name' }, { jp: 'なに', hep: 'na·ni', en: 'What?' }],
+  ni: [{ jp: '日本語', hep: 'ni·hon·go', en: 'Japanese language' }, { jp: '荷物', hep: 'ni·mo·tsu', en: 'Luggage' }, { jp: 'にく', hep: 'ni·ku', en: 'Meat' }],
+  nu: [{ jp: 'ぬるい', hep: 'nu·ru·i', en: 'Lukewarm' }],
+  ne: [{ jp: '値段', hep: 'ne·dan', en: 'Price' }, { jp: 'ねこ', hep: 'ne·ko', en: 'Cat' }],
+  no: [{ jp: '飲みます', hep: 'no·mi·ma·su', en: 'Drink' }, { jp: 'のりもの', hep: 'no·ri·mo·no', en: 'Vehicle / ride' }],
+  ha: [{ jp: 'はい', hep: 'hai', en: 'Yes' }, { jp: '話します', hep: 'ha·na·shi·ma·su', en: 'Speak' }, { jp: '花', hep: 'ha·na', en: 'Flower' }],
+  hi: [{ jp: 'ひとり', hep: 'hi·to·ri', en: 'One person / alone' }, { jp: 'ひだり', hep: 'hi·da·ri', en: 'Left (direction)' }, { jp: '飛行機', hep: 'hi·kou·ki', en: 'Airplane' }],
+  fu: [{ jp: 'ふたり', hep: 'fu·ta·ri', en: 'Two people' }, { jp: 'ふゆ', hep: 'fu·yu', en: 'Winter' }],
+  he: [{ jp: '部屋', hep: 'he·ya', en: 'Room' }, { jp: 'へいわ', hep: 'hei·wa', en: 'Peace' }],
+  ho: [{ jp: 'ホテル', hep: 'ho·te·ru', en: 'Hotel' }, { jp: 'ほしい', hep: 'ho·shii', en: 'Want (something)' }],
+  ma: [{ jp: '待ちます', hep: 'ma·chi·ma·su', en: 'Wait' }, { jp: 'まっすぐ', hep: 'mas·su·gu', en: 'Straight ahead' }, { jp: 'まずい', hep: 'ma·zui', en: 'Bad taste' }],
+  mi: [{ jp: '水', hep: 'mi·zu', en: 'Water' }, { jp: 'みぎ', hep: 'mi·gi', en: 'Right (direction)' }, { jp: 'みせ', hep: 'mi·se', en: 'Shop / store' }],
+  mu: [{ jp: '無料', hep: 'mu·ryou', en: 'Free (no charge)' }, { jp: 'むずかしい', hep: 'mu·zu·ka·shii', en: 'Difficult' }],
+  me: [{ jp: 'メニュー', hep: 'me·nyuu', en: 'Menu' }, { jp: 'めがね', hep: 'me·ga·ne', en: 'Glasses' }],
+  mo: [{ jp: 'もう一度', hep: 'mou i·chi·do', en: 'One more time' }, { jp: 'もの', hep: 'mo·no', en: 'Thing / item' }],
+  ya: [{ jp: 'やすい', hep: 'ya·su·i', en: 'Cheap' }, { jp: 'やさい', hep: 'ya·sai', en: 'Vegetables' }, { jp: '薬局', hep: 'yak·kyoku', en: 'Pharmacy' }],
+  yu: [{ jp: 'ゆっくり', hep: 'yuk·ku·ri', en: 'Slowly' }, { jp: 'ゆき', hep: 'yu·ki', en: 'Snow' }],
+  yo: [{ jp: '予約', hep: 'yo·ya·ku', en: 'Reservation' }, { jp: 'よる', hep: 'yo·ru', en: 'Night' }, { jp: 'ようこそ', hep: 'you·ko·so', en: 'Welcome' }],
+  ra: [{ jp: 'ラーメン', hep: 'raa·men', en: 'Ramen' }, { jp: '来週', hep: 'rai·shuu', en: 'Next week' }],
+  ri: [{ jp: '旅行', hep: 'ryo·kou', en: 'Travel / trip' }, { jp: 'りんご', hep: 'rin·go', en: 'Apple' }],
+  ru: [{ jp: 'るすばん', hep: 'ru·su·ban', en: 'House-sitting' }],
+  re: [{ jp: 'レストラン', hep: 're·su·to·ran', en: 'Restaurant' }, { jp: '冷蔵庫', hep: 'rei·zou·ko', en: 'Refrigerator' }],
+  ro: [{ jp: '六', hep: 'ro·ku', en: 'Six (6)' }, { jp: 'ロッカー', hep: 'rok·kaa', en: 'Locker' }],
+  wa: [{ jp: 'わかります', hep: 'wa·ka·ri·ma·su', en: 'Understand' }, { jp: 'わさび', hep: 'wa·sa·bi', en: 'Wasabi' }],
+  wo: [{ jp: '水をください', hep: 'mi·zu wo ku·da·sai', en: 'Water please' }],
+  n: [{ jp: '何', hep: 'na·ni', en: 'What?' }, { jp: 'パン', hep: 'pan', en: 'Bread' }, { jp: 'ラーメン', hep: 'raa·men', en: 'Ramen' }],
+};
+
+function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   const [chart, setChart] = useState<'hiragana' | 'katakana'>('hiragana');
 
   const hiragana = [
@@ -227,8 +277,22 @@ function GojuonRef() {
 
   const data = chart === 'hiragana' ? hiragana : katakana;
 
+  const handleTap = (char: string, rom: string) => {
+    speak(char, 'ja-JP');
+    const vocab = KANA_VOCAB[rom];
+    if (vocab && vocab.length > 0) {
+      openDrawer({
+        title: char,
+        titleRom: rom,
+        subtitle: `Words with ${rom} — tap 🔊 to hear`,
+        items: vocab,
+      });
+    }
+  };
+
   return (
     <div className="mt-2">
+      <p className="text-base text-slate-500 mb-2">Tap any character to hear it + see real vocab</p>
       <div className="flex gap-2 mb-3">
         <button onClick={() => setChart('hiragana')} className={`flex-1 py-2 rounded-lg text-base transition ${chart === 'hiragana' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
           ひらがな Hiragana
@@ -241,11 +305,12 @@ function GojuonRef() {
         {data.flat().map((cell, i) => {
           if (!cell) return <div key={i} className="h-14" />;
           const [char, rom] = [cell.split(' ')[0], cell.split(' ')[1]];
+          const hasVocab = KANA_VOCAB[rom] && KANA_VOCAB[rom].length > 0;
           return (
             <button
               key={i}
-              onClick={() => speak(char, 'ja-JP')}
-              className="bg-slate-700/40 rounded-lg h-14 flex flex-col items-center justify-center active:bg-slate-600 transition"
+              onClick={() => handleTap(char, rom)}
+              className={`rounded-lg h-14 flex flex-col items-center justify-center active:bg-slate-600 transition ${hasVocab ? 'bg-slate-700/40' : 'bg-slate-700/20'}`}
             >
               <span className="text-lg text-slate-100">{char}</span>
               <span className="text-base text-sakura-300">{rom}</span>
