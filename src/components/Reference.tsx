@@ -396,15 +396,17 @@ function NumberConverter() {
         className="w-full bg-slate-700/50 text-base text-slate-200 placeholder-slate-500 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-sakura-400/50"
       />
       {result && (
-        <div className="bg-slate-700/30 rounded-xl p-3 space-y-2">
-          <div className="flex items-center gap-2">
-            <button onClick={() => speak(result.reading, 'ja-JP')} className="text-lg active:scale-110 transition-transform">🔊</button>
-            <span className="text-xl font-bold text-slate-100">{result.kanji}</span>
+        <div className="bg-slate-700/40 rounded-xl p-3 space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1">
+              <p className="text-lg font-medium text-slate-50">{result.kanji}</p>
+              <p className="text-base text-sakura-300">{result.romaji}</p>
+              <p className="text-base text-slate-400">{result.reading}</p>
+            </div>
+            <button onClick={() => speak(result.reading, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
           </div>
-          <p className="text-base text-sakura-300 ml-8">{result.romaji}</p>
-          <p className="text-base text-slate-300 ml-8">{result.reading}</p>
           {!isNaN(num) && num > 0 && (
-            <div className="mt-2 pt-2 border-t border-slate-700/40 ml-8 space-y-1">
+            <div className="mt-1 pt-2 border-t border-slate-700/40 space-y-1">
               <p className="text-base text-slate-400">¥{num.toLocaleString()} ≈ HK${(num * HKD_RATE).toFixed(1)}</p>
               <p className="text-base text-slate-400">¥{num.toLocaleString()} ≈ CA${(num * CAD_RATE).toFixed(2)}</p>
             </div>
