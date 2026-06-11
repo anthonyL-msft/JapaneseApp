@@ -58,12 +58,16 @@ export function Reference() {
 function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string }) {
   return (
     <div className="py-1.5 border-b border-slate-700/30 last:border-0">
-      <div className="flex items-center gap-2">
-        <button onClick={() => speak(jp, 'ja-JP')} className="text-base active:scale-110 transition-transform shrink-0">🔊</button>
-        <span className="text-base font-medium text-slate-100 shrink-0">{jp}</span>
-        <span className="text-base text-sakura-300">{rom}</span>
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-base font-medium text-slate-100">{jp}</span>
+            <span className="text-base text-sakura-300">{rom}</span>
+          </div>
+          <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
+        </div>
+        <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
       </div>
-      <p className="text-base text-slate-400 mt-0.5 ml-8">{meaning}</p>
     </div>
   );
 }
@@ -353,7 +357,6 @@ function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; 
   return (
     <div className="py-2 border-b border-slate-700/30 last:border-0">
       <div className="flex items-center gap-2">
-        <button onClick={() => speak(jp, 'ja-JP')} className="text-base active:scale-110 transition-transform shrink-0">🔊</button>
         <button onClick={() => setShowEx(!showEx)} className="flex-1 text-left">
           <div className="flex items-baseline gap-2">
             <span className="text-base font-medium text-slate-100">{jp}</span>
@@ -361,17 +364,18 @@ function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; 
           </div>
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </button>
+        <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
         <button onClick={() => setShowEx(!showEx)} className="text-base text-slate-500 shrink-0">{showEx ? '▲' : '▼'}</button>
       </div>
       {showEx && (
-        <div className="mt-2 ml-8 space-y-1.5">
+        <div className="mt-2 space-y-1.5">
           {examples.map((ex, i) => (
             <div key={i} className="bg-slate-700/20 rounded-lg p-2">
-              <div className="flex items-center gap-2">
-                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-base active:scale-110 shrink-0">🔊</button>
-                <p className="text-base text-slate-200">{ex.jp}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-base text-slate-200 flex-1">{ex.jp}</p>
+                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
               </div>
-              <p className="text-base text-slate-400 ml-7">{ex.en}</p>
+              <p className="text-base text-slate-400">{ex.en}</p>
             </div>
           ))}
         </div>
@@ -478,24 +482,24 @@ function PatternCard({ pattern, rom, meaning, examples }: { pattern: string; rom
   return (
     <div className="bg-slate-700/30 rounded-lg p-2">
       <div className="flex items-center gap-2">
-        <button onClick={() => speak(pattern, 'ja-JP')} className="text-base active:scale-110 shrink-0">🔊</button>
         <button onClick={() => setShowEx(!showEx)} className="flex-1 text-left">
           <p className="text-base text-slate-200 font-medium">{pattern}</p>
           <p className="text-base text-sakura-300">{rom}</p>
           <p className="text-base text-slate-400 mt-1">{meaning}</p>
         </button>
+        <button onClick={() => speak(pattern, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
         <button onClick={() => setShowEx(!showEx)} className="text-base text-slate-500 shrink-0">{showEx ? '▲' : '▼'}</button>
       </div>
       {showEx && (
-        <div className="mt-2 ml-7 space-y-1.5 border-t border-slate-700/30 pt-2">
+        <div className="mt-2 space-y-1.5 border-t border-slate-700/30 pt-2">
           <p className="text-base text-slate-500">Examples:</p>
           {examples.map((ex, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-base active:scale-110 shrink-0 mt-0.5">🔊</button>
-              <div>
-                <p className="text-base text-slate-200">{ex.jp}</p>
-                <p className="text-base text-slate-400">{ex.en}</p>
+            <div key={i} className="bg-slate-700/20 rounded-lg p-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-base text-slate-200 flex-1">{ex.jp}</p>
+                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
               </div>
+              <p className="text-base text-slate-400">{ex.en}</p>
             </div>
           ))}
         </div>
