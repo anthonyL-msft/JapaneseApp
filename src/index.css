@@ -51,6 +51,13 @@ body {
 .animate-slide-up {
   animation: slide-up 0.2s ease-out;
 }
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+.animate-slide-down {
+  animation: slide-down 0.2s ease-in forwards;
+}
 
 /* Full-page slide-in from right */
 @keyframes slide-in-right {
@@ -58,7 +65,7 @@ body {
   to { transform: translateX(0); }
 }
 .animate-slide-in-right {
-  animation: slide-in-right 0.15s ease-out;
+  animation: slide-in-right 0.2s ease-out;
 }
 
 /* Slide-out to right */
@@ -67,5 +74,5 @@ body {
   to { transform: translateX(100%); }
 }
 .animate-slide-out-right {
-  animation: slide-out-right 0.15s ease-in forwards;
+  animation: slide-out-right 0.2s ease-in forwards;
 }

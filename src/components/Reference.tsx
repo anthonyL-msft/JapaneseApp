@@ -31,16 +31,27 @@ type DrawerData = {
 } | null;
 
 function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
+  const [closing, setClosing] = useState(false);
   useEffect(() => {
-    if (data) document.body.style.overflow = 'hidden';
+    if (data) {
+      document.body.style.overflow = 'hidden';
+      setClosing(false);
+    }
     return () => { document.body.style.overflow = ''; };
   }, [data]);
+  const handleClose = useCallback(() => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 200);
+  }, [onClose]);
   if (!data) return null;
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={onClose}>
+    <div className={`fixed inset-0 z-50 flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose}>
       <div className="absolute inset-0 bg-black/50" />
       <div
-        className="relative bg-slate-800 rounded-t-2xl max-h-[80vh] flex flex-col animate-slide-up"
+        className={`relative bg-slate-800 rounded-t-2xl max-h-[80vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-center pt-2 pb-1">
@@ -52,7 +63,7 @@ function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
               <h3 className="text-lg font-bold text-slate-100">{data.title}</h3>
               {data.titleRom && <p className="text-base text-sakura-300">{data.titleRom}</p>}
             </div>
-            <button onClick={onClose} className="text-xl text-slate-400 p-2">✕</button>
+            <button onClick={handleClose} className="text-xl text-slate-400 p-2">✕</button>
           </div>
           {data.subtitle && <p className="text-base text-slate-400 mt-0.5">{data.subtitle}</p>}
         </div>

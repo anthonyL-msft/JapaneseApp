@@ -26,7 +26,7 @@ export function useSlidePanel<T = boolean>() {
       setVisible(false);
       setAnimClass('animate-slide-in-right');
       closingRef.current = false;
-    }, 150); // matches animation duration
+    }, 200); // matches animation duration
   }, []);
 
   return { value, visible, animClass, open, close };
