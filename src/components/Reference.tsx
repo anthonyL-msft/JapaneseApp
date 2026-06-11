@@ -352,7 +352,7 @@ function NumbersRef() {
   );
 }
 
-function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; meaning: string; examples: { jp: string; en: string }[] }) {
+function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; meaning: string; examples: { jp: string; hep: string; en: string }[] }) {
   const [showEx, setShowEx] = useState(false);
   return (
     <div className="py-2 border-b border-slate-700/30 last:border-0">
@@ -372,7 +372,10 @@ function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; 
           {examples.map((ex, i) => (
             <div key={i} className="bg-slate-700/20 rounded-lg p-2">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-base text-slate-200 flex-1">{ex.jp}</p>
+                <div className="flex-1">
+                  <p className="text-base text-slate-200">{ex.jp}</p>
+                  <p className="text-base text-sakura-300">{ex.hep}</p>
+                </div>
                 <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
               </div>
               <p className="text-base text-slate-400">{ex.en}</p>
@@ -390,70 +393,70 @@ function ParticlesRef() {
       <p className="text-base text-slate-500 mb-2">Tap a particle to see example sentences</p>
       <ParticleRow jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
         examples={[
-          { jp: 'これは何ですか？', en: 'What is this?' },
-          { jp: '私はアンソニーです', en: 'I am Anthony' },
-          { jp: 'トイレはどこですか？', en: 'Where is the toilet?' },
+          { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
+          { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
+          { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
         ]} />
       <ParticleRow jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
         examples={[
-          { jp: '水がほしいです', en: 'I want water' },
-          { jp: '日本語がわかりません', en: "I don't understand Japanese" },
-          { jp: 'これが一番おいしいです', en: 'This is the most delicious' },
+          { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
+          { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
+          { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
         ]} />
       <ParticleRow jp="を" rom="wo" meaning="Object marker — marks what receives the action"
         examples={[
-          { jp: 'ラーメンを二つお願いします', en: 'Two ramen please' },
-          { jp: '写真を撮ってもらえますか？', en: 'Can you take a photo?' },
-          { jp: '切符を買います', en: 'I buy a ticket' },
+          { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
+          { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
+          { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
         ]} />
       <ParticleRow jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
         examples={[
-          { jp: '6時に予約しました', en: 'I reserved at 6 o\'clock' },
-          { jp: '東京に行きます', en: 'I go to Tokyo' },
-          { jp: 'ホテルに荷物を送ります', en: 'I send luggage to the hotel' },
+          { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
+          { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
+          { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'I send luggage to the hotel' },
         ]} />
       <ParticleRow jp="で" rom="de" meaning="Location of action / by means of"
         examples={[
-          { jp: 'Suicaで払います', en: 'I pay with Suica' },
-          { jp: 'ここで食べます', en: 'I eat here' },
-          { jp: '電車で行きます', en: 'I go by train' },
+          { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica' },
+          { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
+          { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train' },
         ]} />
       <ParticleRow jp="へ" rom="e" meaning="Towards (direction)"
         examples={[
-          { jp: '東京へ行きます', en: 'I\'m heading to Tokyo' },
-          { jp: 'こちらへどうぞ', en: 'This way please' },
+          { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo' },
+          { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
         ]} />
       <ParticleRow jp="の" rom="no" meaning="Possessive / connecting — 's, of"
         examples={[
-          { jp: '名古屋の名物', en: 'Nagoya\'s specialty' },
-          { jp: '日本語のメニュー', en: 'Japanese menu' },
-          { jp: 'ホテルの電話番号', en: 'Hotel\'s phone number' },
+          { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
+          { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
+          { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
         ]} />
       <ParticleRow jp="と" rom="to" meaning="And, with (listing/companion)"
         examples={[
-          { jp: 'ビールと枝豆をお願いします', en: 'Beer and edamame please' },
-          { jp: '二人と一緒に旅行しています', en: 'Traveling together with two people' },
+          { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
+          { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
         ]} />
       <ParticleRow jp="も" rom="mo" meaning="Also, too"
         examples={[
-          { jp: 'これもお願いします', en: 'This one too please' },
-          { jp: '日本語もわかりません', en: 'I don\'t understand Japanese either' },
+          { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
+          { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
         ]} />
       <ParticleRow jp="か" rom="ka" meaning="Question marker (end of sentence)"
         examples={[
-          { jp: 'いくらですか？', en: 'How much?' },
-          { jp: 'クレジットカードは使えますか？', en: 'Can I use credit card?' },
-          { jp: 'これはなんですか？', en: 'What is this?' },
+          { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
+          { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
+          { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
         ]} />
       <ParticleRow jp="から" rom="ka·ra" meaning="From (place/time)"
         examples={[
-          { jp: '名古屋から東京まで', en: 'From Nagoya to Tokyo' },
-          { jp: '7時から朝食です', en: 'Breakfast from 7 o\'clock' },
+          { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
+          { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
         ]} />
       <ParticleRow jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
         examples={[
-          { jp: 'この住所までお願いします', en: 'To this address please' },
-          { jp: '10時まで営業です', en: 'Open until 10 o\'clock' },
+          { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
+          { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
         ]} />
     </div>
   );
@@ -477,7 +480,7 @@ function CountersRef() {
   );
 }
 
-function PatternCard({ pattern, rom, meaning, examples }: { pattern: string; rom: string; meaning: string; examples: { jp: string; en: string }[] }) {
+function PatternCard({ pattern, rom, meaning, examples }: { pattern: string; rom: string; meaning: string; examples: { jp: string; hep: string; en: string }[] }) {
   const [showEx, setShowEx] = useState(false);
   return (
     <div className="bg-slate-700/30 rounded-lg p-2">
@@ -496,7 +499,10 @@ function PatternCard({ pattern, rom, meaning, examples }: { pattern: string; rom
           {examples.map((ex, i) => (
             <div key={i} className="bg-slate-700/20 rounded-lg p-2">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-base text-slate-200 flex-1">{ex.jp}</p>
+                <div className="flex-1">
+                  <p className="text-base text-slate-200">{ex.jp}</p>
+                  <p className="text-base text-sakura-300">{ex.hep}</p>
+                </div>
                 <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
               </div>
               <p className="text-base text-slate-400">{ex.en}</p>
@@ -514,45 +520,45 @@ function PatternsRef() {
       <p className="text-base text-slate-500">Tap a pattern to see real examples</p>
       <PatternCard pattern="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
         examples={[
-          { jp: '水をお願いします', en: 'Water please' },
-          { jp: 'メニューをお願いします', en: 'Menu please' },
-          { jp: 'お会計をお願いします', en: 'Check please' },
-          { jp: '二つをお願いします', en: 'Two of them please' },
+          { jp: '水をお願いします', hep: 'mi·zu wo o·ne·gai·shi·ma·su', en: 'Water please' },
+          { jp: 'メニューをお願いします', hep: 'me·nyuu wo o·ne·gai·shi·ma·su', en: 'Menu please' },
+          { jp: 'お会計をお願いします', hep: 'o·kai·kei wo o·ne·gai·shi·ma·su', en: 'Check please' },
+          { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
         ]} />
       <PatternCard pattern="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
         examples={[
-          { jp: 'Wi-Fiはありますか？', en: 'Is there Wi-Fi?' },
-          { jp: '英語のメニューはありますか？', en: 'Do you have an English menu?' },
-          { jp: '空いている席はありますか？', en: 'Is there an empty seat?' },
+          { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
+          { jp: '英語のメニューはありますか？', hep: 'ei·go no me·nyuu wa a·ri·ma·su ka', en: 'Do you have an English menu?' },
+          { jp: '空いている席はありますか？', hep: 'ai·te i·ru se·ki wa a·ri·ma·su ka', en: 'Is there an empty seat?' },
         ]} />
       <PatternCard pattern="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?"
         examples={[
-          { jp: 'トイレはどこですか？', en: 'Where is the toilet?' },
-          { jp: '駅はどこですか？', en: 'Where is the station?' },
-          { jp: 'ATMはどこですか？', en: 'Where is an ATM?' },
+          { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
+          { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
+          { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
         ]} />
       <PatternCard pattern="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)"
         examples={[
-          { jp: '写真を撮ってもいいですか？', en: 'May I take photos?' },
-          { jp: 'ここで食べてもいいですか？', en: 'May I eat here?' },
-          { jp: '試着してもいいですか？', en: 'May I try it on?' },
+          { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
+          { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
+          { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
       <PatternCard pattern="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
         examples={[
-          { jp: '書いてください', en: 'Please write it down' },
-          { jp: 'ゆっくり話してください', en: 'Please speak slowly' },
-          { jp: '温めてください', en: 'Please heat it up' },
+          { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
+          { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
+          { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
         ]} />
       <PatternCard pattern="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
         examples={[
-          { jp: '日本語がわかりません', en: "I don't understand Japanese" },
-          { jp: '使い方がわかりません', en: "I don't know how to use it" },
+          { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
+          { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
         ]} />
       <PatternCard pattern="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
         examples={[
-          { jp: '食べたいです', en: 'I want to eat' },
-          { jp: '行きたいです', en: 'I want to go' },
-          { jp: '荷物を送りたいです', en: 'I want to send luggage' },
+          { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
+          { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
+          { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
         ]} />
     </div>
   );
