@@ -3,18 +3,18 @@ import { speak } from '../utils/tts';
 
 type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'converter' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs';
 
-const SECTIONS: { id: Section; label: string; emoji: string }[] = [
-  { id: 'gojuon', label: '50 Sounds (Gojūon)', emoji: 'あ' },
-  { id: 'grammar', label: 'Sentence Structure', emoji: '📝' },
-  { id: 'particles', label: 'Key Particles', emoji: '🔤' },
-  { id: 'polite', label: 'Polite Forms', emoji: '🎩' },
-  { id: 'numbers', label: 'Numbers & Digits', emoji: '🔢' },
-  { id: 'converter', label: 'Number Converter', emoji: '🔄' },
-  { id: 'counters', label: 'Counters', emoji: '📏' },
-  { id: 'yesno', label: 'Yes/No Questions', emoji: '❓' },
-  { id: 'whquestions', label: 'Question Words', emoji: '🔍' },
-  { id: 'patterns', label: 'Sentence Patterns', emoji: '📐' },
-  { id: 'signs', label: 'Common Signs', emoji: '🪧' },
+const SECTIONS: { id: Section; label: string; emoji: string; desc: string }[] = [
+  { id: 'gojuon', label: '50 Sounds', emoji: 'あ', desc: 'Hiragana & Katakana chart' },
+  { id: 'grammar', label: 'Sentence Structure', emoji: '📝', desc: 'S は O を V ます word order' },
+  { id: 'particles', label: 'Key Particles', emoji: '🔤', desc: 'は が を に で の and more' },
+  { id: 'polite', label: 'Polite Forms', emoji: '🎩', desc: 'ます ません ました です' },
+  { id: 'numbers', label: 'Numbers & Digits', emoji: '🔢', desc: 'Counting, prices, time' },
+  { id: 'converter', label: 'Number Converter', emoji: '🔄', desc: 'Type a number → kanji + reading' },
+  { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 and more' },
+  { id: 'yesno', label: 'Yes/No Questions', emoji: '❓', desc: 'Statement + か = question' },
+  { id: 'whquestions', label: 'Question Words', emoji: '🔍', desc: '何 どこ いつ いくら どう' },
+  { id: 'patterns', label: 'Sentence Patterns', emoji: '📐', desc: 'お願いします ありますか etc.' },
+  { id: 'signs', label: 'Common Signs', emoji: '🪧', desc: '入口 出口 禁煙 営業中' },
 ];
 
 type DrawerData = {
@@ -70,49 +70,63 @@ function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
 }
 
 export function Reference() {
-  const [open, setOpen] = useState<Section | null>(null);
+  const [activeSection, setActiveSection] = useState<Section | null>(null);
   const [drawer, setDrawer] = useState<DrawerData>(null);
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
   const closeDrawer = useCallback(() => setDrawer(null), []);
 
+  const activeMeta = SECTIONS.find(s => s.id === activeSection);
+
   return (
-    <div className="scroll-area h-full">
-      <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">📚 Quick Reference</h2>
-        <p className="text-base text-slate-400">Grammar cheat sheet for travel</p>
-      </div>
-
-      <div className="p-4 space-y-2">
-        {SECTIONS.map(sec => (
-          <div key={sec.id} className="bg-slate-800/60 rounded-xl overflow-hidden">
+    <div className="h-full relative">
+      {/* L1: Section grid */}
+      <div className="scroll-area h-full">
+        <div className="px-4 py-3 border-b border-slate-800">
+          <h2 className="text-lg font-bold">📚 Quick Reference</h2>
+          <p className="text-base text-slate-400">7-step grammar for travel</p>
+        </div>
+        <div className="p-4 grid grid-cols-2 gap-2">
+          {SECTIONS.map((sec, i) => (
             <button
-              onClick={() => setOpen(open === sec.id ? null : sec.id)}
-              className="w-full flex items-center justify-between p-3 active:bg-slate-700/50 transition"
+              key={sec.id}
+              onClick={() => setActiveSection(sec.id)}
+              className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
             >
-              <span className="text-base font-semibold">
-                {sec.emoji} {sec.label}
-              </span>
-              <span className="text-slate-500 text-base">{open === sec.id ? '▲' : '▼'}</span>
+              <span className="text-2xl">{sec.emoji}</span>
+              <span className="text-base font-semibold text-slate-100">{sec.label}</span>
+              <span className="text-sm text-slate-500 leading-tight">{sec.desc}</span>
+              <span className="text-sm text-slate-600 mt-auto">Step {i + 1 <= 7 ? i + 1 : ''}</span>
             </button>
-            {open === sec.id && (
-              <div className="px-3 pb-3 border-t border-slate-700/50">
-                {sec.id === 'gojuon' && <GojuonRef />}
-                {sec.id === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
-                {sec.id === 'numbers' && <NumbersRef />}
-                {sec.id === 'converter' && <NumberConverter />}
-                {sec.id === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
-                {sec.id === 'counters' && <CountersRef />}
-                {sec.id === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
-                {sec.id === 'polite' && <PoliteRef openDrawer={openDrawer} />}
-                {sec.id === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
-                {sec.id === 'whquestions' && <WHQuestionsRef openDrawer={openDrawer} />}
-                {sec.id === 'signs' && <SignsRef />}
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
+      {/* L2: Full-page slide-in */}
+      {activeSection && (
+        <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
+            <button onClick={() => setActiveSection(null)} className="text-base text-slate-400 active:text-slate-200 p-1">
+              ← Back
+            </button>
+            <h2 className="text-lg font-bold flex-1">{activeMeta?.emoji} {activeMeta?.label}</h2>
+          </div>
+          <div className="scroll-area flex-1 px-3 pb-3">
+            {activeSection === 'gojuon' && <GojuonRef />}
+            {activeSection === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
+            {activeSection === 'numbers' && <NumbersRef />}
+            {activeSection === 'converter' && <NumberConverter />}
+            {activeSection === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
+            {activeSection === 'counters' && <CountersRef />}
+            {activeSection === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
+            {activeSection === 'polite' && <PoliteRef openDrawer={openDrawer} />}
+            {activeSection === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
+            {activeSection === 'whquestions' && <WHQuestionsRef openDrawer={openDrawer} />}
+            {activeSection === 'signs' && <SignsRef />}
+          </div>
+        </div>
+      )}
+
+      {/* L3: Drawer for examples */}
       <Drawer data={drawer} onClose={closeDrawer} />
     </div>
   );
