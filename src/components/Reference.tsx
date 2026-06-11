@@ -68,13 +68,6 @@ function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string
   );
 }
 
-        <span className="text-base text-sakura-300">{rom}</span>
-      </div>
-      <p className="text-base text-slate-400 mt-0.5 ml-8">{meaning}</p>
-    </div>
-  );
-}
-
 // ============================================================
 // 50-Sound Chart (Gojūon)
 // ============================================================
