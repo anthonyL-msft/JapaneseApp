@@ -54,10 +54,10 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
             <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button onClick={handleSpeak} className="p-2 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
+            <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
               🔊
             </button>
-            <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-2 rounded-lg active:bg-slate-600 text-lg">
+            <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
               {isBookmarked ? '⭐' : '☆'}
             </button>
           </div>
@@ -66,7 +66,7 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
 
       {/* Expanded details */}
       {expanded && (
-        <div className="px-3 pb-3 border-t border-slate-700/50 space-y-3">
+        <div className="px-3 pb-3 border-t border-slate-700/40 space-y-3">
           {phrase.pronunciation_chunks && (
             <div className="mt-3 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
               <span className="text-slate-500 text-base">Pronunciation</span>

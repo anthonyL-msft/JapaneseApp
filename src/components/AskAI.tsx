@@ -123,10 +123,10 @@ export function AskAI({ lang, onSaveNote }: Props) {
 
         {/* Result */}
         {result && (
-          <div className="bg-slate-800/80 rounded-2xl p-4 space-y-3">
+          <div className="bg-slate-800/80 rounded-xl p-4 space-y-3">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-xl font-bold text-slate-50">{result.target}</p>
+                <p className="text-lg font-medium text-slate-50">{result.target}</p>
                 <p className="text-base text-sakura-300 mt-1">{result.pronunciation_chunks || result.pronunciation}</p>
               </div>
               <button
@@ -145,7 +145,7 @@ export function AskAI({ lang, onSaveNote }: Props) {
             <div className="grid grid-cols-2 gap-2 text-base">
               <div>
                 <span className="text-slate-500 text-base">English</span>
-                <p className="text-slate-200">{result.english}</p>
+                <p className="text-slate-400">{result.english}</p>
               </div>
               <div>
                 <span className="text-slate-500 text-base">繁體中文</span>

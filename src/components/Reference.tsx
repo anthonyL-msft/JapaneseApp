@@ -136,7 +136,7 @@ export function Reference() {
         <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
             <button onClick={() => setActiveSection(null)} className="text-base text-slate-400 active:text-slate-200 p-1">
-              ← Back
+              ← Quick Reference
             </button>
             <h2 className="text-lg font-bold flex-1">{activeMeta?.emoji} {activeMeta?.label}</h2>
           </div>
@@ -164,7 +164,7 @@ export function Reference() {
 
 function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string }) {
   return (
-    <div className="py-1.5 border-b border-slate-700/30 last:border-0">
+    <div className="py-1.5 border-b border-slate-700/40 last:border-0">
       <div className="flex items-center justify-between gap-2">
         <div>
           <div className="flex items-baseline gap-2">
@@ -327,7 +327,7 @@ function NumberConverter() {
           <p className="text-base text-sakura-300 ml-8">{result.romaji}</p>
           <p className="text-base text-slate-300 ml-8">{result.reading}</p>
           {!isNaN(num) && num > 0 && (
-            <div className="mt-2 pt-2 border-t border-slate-700/30 ml-8 space-y-1">
+            <div className="mt-2 pt-2 border-t border-slate-700/40 ml-8 space-y-1">
               <p className="text-base text-slate-400">¥{num.toLocaleString()} ≈ HK${(num * HKD_RATE).toFixed(1)}</p>
               <p className="text-base text-slate-400">¥{num.toLocaleString()} ≈ CA${(num * CAD_RATE).toFixed(2)}</p>
             </div>
@@ -382,7 +382,7 @@ function NumbersRef() {
           <RefRow jp="八" rom="ha·chi" meaning="8" />
           <RefRow jp="九" rom="kyuu" meaning="9 (also ku)" />
           <RefRow jp="十" rom="juu" meaning="10" />
-          <div className="mt-2 pt-2 border-t border-slate-700/30">
+          <div className="mt-2 pt-2 border-t border-slate-700/40">
             <RefRow jp="二十" rom="ni·juu" meaning="20" />
             <RefRow jp="三十" rom="san·juu" meaning="30" />
             <RefRow jp="五十" rom="go·juu" meaning="50" />

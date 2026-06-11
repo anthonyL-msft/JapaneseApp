@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type { Phrase, UserNote, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { PhraseCard } from './PhraseCard';
-import { Reference } from './Reference';
 
 interface Props {
   phrases: Phrase[];
@@ -18,7 +17,6 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [openSituations, setOpenSituations] = useState<Set<string>>(new Set());
-  const [showReference, setShowReference] = useState(false);
 
   const toggleSituation = (situation: string) => {
     setOpenSituations(prev => {
@@ -31,69 +29,9 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
 
   const categories = Object.entries(CATEGORY_INFO) as [Category, typeof CATEGORY_INFO[Category]][];
 
-  if (showReference) {
-    return (
-      <div className="h-full flex flex-col">
-        <div className="px-4 pt-3 pb-2 border-b border-slate-800 bg-slate-950/95">
-          <button onClick={() => setShowReference(false)} className="text-sakura-400 text-base flex items-center gap-1">
-            ← Back to Phrases
-          </button>
-        </div>
-        <div className="flex-1 overflow-hidden">
-          <Reference />
-        </div>
-      </div>
-    );
-  }
-
-  if (!selectedCategory) {
-    // Category grid
-    return (
-      <div className="scroll-area h-full p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold mb-0.5">📖 Phrase Book</h1>
-            <p className="text-slate-400 text-base">Select a category to start learning</p>
-          </div>
-          <div className="flex gap-2">
-            {onShowCards && (
-              <button
-                onClick={onShowCards}
-                className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
-              >
-                🃏 Cards
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {categories.map(([key, info]) => {
-            const catPhrases = phrases.filter(p => p.category === key);
-            const bookmarked = catPhrases.filter(p => bookmarkedIds.has(p.id)).length;
-            return (
-              <button
-                key={key}
-                onClick={() => { setSelectedCategory(key); setOpenSituations(new Set()); }}
-                className="bg-slate-800/80 rounded-2xl p-4 text-left active:bg-slate-700 transition-colors"
-              >
-                <span className="text-2xl">{info.emoji}</span>
-                <h3 className="text-base font-semibold mt-2 text-slate-100">{info.label}</h3>
-                <p className="text-base text-slate-400 mt-0.5">{info.labelTC}</p>
-                <p className="text-base text-slate-500 mt-1">
-                  {catPhrases.length} phrases
-                  {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
   // Phrase list for selected category
-  const categoryPhrases = phrases.filter(p => p.category === selectedCategory);
-  const info = CATEGORY_INFO[selectedCategory];
+  const categoryPhrases = selectedCategory ? phrases.filter(p => p.category === selectedCategory) : [];
+  const info = selectedCategory ? CATEGORY_INFO[selectedCategory] : null;
 
   // Group by situation
   const situations = new Map<string, Phrase[]>();
@@ -115,64 +53,110 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   };
 
   return (
-    <div className="scroll-area h-full">
-      <div className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800">
-        <div className="flex items-start justify-between">
+    <div className="h-full relative">
+      {/* L1: Category grid */}
+      <div className="scroll-area h-full p-4">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <button
-              onClick={() => { setSelectedCategory(null); setOpenSituations(new Set()); }}
-              className="text-sakura-400 text-base mb-1 flex items-center gap-1"
-            >
-              ← All Categories
-            </button>
-            <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
-            <p className="text-base text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
+            <h1 className="text-xl font-bold mb-0.5">📖 Phrase Book</h1>
+            <p className="text-slate-400 text-base">Select a category to start learning</p>
           </div>
-          <button
-            onClick={toggleAll}
-            className="mt-5 text-base bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
-          >
-            {allOpen ? '▲ Close All' : '▼ Open All'}
-          </button>
+          <div className="flex gap-2">
+            {onShowCards && (
+              <button
+                onClick={onShowCards}
+                className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+              >
+                🃏 Cards
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {categories.map(([key, catInfo]) => {
+            const catPhrases = phrases.filter(p => p.category === key);
+            const bookmarked = catPhrases.filter(p => bookmarkedIds.has(p.id)).length;
+            return (
+              <button
+                key={key}
+                onClick={() => { setSelectedCategory(key); setOpenSituations(new Set()); setExpandedPhrase(null); }}
+                className="bg-slate-800/80 rounded-xl p-4 text-left active:bg-slate-700 transition-colors"
+              >
+                <span className="text-2xl">{catInfo.emoji}</span>
+                <h3 className="text-base font-semibold mt-2 text-slate-100">{catInfo.label}</h3>
+                <p className="text-base text-slate-400 mt-0.5">{catInfo.labelTC}</p>
+                <p className="text-base text-slate-500 mt-1">
+                  {catPhrases.length} phrases
+                  {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
+                </p>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="px-2 py-2 space-y-1.5">
-        {Array.from(situations.entries()).map(([situation, pList]) => {
-          const isOpen = openSituations.has(situation);
-          return (
-            <div key={situation} className="bg-slate-800/60 rounded-xl overflow-hidden">
+      {/* L2: Full-page slide-in for selected category */}
+      {selectedCategory && info && (
+        <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
+          <div className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800 shrink-0">
+            <div className="flex items-start justify-between">
+              <div>
+                <button
+                  onClick={() => { setSelectedCategory(null); setOpenSituations(new Set()); }}
+                  className="text-base text-slate-400 active:text-slate-200 p-1"
+                >
+                  ← All Categories
+                </button>
+                <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
+                <p className="text-base text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
+              </div>
               <button
-                onClick={() => toggleSituation(situation)}
-                className="w-full flex items-center justify-between px-3 py-2.5 text-left active:bg-slate-700/50 transition"
+                onClick={toggleAll}
+                className="mt-5 text-base bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
               >
-                <div className="text-left">
-                  <h3 className="text-base font-semibold text-slate-200">{situation}</h3>
-                  <p className="text-base text-slate-500">{pList.length} phrases</p>
-                </div>
-                <span className="text-slate-500 text-base shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
+                {allOpen ? '▲ Close All' : '▼ Open All'}
               </button>
-              {isOpen && (
-                <div className="px-1.5 pb-1.5 space-y-1">
-                  {pList.map(phrase => (
-                    <PhraseCard
-                      key={phrase.id}
-                      phrase={phrase}
-                      isBookmarked={bookmarkedIds.has(phrase.id)}
-                      notes={notes.filter(n => n.phraseId === phrase.id)}
-                      expanded={expandedPhrase === phrase.id}
-                      onToggleExpand={() => setExpandedPhrase(expandedPhrase === phrase.id ? null : phrase.id)}
-                      onToggleBookmark={() => onToggleBookmark(phrase.id)}
-                      onSaveNote={onSaveNote}
-                      onDeleteNote={onDeleteNote}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
-          );
-        })}
-      </div>
+          </div>
+
+          <div className="scroll-area flex-1 px-2 py-2 space-y-1.5">
+            {Array.from(situations.entries()).map(([situation, pList]) => {
+              const isOpen = openSituations.has(situation);
+              return (
+                <div key={situation} className="bg-slate-800/60 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => toggleSituation(situation)}
+                    className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
+                  >
+                    <div className="text-left">
+                      <h3 className="text-base font-semibold text-slate-200">{situation}</h3>
+                      <p className="text-base text-slate-500">{pList.length} phrases</p>
+                    </div>
+                    <span className="text-slate-500 text-base shrink-0 ml-2">{isOpen ? '▲' : '▼'}</span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-1.5 pb-1.5 space-y-1.5">
+                      {pList.map(phrase => (
+                        <PhraseCard
+                          key={phrase.id}
+                          phrase={phrase}
+                          isBookmarked={bookmarkedIds.has(phrase.id)}
+                          notes={notes.filter(n => n.phraseId === phrase.id)}
+                          expanded={expandedPhrase === phrase.id}
+                          onToggleExpand={() => setExpandedPhrase(expandedPhrase === phrase.id ? null : phrase.id)}
+                          onToggleBookmark={() => onToggleBookmark(phrase.id)}
+                          onSaveNote={onSaveNote}
+                          onDeleteNote={onDeleteNote}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
