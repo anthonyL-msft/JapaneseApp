@@ -706,8 +706,8 @@ function YesNoRef({ openDrawer }: { openDrawer: DrawerOpener }) {
 
       <div className="bg-slate-700/30 rounded-lg p-3 mb-3">
         <p className="text-base text-slate-400 mb-2">Answering:</p>
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-center justify-center gap-2 bg-slate-700/30 rounded-lg p-2">
             <span className="text-green-400 text-base">✅</span>
             <div>
               <p className="text-base text-slate-200">はい</p>
@@ -716,7 +716,7 @@ function YesNoRef({ openDrawer }: { openDrawer: DrawerOpener }) {
             </div>
             <button onClick={() => speak('はい', 'ja-JP')} className="text-lg active:scale-110 p-1">🔊</button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2 bg-slate-700/30 rounded-lg p-2">
             <span className="text-red-400 text-base">❌</span>
             <div>
               <p className="text-base text-slate-200">いいえ</p>
