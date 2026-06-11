@@ -3,6 +3,7 @@ import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
 import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';
 import { speak } from '../utils/tts';
+import { useSlidePanel } from '../utils/useSlidePanel';
 
 interface Props {
   lang: string;
@@ -11,8 +12,8 @@ interface Props {
 }
 
 export function Scenarios({ lang, langConfig, search = '' }: Props) {
-  const [selectedGroup, setSelectedGroup] = useState<ScenarioGroup | null>(null);
-  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
+  const conversationPanel = useSlidePanel<Scenario>();
+  const groupPanel = useSlidePanel<ScenarioGroup>();
   const [revealedCount, setRevealedCount] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const autoPlayRef = useRef(false);
@@ -39,19 +40,21 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
     : allLangScenarios;
 
   const handleSelect = (scenario: Scenario) => {
-    setSelectedScenario(scenario);
+    conversationPanel.open(scenario);
     setRevealedCount(0);
     setIsAutoPlaying(false);
     autoPlayRef.current = false;
   };
 
   const handleBack = () => {
-    setSelectedScenario(null);
+    conversationPanel.close();
     setRevealedCount(0);
     setIsAutoPlaying(false);
     autoPlayRef.current = false;
     window.speechSynthesis.cancel();
   };
+
+  const selectedScenario = conversationPanel.value;
 
   const revealNext = useCallback(() => {
     if (!selectedScenario) return;
@@ -190,7 +193,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
           {groups.map(g => (
             <button
               key={g.key}
-              onClick={() => setSelectedGroup(g.key)}
+              onClick={() => groupPanel.open(g.key)}
               className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
             >
               <span className="text-2xl">{g.emoji}</span>
@@ -202,13 +205,13 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
       </div>
 
       {/* L2: Slide-in scenario list for selected group */}
-      {selectedGroup && (() => {
-        const groupInfo = SCENARIO_GROUPS[selectedGroup];
-        const groupScenarios = langScenarios.filter(s => s.group === selectedGroup);
+      {groupPanel.visible && (() => {
+        const groupInfo = SCENARIO_GROUPS[groupPanel.value!];
+        const groupScenarios = langScenarios.filter(s => s.group === groupPanel.value);
         return (
-          <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
+          <div className={`absolute inset-0 bg-slate-950 ${groupPanel.animClass} flex flex-col z-40`}>
             <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
-              <button onClick={() => setSelectedGroup(null)} className="text-base text-slate-400 active:text-slate-200 p-1">
+              <button onClick={() => groupPanel.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
                 ← All Scenes
               </button>
               <h2 className="text-lg font-bold flex-1">{groupInfo.emoji} {groupInfo.label}</h2>
@@ -235,13 +238,13 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
       })()}
 
       {/* L3: Slide-in conversation view */}
-      {selectedScenario && (
-        <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-50">
+      {conversationPanel.visible && selectedScenario && (
+        <div className={`absolute inset-0 bg-slate-950 ${conversationPanel.animClass} flex flex-col z-50`}>
           <div className="bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800 shrink-0">
             <div className="flex items-center justify-between">
               <div>
                 <button onClick={handleBack} className="text-base text-slate-400 active:text-slate-200 p-1">
-                  ← {selectedGroup ? SCENARIO_GROUPS[selectedGroup].label : 'All Scenes'}
+                  ← {groupPanel.value ? SCENARIO_GROUPS[groupPanel.value].label : 'All Scenes'}
                 </button>
                 <h2 className="text-lg font-bold">{selectedScenario.emoji} {selectedScenario.title}</h2>
                 <p className="text-base text-slate-400">{selectedScenario.titleTC} · {selectedScenario.description}</p>

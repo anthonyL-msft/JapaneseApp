@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { speak } from '../utils/tts';
+import { useSlidePanel } from '../utils/useSlidePanel';
 
 type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'converter' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs';
 
@@ -75,12 +76,12 @@ function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
 }
 
 export function Reference() {
-  const [activeSection, setActiveSection] = useState<Section | null>(null);
+  const panel = useSlidePanel<Section>();
   const [drawer, setDrawer] = useState<DrawerData>(null);
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
   const closeDrawer = useCallback(() => setDrawer(null), []);
 
-  const activeMeta = ALL_SECTIONS.find(s => s.id === activeSection);
+  const activeMeta = ALL_SECTIONS.find(s => s.id === panel.value);
 
   return (
     <div className="h-full relative">
@@ -98,7 +99,7 @@ export function Reference() {
               {LEARN_STEPS.map((sec, i) => (
                 <button
                   key={sec.id}
-                  onClick={() => setActiveSection(sec.id)}
+                  onClick={() => panel.open(sec.id)}
                   className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
                 >
                   <div className="flex items-center justify-between w-full">
@@ -118,7 +119,7 @@ export function Reference() {
               {TOOLS.map(sec => (
                 <button
                   key={sec.id}
-                  onClick={() => setActiveSection(sec.id)}
+                  onClick={() => panel.open(sec.id)}
                   className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
                 >
                   <span className="text-2xl">{sec.emoji}</span>
@@ -132,26 +133,26 @@ export function Reference() {
       </div>
 
       {/* L2: Full-page slide-in */}
-      {activeSection && (
-        <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
+      {panel.visible && (
+        <div className={`absolute inset-0 bg-slate-950 ${panel.animClass} flex flex-col z-40`}>
           <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
-            <button onClick={() => setActiveSection(null)} className="text-base text-slate-400 active:text-slate-200 p-1">
+            <button onClick={() => panel.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
               ← Quick Reference
             </button>
             <h2 className="text-lg font-bold flex-1">{activeMeta?.emoji} {activeMeta?.label}</h2>
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
-            {activeSection === 'gojuon' && <GojuonRef />}
-            {activeSection === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
-            {activeSection === 'numbers' && <NumbersRef />}
-            {activeSection === 'converter' && <NumberConverter />}
-            {activeSection === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
-            {activeSection === 'counters' && <CountersRef openDrawer={openDrawer} />}
-            {activeSection === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
-            {activeSection === 'polite' && <PoliteRef openDrawer={openDrawer} />}
-            {activeSection === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
-            {activeSection === 'whquestions' && <WHQuestionsRef openDrawer={openDrawer} />}
-            {activeSection === 'signs' && <SignsRef />}
+            {panel.value === 'gojuon' && <GojuonRef />}
+            {panel.value === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
+            {panel.value === 'numbers' && <NumbersRef />}
+            {panel.value === 'converter' && <NumberConverter />}
+            {panel.value === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
+            {panel.value === 'counters' && <CountersRef openDrawer={openDrawer} />}
+            {panel.value === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
+            {panel.value === 'polite' && <PoliteRef openDrawer={openDrawer} />}
+            {panel.value === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
+            {panel.value === 'whquestions' && <WHQuestionsRef openDrawer={openDrawer} />}
+            {panel.value === 'signs' && <SignsRef />}
           </div>
         </div>
       )}

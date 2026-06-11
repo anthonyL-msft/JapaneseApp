@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Phrase, UserNote, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { PhraseCard } from './PhraseCard';
+import { useSlidePanel } from '../utils/useSlidePanel';
 
 interface Props {
   phrases: Phrase[];
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, onSaveNote, onDeleteNote, onShowCards }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const panel = useSlidePanel<Category>();
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [openSituations, setOpenSituations] = useState<Set<string>>(new Set());
 
@@ -30,8 +31,8 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   const categories = Object.entries(CATEGORY_INFO) as [Category, typeof CATEGORY_INFO[Category]][];
 
   // Phrase list for selected category
-  const categoryPhrases = selectedCategory ? phrases.filter(p => p.category === selectedCategory) : [];
-  const info = selectedCategory ? CATEGORY_INFO[selectedCategory] : null;
+  const categoryPhrases = panel.value ? phrases.filter(p => p.category === panel.value) : [];
+  const info = panel.value ? CATEGORY_INFO[panel.value] : null;
 
   // Group by situation
   const situations = new Map<string, Phrase[]>();
@@ -79,7 +80,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
             return (
               <button
                 key={key}
-                onClick={() => { setSelectedCategory(key); setOpenSituations(new Set()); setExpandedPhrase(null); }}
+                onClick={() => { panel.open(key); setOpenSituations(new Set()); setExpandedPhrase(null); }}
                 className="bg-slate-800/80 rounded-xl p-4 text-left active:bg-slate-700 transition-colors"
               >
                 <span className="text-2xl">{catInfo.emoji}</span>
@@ -96,13 +97,13 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
       </div>
 
       {/* L2: Full-page slide-in for selected category */}
-      {selectedCategory && info && (
-        <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
+      {panel.visible && info && (
+        <div className={`absolute inset-0 bg-slate-950 ${panel.animClass} flex flex-col z-40`}>
           <div className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800 shrink-0">
             <div className="flex items-start justify-between">
               <div>
                 <button
-                  onClick={() => { setSelectedCategory(null); setOpenSituations(new Set()); }}
+                  onClick={() => { panel.close(); }}
                   className="text-base text-slate-400 active:text-slate-200 p-1"
                 >
                   ← All Categories

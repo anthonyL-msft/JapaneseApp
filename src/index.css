@@ -49,7 +49,7 @@ body {
   to { transform: translateY(0); }
 }
 .animate-slide-up {
-  animation: slide-up 0.25s ease-out;
+  animation: slide-up 0.2s ease-out;
 }
 
 /* Full-page slide-in from right */
@@ -58,5 +58,14 @@ body {
   to { transform: translateX(0); }
 }
 .animate-slide-in-right {
-  animation: slide-in-right 0.25s ease-out;
+  animation: slide-in-right 0.15s ease-out;
+}
+
+/* Slide-out to right */
+@keyframes slide-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+.animate-slide-out-right {
+  animation: slide-out-right 0.15s ease-in forwards;
 }
