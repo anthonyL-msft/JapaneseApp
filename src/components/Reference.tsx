@@ -642,6 +642,7 @@ function ParticlesRef() {
         openSet={openSet} toggle={toggle} items={[
           { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo' },
           { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
+          { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'I\'m heading to the exit' },
         ]} />
       <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
         openSet={openSet} toggle={toggle} items={[
@@ -653,11 +654,13 @@ function ParticlesRef() {
         openSet={openSet} toggle={toggle} items={[
           { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
           { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
+          { jp: '朝と夜、二食付きです', hep: 'a·sa to yo·ru ni·sho·ku tsu·ki de·su', en: 'Breakfast and dinner included' },
         ]} />
       <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
           { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
+          { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
         ]} />
       <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
         openSet={openSet} toggle={toggle} items={[
@@ -669,11 +672,13 @@ function ParticlesRef() {
         openSet={openSet} toggle={toggle} items={[
           { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
           { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
+          { jp: 'ここから駅まで歩けますか？', hep: 'ko·ko ka·ra e·ki ma·de a·ru·ke·ma·su ka', en: 'Can I walk from here to the station?' },
         ]} />
       <AccordionRow id="まで" jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
           { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
+          { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
         ]} />
     </div>
   );
@@ -700,25 +705,31 @@ function CountersRef() {
         openSet={openSet} toggle={toggle} items={[
           { jp: '切符を二枚ください', hep: 'kip·pu wo ni·mai ku·da·sai', en: 'Two tickets please' },
           { jp: 'Tシャツを一枚お願いします', hep: 'tii·sha·tsu wo i·chi·mai o·ne·gai·shi·ma·su', en: 'One T-shirt please' },
+          { jp: 'お皿を三枚ください', hep: 'o·sa·ra wo san·mai ku·da·sai', en: 'Three plates please' },
         ]} />
       <AccordionRow id="〜本" jp="〜本" rom="-hon" meaning="Long objects: bottles, pens, umbrellas"
         openSet={openSet} toggle={toggle} items={[
           { jp: '水を一本ください', hep: 'mi·zu wo ip·pon ku·da·sai', en: 'One bottle of water please' },
           { jp: 'ビールを二本お願いします', hep: 'bii·ru wo ni·hon o·ne·gai·shi·ma·su', en: 'Two beers please' },
+          { jp: '傘を一本貸してください', hep: 'ka·sa wo ip·pon ka·shi·te ku·da·sai', en: 'Please lend me an umbrella' },
         ]} />
       <AccordionRow id="〜杯" jp="〜杯" rom="-hai" meaning="Cups / glasses / bowls"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'コーヒーを一杯ください', hep: 'koo·hii wo ip·pai ku·da·sai', en: 'One coffee please' },
           { jp: 'お茶を二杯お願いします', hep: 'o·cha wo ni·hai o·ne·gai·shi·ma·su', en: 'Two teas please' },
+          { jp: 'ラーメンを一杯お願いします', hep: 'raa·men wo ip·pai o·ne·gai·shi·ma·su', en: 'One bowl of ramen please' },
         ]} />
       <AccordionRow id="〜個" jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples, onigiri"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'おにぎりを三個ください', hep: 'o·ni·gi·ri wo san·ko ku·da·sai', en: 'Three onigiri please' },
           { jp: 'りんごを一個お願いします', hep: 'rin·go wo ik·ko o·ne·gai·shi·ma·su', en: 'One apple please' },
+          { jp: 'たこ焼きを二個ください', hep: 'ta·ko·ya·ki wo ni·ko ku·da·sai', en: 'Two takoyaki please' },
         ]} />
       <AccordionRow id="〜台" jp="〜台" rom="-dai" meaning="Machines / vehicles"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'タクシーを一台お願いします', hep: 'ta·ku·shii wo i·chi·dai o·ne·gai·shi·ma·su', en: 'One taxi please' },
+          { jp: 'バスは何台来ますか？', hep: 'ba·su wa nan·dai ki·ma·su ka', en: 'How many buses are coming?' },
+          { jp: 'ロッカーは一台空いていますか？', hep: 'rok·kaa wa i·chi·dai ai·te i·ma·su ka', en: 'Is there a locker available?' },
         ]} />
       <AccordionRow id="〜泊" jp="〜泊" rom="-ha·ku" meaning="Nights (hotel stay)"
         openSet={openSet} toggle={toggle} items={[
@@ -730,11 +741,13 @@ function CountersRef() {
         openSet={openSet} toggle={toggle} items={[
           { jp: '二名で予約しました', hep: 'ni·mei de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for two (formal)' },
           { jp: '三名様でございますか？', hep: 'san·mei·sa·ma de go·zai·ma·su ka', en: 'Party of three? (staff may ask)' },
+          { jp: '一名です', hep: 'i·chi·mei de·su', en: 'Just one person (formal)' },
         ]} />
       <AccordionRow id="〜階" jp="〜階" rom="-kai" meaning="Floors / stories"
         openSet={openSet} toggle={toggle} items={[
           { jp: 'トイレは二階です', hep: 'toi·re wa ni·kai de·su', en: 'The toilet is on the 2nd floor' },
           { jp: '三階に行きたいです', hep: 'san·gai ni i·ki·tai de·su', en: 'I want to go to the 3rd floor' },
+          { jp: 'レストランは何階ですか？', hep: 're·su·to·ran wa nan·kai de·su ka', en: 'What floor is the restaurant?' },
         ]} />
     </div>
   );
@@ -780,6 +793,7 @@ function PatternsRef() {
         openSet={openSet} toggle={toggle} items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
+          { jp: '道がわかりません', hep: 'mi·chi ga wa·ka·ri·ma·sen', en: "I don't know the way" },
         ]} />
       <AccordionRow id="○○たいです" jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
         openSet={openSet} toggle={toggle} items={[
@@ -1044,6 +1058,7 @@ function WHQuestionsRef() {
             openSet={acc.openSet} toggle={acc.toggle} items={[
               { jp: 'どれがおすすめですか？', hep: 'do·re ga o·su·su·me de·su ka', en: 'Which do you recommend?' },
               { jp: 'どれにしますか？', hep: 'do·re ni shi·ma·su ka', en: 'Which one will you have?' },
+              { jp: 'どれが一番人気ですか？', hep: 'do·re ga i·chi·ban nin·ki de·su ka', en: 'Which is the most popular?' },
             ]} />
           <AccordionRow id="どっち / どちら" jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?"
             openSet={acc.openSet} toggle={acc.toggle} items={[
@@ -1095,11 +1110,13 @@ function WHQuestionsRef() {
             openSet={acc.openSet} toggle={acc.toggle} items={[
               { jp: 'だれに聞けばいいですか？', hep: 'da·re ni ki·ke·ba ii de·su ka', en: 'Who should I ask?' },
               { jp: 'だれが案内してくれますか？', hep: 'da·re ga an·nai shi·te ku·re·ma·su ka', en: 'Who will guide us?' },
+              { jp: 'だれの荷物ですか？', hep: 'da·re no ni·mo·tsu de·su ka', en: 'Whose luggage is this?' },
             ]} />
           <AccordionRow id="なぜ / どうして" jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?"
             openSet={acc.openSet} toggle={acc.toggle} items={[
               { jp: 'どうして閉まっていますか？', hep: 'dou·shi·te shi·mat·te i·ma·su ka', en: 'Why is it closed?' },
               { jp: 'どうしてだめですか？', hep: 'dou·shi·te da·me de·su ka', en: 'Why is it not allowed?' },
+              { jp: 'どうして遅れていますか？', hep: 'dou·shi·te o·ku·re·te i·ma·su ka', en: 'Why is it delayed?' },
             ]} />
         </>
       )}
