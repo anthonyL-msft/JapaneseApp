@@ -982,6 +982,25 @@ function WHQuestionsRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['何 / なに','どこ','いつ','だれ','どう','いくら','どれ','どっち / どちら','なぜ / どうして']);
   return (
     <div className="mt-2 space-y-1.5">
+      <p className="text-base text-slate-500 mb-3">Replace the unknown part with a question word, keep the rest of the sentence</p>
+
+      <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
+        <p className="text-base text-slate-400 mb-2 text-center">The Rule:</p>
+        <div className="flex items-center justify-center gap-1 flex-wrap">
+          <span className="bg-sakura-500/30 text-sakura-300 px-2 py-1 rounded text-base font-bold">Q word</span>
+          <span className="text-slate-500 text-base">+</span>
+          <span className="bg-slate-600/50 text-slate-200 px-2 py-1 rounded text-base">rest of sentence</span>
+          <span className="text-slate-500 text-base">+</span>
+          <span className="bg-slate-600/50 text-slate-200 px-2 py-1 rounded text-base">ですか？</span>
+        </div>
+        <div className="mt-3 space-y-1">
+          <p className="text-base text-slate-400 text-center">Example:</p>
+          <p className="text-base text-slate-300 text-center">トイレは <span className="text-sakura-300 font-medium">どこ</span> ですか？</p>
+          <p className="text-base text-sakura-300 text-center">toi·re wa <span className="font-medium">do·ko</span> de·su ka</p>
+          <p className="text-base text-slate-500 text-center">The toilet is <span className="text-sakura-300">where</span>?</p>
+        </div>
+      </div>
+
       <AccordionHeader label="Question words + か (ka)" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
         openSet={openSet} toggle={toggle} items={[
