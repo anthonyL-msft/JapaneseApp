@@ -192,18 +192,34 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, onToggleBookm
               <span className="text-base text-slate-500">{openSections.has('ai') ? '▲' : '▼'}</span>
             </button>
             {openSections.has('ai') && (
-              <div className="px-3 pb-3 space-y-2">
+              <div className="px-1.5 pb-1.5 space-y-1.5">
                 {aiNotes
                   .sort((a, b) => b.updatedAt - a.updatedAt)
-                  .map(note => (
-                    <div key={note.id} className="bg-slate-700/30 rounded-xl p-3 flex items-start gap-2">
-                      <p className="text-base text-slate-200 flex-1 whitespace-pre-wrap">{note.text}</p>
-                      <button
-                        onClick={() => onDeleteNote(note.id)}
-                        className="text-base text-slate-500 hover:text-red-400 shrink-0"
-                      >🗑️</button>
-                    </div>
-                  ))}
+                  .map(note => {
+                    // Parse: 🤖 target (pronunciation) — english / chinese_tc
+                    const text = note.text.replace(/^🤖\s*/, '');
+                    const parenMatch = text.match(/^(.+?)\s*\(([^)]+)\)\s*—\s*(.+)$/);
+                    const target = parenMatch ? parenMatch[1].trim() : text;
+                    const pron = parenMatch ? parenMatch[2].trim() : '';
+                    const rest = parenMatch ? parenMatch[3].trim() : '';
+                    const [eng, tc] = rest.includes(' / ') ? rest.split(' / ', 2) : [rest, ''];
+                    return (
+                      <div key={note.id} className="bg-slate-700/40 rounded-xl p-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-lg font-medium text-slate-50">{target}</p>
+                            {pron && <p className="text-base text-sakura-300 mt-0.5">{pron}</p>}
+                            <p className="text-base text-slate-400 mt-0.5">{eng}</p>
+                            {tc && <p className="text-base text-slate-500 mt-0.5">{tc}</p>}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button onClick={() => speak(target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                            <button onClick={() => onDeleteNote(note.id)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🗑️</button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>
