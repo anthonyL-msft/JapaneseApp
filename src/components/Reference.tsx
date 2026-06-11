@@ -3,19 +3,24 @@ import { speak } from '../utils/tts';
 
 type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'converter' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs';
 
-const SECTIONS: { id: Section; label: string; emoji: string; desc: string }[] = [
+const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'gojuon', label: '50 Sounds', emoji: 'あ', desc: 'Hiragana & Katakana chart' },
   { id: 'grammar', label: 'Sentence Structure', emoji: '📝', desc: 'S は O を V ます word order' },
   { id: 'particles', label: 'Key Particles', emoji: '🔤', desc: 'は が を に で の and more' },
   { id: 'polite', label: 'Polite Forms', emoji: '🎩', desc: 'ます ません ました です' },
-  { id: 'numbers', label: 'Numbers & Digits', emoji: '🔢', desc: 'Counting, prices, time' },
-  { id: 'converter', label: 'Number Converter', emoji: '🔄', desc: 'Type a number → kanji + reading' },
-  { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 and more' },
+  { id: 'numbers', label: 'Numbers', emoji: '🔢', desc: 'Counting, prices, time' },
   { id: 'yesno', label: 'Yes/No Questions', emoji: '❓', desc: 'Statement + か = question' },
   { id: 'whquestions', label: 'Question Words', emoji: '🔍', desc: '何 どこ いつ いくら どう' },
+];
+
+const TOOLS: { id: Section; label: string; emoji: string; desc: string }[] = [
+  { id: 'converter', label: 'Number Converter', emoji: '🔄', desc: 'Type a number → kanji + reading' },
+  { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 (like 量詞)' },
   { id: 'patterns', label: 'Sentence Patterns', emoji: '📐', desc: 'お願いします ありますか etc.' },
   { id: 'signs', label: 'Common Signs', emoji: '🪧', desc: '入口 出口 禁煙 営業中' },
 ];
+
+const ALL_SECTIONS = [...LEARN_STEPS, ...TOOLS];
 
 type DrawerData = {
   title: string;
@@ -75,7 +80,7 @@ export function Reference() {
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
   const closeDrawer = useCallback(() => setDrawer(null), []);
 
-  const activeMeta = SECTIONS.find(s => s.id === activeSection);
+  const activeMeta = ALL_SECTIONS.find(s => s.id === activeSection);
 
   return (
     <div className="h-full relative">
@@ -83,21 +88,46 @@ export function Reference() {
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
           <h2 className="text-lg font-bold">📚 Quick Reference</h2>
-          <p className="text-base text-slate-400">7-step grammar for travel</p>
+          <p className="text-base text-slate-400">Grammar & tools for travel</p>
         </div>
-        <div className="p-4 grid grid-cols-2 gap-2">
-          {SECTIONS.map((sec, i) => (
-            <button
-              key={sec.id}
-              onClick={() => setActiveSection(sec.id)}
-              className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
-            >
-              <span className="text-2xl">{sec.emoji}</span>
-              <span className="text-base font-semibold text-slate-100">{sec.label}</span>
-              <span className="text-sm text-slate-500 leading-tight">{sec.desc}</span>
-              <span className="text-sm text-slate-600 mt-auto">Step {i + 1 <= 7 ? i + 1 : ''}</span>
-            </button>
-          ))}
+
+        <div className="p-4 space-y-4">
+          <div>
+            <h3 className="text-base font-semibold text-slate-400 mb-2">📖 Learn — 7 Steps</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {LEARN_STEPS.map((sec, i) => (
+                <button
+                  key={sec.id}
+                  onClick={() => setActiveSection(sec.id)}
+                  className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-2xl">{sec.emoji}</span>
+                    <span className="text-sm text-sakura-400/60 font-medium">{i + 1}</span>
+                  </div>
+                  <span className="text-base font-semibold text-slate-100">{sec.label}</span>
+                  <span className="text-sm text-slate-500 leading-tight">{sec.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-base font-semibold text-slate-400 mb-2">🧰 Tools & Reference</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {TOOLS.map(sec => (
+                <button
+                  key={sec.id}
+                  onClick={() => setActiveSection(sec.id)}
+                  className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
+                >
+                  <span className="text-2xl">{sec.emoji}</span>
+                  <span className="text-base font-semibold text-slate-100">{sec.label}</span>
+                  <span className="text-sm text-slate-500 leading-tight">{sec.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
