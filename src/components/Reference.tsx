@@ -1,21 +1,79 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { speak } from '../utils/tts';
 
-type Section = 'gojuon' | 'numbers' | 'converter' | 'particles' | 'counters' | 'patterns' | 'polite' | 'signs';
+type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'converter' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs';
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'gojuon', label: '50 Sounds (Gojūon)', emoji: 'あ' },
+  { id: 'grammar', label: 'Sentence Structure', emoji: '📝' },
+  { id: 'particles', label: 'Key Particles', emoji: '🔤' },
+  { id: 'polite', label: 'Polite Forms', emoji: '🎩' },
   { id: 'numbers', label: 'Numbers & Digits', emoji: '🔢' },
   { id: 'converter', label: 'Number Converter', emoji: '🔄' },
-  { id: 'particles', label: 'Key Particles', emoji: '🔤' },
   { id: 'counters', label: 'Counters', emoji: '📏' },
+  { id: 'yesno', label: 'Yes/No Questions', emoji: '❓' },
+  { id: 'whquestions', label: 'Question Words', emoji: '🔍' },
   { id: 'patterns', label: 'Sentence Patterns', emoji: '📐' },
-  { id: 'polite', label: 'Polite Forms', emoji: '🎩' },
   { id: 'signs', label: 'Common Signs', emoji: '🪧' },
 ];
 
+type DrawerData = {
+  title: string;
+  titleRom?: string;
+  subtitle?: string;
+  items: { jp: string; hep: string; en: string }[];
+} | null;
+
+function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
+  useEffect(() => {
+    if (data) document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, [data]);
+  if (!data) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/50" />
+      <div
+        className="relative bg-slate-800 rounded-t-2xl max-h-[80vh] flex flex-col animate-slide-up"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex justify-center pt-2 pb-1">
+          <div className="w-10 h-1 rounded-full bg-slate-600" />
+        </div>
+        <div className="px-4 pb-2 border-b border-slate-700/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-slate-100">{data.title}</h3>
+              {data.titleRom && <p className="text-base text-sakura-300">{data.titleRom}</p>}
+            </div>
+            <button onClick={onClose} className="text-xl text-slate-400 p-2">✕</button>
+          </div>
+          {data.subtitle && <p className="text-base text-slate-400 mt-0.5">{data.subtitle}</p>}
+        </div>
+        <div className="overflow-y-auto p-4 space-y-2">
+          {data.items.map((ex, i) => (
+            <div key={i} className="bg-slate-700/30 rounded-lg p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <p className="text-base text-slate-200">{ex.jp}</p>
+                  <p className="text-base text-sakura-300">{ex.hep}</p>
+                </div>
+                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
+              </div>
+              <p className="text-base text-slate-400 mt-1">{ex.en}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Reference() {
   const [open, setOpen] = useState<Section | null>(null);
+  const [drawer, setDrawer] = useState<DrawerData>(null);
+  const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
+  const closeDrawer = useCallback(() => setDrawer(null), []);
 
   return (
     <div className="scroll-area h-full">
@@ -39,18 +97,23 @@ export function Reference() {
             {open === sec.id && (
               <div className="px-3 pb-3 border-t border-slate-700/50">
                 {sec.id === 'gojuon' && <GojuonRef />}
+                {sec.id === 'grammar' && <GrammarRef openDrawer={openDrawer} />}
                 {sec.id === 'numbers' && <NumbersRef />}
                 {sec.id === 'converter' && <NumberConverter />}
-                {sec.id === 'particles' && <ParticlesRef />}
+                {sec.id === 'particles' && <ParticlesRef openDrawer={openDrawer} />}
                 {sec.id === 'counters' && <CountersRef />}
-                {sec.id === 'patterns' && <PatternsRef />}
-                {sec.id === 'polite' && <PoliteRef />}
+                {sec.id === 'patterns' && <PatternsRef openDrawer={openDrawer} />}
+                {sec.id === 'polite' && <PoliteRef openDrawer={openDrawer} />}
+                {sec.id === 'yesno' && <YesNoRef openDrawer={openDrawer} />}
+                {sec.id === 'whquestions' && <WHQuestionsRef openDrawer={openDrawer} />}
                 {sec.id === 'signs' && <SignsRef />}
               </div>
             )}
           </div>
         ))}
       </div>
+
+      <Drawer data={drawer} onClose={closeDrawer} />
     </div>
   );
 }
@@ -352,12 +415,16 @@ function NumbersRef() {
   );
 }
 
-function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; meaning: string; examples: { jp: string; hep: string; en: string }[] }) {
-  const [showEx, setShowEx] = useState(false);
+type DrawerOpener = (d: DrawerData) => void;
+
+function DrawerRow({ jp, rom, meaning, items, openDrawer }: { jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openDrawer: DrawerOpener }) {
   return (
     <div className="py-2 border-b border-slate-700/30 last:border-0">
       <div className="flex items-center gap-2">
-        <button onClick={() => setShowEx(!showEx)} className="flex-1 text-left">
+        <button
+          onClick={() => openDrawer({ title: jp, titleRom: rom, subtitle: meaning, items })}
+          className="flex-1 text-left"
+        >
           <div className="flex items-baseline gap-2">
             <span className="text-base font-medium text-slate-100">{jp}</span>
             <span className="text-base text-sakura-300">{rom}</span>
@@ -365,96 +432,80 @@ function ParticleRow({ jp, rom, meaning, examples }: { jp: string; rom: string; 
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </button>
         <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
-        <button onClick={() => setShowEx(!showEx)} className="text-base text-slate-500 shrink-0">{showEx ? '▲' : '▼'}</button>
+        <span className="text-base text-slate-500 shrink-0">›</span>
       </div>
-      {showEx && (
-        <div className="mt-2 space-y-1.5">
-          {examples.map((ex, i) => (
-            <div key={i} className="bg-slate-700/20 rounded-lg p-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-base text-slate-200">{ex.jp}</p>
-                  <p className="text-base text-sakura-300">{ex.hep}</p>
-                </div>
-                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
-              </div>
-              <p className="text-base text-slate-400">{ex.en}</p>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
-function ParticlesRef() {
+function ParticlesRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   return (
     <div className="mt-2">
-      <p className="text-base text-slate-500 mb-2">Tap a particle to see example sentences</p>
-      <ParticleRow jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
-        examples={[
+      <p className="text-base text-slate-500 mb-2">Tap a particle to see examples</p>
+      <DrawerRow jp="は" rom="wa" meaning="Topic marker — marks what you're talking about" openDrawer={openDrawer}
+        items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
           { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
         ]} />
-      <ParticleRow jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
-        examples={[
+      <DrawerRow jp="が" rom="ga" meaning="Subject marker — marks who/what does the action" openDrawer={openDrawer}
+        items={[
           { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
         ]} />
-      <ParticleRow jp="を" rom="wo" meaning="Object marker — marks what receives the action"
-        examples={[
+      <DrawerRow jp="を" rom="wo" meaning="Object marker — marks what receives the action" openDrawer={openDrawer}
+        items={[
           { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
           { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
         ]} />
-      <ParticleRow jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
-        examples={[
+      <DrawerRow jp="に" rom="ni" meaning="Direction/time — to, at, in, on" openDrawer={openDrawer}
+        items={[
           { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'I send luggage to the hotel' },
         ]} />
-      <ParticleRow jp="で" rom="de" meaning="Location of action / by means of"
-        examples={[
+      <DrawerRow jp="で" rom="de" meaning="Location of action / by means of" openDrawer={openDrawer}
+        items={[
           { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica' },
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train' },
         ]} />
-      <ParticleRow jp="へ" rom="e" meaning="Towards (direction)"
-        examples={[
+      <DrawerRow jp="へ" rom="e" meaning="Towards (direction)" openDrawer={openDrawer}
+        items={[
           { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo' },
           { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
         ]} />
-      <ParticleRow jp="の" rom="no" meaning="Possessive / connecting — 's, of"
-        examples={[
+      <DrawerRow jp="の" rom="no" meaning="Possessive / connecting — 's, of" openDrawer={openDrawer}
+        items={[
           { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
           { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
           { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
         ]} />
-      <ParticleRow jp="と" rom="to" meaning="And, with (listing/companion)"
-        examples={[
+      <DrawerRow jp="と" rom="to" meaning="And, with (listing/companion)" openDrawer={openDrawer}
+        items={[
           { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
           { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
         ]} />
-      <ParticleRow jp="も" rom="mo" meaning="Also, too"
-        examples={[
+      <DrawerRow jp="も" rom="mo" meaning="Also, too" openDrawer={openDrawer}
+        items={[
           { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
           { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
         ]} />
-      <ParticleRow jp="か" rom="ka" meaning="Question marker (end of sentence)"
-        examples={[
+      <DrawerRow jp="か" rom="ka" meaning="Question marker (end of sentence)" openDrawer={openDrawer}
+        items={[
           { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
           { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
           { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
         ]} />
-      <ParticleRow jp="から" rom="ka·ra" meaning="From (place/time)"
-        examples={[
+      <DrawerRow jp="から" rom="ka·ra" meaning="From (place/time)" openDrawer={openDrawer}
+        items={[
           { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
           { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
         ]} />
-      <ParticleRow jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
-        examples={[
+      <DrawerRow jp="まで" rom="ma·de" meaning="Until, to (endpoint)" openDrawer={openDrawer}
+        items={[
           { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
           { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
         ]} />
@@ -480,82 +531,48 @@ function CountersRef() {
   );
 }
 
-function PatternCard({ pattern, rom, meaning, examples }: { pattern: string; rom: string; meaning: string; examples: { jp: string; hep: string; en: string }[] }) {
-  const [showEx, setShowEx] = useState(false);
+function PatternsRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   return (
-    <div className="bg-slate-700/30 rounded-lg p-2">
-      <div className="flex items-center gap-2">
-        <button onClick={() => setShowEx(!showEx)} className="flex-1 text-left">
-          <p className="text-base text-slate-200 font-medium">{pattern}</p>
-          <p className="text-base text-sakura-300">{rom}</p>
-          <p className="text-base text-slate-400 mt-1">{meaning}</p>
-        </button>
-        <button onClick={() => speak(pattern, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
-        <button onClick={() => setShowEx(!showEx)} className="text-base text-slate-500 shrink-0">{showEx ? '▲' : '▼'}</button>
-      </div>
-      {showEx && (
-        <div className="mt-2 space-y-1.5 border-t border-slate-700/30 pt-2">
-          <p className="text-base text-slate-500">Examples:</p>
-          {examples.map((ex, i) => (
-            <div key={i} className="bg-slate-700/20 rounded-lg p-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-base text-slate-200">{ex.jp}</p>
-                  <p className="text-base text-sakura-300">{ex.hep}</p>
-                </div>
-                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
-              </div>
-              <p className="text-base text-slate-400">{ex.en}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function PatternsRef() {
-  return (
-    <div className="mt-2 space-y-3">
+    <div className="mt-2 space-y-2">
       <p className="text-base text-slate-500">Tap a pattern to see real examples</p>
-      <PatternCard pattern="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
-        examples={[
+      <DrawerRow jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!" openDrawer={openDrawer}
+        items={[
           { jp: '水をお願いします', hep: 'mi·zu wo o·ne·gai·shi·ma·su', en: 'Water please' },
           { jp: 'メニューをお願いします', hep: 'me·nyuu wo o·ne·gai·shi·ma·su', en: 'Menu please' },
           { jp: 'お会計をお願いします', hep: 'o·kai·kei wo o·ne·gai·shi·ma·su', en: 'Check please' },
           { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
         ]} />
-      <PatternCard pattern="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
-        examples={[
+      <DrawerRow jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?" openDrawer={openDrawer}
+        items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
           { jp: '英語のメニューはありますか？', hep: 'ei·go no me·nyuu wa a·ri·ma·su ka', en: 'Do you have an English menu?' },
           { jp: '空いている席はありますか？', hep: 'ai·te i·ru se·ki wa a·ri·ma·su ka', en: 'Is there an empty seat?' },
         ]} />
-      <PatternCard pattern="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?"
-        examples={[
+      <DrawerRow jp="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?" openDrawer={openDrawer}
+        items={[
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
           { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
           { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
         ]} />
-      <PatternCard pattern="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)"
-        examples={[
+      <DrawerRow jp="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)" openDrawer={openDrawer}
+        items={[
           { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
           { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
-      <PatternCard pattern="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
-        examples={[
+      <DrawerRow jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)" openDrawer={openDrawer}
+        items={[
           { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
           { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
         ]} />
-      <PatternCard pattern="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
-        examples={[
+      <DrawerRow jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○" openDrawer={openDrawer}
+        items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
         ]} />
-      <PatternCard pattern="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
-        examples={[
+      <DrawerRow jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)" openDrawer={openDrawer}
+        items={[
           { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
           { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
           { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
@@ -564,104 +581,245 @@ function PatternsRef() {
   );
 }
 
-function PoliteRef() {
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
-  const toggle = (i: number) => setOpenIdx(openIdx === i ? null : i);
-  const forms = [
-    {
-      jp: '〜ます', rom: 'ma·su', label: 'Polite positive',
-      when: 'Default for ALL travel situations — ordering, asking, stating facts',
-      examples: [
-        { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
-        { jp: 'わかります', hep: 'wa·ka·ri·ma·su', en: 'I understand' },
-        { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
-        { jp: '払います', hep: 'ha·rai·ma·su', en: 'I pay' },
-      ],
-    },
-    {
-      jp: '〜ません', rom: 'ma·sen', label: 'Polite negative',
-      when: 'Saying you can\'t / don\'t — declining, explaining limitations',
-      examples: [
-        { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
-        { jp: '食べられません', hep: 'ta·be·ra·re·ma·sen', en: "I can't eat (allergies)" },
-        { jp: 'いりません', hep: 'i·ri·ma·sen', en: "I don't need it" },
-      ],
-    },
-    {
-      jp: '〜ました', rom: 'ma·shi·ta', label: 'Polite past',
-      when: 'Talking about something already done — reservations made, things you saw',
-      examples: [
-        { jp: '予約しました', hep: 'yo·ya·ku shi·ma·shi·ta', en: 'I made a reservation' },
-        { jp: 'もう払いました', hep: 'mou ha·rai·ma·shi·ta', en: 'I already paid' },
-        { jp: '荷物をなくしました', hep: 'ni·mo·tsu wo na·ku·shi·ma·shi·ta', en: 'I lost my luggage' },
-      ],
-    },
-    {
-      jp: '〜です', rom: 'de·su', label: 'Polite "is/am" (copula)',
-      when: 'Stating what something IS — introducing yourself, describing things, quantities',
-      examples: [
-        { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people (party size)' },
-        { jp: 'アレルギーです', hep: 'a·re·ru·gii de·su', en: "It's an allergy" },
-        { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
-        { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
-      ],
-    },
-    {
-      jp: '〜てください', rom: 'te ku·da·sai', label: 'Polite request',
-      when: 'Asking someone to do something — "please do ○○"',
-      examples: [
-        { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
-        { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
-        { jp: 'もう一度お願いします', hep: 'mou i·chi·do o·ne·gai·shi·ma·su', en: 'One more time please' },
-      ],
-    },
-    {
-      jp: '〜てもいいですか', rom: 'te mo ii de·su ka', label: 'Asking permission',
-      when: 'Asking "may I?" — photos, trying things on, sitting down',
-      examples: [
-        { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
-        { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
-        { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
-      ],
-    },
-  ];
+function PoliteRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   return (
     <div className="mt-2">
       <p className="text-base text-slate-500 mb-2">Use ます (masu) form for all travel situations — it's polite and always safe.</p>
-      <div className="space-y-2">
-        {forms.map((f, i) => (
-          <div key={i} className="bg-slate-700/30 rounded-lg p-2">
-            <div className="flex items-center gap-2">
-              <button onClick={() => toggle(i)} className="flex-1 text-left">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-base font-medium text-slate-100">{f.jp}</span>
-                  <span className="text-base text-sakura-300">{f.rom}</span>
-                  <span className="text-base text-slate-500">— {f.label}</span>
-                </div>
-                <p className="text-base text-slate-400 mt-0.5">🕐 {f.when}</p>
-              </button>
-              <button onClick={() => speak(f.jp.replace('〜', ''), 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
-              <button onClick={() => toggle(i)} className="text-base text-slate-500 shrink-0">{openIdx === i ? '▲' : '▼'}</button>
-            </div>
-            {openIdx === i && (
-              <div className="mt-2 space-y-1.5 border-t border-slate-700/30 pt-2">
-                {f.examples.map((ex, j) => (
-                  <div key={j} className="bg-slate-700/20 rounded-lg p-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex-1">
-                        <p className="text-base text-slate-200">{ex.jp}</p>
-                        <p className="text-base text-sakura-300">{ex.hep}</p>
-                      </div>
-                      <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
-                    </div>
-                    <p className="text-base text-slate-400">{ex.en}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+      <DrawerRow jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating" openDrawer={openDrawer}
+        items={[
+          { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
+          { jp: 'わかります', hep: 'wa·ka·ri·ma·su', en: 'I understand' },
+          { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
+          { jp: '払います', hep: 'ha·rai·ma·su', en: 'I pay' },
+        ]} />
+      <DrawerRow jp="〜ません" rom="ma·sen" meaning="🕐 Saying you can't / don't — declining, limitations" openDrawer={openDrawer}
+        items={[
+          { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
+          { jp: '食べられません', hep: 'ta·be·ra·re·ma·sen', en: "I can't eat (allergies)" },
+          { jp: 'いりません', hep: 'i·ri·ma·sen', en: "I don't need it" },
+        ]} />
+      <DrawerRow jp="〜ました" rom="ma·shi·ta" meaning="🕐 Already done — reservations, things you saw" openDrawer={openDrawer}
+        items={[
+          { jp: '予約しました', hep: 'yo·ya·ku shi·ma·shi·ta', en: 'I made a reservation' },
+          { jp: 'もう払いました', hep: 'mou ha·rai·ma·shi·ta', en: 'I already paid' },
+          { jp: '荷物をなくしました', hep: 'ni·mo·tsu wo na·ku·shi·ma·shi·ta', en: 'I lost my luggage' },
+        ]} />
+      <DrawerRow jp="〜です" rom="de·su" meaning='🕐 Stating what something IS — identity, quantities' openDrawer={openDrawer}
+        items={[
+          { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people (party size)' },
+          { jp: 'アレルギーです', hep: 'a·re·ru·gii de·su', en: "It's an allergy" },
+          { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
+          { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
+        ]} />
+      <DrawerRow jp="〜てください" rom="te ku·da·sai" meaning='🕐 Asking someone to do something — "please do ○○"' openDrawer={openDrawer}
+        items={[
+          { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
+          { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
+          { jp: 'もう一度お願いします', hep: 'mou i·chi·do o·ne·gai·shi·ma·su', en: 'One more time please' },
+        ]} />
+      <DrawerRow jp="〜てもいいですか" rom="te mo ii de·su ka" meaning='🕐 Asking "may I?" — photos, trying on, sitting' openDrawer={openDrawer}
+        items={[
+          { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
+          { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
+          { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
+        ]} />
+    </div>
+  );
+}
+
+// ============================================================
+// Sentence Structure (Step 2)
+// ============================================================
+function GrammarRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+  return (
+    <div className="mt-2">
+      <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
+
+      <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
+        <p className="text-base text-slate-400 mb-2 text-center">Basic Pattern:</p>
+        <div className="flex items-center justify-center gap-1 flex-wrap">
+          <span className="bg-blue-500/30 text-blue-300 px-2 py-1 rounded text-base font-medium">Subject</span>
+          <span className="text-slate-500 text-base">は</span>
+          <span className="bg-green-500/30 text-green-300 px-2 py-1 rounded text-base font-medium">Object</span>
+          <span className="text-slate-500 text-base">を</span>
+          <span className="bg-purple-500/30 text-purple-300 px-2 py-1 rounded text-base font-medium">Verb</span>
+          <span className="text-slate-500 text-base">ます</span>
+        </div>
+        <p className="text-base text-sakura-300 text-center mt-1">S wa O wo V ma·su</p>
       </div>
+
+      <p className="text-base text-slate-400 mb-2">Tap to see examples of each structure:</p>
+
+      <DrawerRow jp="S は V ます" rom="S wa V ma·su" meaning="Simple: Subject does something" openDrawer={openDrawer}
+        items={[
+          { jp: '私は行きます', hep: 'wa·ta·shi wa i·ki·ma·su', en: 'I go' },
+          { jp: '電車が来ます', hep: 'den·sha ga ki·ma·su', en: 'The train comes' },
+          { jp: '友達が待っています', hep: 'to·mo·da·chi ga mat·te i·ma·su', en: 'My friend is waiting' },
+        ]} />
+      <DrawerRow jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full: Subject does something to Object" openDrawer={openDrawer}
+        items={[
+          { jp: '私はラーメンを食べます', hep: 'wa·ta·shi wa raa·men wo ta·be·ma·su', en: 'I eat ramen' },
+          { jp: '私は切符を買います', hep: 'wa·ta·shi wa kip·pu wo kai·ma·su', en: 'I buy a ticket' },
+          { jp: '私は写真を撮ります', hep: 'wa·ta·shi wa sha·shin wo to·ri·ma·su', en: 'I take a photo' },
+        ]} />
+      <DrawerRow jp="S は Place で V ます" rom="S wa Place de V ma·su" meaning="Where: Subject does something AT a place" openDrawer={openDrawer}
+        items={[
+          { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
+          { jp: 'コンビニでコーヒーを買います', hep: 'kon·bi·ni de koo·hii wo kai·ma·su', en: 'I buy coffee at the convenience store' },
+          { jp: 'ホテルで休みます', hep: 'ho·te·ru de ya·su·mi·ma·su', en: 'I rest at the hotel' },
+        ]} />
+      <DrawerRow jp="S は Place に V ます" rom="S wa Place ni V ma·su" meaning="Direction: Subject goes TO a place" openDrawer={openDrawer}
+        items={[
+          { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
+          { jp: 'ホテルに帰ります', hep: 'ho·te·ru ni ka·e·ri·ma·su', en: 'I return to the hotel' },
+          { jp: '駅に着きました', hep: 'e·ki ni tsu·ki·ma·shi·ta', en: 'I arrived at the station' },
+        ]} />
+
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-3 mt-3">
+        <p className="text-base text-indigo-300 font-medium">💡 Shortcut for travelers</p>
+        <p className="text-base text-slate-400 mt-1">You can often drop 私は (I) — it's understood from context. Just say the object + verb!</p>
+        <div className="mt-2 space-y-1">
+          <p className="text-base text-slate-300">❌ 私はラーメンを食べます</p>
+          <p className="text-base text-slate-300">✅ ラーメンを食べます <span className="text-slate-500">(same meaning, more natural)</span></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Yes/No Questions (Step 6)
+// ============================================================
+function YesNoRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+  return (
+    <div className="mt-2">
+      <p className="text-base text-slate-500 mb-3">Take any statement, add か (ka) at the end = question. That's it!</p>
+
+      <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
+        <p className="text-base text-slate-400 mb-2 text-center">The Rule:</p>
+        <div className="flex items-center justify-center gap-2">
+          <span className="bg-slate-600/50 text-slate-200 px-3 py-1 rounded text-base">any statement</span>
+          <span className="text-slate-500 text-lg">+</span>
+          <span className="bg-sakura-500/30 text-sakura-300 px-3 py-1 rounded text-base font-bold">か？</span>
+        </div>
+      </div>
+
+      <div className="bg-slate-700/30 rounded-lg p-3 mb-3">
+        <p className="text-base text-slate-400 mb-2">Answering:</p>
+        <div className="flex gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-green-400 text-base">✅</span>
+            <div>
+              <p className="text-base text-slate-200">はい</p>
+              <p className="text-base text-sakura-300">hai</p>
+              <p className="text-base text-slate-400">Yes</p>
+            </div>
+            <button onClick={() => speak('はい', 'ja-JP')} className="text-lg active:scale-110 p-1">🔊</button>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-red-400 text-base">❌</span>
+            <div>
+              <p className="text-base text-slate-200">いいえ</p>
+              <p className="text-base text-sakura-300">ii·e</p>
+              <p className="text-base text-slate-400">No</p>
+            </div>
+            <button onClick={() => speak('いいえ', 'ja-JP')} className="text-lg active:scale-110 p-1">🔊</button>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-base text-slate-400 mb-2">Tap to see examples:</p>
+
+      <DrawerRow jp="○○ですか？" rom="○○ de·su ka" meaning="Is it ○○? / Are you ○○?" openDrawer={openDrawer}
+        items={[
+          { jp: 'これは味噌ラーメンですか？', hep: 'ko·re wa mi·so raa·men de·su ka', en: 'Is this miso ramen?' },
+          { jp: '無料ですか？', hep: 'mu·ryou de·su ka', en: 'Is it free?' },
+          { jp: 'ここですか？', hep: 'ko·ko de·su ka', en: 'Is it here?' },
+        ]} />
+      <DrawerRow jp="○○ますか？" rom="○○ ma·su ka" meaning="Do you ○○? / Can you ○○?" openDrawer={openDrawer}
+        items={[
+          { jp: '英語を話しますか？', hep: 'ei·go wo ha·na·shi·ma·su ka', en: 'Do you speak English?' },
+          { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
+          { jp: '配達しますか？', hep: 'hai·ta·tsu shi·ma·su ka', en: 'Do you deliver?' },
+        ]} />
+      <DrawerRow jp="○○ありますか？" rom="○○ a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?" openDrawer={openDrawer}
+        items={[
+          { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
+          { jp: '空いている部屋はありますか？', hep: 'ai·te i·ru he·ya wa a·ri·ma·su ka', en: 'Do you have a vacant room?' },
+          { jp: 'おすすめはありますか？', hep: 'o·su·su·me wa a·ri·ma·su ka', en: 'Do you have any recommendations?' },
+        ]} />
+
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-3 mt-3">
+        <p className="text-base text-indigo-300 font-medium">💡 Softer alternatives</p>
+        <p className="text-base text-slate-400 mt-1">Instead of direct はい/いいえ, Japanese often uses softer responses:</p>
+        <div className="mt-2 space-y-1">
+          <p className="text-base text-slate-300">大丈夫です <span className="text-sakura-300">dai·jou·bu de·su</span> <span className="text-slate-500">= It's okay (soft yes)</span></p>
+          <p className="text-base text-slate-300">ちょっと… <span className="text-sakura-300">chot·to…</span> <span className="text-slate-500">= A little… (soft no)</span></p>
+          <p className="text-base text-slate-300">すみません <span className="text-sakura-300">su·mi·ma·sen</span> <span className="text-slate-500">= Sorry (polite no)</span></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// WH Question Words (Step 7)
+// ============================================================
+function WHQuestionsRef({ openDrawer }: { openDrawer: DrawerOpener }) {
+  return (
+    <div className="mt-2">
+      <p className="text-base text-slate-500 mb-2">Question word goes where the answer would be, then add か (ka)</p>
+      <DrawerRow jp="何 / なに" rom="na·ni" meaning="What?" openDrawer={openDrawer}
+        items={[
+          { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
+          { jp: '何がおすすめですか？', hep: 'na·ni ga o·su·su·me de·su ka', en: 'What do you recommend?' },
+          { jp: '何時ですか？', hep: 'nan·ji de·su ka', en: 'What time is it?' },
+        ]} />
+      <DrawerRow jp="どこ" rom="do·ko" meaning="Where?" openDrawer={openDrawer}
+        items={[
+          { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
+          { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
+          { jp: 'どこで食べますか？', hep: 'do·ko de ta·be·ma·su ka', en: 'Where shall we eat?' },
+        ]} />
+      <DrawerRow jp="いつ" rom="i·tsu" meaning="When?" openDrawer={openDrawer}
+        items={[
+          { jp: 'いつ開きますか？', hep: 'i·tsu a·ki·ma·su ka', en: 'When does it open?' },
+          { jp: 'いつ出発しますか？', hep: 'i·tsu shup·pa·tsu shi·ma·su ka', en: 'When does it depart?' },
+          { jp: 'チェックアウトはいつですか？', hep: 'chek·ku au·to wa i·tsu de·su ka', en: 'When is checkout?' },
+        ]} />
+      <DrawerRow jp="だれ" rom="da·re" meaning="Who?" openDrawer={openDrawer}
+        items={[
+          { jp: 'だれに聞けばいいですか？', hep: 'da·re ni ki·ke·ba ii de·su ka', en: 'Who should I ask?' },
+          { jp: 'だれが案内してくれますか？', hep: 'da·re ga an·nai shi·te ku·re·ma·su ka', en: 'Who will guide us?' },
+        ]} />
+      <DrawerRow jp="どう" rom="dou" meaning="How? (method/manner)" openDrawer={openDrawer}
+        items={[
+          { jp: 'どう行きますか？', hep: 'dou i·ki·ma·su ka', en: 'How do I get there?' },
+          { jp: 'これはどう使いますか？', hep: 'ko·re wa dou tsu·kai·ma·su ka', en: 'How do I use this?' },
+          { jp: 'どうですか？', hep: 'dou de·su ka', en: 'How is it? / What do you think?' },
+        ]} />
+      <DrawerRow jp="いくら" rom="i·ku·ra" meaning="How much? (price)" openDrawer={openDrawer}
+        items={[
+          { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much is it?' },
+          { jp: '全部でいくらですか？', hep: 'zen·bu de i·ku·ra de·su ka', en: 'How much is it in total?' },
+          { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
+        ]} />
+      <DrawerRow jp="どれ" rom="do·re" meaning="Which one? (of 3+)" openDrawer={openDrawer}
+        items={[
+          { jp: 'どれがおすすめですか？', hep: 'do·re ga o·su·su·me de·su ka', en: 'Which one do you recommend?' },
+          { jp: 'どれにしますか？', hep: 'do·re ni shi·ma·su ka', en: 'Which one will you have?' },
+        ]} />
+      <DrawerRow jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?" openDrawer={openDrawer}
+        items={[
+          { jp: 'どちらがいいですか？', hep: 'do·chi·ra ga ii de·su ka', en: 'Which is better?' },
+          { jp: '出口はどちらですか？', hep: 'de·gu·chi wa do·chi·ra de·su ka', en: 'Which way is the exit?' },
+          { jp: 'どっちが大きいですか？', hep: 'dot·chi ga oo·kii de·su ka', en: 'Which one is bigger?' },
+        ]} />
+      <DrawerRow jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?" openDrawer={openDrawer}
+        items={[
+          { jp: 'どうして閉まっていますか？', hep: 'dou·shi·te shi·mat·te i·ma·su ka', en: 'Why is it closed?' },
+          { jp: 'どうしてだめですか？', hep: 'dou·shi·te da·me de·su ka', en: 'Why is it not allowed?' },
+        ]} />
     </div>
   );
 }
