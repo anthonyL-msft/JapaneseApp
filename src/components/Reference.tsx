@@ -565,42 +565,102 @@ function PatternsRef() {
 }
 
 function PoliteRef() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const toggle = (i: number) => setOpenIdx(openIdx === i ? null : i);
+  const forms = [
+    {
+      jp: '〜ます', rom: 'ma·su', label: 'Polite positive',
+      when: 'Default for ALL travel situations — ordering, asking, stating facts',
+      examples: [
+        { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
+        { jp: 'わかります', hep: 'wa·ka·ri·ma·su', en: 'I understand' },
+        { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
+        { jp: '払います', hep: 'ha·rai·ma·su', en: 'I pay' },
+      ],
+    },
+    {
+      jp: '〜ません', rom: 'ma·sen', label: 'Polite negative',
+      when: 'Saying you can\'t / don\'t — declining, explaining limitations',
+      examples: [
+        { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
+        { jp: '食べられません', hep: 'ta·be·ra·re·ma·sen', en: "I can't eat (allergies)" },
+        { jp: 'いりません', hep: 'i·ri·ma·sen', en: "I don't need it" },
+      ],
+    },
+    {
+      jp: '〜ました', rom: 'ma·shi·ta', label: 'Polite past',
+      when: 'Talking about something already done — reservations made, things you saw',
+      examples: [
+        { jp: '予約しました', hep: 'yo·ya·ku shi·ma·shi·ta', en: 'I made a reservation' },
+        { jp: 'もう払いました', hep: 'mou ha·rai·ma·shi·ta', en: 'I already paid' },
+        { jp: '荷物をなくしました', hep: 'ni·mo·tsu wo na·ku·shi·ma·shi·ta', en: 'I lost my luggage' },
+      ],
+    },
+    {
+      jp: '〜です', rom: 'de·su', label: 'Polite "is/am" (copula)',
+      when: 'Stating what something IS — introducing yourself, describing things, quantities',
+      examples: [
+        { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people (party size)' },
+        { jp: 'アレルギーです', hep: 'a·re·ru·gii de·su', en: "It's an allergy" },
+        { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
+        { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
+      ],
+    },
+    {
+      jp: '〜てください', rom: 'te ku·da·sai', label: 'Polite request',
+      when: 'Asking someone to do something — "please do ○○"',
+      examples: [
+        { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
+        { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
+        { jp: 'もう一度お願いします', hep: 'mou i·chi·do o·ne·gai·shi·ma·su', en: 'One more time please' },
+      ],
+    },
+    {
+      jp: '〜てもいいですか', rom: 'te mo ii de·su ka', label: 'Asking permission',
+      when: 'Asking "may I?" — photos, trying things on, sitting down',
+      examples: [
+        { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
+        { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
+        { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
+      ],
+    },
+  ];
   return (
     <div className="mt-2">
-      <p className="text-base text-slate-500 mb-2">Japanese has different politeness levels. Use ます (masu) form for all travel situations.</p>
+      <p className="text-base text-slate-500 mb-2">Use ます (masu) form for all travel situations — it's polite and always safe.</p>
       <div className="space-y-2">
-        <div className="bg-slate-700/30 rounded-lg p-2">
-          <div className="flex justify-between">
-            <span className="text-base text-slate-200">〜ます</span>
-            <span className="text-base text-slate-500">Polite positive</span>
+        {forms.map((f, i) => (
+          <div key={i} className="bg-slate-700/30 rounded-lg p-2">
+            <div className="flex items-center gap-2">
+              <button onClick={() => toggle(i)} className="flex-1 text-left">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-base font-medium text-slate-100">{f.jp}</span>
+                  <span className="text-base text-sakura-300">{f.rom}</span>
+                  <span className="text-base text-slate-500">— {f.label}</span>
+                </div>
+                <p className="text-base text-slate-400 mt-0.5">🕐 {f.when}</p>
+              </button>
+              <button onClick={() => speak(f.jp.replace('〜', ''), 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
+              <button onClick={() => toggle(i)} className="text-base text-slate-500 shrink-0">{openIdx === i ? '▲' : '▼'}</button>
+            </div>
+            {openIdx === i && (
+              <div className="mt-2 space-y-1.5 border-t border-slate-700/30 pt-2">
+                {f.examples.map((ex, j) => (
+                  <div key={j} className="bg-slate-700/20 rounded-lg p-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-base text-slate-200">{ex.jp}</p>
+                        <p className="text-base text-sakura-300">{ex.hep}</p>
+                      </div>
+                      <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
+                    </div>
+                    <p className="text-base text-slate-400">{ex.en}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <p className="text-base text-sakura-300">ma·su</p>
-          <p className="text-base text-slate-400">行きます (i·ki·ma·su) = I go</p>
-        </div>
-        <div className="bg-slate-700/30 rounded-lg p-2">
-          <div className="flex justify-between">
-            <span className="text-base text-slate-200">〜ません</span>
-            <span className="text-base text-slate-500">Polite negative</span>
-          </div>
-          <p className="text-base text-sakura-300">ma·sen</p>
-          <p className="text-base text-slate-400">行きません (i·ki·ma·sen) = I don't go</p>
-        </div>
-        <div className="bg-slate-700/30 rounded-lg p-2">
-          <div className="flex justify-between">
-            <span className="text-base text-slate-200">〜ました</span>
-            <span className="text-base text-slate-500">Polite past</span>
-          </div>
-          <p className="text-base text-sakura-300">ma·shi·ta</p>
-          <p className="text-base text-slate-400">行きました (i·ki·ma·shi·ta) = I went</p>
-        </div>
-        <div className="bg-slate-700/30 rounded-lg p-2">
-          <div className="flex justify-between">
-            <span className="text-base text-slate-200">〜です</span>
-            <span className="text-base text-slate-500">Polite copula (is/am)</span>
-          </div>
-          <p className="text-base text-sakura-300">de·su</p>
-          <p className="text-base text-slate-400">ふたりです (fu·ta·ri de·su) = There are two of us</p>
-        </div>
+        ))}
       </div>
     </div>
   );
