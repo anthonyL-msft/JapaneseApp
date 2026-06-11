@@ -541,26 +541,26 @@ type DrawerOpener = (d: DrawerData) => void;
 function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void }) {
   const isOpen = openSet.has(id);
   return (
-    <div className="border-b border-slate-700/40 last:border-0">
-      <div className="flex items-center gap-2 py-2">
+    <div className={`bg-slate-700/40 rounded-xl overflow-hidden ${isOpen ? 'ring-1 ring-sakura-400/30' : ''}`}>
+      <div className="flex items-start gap-2 p-3">
         <button onClick={() => toggle(id)} className="flex-1 text-left">
-          <p className="text-base font-medium text-slate-100">{jp}</p>
-          <p className="text-base text-sakura-300">{rom}</p>
+          <p className="text-lg font-medium text-slate-50">{jp}</p>
+          <p className="text-base text-sakura-300 mt-0.5">{rom}</p>
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </button>
-        <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
-        <button onClick={() => toggle(id)} className="text-base text-slate-500 shrink-0">{isOpen ? '▲' : '▼'}</button>
+        <button onClick={() => speak(jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+        <button onClick={() => toggle(id)} className="text-base text-slate-500 shrink-0 p-1">{isOpen ? '▲' : '▼'}</button>
       </div>
       {isOpen && (
-        <div className="pb-2 space-y-1.5">
+        <div className="px-3 pb-3 border-t border-slate-700/40 space-y-1.5">
           {items.map((ex, i) => (
-            <div key={i} className="bg-slate-700/20 rounded-lg p-2">
+            <div key={i} className="bg-slate-700/30 rounded-lg p-2">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex-1">
                   <p className="text-base text-slate-200">{ex.jp}</p>
                   <p className="text-base text-sakura-300">{ex.hep}</p>
                 </div>
-                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
+                <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
               </div>
               <p className="text-base text-slate-400">{ex.en}</p>
             </div>
@@ -606,7 +606,7 @@ function AccordionHeader({ label, allOpen, toggleAll }: { label: string; allOpen
 function ParticlesRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで']);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Tap a particle to see examples" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
         openSet={openSet} toggle={toggle} items={[
@@ -682,7 +682,7 @@ function ParticlesRef() {
 function CountersRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜つ','〜人','〜枚','〜本','〜杯','〜個','〜台','〜泊','〜名','〜階']);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Counters (like Chinese 量詞)" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="〜つ" jp="〜つ" rom="-tsu" meaning="General counter (1-10)"
         openSet={openSet} toggle={toggle} items={[
@@ -743,7 +743,7 @@ function CountersRef() {
 function PatternsRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○をお願いします','○○はありますか','○○はどこですか','○○してもいいですか','○○てください','○○がわかりません','○○たいです']);
   return (
-    <div className="mt-2 space-y-2">
+    <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Tap a pattern to see real examples" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="○○をお願いします" jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
         openSet={openSet} toggle={toggle} items={[
@@ -794,7 +794,7 @@ function PatternsRef() {
 function PoliteRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜ます','〜ません','〜ました','〜です','〜てください','〜てもいいですか']);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Use ます form — polite and always safe" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="〜ます" jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating"
         openSet={openSet} toggle={toggle} items={[
@@ -844,7 +844,7 @@ function PoliteRef() {
 function GrammarRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['S は V ます','S は O を V ます','S は Place で V ます','S は Place に V ます']);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
 
       <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
@@ -905,7 +905,7 @@ function GrammarRef() {
 function YesNoRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○ですか？','○○ますか？','○○ありますか？']);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Take any statement, add か (ka) at the end = question. That's it!</p>
 
       <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
@@ -981,7 +981,7 @@ function YesNoRef() {
 function WHQuestionsRef() {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['何 / なに','どこ','いつ','だれ','どう','いくら','どれ','どっち / どちら','なぜ / どうして']);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Question words + か (ka)" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
         openSet={openSet} toggle={toggle} items={[
