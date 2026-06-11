@@ -564,25 +564,27 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
         <button onClick={() => toggle(id)} className="text-base text-slate-500 shrink-0 p-1">{isOpen ? '▲' : '▼'}</button>
       </div>
       {isOpen && (
-        <div className="px-3 pb-3 border-t border-slate-700/40 space-y-1.5">
+        <div className="px-1.5 pb-1.5 space-y-1.5">
           {items.map((ex, i) => {
             const bmId = `ref_${ex.jp}`;
             const isBm = refBookmarkedIds?.has(bmId);
             return (
-              <div key={i} className="bg-slate-700/30 rounded-lg p-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex-1">
-                    <p className="text-base text-slate-200">{ex.jp}</p>
-                    <p className="text-base text-sakura-300">{ex.hep}</p>
+              <div key={i} className="bg-slate-700/40 rounded-xl p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-medium text-slate-50">{ex.jp}</p>
+                    <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
+                    <p className="text-base text-slate-400 mt-0.5">{ex.en}</p>
                   </div>
-                  <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
-                  {onToggleRefBookmark && (
-                    <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">
-                      {isBm ? '⭐' : '☆'}
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                    {onToggleRefBookmark && (
+                      <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                        {isBm ? '⭐' : '☆'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <p className="text-base text-slate-400">{ex.en}</p>
               </div>
             );
           })}
