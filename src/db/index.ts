@@ -1,9 +1,9 @@
 import { openDB } from 'idb';
 import type { IDBPDatabase } from 'idb';
-import type { UserNote, Bookmark, SRSCard } from '../data/types';
+import type { UserNote, Bookmark, SRSCard, RefBookmark } from '../data/types';
 
 const DB_NAME = 'nihongo-travel';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -20,6 +20,9 @@ function getDB() {
         }
         if (!db.objectStoreNames.contains('srs')) {
           db.createObjectStore('srs', { keyPath: 'phraseId' });
+        }
+        if (!db.objectStoreNames.contains('ref-bookmarks')) {
+          db.createObjectStore('ref-bookmarks', { keyPath: 'id' });
         }
       },
     });
@@ -85,4 +88,20 @@ export async function saveSRSCard(card: SRSCard): Promise<void> {
 export async function getSRSCard(phraseId: string): Promise<SRSCard | undefined> {
   const db = await getDB();
   return db.get('srs', phraseId);
+}
+
+// Ref Bookmarks
+export async function getRefBookmarks(): Promise<RefBookmark[]> {
+  const db = await getDB();
+  return db.getAll('ref-bookmarks');
+}
+
+export async function addRefBookmark(item: RefBookmark): Promise<void> {
+  const db = await getDB();
+  await db.put('ref-bookmarks', item);
+}
+
+export async function removeRefBookmark(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('ref-bookmarks', id);
 }

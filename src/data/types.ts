@@ -65,6 +65,15 @@ export interface Bookmark {
   createdAt: number;
 }
 
+export interface RefBookmark {
+  id: string;
+  jp: string;
+  hep: string;
+  en: string;
+  section: string;
+  createdAt: number;
+}
+
 export interface SRSCard {
   phraseId: string;
   easeFactor: number;

@@ -1,20 +1,23 @@
 import { useState } from 'react';
-import type { Phrase, Bookmark, UserNote } from '../data/types';
+import type { Phrase, Bookmark, UserNote, RefBookmark } from '../data/types';
 import { PhraseCard } from './PhraseCard';
+import { speak } from '../utils/tts';
 
 interface Props {
   phrases: Phrase[];
   bookmarks: Bookmark[];
   notes: UserNote[];
+  refBookmarks: RefBookmark[];
   onToggleBookmark: (id: string) => void;
+  onToggleRefBookmark: (item: { jp: string; hep: string; en: string; section: string }) => void;
   onSaveNote: (note: UserNote) => void;
   onDeleteNote: (id: string) => void;
   search: string;
 }
 
-type Section = 'bookmarks' | 'ai' | 'notes';
+type Section = 'bookmarks' | 'refbookmarks' | 'ai' | 'notes';
 
-export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNote, onDeleteNote, search }: Props) {
+export function MyStuff({ phrases, bookmarks, notes, refBookmarks, onToggleBookmark, onToggleRefBookmark, onSaveNote, onDeleteNote, search }: Props) {
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [newNoteText, setNewNoteText] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,7 +68,7 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
     setEditText('');
   };
 
-  const totalItems = bookmarks.length + notes.length;
+  const totalItems = bookmarks.length + refBookmarks.length + notes.length;
 
   return (
     <div className="scroll-area h-full">
@@ -133,6 +136,47 @@ export function MyStuff({ phrases, bookmarks, notes, onToggleBookmark, onSaveNot
             </div>
           )}
         </div>
+
+        {/* 📚 Reference Bookmarks */}
+        {refBookmarks.length > 0 && (
+          <div className="bg-slate-800/60 rounded-xl overflow-hidden">
+            <button
+              onClick={() => toggleSection('refbookmarks')}
+              className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
+            >
+              <div>
+                <h3 className="text-base font-semibold text-slate-200">📚 Reference Examples</h3>
+                <p className="text-base text-slate-500">{refBookmarks.length} saved</p>
+              </div>
+              <span className="text-base text-slate-500">{openSections.has('refbookmarks') ? '▲' : '▼'}</span>
+            </button>
+            {openSections.has('refbookmarks') && (
+              <div className="px-2 pb-2 space-y-1.5">
+                {refBookmarks
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .filter(rb => {
+                    if (!search.trim()) return true;
+                    const q = search.toLowerCase();
+                    return rb.jp.toLowerCase().includes(q) || rb.hep.toLowerCase().includes(q) || rb.en.toLowerCase().includes(q);
+                  })
+                  .map(rb => (
+                    <div key={rb.id} className="bg-slate-700/40 rounded-xl p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <p className="text-lg font-medium text-slate-50">{rb.jp}</p>
+                          <p className="text-base text-sakura-300 mt-0.5">{rb.hep}</p>
+                          <p className="text-base text-slate-400 mt-0.5">{rb.en}</p>
+                        </div>
+                        <button onClick={() => speak(rb.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                        <button onClick={() => onToggleRefBookmark({ jp: rb.jp, hep: rb.hep, en: rb.en, section: rb.section })} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">⭐</button>
+                      </div>
+                      <p className="text-base text-slate-600 mt-1">from {rb.section}</p>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 🤖 AI Translations */}
         {aiNotes.length > 0 && (

@@ -86,7 +86,12 @@ function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
   );
 }
 
-export function Reference() {
+interface RefProps {
+  refBookmarkedIds?: Set<string>;
+  onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void;
+}
+
+export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark }: RefProps) {
   const panel = useSlidePanel<Section>();
   const [drawer, setDrawer] = useState<DrawerData>(null);
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
@@ -154,15 +159,15 @@ export function Reference() {
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
             {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
-            {panel.value === 'grammar' && <GrammarRef />}
+            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'converter' && <NumberConverter />}
-            {panel.value === 'particles' && <ParticlesRef />}
-            {panel.value === 'counters' && <CountersRef />}
-            {panel.value === 'patterns' && <PatternsRef />}
-            {panel.value === 'polite' && <PoliteRef />}
-            {panel.value === 'yesno' && <YesNoRef />}
-            {panel.value === 'whquestions' && <WHQuestionsRef />}
+            {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
+            {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
+            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
+            {panel.value === 'polite' && <PoliteRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
+            {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
+            {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} />}
             {panel.value === 'signs' && <SignsRef />}
           </div>
         </div>
@@ -540,7 +545,12 @@ function NumbersRef() {
 
 type DrawerOpener = (d: DrawerData) => void;
 
-function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void }) {
+interface RbProps {
+  rbIds?: Set<string>;
+  onRbToggle?: (item: { jp: string; hep: string; en: string; section: string }) => void;
+}
+
+function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, refBookmarkedIds, onToggleRefBookmark }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void; section?: string; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void }) {
   const isOpen = openSet.has(id);
   return (
     <div className={`bg-slate-700/40 rounded-xl overflow-hidden ${isOpen ? 'ring-1 ring-sakura-400/30' : ''}`}>
@@ -555,18 +565,27 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle }: { id: st
       </div>
       {isOpen && (
         <div className="px-3 pb-3 border-t border-slate-700/40 space-y-1.5">
-          {items.map((ex, i) => (
-            <div key={i} className="bg-slate-700/30 rounded-lg p-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-base text-slate-200">{ex.jp}</p>
-                  <p className="text-base text-sakura-300">{ex.hep}</p>
+          {items.map((ex, i) => {
+            const bmId = `ref_${ex.jp}`;
+            const isBm = refBookmarkedIds?.has(bmId);
+            return (
+              <div key={i} className="bg-slate-700/30 rounded-lg p-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1">
+                    <p className="text-base text-slate-200">{ex.jp}</p>
+                    <p className="text-base text-sakura-300">{ex.hep}</p>
+                  </div>
+                  <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                  {onToggleRefBookmark && (
+                    <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">
+                      {isBm ? '⭐' : '☆'}
+                    </button>
+                  )}
                 </div>
-                <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                <p className="text-base text-slate-400">{ex.en}</p>
               </div>
-              <p className="text-base text-slate-400">{ex.en}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -605,79 +624,79 @@ function AccordionHeader({ label, allOpen, toggleAll }: { label: string; allOpen
   );
 }
 
-function ParticlesRef() {
+function ParticlesRef({ rbIds, onRbToggle }: RbProps) {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで']);
   return (
     <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Tap a particle to see examples" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
           { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
         ]} />
       <AccordionRow id="が" jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
         ]} />
       <AccordionRow id="を" jp="を" rom="wo" meaning="Object marker — marks what receives the action"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
           { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
         ]} />
       <AccordionRow id="に" jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'I send luggage to the hotel' },
         ]} />
       <AccordionRow id="で" jp="で" rom="de" meaning="Location of action / by means of"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica' },
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train' },
         ]} />
       <AccordionRow id="へ" jp="へ" rom="e" meaning="Towards (direction)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo' },
           { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
           { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'I\'m heading to the exit' },
         ]} />
       <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
           { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
           { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
         ]} />
       <AccordionRow id="と" jp="と" rom="to" meaning="And, with (listing/companion)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
           { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
           { jp: '朝と夜、二食付きです', hep: 'a·sa to yo·ru ni·sho·ku tsu·ki de·su', en: 'Breakfast and dinner included' },
         ]} />
       <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
           { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
           { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
         ]} />
       <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
           { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
           { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
         ]} />
       <AccordionRow id="から" jp="から" rom="ka·ra" meaning="From (place/time)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
           { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
           { jp: 'ここから駅まで歩けますか？', hep: 'ko·ko ka·ra e·ki ma·de a·ru·ke·ma·su ka', en: 'Can I walk from here to the station?' },
         ]} />
       <AccordionRow id="まで" jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
           { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
           { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
@@ -686,67 +705,67 @@ function ParticlesRef() {
   );
 }
 
-function CountersRef() {
+function CountersRef({ rbIds, onRbToggle }: RbProps) {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜つ','〜人','〜枚','〜本','〜杯','〜個','〜台','〜泊','〜名','〜階']);
   return (
     <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Counters (like Chinese 量詞)" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="〜つ" jp="〜つ" rom="-tsu" meaning="General counter (1-10)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ひとつください', hep: 'hi·to·tsu ku·da·sai', en: 'One please' },
           { jp: 'ふたつお願いします', hep: 'fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two please' },
           { jp: 'みっつあります', hep: 'mit·tsu a·ri·ma·su', en: 'There are three' },
         ]} />
       <AccordionRow id="〜人" jp="〜人" rom="-nin" meaning="People"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people' },
           { jp: 'さんにんで予約しました', hep: 'san·nin de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for three people' },
           { jp: 'ひとりです', hep: 'hi·to·ri de·su', en: 'Just one person' },
         ]} />
       <AccordionRow id="〜枚" jp="〜枚" rom="-mai" meaning="Flat objects: tickets, plates, shirts"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '切符を二枚ください', hep: 'kip·pu wo ni·mai ku·da·sai', en: 'Two tickets please' },
           { jp: 'Tシャツを一枚お願いします', hep: 'tii·sha·tsu wo i·chi·mai o·ne·gai·shi·ma·su', en: 'One T-shirt please' },
           { jp: 'お皿を三枚ください', hep: 'o·sa·ra wo san·mai ku·da·sai', en: 'Three plates please' },
         ]} />
       <AccordionRow id="〜本" jp="〜本" rom="-hon" meaning="Long objects: bottles, pens, umbrellas"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '水を一本ください', hep: 'mi·zu wo ip·pon ku·da·sai', en: 'One bottle of water please' },
           { jp: 'ビールを二本お願いします', hep: 'bii·ru wo ni·hon o·ne·gai·shi·ma·su', en: 'Two beers please' },
           { jp: '傘を一本貸してください', hep: 'ka·sa wo ip·pon ka·shi·te ku·da·sai', en: 'Please lend me an umbrella' },
         ]} />
       <AccordionRow id="〜杯" jp="〜杯" rom="-hai" meaning="Cups / glasses / bowls"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'コーヒーを一杯ください', hep: 'koo·hii wo ip·pai ku·da·sai', en: 'One coffee please' },
           { jp: 'お茶を二杯お願いします', hep: 'o·cha wo ni·hai o·ne·gai·shi·ma·su', en: 'Two teas please' },
           { jp: 'ラーメンを一杯お願いします', hep: 'raa·men wo ip·pai o·ne·gai·shi·ma·su', en: 'One bowl of ramen please' },
         ]} />
       <AccordionRow id="〜個" jp="〜個" rom="-ko" meaning="Small round objects: eggs, apples, onigiri"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'おにぎりを三個ください', hep: 'o·ni·gi·ri wo san·ko ku·da·sai', en: 'Three onigiri please' },
           { jp: 'りんごを一個お願いします', hep: 'rin·go wo ik·ko o·ne·gai·shi·ma·su', en: 'One apple please' },
           { jp: 'たこ焼きを二個ください', hep: 'ta·ko·ya·ki wo ni·ko ku·da·sai', en: 'Two takoyaki please' },
         ]} />
       <AccordionRow id="〜台" jp="〜台" rom="-dai" meaning="Machines / vehicles"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'タクシーを一台お願いします', hep: 'ta·ku·shii wo i·chi·dai o·ne·gai·shi·ma·su', en: 'One taxi please' },
           { jp: 'バスは何台来ますか？', hep: 'ba·su wa nan·dai ki·ma·su ka', en: 'How many buses are coming?' },
           { jp: 'ロッカーは一台空いていますか？', hep: 'rok·kaa wa i·chi·dai ai·te i·ma·su ka', en: 'Is there a locker available?' },
         ]} />
       <AccordionRow id="〜泊" jp="〜泊" rom="-ha·ku" meaning="Nights (hotel stay)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '二泊お願いします', hep: 'ni·ha·ku o·ne·gai·shi·ma·su', en: 'Two nights please' },
           { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
           { jp: '三泊四日です', hep: 'san·pa·ku yok·ka de·su', en: 'Three nights, four days' },
         ]} />
       <AccordionRow id="〜名" jp="〜名" rom="-mei" meaning="People (formal, restaurants)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '二名で予約しました', hep: 'ni·mei de yo·ya·ku shi·ma·shi·ta', en: 'Reserved for two (formal)' },
           { jp: '三名様でございますか？', hep: 'san·mei·sa·ma de go·zai·ma·su ka', en: 'Party of three? (staff may ask)' },
           { jp: '一名です', hep: 'i·chi·mei de·su', en: 'Just one person (formal)' },
         ]} />
       <AccordionRow id="〜階" jp="〜階" rom="-kai" meaning="Floors / stories"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'トイレは二階です', hep: 'toi·re wa ni·kai de·su', en: 'The toilet is on the 2nd floor' },
           { jp: '三階に行きたいです', hep: 'san·gai ni i·ki·tai de·su', en: 'I want to go to the 3rd floor' },
           { jp: 'レストランは何階ですか？', hep: 're·su·to·ran wa nan·kai de·su ka', en: 'What floor is the restaurant?' },
@@ -755,50 +774,50 @@ function CountersRef() {
   );
 }
 
-function PatternsRef() {
+function PatternsRef({ rbIds, onRbToggle }: RbProps) {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○をお願いします','○○はありますか','○○はどこですか','○○してもいいですか','○○てください','○○がわかりません','○○たいです']);
   return (
     <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Tap a pattern to see real examples" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="○○をお願いします" jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '水をお願いします', hep: 'mi·zu wo o·ne·gai·shi·ma·su', en: 'Water please' },
           { jp: 'メニューをお願いします', hep: 'me·nyuu wo o·ne·gai·shi·ma·su', en: 'Menu please' },
           { jp: 'お会計をお願いします', hep: 'o·kai·kei wo o·ne·gai·shi·ma·su', en: 'Check please' },
           { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
         ]} />
       <AccordionRow id="○○はありますか" jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
           { jp: '英語のメニューはありますか？', hep: 'ei·go no me·nyuu wa a·ri·ma·su ka', en: 'Do you have an English menu?' },
           { jp: '空いている席はありますか？', hep: 'ai·te i·ru se·ki wa a·ri·ma·su ka', en: 'Is there an empty seat?' },
         ]} />
       <AccordionRow id="○○はどこですか" jp="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
           { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
           { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
         ]} />
       <AccordionRow id="○○してもいいですか" jp="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
           { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
       <AccordionRow id="○○てください" jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
           { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
         ]} />
       <AccordionRow id="○○がわかりません" jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
           { jp: '道がわかりません', hep: 'mi·chi ga wa·ka·ri·ma·sen', en: "I don't know the way" },
         ]} />
       <AccordionRow id="○○たいです" jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
           { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
           { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
@@ -807,45 +826,45 @@ function PatternsRef() {
   );
 }
 
-function PoliteRef() {
+function PoliteRef({ rbIds, onRbToggle }: RbProps) {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜ます','〜ません','〜ました','〜です','〜てください','〜てもいいですか']);
   return (
     <div className="mt-2 space-y-1.5">
       <AccordionHeader label="Use ます form — polite and always safe" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="〜ます" jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
           { jp: 'わかります', hep: 'wa·ka·ri·ma·su', en: 'I understand' },
           { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
           { jp: '払います', hep: 'ha·rai·ma·su', en: 'I pay' },
         ]} />
       <AccordionRow id="〜ません" jp="〜ません" rom="ma·sen" meaning="🕐 Saying you can't / don't — declining, limitations"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '食べられません', hep: 'ta·be·ra·re·ma·sen', en: "I can't eat (allergies)" },
           { jp: 'いりません', hep: 'i·ri·ma·sen', en: "I don't need it" },
         ]} />
       <AccordionRow id="〜ました" jp="〜ました" rom="ma·shi·ta" meaning="🕐 Already done — reservations, things you saw"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '予約しました', hep: 'yo·ya·ku shi·ma·shi·ta', en: 'I made a reservation' },
           { jp: 'もう払いました', hep: 'mou ha·rai·ma·shi·ta', en: 'I already paid' },
           { jp: '荷物をなくしました', hep: 'ni·mo·tsu wo na·ku·shi·ma·shi·ta', en: 'I lost my luggage' },
         ]} />
       <AccordionRow id="〜です" jp="〜です" rom="de·su" meaning='🕐 Stating what something IS — identity, quantities'
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people (party size)' },
           { jp: 'アレルギーです', hep: 'a·re·ru·gii de·su', en: "It's an allergy" },
           { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
           { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
         ]} />
       <AccordionRow id="〜てください" jp="〜てください" rom="te ku·da·sai" meaning='🕐 Asking someone to do something — "please do ○○"'
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
           { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
           { jp: 'もう一度お願いします', hep: 'mou i·chi·do o·ne·gai·shi·ma·su', en: 'One more time please' },
         ]} />
       <AccordionRow id="〜てもいいですか" jp="〜てもいいですか" rom="te mo ii de·su ka" meaning='🕐 Asking "may I?" — photos, trying on, sitting'
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
           { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
@@ -857,7 +876,7 @@ function PoliteRef() {
 // ============================================================
 // Sentence Structure (Step 2)
 // ============================================================
-function GrammarRef() {
+function GrammarRef({ rbIds, onRbToggle }: RbProps) {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['O を V ます','V ます','S は O を V ます','Place で V ます','Place に V ます','S は ... です']);
   return (
     <div className="mt-2 space-y-1.5">
@@ -879,37 +898,37 @@ function GrammarRef() {
       <AccordionHeader label="Tap to see examples of each structure" allOpen={allOpen} toggleAll={toggleAll} />
 
       <AccordionRow id="O を V ます" jp="O を V ます" rom="O wo V ma·su" meaning="Most common: Object + Verb (subject dropped)"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ラーメンを食べます', hep: 'raa·men wo ta·be·ma·su', en: 'I eat ramen' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
           { jp: '写真を撮ります', hep: 'sha·shin wo to·ri·ma·su', en: 'I take a photo' },
         ]} />
       <AccordionRow id="V ます" jp="V ます" rom="V ma·su" meaning="Simplest: just the verb"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
           { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
           { jp: 'わかりました', hep: 'wa·ka·ri·ma·shi·ta', en: 'I understood / Got it' },
         ]} />
       <AccordionRow id="S は O を V ます" jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full sentence with subject (when it's not 'I')"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'このバスは東京駅を通ります', hep: 'ko·no ba·su wa tou·kyou·e·ki wo too·ri·ma·su', en: 'This bus passes Tokyo Station' },
           { jp: 'お店は朝食を出します', hep: 'o·mi·se wa chou·sho·ku wo da·shi·ma·su', en: 'The restaurant serves breakfast' },
           { jp: '友達はお土産を買います', hep: 'to·mo·da·chi wa o·mi·ya·ge wo kai·ma·su', en: 'My friend buys souvenirs' },
         ]} />
       <AccordionRow id="Place で V ます" jp="Place で V ます" rom="Place de V ma·su" meaning="Where: do something AT a place"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: 'コンビニでコーヒーを買います', hep: 'kon·bi·ni de koo·hii wo kai·ma·su', en: 'I buy coffee at the convenience store' },
           { jp: 'ホテルで休みます', hep: 'ho·te·ru de ya·su·mi·ma·su', en: 'I rest at the hotel' },
         ]} />
       <AccordionRow id="Place に V ます" jp="Place に V ます" rom="Place ni V ma·su" meaning="Direction: go TO a place"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに帰ります', hep: 'ho·te·ru ni ka·e·ri·ma·su', en: 'I return to the hotel' },
           { jp: '駅に着きました', hep: 'e·ki ni tsu·ki·ma·shi·ta', en: 'I arrived at the station' },
         ]} />
       <AccordionRow id="S は ... です" jp="S は ... です" rom="S wa ... de·su" meaning="When you DO need to name the subject"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '電車が来ます', hep: 'den·sha ga ki·ma·su', en: 'The train comes (it, not me)' },
           { jp: '友達が待っています', hep: 'to·mo·da·chi ga mat·te i·ma·su', en: 'My friend is waiting (they, not me)' },
           { jp: 'このお店は人気です', hep: 'ko·no o·mi·se wa nin·ki de·su', en: 'This shop is popular' },
@@ -932,7 +951,7 @@ function GrammarRef() {
 // ============================================================
 // Yes/No Questions (Step 6)
 // ============================================================
-function YesNoRef() {
+function YesNoRef({ rbIds, onRbToggle }: RbProps) {
   const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○ですか？','○○ますか？','○○ありますか？']);
   return (
     <div className="mt-2 space-y-1.5">
@@ -974,19 +993,19 @@ function YesNoRef() {
       <AccordionHeader label="Tap to see examples" allOpen={allOpen} toggleAll={toggleAll} />
 
       <AccordionRow id="○○ですか？" jp="○○ですか？" rom="○○ de·su ka" meaning="Is it ○○? / Are you ○○?"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'これは味噌ラーメンですか？', hep: 'ko·re wa mi·so raa·men de·su ka', en: 'Is this miso ramen?' },
           { jp: '無料ですか？', hep: 'mu·ryou de·su ka', en: 'Is it free?' },
           { jp: 'ここですか？', hep: 'ko·ko de·su ka', en: 'Is it here?' },
         ]} />
       <AccordionRow id="○○ますか？" jp="○○ますか？" rom="○○ ma·su ka" meaning="Do you ○○? / Can you ○○?"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: '英語を話しますか？', hep: 'ei·go wo ha·na·shi·ma·su ka', en: 'Do you speak English?' },
           { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
           { jp: '配達しますか？', hep: 'hai·ta·tsu shi·ma·su ka', en: 'Do you deliver?' },
         ]} />
       <AccordionRow id="○○ありますか？" jp="○○ありますか？" rom="○○ a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
-        openSet={openSet} toggle={toggle} items={[
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
           { jp: '空いている部屋はありますか？', hep: 'ai·te i·ru he·ya wa a·ri·ma·su ka', en: 'Do you have a vacant room?' },
           { jp: 'おすすめはありますか？', hep: 'o·su·su·me wa a·ri·ma·su ka', en: 'Do you have any recommendations?' },
@@ -1008,7 +1027,7 @@ function YesNoRef() {
 // ============================================================
 // WH Question Words (Step 7)
 // ============================================================
-function WHQuestionsRef() {
+function WHQuestionsRef({ rbIds, onRbToggle }: RbProps) {
   const [tab, setTab] = useState<'thing' | 'action'>('thing');
   const thingAcc = useAccordion(['何 / なに','どこ','いつ','いくら','どれ','どっち / どちら']);
   const actionAcc = useAccordion(['どう','だれ','なぜ / どうして']);
@@ -1047,37 +1066,37 @@ function WHQuestionsRef() {
           <AccordionHeader label="Question words" allOpen={acc.allOpen} toggleAll={acc.toggleAll} />
 
           <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
               { jp: '何がおすすめですか？', hep: 'na·ni ga o·su·su·me de·su ka', en: 'What do you recommend?' },
               { jp: '何時ですか？', hep: 'nan·ji de·su ka', en: 'What time is it?' },
             ]} />
           <AccordionRow id="どこ" jp="どこ" rom="do·ko" meaning="Where?"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
               { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
               { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
             ]} />
           <AccordionRow id="いつ" jp="いつ" rom="i·tsu" meaning="When?"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'チェックアウトはいつですか？', hep: 'chek·ku au·to wa i·tsu de·su ka', en: 'When is checkout?' },
               { jp: 'いつ開きますか？', hep: 'i·tsu a·ki·ma·su ka', en: 'When does it open?' },
               { jp: 'いつ出発しますか？', hep: 'i·tsu shup·pa·tsu shi·ma·su ka', en: 'When does it depart?' },
             ]} />
           <AccordionRow id="いくら" jp="いくら" rom="i·ku·ra" meaning="How much? (price)"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much is it?' },
               { jp: '全部でいくらですか？', hep: 'zen·bu de i·ku·ra de·su ka', en: 'How much in total?' },
               { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
             ]} />
           <AccordionRow id="どれ" jp="どれ" rom="do·re" meaning="Which one? (of 3+)"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'どれがおすすめですか？', hep: 'do·re ga o·su·su·me de·su ka', en: 'Which do you recommend?' },
               { jp: 'どれにしますか？', hep: 'do·re ni shi·ma·su ka', en: 'Which one will you have?' },
               { jp: 'どれが一番人気ですか？', hep: 'do·re ga i·chi·ban nin·ki de·su ka', en: 'Which is the most popular?' },
             ]} />
           <AccordionRow id="どっち / どちら" jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'どちらがいいですか？', hep: 'do·chi·ra ga ii de·su ka', en: 'Which is better?' },
               { jp: '出口はどちらですか？', hep: 'de·gu·chi wa do·chi·ra de·su ka', en: 'Which way is the exit?' },
               { jp: 'どっちが大きいですか？', hep: 'dot·chi ga oo·kii de·su ka', en: 'Which one is bigger?' },
@@ -1117,19 +1136,19 @@ function WHQuestionsRef() {
           <AccordionHeader label="Question words" allOpen={acc.allOpen} toggleAll={acc.toggleAll} />
 
           <AccordionRow id="どう" jp="どう" rom="dou" meaning="How? (method/manner)"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'どう行きますか？', hep: 'dou i·ki·ma·su ka', en: 'How do I get there?' },
               { jp: 'これはどう使いますか？', hep: 'ko·re wa dou tsu·kai·ma·su ka', en: 'How do I use this?' },
               { jp: 'どうですか？', hep: 'dou de·su ka', en: 'How is it? / What do you think?' },
             ]} />
           <AccordionRow id="だれ" jp="だれ" rom="da·re" meaning="Who?"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'だれに聞けばいいですか？', hep: 'da·re ni ki·ke·ba ii de·su ka', en: 'Who should I ask?' },
               { jp: 'だれが案内してくれますか？', hep: 'da·re ga an·nai shi·te ku·re·ma·su ka', en: 'Who will guide us?' },
               { jp: 'だれの荷物ですか？', hep: 'da·re no ni·mo·tsu de·su ka', en: 'Whose luggage is this?' },
             ]} />
           <AccordionRow id="なぜ / どうして" jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?"
-            openSet={acc.openSet} toggle={acc.toggle} items={[
+            openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} items={[
               { jp: 'どうして閉まっていますか？', hep: 'dou·shi·te shi·mat·te i·ma·su ka', en: 'Why is it closed?' },
               { jp: 'どうしてだめですか？', hep: 'dou·shi·te da·me de·su ka', en: 'Why is it not allowed?' },
               { jp: 'どうして遅れていますか？', hep: 'dou·shi·te o·ku·re·te i·ma·su ka', en: 'Why is it delayed?' },
