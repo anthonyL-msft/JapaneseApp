@@ -979,80 +979,119 @@ function YesNoRef() {
 // WH Question Words (Step 7)
 // ============================================================
 function WHQuestionsRef() {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['何 / なに','どこ','いつ','だれ','どう','いくら','どれ','どっち / どちら','なぜ / どうして']);
+  const [tab, setTab] = useState<'thing' | 'action'>('thing');
+  const thingAcc = useAccordion(['何 / なに','どこ','いつ','いくら','どれ','どっち / どちら']);
+  const actionAcc = useAccordion(['どう','だれ','なぜ / どうして']);
+  const acc = tab === 'thing' ? thingAcc : actionAcc;
+
   return (
     <div className="mt-2 space-y-1.5">
-      <p className="text-base text-slate-500 mb-3">Replace the unknown part with a question word, keep the rest of the sentence</p>
-
-      <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
-        <p className="text-base text-slate-400 mb-2 text-center">The Rule:</p>
-        <div className="flex items-center justify-center gap-1 flex-wrap">
-          <span className="bg-sakura-500/30 text-sakura-300 px-2 py-1 rounded text-base font-bold">Q word</span>
-          <span className="text-slate-500 text-base">+</span>
-          <span className="bg-slate-600/50 text-slate-200 px-2 py-1 rounded text-base">rest of sentence</span>
-          <span className="text-slate-500 text-base">+</span>
-          <span className="bg-slate-600/50 text-slate-200 px-2 py-1 rounded text-base">ですか？</span>
-        </div>
-        <div className="mt-3 space-y-1">
-          <p className="text-base text-slate-400 text-center">Example:</p>
-          <p className="text-base text-slate-300 text-center">トイレは <span className="text-sakura-300 font-medium">どこ</span> ですか？</p>
-          <p className="text-base text-sakura-300 text-center">toi·re wa <span className="font-medium">do·ko</span> de·su ka</p>
-          <p className="text-base text-slate-500 text-center">The toilet is <span className="text-sakura-300">where</span>?</p>
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-2 mb-2">
+        <button onClick={() => setTab('thing')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'thing' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+          Asking about things
+        </button>
+        <button onClick={() => setTab('action')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'action' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+          Asking about actions
+        </button>
       </div>
 
-      <AccordionHeader label="Question words + か (ka)" allOpen={allOpen} toggleAll={toggleAll} />
-      <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
-          { jp: '何がおすすめですか？', hep: 'na·ni ga o·su·su·me de·su ka', en: 'What do you recommend?' },
-          { jp: '何時ですか？', hep: 'nan·ji de·su ka', en: 'What time is it?' },
-        ]} />
-      <AccordionRow id="どこ" jp="どこ" rom="do·ko" meaning="Where?"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
-          { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
-          { jp: 'どこで食べますか？', hep: 'do·ko de ta·be·ma·su ka', en: 'Where shall we eat?' },
-        ]} />
-      <AccordionRow id="いつ" jp="いつ" rom="i·tsu" meaning="When?"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'いつ開きますか？', hep: 'i·tsu a·ki·ma·su ka', en: 'When does it open?' },
-          { jp: 'いつ出発しますか？', hep: 'i·tsu shup·pa·tsu shi·ma·su ka', en: 'When does it depart?' },
-          { jp: 'チェックアウトはいつですか？', hep: 'chek·ku au·to wa i·tsu de·su ka', en: 'When is checkout?' },
-        ]} />
-      <AccordionRow id="だれ" jp="だれ" rom="da·re" meaning="Who?"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'だれに聞けばいいですか？', hep: 'da·re ni ki·ke·ba ii de·su ka', en: 'Who should I ask?' },
-          { jp: 'だれが案内してくれますか？', hep: 'da·re ga an·nai shi·te ku·re·ma·su ka', en: 'Who will guide us?' },
-        ]} />
-      <AccordionRow id="どう" jp="どう" rom="dou" meaning="How? (method/manner)"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'どう行きますか？', hep: 'dou i·ki·ma·su ka', en: 'How do I get there?' },
-          { jp: 'これはどう使いますか？', hep: 'ko·re wa dou tsu·kai·ma·su ka', en: 'How do I use this?' },
-          { jp: 'どうですか？', hep: 'dou de·su ka', en: 'How is it? / What do you think?' },
-        ]} />
-      <AccordionRow id="いくら" jp="いくら" rom="i·ku·ra" meaning="How much? (price)"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much is it?' },
-          { jp: '全部でいくらですか？', hep: 'zen·bu de i·ku·ra de·su ka', en: 'How much is it in total?' },
-          { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
-        ]} />
-      <AccordionRow id="どれ" jp="どれ" rom="do·re" meaning="Which one? (of 3+)"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'どれがおすすめですか？', hep: 'do·re ga o·su·su·me de·su ka', en: 'Which one do you recommend?' },
-          { jp: 'どれにしますか？', hep: 'do·re ni shi·ma·su ka', en: 'Which one will you have?' },
-        ]} />
-      <AccordionRow id="どっち / どちら" jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'どちらがいいですか？', hep: 'do·chi·ra ga ii de·su ka', en: 'Which is better?' },
-          { jp: '出口はどちらですか？', hep: 'de·gu·chi wa do·chi·ra de·su ka', en: 'Which way is the exit?' },
-          { jp: 'どっちが大きいですか？', hep: 'dot·chi ga oo·kii de·su ka', en: 'Which one is bigger?' },
-        ]} />
-      <AccordionRow id="なぜ / どうして" jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?"
-        openSet={openSet} toggle={toggle} items={[
-          { jp: 'どうして閉まっていますか？', hep: 'dou·shi·te shi·mat·te i·ma·su ka', en: 'Why is it closed?' },
-          { jp: 'どうしてだめですか？', hep: 'dou·shi·te da·me de·su ka', en: 'Why is it not allowed?' },
-        ]} />
+      {/* Rule card — Pattern 1 */}
+      {tab === 'thing' && (
+        <>
+          <div className="bg-slate-700/30 rounded-xl p-3">
+            <p className="text-base text-slate-400 mb-2 text-center">Pattern: asking about things / places / time</p>
+            <div className="flex items-center justify-center gap-1 flex-wrap">
+              <span className="bg-slate-600/50 text-slate-200 px-2 py-1 rounded text-base">○○</span>
+              <span className="text-slate-500 text-base">は</span>
+              <span className="bg-sakura-500/30 text-sakura-300 px-2 py-1 rounded text-base font-bold">Q word</span>
+              <span className="text-slate-500 text-base">ですか？</span>
+            </div>
+            <div className="mt-3 space-y-1">
+              <p className="text-base text-slate-300 text-center">トイレは <span className="text-sakura-300 font-medium">どこ</span> ですか？</p>
+              <p className="text-base text-sakura-300 text-center">toi·re wa <span className="font-medium">do·ko</span> de·su ka</p>
+              <p className="text-base text-slate-500 text-center">The toilet is <span className="text-sakura-300">where</span>?</p>
+            </div>
+          </div>
+
+          <AccordionHeader label="Question words" allOpen={acc.allOpen} toggleAll={acc.toggleAll} />
+
+          <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
+              { jp: '何がおすすめですか？', hep: 'na·ni ga o·su·su·me de·su ka', en: 'What do you recommend?' },
+              { jp: '何時ですか？', hep: 'nan·ji de·su ka', en: 'What time is it?' },
+            ]} />
+          <AccordionRow id="どこ" jp="どこ" rom="do·ko" meaning="Where?"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
+              { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
+              { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
+            ]} />
+          <AccordionRow id="いつ" jp="いつ" rom="i·tsu" meaning="When?"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'チェックアウトはいつですか？', hep: 'chek·ku au·to wa i·tsu de·su ka', en: 'When is checkout?' },
+              { jp: 'いつ開きますか？', hep: 'i·tsu a·ki·ma·su ka', en: 'When does it open?' },
+              { jp: 'いつ出発しますか？', hep: 'i·tsu shup·pa·tsu shi·ma·su ka', en: 'When does it depart?' },
+            ]} />
+          <AccordionRow id="いくら" jp="いくら" rom="i·ku·ra" meaning="How much? (price)"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much is it?' },
+              { jp: '全部でいくらですか？', hep: 'zen·bu de i·ku·ra de·su ka', en: 'How much in total?' },
+              { jp: '一泊いくらですか？', hep: 'ip·pa·ku i·ku·ra de·su ka', en: 'How much per night?' },
+            ]} />
+          <AccordionRow id="どれ" jp="どれ" rom="do·re" meaning="Which one? (of 3+)"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'どれがおすすめですか？', hep: 'do·re ga o·su·su·me de·su ka', en: 'Which do you recommend?' },
+              { jp: 'どれにしますか？', hep: 'do·re ni shi·ma·su ka', en: 'Which one will you have?' },
+            ]} />
+          <AccordionRow id="どっち / どちら" jp="どっち / どちら" rom="dot·chi / do·chi·ra" meaning="Which? (of 2) / Which way?"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'どちらがいいですか？', hep: 'do·chi·ra ga ii de·su ka', en: 'Which is better?' },
+              { jp: '出口はどちらですか？', hep: 'de·gu·chi wa do·chi·ra de·su ka', en: 'Which way is the exit?' },
+              { jp: 'どっちが大きいですか？', hep: 'dot·chi ga oo·kii de·su ka', en: 'Which one is bigger?' },
+            ]} />
+        </>
+      )}
+
+      {/* Rule card — Pattern 2 */}
+      {tab === 'action' && (
+        <>
+          <div className="bg-slate-700/30 rounded-xl p-3">
+            <p className="text-base text-slate-400 mb-2 text-center">Pattern: asking about actions / methods</p>
+            <div className="flex items-center justify-center gap-1 flex-wrap">
+              <span className="bg-sakura-500/30 text-sakura-300 px-2 py-1 rounded text-base font-bold">Q word</span>
+              <span className="text-slate-500 text-base">+</span>
+              <span className="bg-slate-600/50 text-slate-200 px-2 py-1 rounded text-base">verb</span>
+              <span className="text-slate-500 text-base">ますか？</span>
+            </div>
+            <div className="mt-3 space-y-1">
+              <p className="text-base text-slate-300 text-center"><span className="text-sakura-300 font-medium">どう</span> 行きますか？</p>
+              <p className="text-base text-sakura-300 text-center"><span className="font-medium">dou</span> i·ki·ma·su ka</p>
+              <p className="text-base text-slate-500 text-center"><span className="text-sakura-300">How</span> do I get there?</p>
+            </div>
+          </div>
+
+          <AccordionHeader label="Question words" allOpen={acc.allOpen} toggleAll={acc.toggleAll} />
+
+          <AccordionRow id="どう" jp="どう" rom="dou" meaning="How? (method/manner)"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'どう行きますか？', hep: 'dou i·ki·ma·su ka', en: 'How do I get there?' },
+              { jp: 'これはどう使いますか？', hep: 'ko·re wa dou tsu·kai·ma·su ka', en: 'How do I use this?' },
+              { jp: 'どうですか？', hep: 'dou de·su ka', en: 'How is it? / What do you think?' },
+            ]} />
+          <AccordionRow id="だれ" jp="だれ" rom="da·re" meaning="Who?"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'だれに聞けばいいですか？', hep: 'da·re ni ki·ke·ba ii de·su ka', en: 'Who should I ask?' },
+              { jp: 'だれが案内してくれますか？', hep: 'da·re ga an·nai shi·te ku·re·ma·su ka', en: 'Who will guide us?' },
+            ]} />
+          <AccordionRow id="なぜ / どうして" jp="なぜ / どうして" rom="na·ze / dou·shi·te" meaning="Why?"
+            openSet={acc.openSet} toggle={acc.toggle} items={[
+              { jp: 'どうして閉まっていますか？', hep: 'dou·shi·te shi·mat·te i·ma·su ka', en: 'Why is it closed?' },
+              { jp: 'どうしてだめですか？', hep: 'dou·shi·te da·me de·su ka', en: 'Why is it not allowed?' },
+            ]} />
+        </>
+      )}
     </div>
   );
 }
