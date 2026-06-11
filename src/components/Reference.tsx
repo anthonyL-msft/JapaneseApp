@@ -1051,6 +1051,17 @@ function WHQuestionsRef() {
               { jp: '出口はどちらですか？', hep: 'de·gu·chi wa do·chi·ra de·su ka', en: 'Which way is the exit?' },
               { jp: 'どっちが大きいですか？', hep: 'dot·chi ga oo·kii de·su ka', en: 'Which one is bigger?' },
             ]} />
+
+          <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-3 mt-1">
+            <p className="text-base text-indigo-300 font-medium">💡 Casual shortcut</p>
+            <p className="text-base text-slate-400 mt-1">In shops or casual situations, you can just say the question word alone — no ですか needed:</p>
+            <div className="mt-2 space-y-1">
+              <p className="text-base text-slate-300">いくら？ <span className="text-slate-500">— How much? (pointing at item)</span></p>
+              <p className="text-base text-slate-300">どれ？ <span className="text-slate-500">— Which one? (choosing)</span></p>
+              <p className="text-base text-slate-300">いつ？ <span className="text-slate-500">— When? (quick follow-up)</span></p>
+              <p className="text-base text-slate-300">なに？ <span className="text-slate-500">— What? (surprised reaction)</span></p>
+            </div>
+          </div>
         </>
       )}
 
