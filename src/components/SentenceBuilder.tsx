@@ -69,8 +69,13 @@ const PATTERNS: Pattern[] = [
   },
   {
     id: 'temo', group: 'request', template: '○○してもいいですか？', templateRom: '○○ shi·te mo ii de·su ka',
-    meaning: 'May I ○○?', slotType: 'action', slotLabel: 'What do you want to do?',
+    meaning: 'May I ○○? (permission)', slotType: 'action', slotLabel: 'What do you want to do?',
     build: (v) => ({ jp: `${v.jp}してもいいですか？`, rom: `${v.rom} shi·te mo ii de·su ka`, en: `May I ${v.en.toLowerCase()}?` }),
+  },
+  {
+    id: 'dekimasu', group: 'question', template: '○○できますか？', templateRom: '○○ de·ki·ma·su ka',
+    meaning: 'Can I ○○? (possible?)', slotType: 'action', slotLabel: 'What do you want to do?',
+    build: (v) => ({ jp: `${v.jp}できますか？`, rom: `${v.rom} de·ki·ma·su ka`, en: `Can I ${v.en.toLowerCase()}?` }),
   },
   {
     id: 'count', group: 'request', template: '○○を△△お願いします', templateRom: '○○ wo △△ o·ne·gai·shi·ma·su',
@@ -160,8 +165,12 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: 'ここに座って', rom: 'ko·ko ni su·wat·te', en: 'Sit here' },
     { jp: 'カードで払って', rom: 'kaa·do de ha·rat·te', en: 'Pay by card' },
     { jp: '荷物を預けて', rom: 'ni·mo·tsu wo a·zu·ke·te', en: 'Leave luggage' },
-    { jp: '録音', rom: 'ro·ku·on', en: 'Record' },
+    { jp: 'キャンセル', rom: 'kyan·se·ru', en: 'Cancel' },
+    { jp: '予約', rom: 'yo·ya·ku', en: 'Reserve / book' },
+    { jp: '変更', rom: 'hen·kou', en: 'Change' },
+    { jp: '返品', rom: 'hen·pin', en: 'Return (item)' },
     { jp: 'Wi-Fiを使って', rom: 'wai·fai wo tsu·kat·te', en: 'Use Wi-Fi' },
+    { jp: '充電', rom: 'juu·den', en: 'Charge (phone)' },
   ],
 };
 
