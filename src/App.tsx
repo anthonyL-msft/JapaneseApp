@@ -10,6 +10,7 @@ import { Reference } from './components/Reference';
 import { Scenarios } from './components/Scenarios';
 import { AskAI } from './components/AskAI';
 import { SentenceBuilder } from './components/SentenceBuilder';
+import { QuickNote } from './components/QuickNote';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
@@ -123,10 +124,7 @@ function App() {
         onOpenCards={() => setTab('cards')}
         onOpenConverter={() => { setTab('reference'); }}
         onOpenBuilder={() => setTab('builder')}
-        onAddNote={(text) => {
-          const now = Date.now();
-          handleSaveNote({ id: `sn_${now}`, text, createdAt: now, updatedAt: now });
-        }}
+        onOpenNotes={() => setTab('notes')}
       />
 
       {/* Main Content */}
@@ -165,6 +163,7 @@ function App() {
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
         {tab === 'builder' && <SentenceBuilder />}
+        {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
       </div>
 
       {/* Bottom Navigation */}

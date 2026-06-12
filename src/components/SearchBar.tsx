@@ -10,7 +10,7 @@ interface Props {
   onOpenCards: () => void;
   onOpenConverter: () => void;
   onOpenBuilder: () => void;
-  onAddNote: (text: string) => void;
+  onOpenNotes: () => void;
 }
 
 const SPEED_LABELS: Record<string, string> = {
@@ -21,13 +21,12 @@ const SPEED_LABELS: Record<string, string> = {
   '1': 'Native',
 };
 
-export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter, onOpenBuilder, onAddNote }: Props) {
+export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter, onOpenBuilder, onOpenNotes }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
   const [rate, setRate] = useState(getTtsRate);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [noteText, setNoteText] = useState('');
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -168,28 +167,16 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
                     <p className="text-sm text-slate-500">Pick a pattern, fill the blank</p>
                   </div>
                 </button>
-              </div>
-
-              {/* Quick Note */}
-              <div className="px-4 py-3 border-b border-slate-800/50">
-                <p className="text-sm text-slate-500 mb-2">Quick Note</p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={noteText}
-                    onChange={e => setNoteText(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter' && noteText.trim()) { onAddNote(noteText.trim()); setNoteText(''); } }}
-                    placeholder="WiFi password, restaurant name..."
-                    className="flex-1 bg-slate-700/50 text-base text-slate-200 placeholder-slate-500 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-sakura-400/50"
-                  />
-                  <button
-                    onClick={() => { if (noteText.trim()) { onAddNote(noteText.trim()); setNoteText(''); } }}
-                    disabled={!noteText.trim()}
-                    className="bg-sakura-500/80 text-white text-base px-3 py-2 rounded-lg disabled:opacity-30 active:bg-sakura-600 transition shrink-0"
-                  >
-                    Add
-                  </button>
-                </div>
+                <button
+                  onClick={() => { closeDrawer(); onOpenNotes(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">📝</span>
+                  <div>
+                    <p className="text-base text-slate-200">Quick Note</p>
+                    <p className="text-sm text-slate-500">WiFi passwords, names, reminders</p>
+                  </div>
+                </button>
               </div>
 
               {/* Settings */}
