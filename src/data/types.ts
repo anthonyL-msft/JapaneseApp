@@ -39,7 +39,8 @@ export type Category =
   | 'directions'
   | 'emergency'
   | 'smalltalk'
-  | 'culture';
+  | 'culture'
+  | 'local';
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; labelTC: string }> = {
   greetings:  { label: 'Greetings',              emoji: '👋', labelTC: '問候用語' },
@@ -52,6 +53,7 @@ export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; lab
   emergency:  { label: 'Emergency & Health',      emoji: '🚑', labelTC: '緊急與醫療' },
   smalltalk:  { label: 'Small Talk & Politeness', emoji: '💬', labelTC: '閒聊與禮貌' },
   culture:    { label: 'Culture Tips',            emoji: '⛩️', labelTC: '文化禮儀' },
+  local:      { label: 'Local Specials',          emoji: '📍', labelTC: '當地特色' },
 };
 
 export interface UserNote {
