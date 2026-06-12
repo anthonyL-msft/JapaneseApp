@@ -211,7 +211,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
         return (
           <div className={`absolute inset-0 bg-slate-950 ${groupPanel.animClass} flex flex-col z-40`}>
             <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
-              <button onClick={() => groupPanel.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
+              <button onClick={() => groupPanel.close()} className="text-lg text-slate-400 active:text-slate-200 p-1">
                 ←
               </button>
               <h2 className="text-lg font-bold flex-1">{groupInfo.emoji} {groupInfo.label}</h2>

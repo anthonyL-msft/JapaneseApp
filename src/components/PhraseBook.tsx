@@ -108,25 +108,17 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
       {/* L2: Full-page slide-in for selected category */}
       {panel.visible && info && (
         <div className={`absolute inset-0 bg-slate-950 ${panel.animClass} flex flex-col z-40`}>
-          <div className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800 shrink-0">
-            <div className="flex items-start justify-between">
-              <div>
-                <button
-                  onClick={() => { panel.close(); }}
-                  className="text-base text-slate-400 active:text-slate-200 p-1"
-                >
-                  ←
-                </button>
-                <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
-                <p className="text-base text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
-              </div>
-              <button
-                onClick={toggleAll}
-                className="mt-5 text-base bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
-              >
-                {allOpen ? '▲ Close All' : '▼ Open All'}
-              </button>
-            </div>
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
+            <button onClick={() => panel.close()} className="text-lg text-slate-400 active:text-slate-200 p-1">
+              ←
+            </button>
+            <h2 className="text-lg font-bold flex-1">{info.emoji} {info.label}</h2>
+            <button
+              onClick={toggleAll}
+              className="text-base bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
+            >
+              {allOpen ? '▲ Close All' : '▼ Open All'}
+            </button>
           </div>
 
           <div className="scroll-area flex-1 px-2 py-2 space-y-1.5">
