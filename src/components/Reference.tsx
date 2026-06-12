@@ -687,7 +687,6 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
                   <div className="flex-1 min-w-0">
                     <p className="text-lg font-medium text-slate-50">{ex.jp}</p>
                     <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
-                    <p className="text-base text-slate-400 mt-0.5">{ex.en}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
@@ -698,16 +697,17 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
                     )}
                   </div>
                 </div>
-                {onToggleLearned && (
-                  <div className="flex justify-end mt-1">
+                <div className="flex items-center justify-between mt-0.5">
+                  <p className="text-base text-slate-400 flex-1">{ex.en}</p>
+                  {onToggleLearned && (
                     <button
                       onClick={() => onToggleLearned(learnId)}
-                      className={`text-sm px-2.5 py-0.5 rounded-full transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
+                      className={`text-sm px-2 py-0.5 rounded-full transition shrink-0 ml-2 ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
                     >
                       {isLearned ? 'Learned ✓' : 'Mark learned'}
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             );
           })}

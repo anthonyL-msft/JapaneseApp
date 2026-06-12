@@ -53,7 +53,6 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
           <div className="flex-1 min-w-0">
             <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
-            <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
@@ -64,16 +63,17 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
             </button>
           </div>
         </div>
-        {onToggleLearned && (
-          <div className="flex justify-end mt-1">
+        <div className="flex items-center justify-between">
+          <p className="text-base text-slate-400 flex-1">{phrase.english}</p>
+          {onToggleLearned && (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleLearned(); }}
-              className={`text-sm px-2.5 py-0.5 rounded-full transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
+              className={`text-sm px-2 py-0.5 rounded-full transition shrink-0 ml-2 ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
             >
               {isLearned ? 'Learned ✓' : 'Mark learned'}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Expanded details */}
