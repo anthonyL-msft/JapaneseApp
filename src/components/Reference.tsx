@@ -30,7 +30,7 @@ type DrawerData = {
   items: { jp: string; hep: string; en: string }[];
 } | null;
 
-function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
+function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedIds, onToggleLearned }: { data: DrawerData; onClose: () => void; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void; learnedIds?: Set<string>; onToggleLearned?: (id: string) => void }) {
   const [closing, setClosing] = useState(false);
   useEffect(() => {
     if (data) {
@@ -68,18 +68,41 @@ function Drawer({ data, onClose }: { data: DrawerData; onClose: () => void }) {
           {data.subtitle && <p className="text-base text-slate-400 mt-0.5">{data.subtitle}</p>}
         </div>
         <div className="overflow-y-auto p-4 space-y-2">
-          {data.items.map((ex, i) => (
-            <div key={i} className="bg-slate-700/30 rounded-lg p-3">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-base text-slate-200">{ex.jp}</p>
-                  <p className="text-base text-sakura-300">{ex.hep}</p>
+          {data.items.map((ex, i) => {
+            const bmId = `ref_${ex.jp}`;
+            const isBm = refBookmarkedIds?.has(bmId);
+            const learnId = `ref_${ex.jp}`;
+            const isLearned = learnedIds?.has(learnId);
+            return (
+              <div key={i} className="bg-slate-700/40 rounded-xl p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-medium text-slate-50">{ex.jp}</p>
+                    <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                    {onToggleRefBookmark && (
+                      <button onClick={() => onToggleRefBookmark({ ...ex, section: data.title })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                        {isBm ? '⭐' : '☆'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <button onClick={() => speak(ex.jp, 'ja-JP')} className="text-lg active:scale-110 shrink-0 p-1">🔊</button>
+                <div className="flex items-center justify-between mt-0.5">
+                  <p className="text-base text-slate-400 flex-1">{ex.en}</p>
+                  {onToggleLearned && (
+                    <button
+                      onClick={() => onToggleLearned(learnId)}
+                      className={`text-sm px-2 py-0.5 rounded-full transition shrink-0 ml-2 ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
+                    >
+                      {isLearned ? 'Learned ✓' : 'Mark learned'}
+                    </button>
+                  )}
+                </div>
               </div>
-              <p className="text-base text-slate-400 mt-1">{ex.en}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -176,7 +199,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
       )}
 
       {/* L3: Drawer for examples */}
-      <Drawer data={drawer} onClose={closeDrawer} />
+      <Drawer data={drawer} onClose={closeDrawer} refBookmarkedIds={refBookmarkedIds} onToggleRefBookmark={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />
     </div>
   );
 }
