@@ -174,7 +174,7 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
                   <span className="text-lg">📝</span>
                   <div>
                     <p className="text-base text-slate-200">Quick Note</p>
-                    <p className="text-sm text-slate-500">WiFi passwords, names, reminders</p>
+                    <p className="text-sm text-slate-500">Jot down anything</p>
                   </div>
                 </button>
               </div>
