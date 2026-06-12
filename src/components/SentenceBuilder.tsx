@@ -248,9 +248,9 @@ export function SentenceBuilder() {
     : [];
 
   return (
-    <div className="scroll-area h-full">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
         <button onClick={handleBack} className="text-lg text-slate-400 active:text-slate-200 p-1">←</button>
         <div className="flex-1">
           <h2 className="text-lg font-bold">{selectedPattern.template}</h2>
@@ -258,33 +258,33 @@ export function SentenceBuilder() {
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        {/* Result */}
-        {result && (
-          <div className="bg-slate-700/40 rounded-xl p-4">
+      {/* Sticky result card */}
+      <div className="px-4 py-3 border-b border-slate-800 shrink-0 bg-slate-950">
+        {result ? (
+          <div className="bg-slate-700/40 rounded-xl p-3">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
-                <p className="text-2xl font-bold text-slate-50">{result.jp}</p>
-                <p className="text-lg text-sakura-300 mt-1">{result.rom}</p>
-                <p className="text-base text-slate-400 mt-1">{result.en}</p>
+                <p className="text-xl font-bold text-slate-50">{result.jp}</p>
+                <p className="text-base text-sakura-300 mt-0.5">{result.rom}</p>
+                <p className="text-base text-slate-400 mt-0.5">{result.en}</p>
               </div>
-              <button onClick={() => speak(result.jp, 'ja-JP')} className="text-2xl p-1 active:scale-110 transition-transform shrink-0">🔊</button>
-            </div>
-            <div className="flex gap-2 mt-3">
-              <button onClick={() => speak(result.jp, 'ja-JP')} className="flex-1 bg-slate-600/40 text-slate-300 text-base py-2 rounded-lg active:bg-slate-600 transition">
-                🔊 Play Again
-              </button>
-              <button onClick={handleCopy} className="flex-1 bg-slate-600/40 text-slate-300 text-base py-2 rounded-lg active:bg-slate-600 transition">
-                {copied ? '✓ Copied' : '📋 Copy'}
-              </button>
+              <div className="flex items-center gap-1 shrink-0">
+                <button onClick={() => speak(result.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                <button onClick={handleCopy} className="p-1 rounded-lg active:bg-slate-600 text-base">
+                  {copied ? '✓' : '📋'}
+                </button>
+              </div>
             </div>
           </div>
+        ) : (
+          <div className="bg-slate-800/40 rounded-xl p-3 border border-dashed border-slate-700">
+            <p className="text-base text-slate-500 text-center">{selectedPattern.slotLabel}</p>
+          </div>
         )}
+      </div>
 
-        {/* Slot label */}
-        <p className="text-base text-slate-500">{selectedPattern.slotLabel}</p>
-
-        {/* Primary vocab chips */}
+      {/* Scrollable vocab chips */}
+      <div className="scroll-area flex-1 p-4 space-y-4">
         <div>
           <p className="text-sm text-slate-500 mb-2">{SLOT_LABELS[selectedPattern.slotType]}</p>
           <div className="flex flex-wrap gap-1.5">
