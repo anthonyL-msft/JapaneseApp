@@ -12,12 +12,11 @@ import { AskAI } from './components/AskAI';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'phrases', label: 'Phrases', icon: '📖' },
-  { id: 'scenes', label: 'Scenes', icon: '🎭' },
-  { id: 'cards', label: 'Cards', icon: '🃏' },
-  { id: 'ai', label: 'Ask AI', icon: '🤖' },
-  { id: 'bookmarks', label: 'My Stuff', icon: '📌' },
+  { id: 'phrases', label: 'Learn', icon: '📖' },
   { id: 'reference', label: 'Ref', icon: '📚' },
+  { id: 'scenes', label: 'Scenes', icon: '🎭' },
+  { id: 'ai', label: 'AI', icon: '🤖' },
+  { id: 'bookmarks', label: 'Mine', icon: '📌' },
 ];
 
 function App() {
@@ -115,7 +114,14 @@ function App() {
   return (
     <div className="flex flex-col h-full">
       {/* Search Bar */}
-      <SearchBar value={search} onChange={setSearch} lang={lang} onLangChange={setLang} />
+      <SearchBar
+        value={search}
+        onChange={setSearch}
+        lang={lang}
+        onLangChange={setLang}
+        onOpenCards={() => setTab('cards')}
+        onOpenConverter={() => { setTab('reference'); /* converter opened via ref */ }}
+      />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
