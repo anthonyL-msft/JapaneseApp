@@ -105,10 +105,10 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
             {/* Header */}
             <div className="px-4 py-4 border-b border-slate-800">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-100">🇯🇵 にほんご</h2>
+                <h2 className="text-lg font-bold text-slate-100">{currentLang.flag} {currentLang.nameNative}</h2>
                 <button onClick={closeDrawer} className="text-xl text-slate-400 p-1">✕</button>
               </div>
-              <p className="text-sm text-slate-500 mt-0.5">Japanese Travel Companion</p>
+              <p className="text-sm text-slate-500 mt-0.5">Travel Language Companion</p>
             </div>
 
             {/* Menu items */}
@@ -185,7 +185,7 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
 
             {/* Footer */}
             <div className="px-4 py-3 border-t border-slate-800 text-center">
-              <p className="text-sm text-slate-600">Nagoya → Tokyo · Dec 2026</p>
+              <p className="text-sm text-slate-600">Made with ❤️ by Anthony</p>
             </div>
           </div>
         </div>
