@@ -2,7 +2,6 @@
 
 An offline-first PWA for learning and using foreign languages while traveling. Built for real-world situations — ordering food, asking directions, taking trains, checking into hotels.
 
-**Live:** [anthonyl-msft.github.io/JapaneseApp](https://anthonyl-msft.github.io/JapaneseApp/)
 
 ## Features
 
