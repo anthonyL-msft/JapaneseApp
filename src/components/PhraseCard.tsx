@@ -62,16 +62,18 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
             <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
               {isBookmarked ? '⭐' : '☆'}
             </button>
-            {onToggleLearned && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onToggleLearned(); }}
-                className={`px-2 py-0.5 rounded-full text-sm transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
-              >
-                {isLearned ? '✓' : '···'}
-              </button>
-            )}
           </div>
         </div>
+        {onToggleLearned && (
+          <div className="flex justify-end mt-1">
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleLearned(); }}
+              className={`text-sm px-2.5 py-0.5 rounded-full transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
+            >
+              {isLearned ? 'Learned ✓' : 'Mark learned'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Expanded details */}
