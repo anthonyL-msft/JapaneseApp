@@ -61,7 +61,7 @@ export const scenarios: Scenario[] = [
   // === SC30: Airport Arrival ===
   {
     id: 'sc30', lang: 'ja', group: 'airport',
-    title: 'Airport Arrival', titleTC: '機場入境',
+    title: 'Passport & Immigration', titleTC: '機場入境',
     emoji: '🛬', description: 'Immigration, customs, and finding transport to the city',
     lines: [
       { speaker: 'staff', target: 'パスポートをお見せください', pronunciation: 'pasupooto wo omise kudasai', pronunciation_chunks: 'pa·su·poo·to wo o·mi·se ku·da·sai', english: 'Please show your passport.', chinese_tc: '請出示護照' },
@@ -91,7 +91,7 @@ export const scenarios: Scenario[] = [
   // === SC29: IC Card Purchase ===
   {
     id: 'sc29', lang: 'ja', group: 'airport',
-    title: 'Buying an IC Card', titleTC: '購買IC卡',
+    title: 'IC Card at the Machine', titleTC: '購買IC卡',
     emoji: '💳', description: 'At the station ticket machine, buying and charging a Suica/Manaca',
     lines: [
       { speaker: 'you', target: 'すみません、ICカードはどこで買えますか？', pronunciation: 'sumimasen, ai-shii kaado wa doko de kaemasu ka', pronunciation_chunks: 'su·mi·ma·sen ai·shii kaa·do wa do·ko de ka·e·ma·su ka', english: 'Excuse me, where can I buy an IC card?', chinese_tc: '請問哪裡可以買IC卡？' },
@@ -107,7 +107,7 @@ export const scenarios: Scenario[] = [
     id: 'sc08',
     lang: 'ja',
     group: 'train',
-    title: 'Buying Train Tickets',
+    title: 'Ticket Counter',
     titleTC: '買車票',
     emoji: '🚃',
     description: 'At the ticket counter for Shinkansen',
@@ -142,7 +142,7 @@ export const scenarios: Scenario[] = [
     id: 'sc21',
     lang: 'ja',
     group: 'train',
-    title: 'Nagoya to Tokyo Shinkansen',
+    title: 'Booking Shinkansen',
     titleTC: '名古屋到東京新幹線',
     emoji: '🚅',
     description: 'Buying Nagoya→Tokyo Nozomi tickets at the counter',
@@ -171,7 +171,7 @@ export const scenarios: Scenario[] = [
     id: 'sc27',
     lang: 'ja',
     group: 'train',
-    title: 'Train Ticket Gate Problem',
+    title: 'Gate Won\'t Open',
     titleTC: '車票閘門故障',
     emoji: '🚧',
     description: 'Your multi-day pass won\'t scan — asking station staff for help',
@@ -195,7 +195,7 @@ export const scenarios: Scenario[] = [
   // === SC32: Getting Lost on Train ===
   {
     id: 'sc32', lang: 'ja', group: 'train',
-    title: 'Wrong Train / Lost', titleTC: '搭錯車',
+    title: 'Wrong Train — What Now?', titleTC: '搭錯車',
     emoji: '😰', description: 'Realizing you\'re on the wrong train and asking for help',
     lines: [
       { speaker: 'you', target: 'すみません、この電車は東京駅に行きますか？', pronunciation: 'sumimasen, kono densha wa toukyou eki ni ikimasu ka', pronunciation_chunks: 'su·mi·ma·sen ko·no den·sha wa tou·kyou e·ki ni i·ki·ma·su ka', english: 'Excuse me, does this train go to Tokyo Station?', chinese_tc: '請問這班電車有到東京站嗎？' },
@@ -209,7 +209,7 @@ export const scenarios: Scenario[] = [
   // === SC43: Taking a Bus ===
   {
     id: 'sc43', lang: 'ja', group: 'transit',
-    title: 'Taking a Bus', titleTC: '搭公車',
+    title: 'Bus Stop & Riding', titleTC: '搭公車',
     emoji: '🚌', description: 'Finding the bus stop, asking about routes and schedules',
     lines: [
       { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？' },
@@ -226,7 +226,7 @@ export const scenarios: Scenario[] = [
     id: 'sc09',
     lang: 'ja',
     group: 'transit',
-    title: 'Asking for Directions',
+    title: '"How Do I Get To...?"',
     titleTC: '問路',
     emoji: '🗺️',
     description: 'You\'re lost, asking a local',
@@ -255,7 +255,7 @@ export const scenarios: Scenario[] = [
     id: 'sc07',
     lang: 'ja',
     group: 'transit',
-    title: 'Taking a Taxi',
+    title: 'Taxi to Your Destination',
     titleTC: '搭計程車',
     emoji: '🚕',
     description: 'Telling driver your destination',
@@ -300,7 +300,7 @@ export const scenarios: Scenario[] = [
   // === SC39: Hotel — Borrowing Items & Services ===
   {
     id: 'sc39', lang: 'ja', group: 'hotel',
-    title: 'Hotel Requests', titleTC: '飯店需求',
+    title: 'Room Service & Requests', titleTC: '飯店需求',
     emoji: '🛎️', description: 'Borrowing items, breakfast, late checkout, sending luggage',
     lines: [
       { speaker: 'you', target: '充電器を貸していただけますか？', pronunciation: 'juudenki wo kashite itadakemasu ka', pronunciation_chunks: 'juu·den·ki wo ka·shi·te i·ta·da·ke·ma·su ka', english: 'Could I borrow a charger?', chinese_tc: '可以借充電器嗎？', note: 'Hotels often lend: chargers, umbrellas (傘), adapters (変換プラグ), hair dryers (ドライヤー)' },
@@ -416,7 +416,7 @@ export const scenarios: Scenario[] = [
     id: 'sc01',
     lang: 'ja',
     group: 'restaurant',
-    title: 'Entering a Restaurant',
+    title: 'Walk-in (No Reservation)',
     titleTC: '進入餐廳',
     emoji: '🚪',
     description: 'Walking in, getting seated (2 people)',
@@ -435,7 +435,7 @@ export const scenarios: Scenario[] = [
     id: 'sc02',
     lang: 'ja',
     group: 'restaurant',
-    title: 'Entering with Reservation',
+    title: 'Arriving with Reservation',
     titleTC: '有預約進入餐廳',
     emoji: '📋',
     description: 'You booked a table for 6pm',
@@ -459,7 +459,7 @@ export const scenarios: Scenario[] = [
     id: 'sc03',
     lang: 'ja',
     group: 'restaurant',
-    title: 'Ordering Food',
+    title: 'Ordering from the Menu',
     titleTC: '點餐',
     emoji: '📝',
     description: 'The waiter comes, you order for two',
@@ -476,7 +476,7 @@ export const scenarios: Scenario[] = [
   // === SC45: Ordering a Set Meal ===
   {
     id: 'sc45', lang: 'ja', group: 'restaurant',
-    title: 'Ordering a Set Meal', titleTC: '點套餐/定食',
+    title: 'Set Meal & Upgrades', titleTC: '點套餐/定食',
     emoji: '🍱', description: 'Set meal options, upgrades, rice size, soup swap',
     lines: [
       { speaker: 'staff', target: '定食になさいますか？単品になさいますか？', pronunciation: 'teishoku ni nasaimasu ka? tanpin ni nasaimasu ka?', pronunciation_chunks: 'tei·sho·ku ni na·sai·ma·su ka tan·pin ni na·sai·ma·su ka', english: 'Would you like a set meal or à la carte?', chinese_tc: '要套餐還是單點？', note: '定食 (teishoku) = set meal with rice, soup, side dishes. 単品 (tanpin) = just the main dish.' },
@@ -493,7 +493,7 @@ export const scenarios: Scenario[] = [
     id: 'sc28',
     lang: 'ja',
     group: 'restaurant',
-    title: 'Politely Declining & Correcting',
+    title: 'Wrong Order & Declining',
     titleTC: '禮貌拒絕與更正',
     emoji: '🙅',
     description: 'Saying no, correcting a wrong order, declining offers politely',
@@ -677,7 +677,7 @@ export const scenarios: Scenario[] = [
     id: 'sc10',
     lang: 'ja',
     group: 'shopping',
-    title: 'Shopping — Tax Free',
+    title: 'Tax-Free Shopping',
     titleTC: '免稅購物',
     emoji: '🛍️',
     description: 'Buying souvenirs with tax-free',
@@ -723,7 +723,7 @@ export const scenarios: Scenario[] = [
     id: 'sc05',
     lang: 'ja',
     group: 'daily',
-    title: 'Convenience Store',
+    title: 'First Time at Konbini',
     titleTC: '便利商店',
     emoji: '🏪',
     description: 'Buying at 7-Eleven, Lawson, or FamilyMart',
@@ -753,7 +753,7 @@ export const scenarios: Scenario[] = [
   // === SC34: Convenience Store Detailed ===
   {
     id: 'sc34', lang: 'ja', group: 'daily',
-    title: 'Convenience Store Checkout', titleTC: '便利店結帳',
+    title: 'Konbini Checkout Flow', titleTC: '便利店結帳',
     emoji: '🏪', description: 'Full checkout flow — heating, bags, payment, eating in',
     lines: [
       { speaker: 'staff', target: 'いらっしゃいませ', pronunciation: 'irasshaimase', pronunciation_chunks: 'i·ras·shai·ma·se', english: 'Welcome!', chinese_tc: '歡迎光臨' },
@@ -769,7 +769,7 @@ export const scenarios: Scenario[] = [
   // === SC37: ATM / Money ===
   {
     id: 'sc37', lang: 'ja', group: 'daily',
-    title: 'Convenience Store ATM', titleTC: '便利店ATM',
+    title: 'Withdrawing Cash (ATM)', titleTC: '便利店ATM',
     emoji: '🏧', description: 'Withdrawing money from a convenience store ATM',
     lines: [
       { speaker: 'you', target: 'ATMはどこですか？', pronunciation: 'ee-tii-emu wa doko desu ka', pronunciation_chunks: 'ee·tii·e·mu wa do·ko de·su ka', english: 'Where is the ATM?', chinese_tc: 'ATM在哪裡？' },
@@ -782,7 +782,7 @@ export const scenarios: Scenario[] = [
   // === SC38: Vending Machine ===
   {
     id: 'sc38', lang: 'ja', group: 'daily',
-    title: 'Vending Machine', titleTC: '自動販賣機',
+    title: 'Hot & Cold Drinks Machine', titleTC: '自動販賣機',
     emoji: '🥤', description: 'Using Japan\'s famous vending machines',
     lines: [
       { speaker: 'you', target: 'この自動販売機、ICカードは使えますか？', pronunciation: 'kono jidou hanbaiki, ai-shii kaado wa tsukaemasu ka', pronunciation_chunks: 'ko·no ji·dou han·bai·ki ai·shii kaa·do wa tsu·ka·e·ma·su ka', english: 'Can I use an IC card on this vending machine?', chinese_tc: '這台自動販賣機可以用IC卡嗎？', note: 'Look for the IC card symbol. Tap your Suica/Manaca on the reader, then press your drink.' },
@@ -973,7 +973,7 @@ export const scenarios: Scenario[] = [
     id: 'sc19',
     lang: 'ja',
     group: 'trouble',
-    title: 'At the Pharmacy',
+    title: 'Buying Medicine',
     titleTC: '藥局',
     emoji: '💊',
     description: 'Buying medicine for common travel ailments',
@@ -1003,7 +1003,7 @@ export const scenarios: Scenario[] = [
   // === SC31: Feeling Sick / Medical ===
   {
     id: 'sc31', lang: 'ja', group: 'trouble',
-    title: 'Feeling Sick', titleTC: '身體不舒服',
+    title: 'I\'m Not Feeling Well', titleTC: '身體不舒服',
     emoji: '🤒', description: 'Telling hotel staff or a pharmacist about symptoms',
     lines: [
       { speaker: 'you', target: 'すみません、体調が悪いです', pronunciation: 'sumimasen, taichou ga warui desu', pronunciation_chunks: 'su·mi·ma·sen tai·chou ga wa·rui de·su', english: 'Excuse me, I\'m not feeling well.', chinese_tc: '不好意思，我身體不舒服' },
