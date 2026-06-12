@@ -350,13 +350,12 @@ function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
         </button>
       </div>
 
-      {/* Voiced toggle banner */}
-      <div className="flex items-center justify-between bg-slate-700/30 rounded-lg px-3 py-2 mb-2">
-        <div className="flex-1">
-          <p className="text-base text-slate-400">Voiced ゛゜</p>
-          {showVoiced && (
-            <p className="text-sm text-indigo-300 mt-0.5">か→が　さ→ざ　た→だ　は→ば/ぱ</p>
-          )}
+      {/* Voiced toggle banner — fixed height */}
+      <div className="flex items-center justify-between bg-slate-700/30 rounded-lg px-3 mb-2 h-12">
+        <div className="flex-1 min-w-0">
+          <p className={`text-base transition-colors ${showVoiced ? 'text-indigo-300' : 'text-slate-400'}`}>
+            {showVoiced ? 'か→が　さ→ざ　た→だ　は→ば/ぱ' : 'Voiced ゛゜'}
+          </p>
         </div>
         <button
           onClick={() => setShowVoiced(!showVoiced)}
