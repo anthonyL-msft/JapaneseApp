@@ -4,6 +4,7 @@ import { speak } from '../utils/tts';
 // === Pattern Templates ===
 interface Pattern {
   id: string;
+  group: 'request' | 'question' | 'want';
   template: string;
   templateRom: string;
   meaning: string;
@@ -22,57 +23,57 @@ interface Vocab {
 
 const PATTERNS: Pattern[] = [
   {
-    id: 'onegai', template: '○○をお願いします', templateRom: '○○ wo o·ne·gai·shi·ma·su',
+    id: 'onegai', group: 'request', template: '○○をお願いします', templateRom: '○○ wo o·ne·gai·shi·ma·su',
     meaning: '○○ please', slotType: 'noun', slotLabel: 'What do you want?',
     build: (v) => ({ jp: `${v.jp}をお願いします`, rom: `${v.rom} wo o·ne·gai·shi·ma·su`, en: `${v.en} please` }),
   },
   {
-    id: 'doko', template: '○○はどこですか？', templateRom: '○○ wa do·ko de·su ka',
+    id: 'doko', group: 'question', template: '○○はどこですか？', templateRom: '○○ wa do·ko de·su ka',
     meaning: 'Where is ○○?', slotType: 'place', slotLabel: 'What are you looking for?',
     build: (v) => ({ jp: `${v.jp}はどこですか？`, rom: `${v.rom} wa do·ko de·su ka`, en: `Where is ${v.en.toLowerCase()}?` }),
   },
   {
-    id: 'arimasu', template: '○○はありますか？', templateRom: '○○ wa a·ri·ma·su ka',
+    id: 'arimasu', group: 'question', template: '○○はありますか？', templateRom: '○○ wa a·ri·ma·su ka',
     meaning: 'Do you have ○○?', slotType: 'noun', slotLabel: 'What are you asking for?',
     build: (v) => ({ jp: `${v.jp}はありますか？`, rom: `${v.rom} wa a·ri·ma·su ka`, en: `Do you have ${v.en.toLowerCase()}?` }),
   },
   {
-    id: 'kudasai', template: '○○をください', templateRom: '○○ wo ku·da·sai',
+    id: 'kudasai', group: 'request', template: '○○をください', templateRom: '○○ wo ku·da·sai',
     meaning: 'Give me ○○', slotType: 'noun', slotLabel: 'What do you want?',
     build: (v) => ({ jp: `${v.jp}をください`, rom: `${v.rom} wo ku·da·sai`, en: `${v.en} please (give me)` }),
   },
   {
-    id: 'ikitai', template: '○○に行きたいです', templateRom: '○○ ni i·ki·tai de·su',
+    id: 'ikitai', group: 'want', template: '○○に行きたいです', templateRom: '○○ ni i·ki·tai de·su',
     meaning: 'I want to go to ○○', slotType: 'place', slotLabel: 'Where do you want to go?',
     build: (v) => ({ jp: `${v.jp}に行きたいです`, rom: `${v.rom} ni i·ki·tai de·su`, en: `I want to go to ${v.en.toLowerCase()}` }),
   },
   {
-    id: 'hoshii', template: '○○がほしいです', templateRom: '○○ ga ho·shii de·su',
+    id: 'hoshii', group: 'want', template: '○○がほしいです', templateRom: '○○ ga ho·shii de·su',
     meaning: 'I want ○○', slotType: 'noun', slotLabel: 'What do you want?',
     build: (v) => ({ jp: `${v.jp}がほしいです`, rom: `${v.rom} ga ho·shii de·su`, en: `I want ${v.en.toLowerCase()}` }),
   },
   {
-    id: 'tabetai', template: '○○を食べたいです', templateRom: '○○ wo ta·be·tai de·su',
+    id: 'tabetai', group: 'want', template: '○○を食べたいです', templateRom: '○○ wo ta·be·tai de·su',
     meaning: 'I want to eat ○○', slotType: 'food', slotLabel: 'What do you want to eat?',
     build: (v) => ({ jp: `${v.jp}を食べたいです`, rom: `${v.rom} wo ta·be·tai de·su`, en: `I want to eat ${v.en.toLowerCase()}` }),
   },
   {
-    id: 'nomitai', template: '○○を飲みたいです', templateRom: '○○ wo no·mi·tai de·su',
+    id: 'nomitai', group: 'want', template: '○○を飲みたいです', templateRom: '○○ wo no·mi·tai de·su',
     meaning: 'I want to drink ○○', slotType: 'drink', slotLabel: 'What do you want to drink?',
     build: (v) => ({ jp: `${v.jp}を飲みたいです`, rom: `${v.rom} wo no·mi·tai de·su`, en: `I want to drink ${v.en.toLowerCase()}` }),
   },
   {
-    id: 'ikura', template: '○○はいくらですか？', templateRom: '○○ wa i·ku·ra de·su ka',
+    id: 'ikura', group: 'question', template: '○○はいくらですか？', templateRom: '○○ wa i·ku·ra de·su ka',
     meaning: 'How much is ○○?', slotType: 'noun', slotLabel: 'What are you asking about?',
     build: (v) => ({ jp: `${v.jp}はいくらですか？`, rom: `${v.rom} wa i·ku·ra de·su ka`, en: `How much is ${v.en.toLowerCase()}?` }),
   },
   {
-    id: 'temo', template: '○○してもいいですか？', templateRom: '○○ shi·te mo ii de·su ka',
+    id: 'temo', group: 'request', template: '○○してもいいですか？', templateRom: '○○ shi·te mo ii de·su ka',
     meaning: 'May I ○○?', slotType: 'action', slotLabel: 'What do you want to do?',
     build: (v) => ({ jp: `${v.jp}してもいいですか？`, rom: `${v.rom} shi·te mo ii de·su ka`, en: `May I ${v.en.toLowerCase()}?` }),
   },
   {
-    id: 'count', template: '○○を△△お願いします', templateRom: '○○ wo △△ o·ne·gai·shi·ma·su',
+    id: 'count', group: 'request', template: '○○を△△お願いします', templateRom: '○○ wo △△ o·ne·gai·shi·ma·su',
     meaning: '△△ of ○○ please', slotType: 'food', slotLabel: 'What do you want?',
     build: (v) => ({ jp: `${v.jp}をお願いします`, rom: `${v.rom} wo o·ne·gai·shi·ma·su`, en: `${v.en} please` }),
   },
@@ -178,6 +179,7 @@ export function SentenceBuilder() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [result, setResult] = useState<{ jp: string; rom: string; en: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState<'request' | 'question' | 'want'>('request');
 
   const handleSelectVocab = useCallback((vocab: Vocab) => {
     if (!selectedPattern) return;
@@ -206,8 +208,21 @@ export function SentenceBuilder() {
           <h2 className="text-lg font-bold">🔧 Sentence Builder</h2>
           <p className="text-base text-slate-400">Pick a pattern, fill the blank, speak it!</p>
         </div>
-        <div className="p-4 space-y-1.5">
-          {PATTERNS.map(p => (
+        <div className="px-4 pt-3">
+          <div className="flex gap-2 mb-3">
+            <button onClick={() => setTab('request')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'request' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+              🙏 Requests
+            </button>
+            <button onClick={() => setTab('question')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'question' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+              ❓ Questions
+            </button>
+            <button onClick={() => setTab('want')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'want' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+              💭 I want...
+            </button>
+          </div>
+        </div>
+        <div className="px-4 pb-4 space-y-1.5">
+          {PATTERNS.filter(p => p.group === tab).map(p => (
             <button
               key={p.id}
               onClick={() => { setSelectedPattern(p); setResult(null); }}
