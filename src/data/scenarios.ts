@@ -55,6 +55,10 @@ export const scenarios: Scenario[] = [
   // RESTAURANT — Full flow
   // ============================================================
   // === SC30: Airport Arrival ===
+  // ============================================================
+  // RESTAURANT — Full flow
+  // ============================================================
+  // === SC30: Airport Arrival ===
   {
     id: 'sc30', lang: 'ja', group: 'airport',
     title: 'Airport Arrival', titleTC: '機場入境',
@@ -202,22 +206,20 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'はい、次の駅で中央線に乗り換えてください', pronunciation: 'hai, tsugi no eki de chuuou-sen ni norikaete kudasai', pronunciation_chunks: 'hai tsu·gi no e·ki de chuu·ou·sen ni no·ri·ka·e·te ku·da·sai', english: 'Yes, transfer to the Chuo Line at the next station.', chinese_tc: '是的，在下一站轉中央線' },
     ],
   },
+  // === SC43: Taking a Bus ===
   {
-    id: 'sc07',
-    lang: 'ja',
-    group: 'transit',
-    title: 'Taking a Taxi',
-    titleTC: '搭計程車',
-    emoji: '🚕',
-    description: 'Telling driver your destination',
+    id: 'sc43', lang: 'ja', group: 'transit',
+    title: 'Taking a Bus', titleTC: '搭公車',
+    emoji: '🚌', description: 'Finding the bus stop, asking about routes and schedules',
     lines: [
-      { speaker: 'you', target: 'すみません、この住所までお願いします', pronunciation: 'sumimasen, kono juusho made onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, ko·no juu·sho ma·de o·ne·gai·shi·ma·su', english: 'Excuse me, to this address please', chinese_tc: '不好意思，請到這個地址', note: 'Show address on phone — the door opens automatically!' },
-      { speaker: 'staff', target: 'はい、わかりました', pronunciation: 'hai, wakarimashita', pronunciation_chunks: 'hai, wa·ka·ri·ma·shi·ta', english: 'Yes, understood', chinese_tc: '好的，明白了' },
-      { speaker: 'you', target: 'だいたい何分くらいですか？', pronunciation: 'daitai nanpun kurai desu ka?', pronunciation_chunks: 'dai·tai nan·pun ku·rai de·su ka', english: 'About how many minutes?', chinese_tc: '大概幾分鐘？' },
-      { speaker: 'staff', target: '15分くらいですね', pronunciation: 'juugo fun kurai desu ne', pronunciation_chunks: 'juu·go fun ku·rai de·su ne', english: 'About 15 minutes', chinese_tc: '大概15分鐘' },
-      { speaker: 'you', target: 'ここで降ります。ありがとうございます', pronunciation: 'koko de orimasu. arigatou gozaimasu', pronunciation_chunks: 'ko·ko de o·ri·ma·su. a·ri·ga·tou go·zai·ma·su', english: 'I\'ll get off here. Thank you.', chinese_tc: '我在這裡下車。謝謝', note: 'Don\'t touch the door — it opens automatically' },
-      { speaker: 'staff', target: '1,240円になります', pronunciation: 'sen nihyaku yonjuu en ni narimasu', pronunciation_chunks: 'sen ni·hya·ku yon·juu en ni na·ri·ma·su', english: 'That\'ll be 1,240 yen', chinese_tc: '1,240日圓' },
-      { speaker: 'you', target: 'Suicaで払えますか？', pronunciation: 'suika de haraemasu ka?', pronunciation_chunks: 'sui·ka de ha·ra·e·ma·su ka', english: 'Can I pay with Suica?', chinese_tc: '可以用Suica付嗎？' },
+      { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？' },
+      { speaker: 'staff', target: 'あちらの3番のりばです', pronunciation: 'achira no sanban noriba desu', pronunciation_chunks: 'a·chi·ra no san·ban no·ri·ba de·su', english: 'It\'s at bus stop number 3 over there.', chinese_tc: '在那邊的3號乘車處' },
+      { speaker: 'you', target: '次のバスは何時ですか？', pronunciation: 'tsugi no basu wa nanji desu ka', pronunciation_chunks: 'tsu·gi no ba·su wa nan·ji de·su ka', english: 'What time is the next bus?', chinese_tc: '下一班公車幾點？' },
+      { speaker: 'staff', target: '10分後に来ますよ', pronunciation: 'juppun go ni kimasu yo', pronunciation_chunks: 'jup·pun go ni ki·ma·su yo', english: 'It comes in 10 minutes.', chinese_tc: '10分鐘後來' },
+      { speaker: 'you', target: 'ICカードで乗れますか？', pronunciation: 'ai-shii kaado de noremasu ka', pronunciation_chunks: 'ai·shii kaa·do de no·re·ma·su ka', english: 'Can I ride with an IC card?', chinese_tc: '可以用IC卡搭嗎？', note: 'Most city buses accept IC cards. Tap when boarding (front) or exiting (back) depending on the city.' },
+      { speaker: 'staff', target: 'はい、乗る時にタッチしてください', pronunciation: 'hai, noru toki ni tacchi shite kudasai', pronunciation_chunks: 'hai no·ru to·ki ni tat·chi shi·te ku·da·sai', english: 'Yes, tap when you board.', chinese_tc: '可以，上車時感應一下' },
+      { speaker: 'you', target: '降りたい時はどうすればいいですか？', pronunciation: 'oritai toki wa dou sureba ii desu ka', pronunciation_chunks: 'o·ri·tai to·ki wa dou su·re·ba ii de·su ka', english: 'What should I do when I want to get off?', chinese_tc: '想下車的時候怎麼辦？' },
+      { speaker: 'staff', target: 'ボタンを押してください。次のバス停で降りられます', pronunciation: 'botan wo oshite kudasai. tsugi no basutei de oriraremasu', pronunciation_chunks: 'bo·tan wo o·shi·te ku·da·sai. tsu·gi no ba·su·tei de o·ri·ra·re·ma·su', english: 'Press the button. You can get off at the next stop.', chinese_tc: '按按鈕。在下一站就可以下車' },
     ],
   },
   {
@@ -247,6 +249,24 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: '歩いて何分くらいですか？', pronunciation: 'aruite nanpun kurai desu ka?', pronunciation_chunks: 'a·ru·i·te nan·pun ku·rai de·su ka', english: 'About how many minutes on foot?', chinese_tc: '走路大概幾分鐘？' },
       { speaker: 'staff', target: '5分くらいですよ', pronunciation: 'gofun kurai desu yo', pronunciation_chunks: 'go·fun ku·rai de·su yo', english: 'About 5 minutes', chinese_tc: '大概5分鐘' },
       { speaker: 'you', target: 'ありがとうございます！助かりました', pronunciation: 'arigatou gozaimasu! tasukarimashita', pronunciation_chunks: 'a·ri·ga·tou go·zai·ma·su! ta·su·ka·ri·ma·shi·ta', english: 'Thank you! That\'s a big help.', chinese_tc: '謝謝！幫了大忙' },
+    ],
+  },
+  {
+    id: 'sc07',
+    lang: 'ja',
+    group: 'transit',
+    title: 'Taking a Taxi',
+    titleTC: '搭計程車',
+    emoji: '🚕',
+    description: 'Telling driver your destination',
+    lines: [
+      { speaker: 'you', target: 'すみません、この住所までお願いします', pronunciation: 'sumimasen, kono juusho made onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, ko·no juu·sho ma·de o·ne·gai·shi·ma·su', english: 'Excuse me, to this address please', chinese_tc: '不好意思，請到這個地址', note: 'Show address on phone — the door opens automatically!' },
+      { speaker: 'staff', target: 'はい、わかりました', pronunciation: 'hai, wakarimashita', pronunciation_chunks: 'hai, wa·ka·ri·ma·shi·ta', english: 'Yes, understood', chinese_tc: '好的，明白了' },
+      { speaker: 'you', target: 'だいたい何分くらいですか？', pronunciation: 'daitai nanpun kurai desu ka?', pronunciation_chunks: 'dai·tai nan·pun ku·rai de·su ka', english: 'About how many minutes?', chinese_tc: '大概幾分鐘？' },
+      { speaker: 'staff', target: '15分くらいですね', pronunciation: 'juugo fun kurai desu ne', pronunciation_chunks: 'juu·go fun ku·rai de·su ne', english: 'About 15 minutes', chinese_tc: '大概15分鐘' },
+      { speaker: 'you', target: 'ここで降ります。ありがとうございます', pronunciation: 'koko de orimasu. arigatou gozaimasu', pronunciation_chunks: 'ko·ko de o·ri·ma·su. a·ri·ga·tou go·zai·ma·su', english: 'I\'ll get off here. Thank you.', chinese_tc: '我在這裡下車。謝謝', note: 'Don\'t touch the door — it opens automatically' },
+      { speaker: 'staff', target: '1,240円になります', pronunciation: 'sen nihyaku yonjuu en ni narimasu', pronunciation_chunks: 'sen ni·hya·ku yon·juu en ni na·ri·ma·su', english: 'That\'ll be 1,240 yen', chinese_tc: '1,240日圓' },
+      { speaker: 'you', target: 'Suicaで払えますか？', pronunciation: 'suika de haraemasu ka?', pronunciation_chunks: 'sui·ka de ha·ra·e·ma·su ka', english: 'Can I pay with Suica?', chinese_tc: '可以用Suica付嗎？' },
     ],
   },
   {
@@ -375,6 +395,20 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: '7時にお待ちしております', pronunciation: 'shichiji ni omachi shite orimasu', pronunciation_chunks: 'shi·chi·ji ni o·ma·chi shi·te o·ri·ma·su', english: 'We\'ll be expecting you at 7.', chinese_tc: '7點恭候您的到來' },
     ],
   },
+  // === SC44: Restaurant — Non-smoking ===
+  {
+    id: 'sc44', lang: 'ja', group: 'restaurant',
+    title: 'Seating Preferences', titleTC: '座位需求',
+    emoji: '🪑', description: 'Requesting non-smoking, counter vs table, window seat',
+    lines: [
+      { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
+      { speaker: 'you', target: '二名です。禁煙席をお願いします', pronunciation: 'nimei desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'ni·mei de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.' },
+      { speaker: 'staff', target: 'カウンター席とテーブル席、どちらがよろしいですか？', pronunciation: 'kauntaa seki to teeburu seki, dochira ga yoroshii desu ka', pronunciation_chunks: 'kaun·taa se·ki to tee·bu·ru se·ki do·chi·ra ga yo·ro·shii de·su ka', english: 'Counter or table seat?', chinese_tc: '吧台還是桌位？' },
+      { speaker: 'you', target: 'テーブル席でお願いします', pronunciation: 'teeburu seki de onegaishimasu', pronunciation_chunks: 'tee·bu·ru se·ki de o·ne·gai·shi·ma·su', english: 'Table seat please.', chinese_tc: '桌位' },
+      { speaker: 'you', target: '窓側の席はありますか？', pronunciation: 'madogawa no seki wa arimasu ka', pronunciation_chunks: 'ma·do·ga·wa no se·ki wa a·ri·ma·su ka', english: 'Is there a window seat?', chinese_tc: '有靠窗的座位嗎？' },
+      { speaker: 'staff', target: '少々お待ちください。ご案内いたします', pronunciation: 'shoushou omachi kudasai. go-annai itashimasu', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai. go·an·nai i·ta·shi·ma·su', english: 'One moment. I\'ll show you to your seat.', chinese_tc: '請稍等。帶您入座' },
+    ],
+  },
   // ============================================================
   // RESTAURANT — Full flow
   // ============================================================
@@ -437,6 +471,22 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'ご注文は以上でよろしいでしょうか？', pronunciation: 'go-chuumon wa ijou de yoroshii deshou ka?', pronunciation_chunks: 'go·chuu·mon wa i·jou de yo·ro·shii de·shou ka', english: 'Is that everything?', chinese_tc: '以上就是您的點餐了嗎？' },
       { speaker: 'you', target: 'はい、お願いします', pronunciation: 'hai, onegaishimasu', pronunciation_chunks: 'hai, o·ne·gai·shi·ma·su', english: 'Yes, please', chinese_tc: '好的，麻煩了' },
       { speaker: 'staff', target: '少々お待ちください', pronunciation: 'shoushou omachi kudasai', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai', english: 'Please wait a moment', chinese_tc: '請稍等' },
+    ],
+  },
+  // === SC45: Ordering a Set Meal ===
+  {
+    id: 'sc45', lang: 'ja', group: 'restaurant',
+    title: 'Ordering a Set Meal', titleTC: '點套餐/定食',
+    emoji: '🍱', description: 'Set meal options, upgrades, rice size, soup swap',
+    lines: [
+      { speaker: 'staff', target: '定食になさいますか？単品になさいますか？', pronunciation: 'teishoku ni nasaimasu ka? tanpin ni nasaimasu ka?', pronunciation_chunks: 'tei·sho·ku ni na·sai·ma·su ka tan·pin ni na·sai·ma·su ka', english: 'Would you like a set meal or à la carte?', chinese_tc: '要套餐還是單點？', note: '定食 (teishoku) = set meal with rice, soup, side dishes. 単品 (tanpin) = just the main dish.' },
+      { speaker: 'you', target: '定食でお願いします', pronunciation: 'teishoku de onegaishimasu', pronunciation_chunks: 'tei·sho·ku de o·ne·gai·shi·ma·su', english: 'Set meal please.', chinese_tc: '套餐' },
+      { speaker: 'staff', target: 'ドリンクセットにしますか？プラス200円です', pronunciation: 'dorinku setto ni shimasu ka? purasu nihyaku en desu', pronunciation_chunks: 'do·rin·ku set·to ni shi·ma·su ka pu·ra·su ni·hya·ku en de·su', english: 'Would you like the drink set? Plus 200 yen.', chinese_tc: '要飲料套餐嗎？加200日圓' },
+      { speaker: 'you', target: 'はい、コーヒーでお願いします', pronunciation: 'hai, koohii de onegaishimasu', pronunciation_chunks: 'hai koo·hii de o·ne·gai·shi·ma·su', english: 'Yes, coffee please.', chinese_tc: '好，咖啡' },
+      { speaker: 'staff', target: 'ご飯の量はどうしますか？', pronunciation: 'gohan no ryou wa dou shimasu ka', pronunciation_chunks: 'go·han no ryou wa dou shi·ma·su ka', english: 'How much rice would you like?', chinese_tc: '飯量怎麼樣？' },
+      { speaker: 'you', target: '大盛りでお願いします', pronunciation: 'oomori de onegaishimasu', pronunciation_chunks: 'oo·mo·ri de o·ne·gai·shi·ma·su', english: 'Large serving please.', chinese_tc: '大碗', note: '大盛り (oomori) = large. 普通 (futsuu) = regular. 少なめ (sukuname) = smaller. Many places offer 大盛り free!' },
+      { speaker: 'you', target: '味噌汁を豚汁に変更できますか？', pronunciation: 'misoshiru wo tonjiru ni henkou dekimasu ka', pronunciation_chunks: 'mi·so·shi·ru wo ton·ji·ru ni hen·kou de·ki·ma·su ka', english: 'Can I change miso soup to pork soup?', chinese_tc: '味噌湯可以換豬肉湯嗎？', note: '豚汁 (tonjiru) = hearty pork & vegetable soup. Usually +¥100-200 upgrade.' },
+      { speaker: 'staff', target: 'はい、プラス100円で変更できます', pronunciation: 'hai, purasu hyaku en de henkou dekimasu', pronunciation_chunks: 'hai pu·ra·su hya·ku en de hen·kou de·ki·ma·su', english: 'Yes, plus 100 yen for the change.', chinese_tc: '可以，加100日圓' },
     ],
   },
   {
@@ -963,55 +1013,6 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: 'まず薬局で薬を買いたいです', pronunciation: 'mazu yakkyoku de kusuri wo kaitai desu', pronunciation_chunks: 'ma·zu yak·kyo·ku de ku·su·ri wo kai·tai de·su', english: 'First I\'d like to buy medicine at a pharmacy.', chinese_tc: '先想去藥局買藥' },
       { speaker: 'staff', target: '近くの薬局をご案内します', pronunciation: 'chikaku no yakkyoku wo go-annai shimasu', pronunciation_chunks: 'chi·ka·ku no yak·kyo·ku wo go·an·nai shi·ma·su', english: 'I\'ll show you a nearby pharmacy.', chinese_tc: '我帶您去附近的藥局' },
       { speaker: 'you', target: '風邪薬をください', pronunciation: 'kaze-gusuri wo kudasai', pronunciation_chunks: 'ka·ze·gu·su·ri wo ku·da·sai', english: 'Cold medicine please.', chinese_tc: '請給我感冒藥', note: 'Useful: 頭痛薬 (headache), 胃薬 (stomach), 解熱剤 (fever reducer)' },
-    ],
-  },
-
-  // === SC43: Taking a Bus ===
-  {
-    id: 'sc43', lang: 'ja', group: 'transit',
-    title: 'Taking a Bus', titleTC: '搭公車',
-    emoji: '🚌', description: 'Finding the bus stop, asking about routes and schedules',
-    lines: [
-      { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？' },
-      { speaker: 'staff', target: 'あちらの3番のりばです', pronunciation: 'achira no sanban noriba desu', pronunciation_chunks: 'a·chi·ra no san·ban no·ri·ba de·su', english: 'It\'s at bus stop number 3 over there.', chinese_tc: '在那邊的3號乘車處' },
-      { speaker: 'you', target: '次のバスは何時ですか？', pronunciation: 'tsugi no basu wa nanji desu ka', pronunciation_chunks: 'tsu·gi no ba·su wa nan·ji de·su ka', english: 'What time is the next bus?', chinese_tc: '下一班公車幾點？' },
-      { speaker: 'staff', target: '10分後に来ますよ', pronunciation: 'juppun go ni kimasu yo', pronunciation_chunks: 'jup·pun go ni ki·ma·su yo', english: 'It comes in 10 minutes.', chinese_tc: '10分鐘後來' },
-      { speaker: 'you', target: 'ICカードで乗れますか？', pronunciation: 'ai-shii kaado de noremasu ka', pronunciation_chunks: 'ai·shii kaa·do de no·re·ma·su ka', english: 'Can I ride with an IC card?', chinese_tc: '可以用IC卡搭嗎？', note: 'Most city buses accept IC cards. Tap when boarding (front) or exiting (back) depending on the city.' },
-      { speaker: 'staff', target: 'はい、乗る時にタッチしてください', pronunciation: 'hai, noru toki ni tacchi shite kudasai', pronunciation_chunks: 'hai no·ru to·ki ni tat·chi shi·te ku·da·sai', english: 'Yes, tap when you board.', chinese_tc: '可以，上車時感應一下' },
-      { speaker: 'you', target: '降りたい時はどうすればいいですか？', pronunciation: 'oritai toki wa dou sureba ii desu ka', pronunciation_chunks: 'o·ri·tai to·ki wa dou su·re·ba ii de·su ka', english: 'What should I do when I want to get off?', chinese_tc: '想下車的時候怎麼辦？' },
-      { speaker: 'staff', target: 'ボタンを押してください。次のバス停で降りられます', pronunciation: 'botan wo oshite kudasai. tsugi no basutei de oriraremasu', pronunciation_chunks: 'bo·tan wo o·shi·te ku·da·sai. tsu·gi no ba·su·tei de o·ri·ra·re·ma·su', english: 'Press the button. You can get off at the next stop.', chinese_tc: '按按鈕。在下一站就可以下車' },
-    ],
-  },
-
-  // === SC44: Restaurant — Non-smoking ===
-  {
-    id: 'sc44', lang: 'ja', group: 'restaurant',
-    title: 'Seating Preferences', titleTC: '座位需求',
-    emoji: '🪑', description: 'Requesting non-smoking, counter vs table, window seat',
-    lines: [
-      { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
-      { speaker: 'you', target: '二名です。禁煙席をお願いします', pronunciation: 'nimei desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'ni·mei de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.' },
-      { speaker: 'staff', target: 'カウンター席とテーブル席、どちらがよろしいですか？', pronunciation: 'kauntaa seki to teeburu seki, dochira ga yoroshii desu ka', pronunciation_chunks: 'kaun·taa se·ki to tee·bu·ru se·ki do·chi·ra ga yo·ro·shii de·su ka', english: 'Counter or table seat?', chinese_tc: '吧台還是桌位？' },
-      { speaker: 'you', target: 'テーブル席でお願いします', pronunciation: 'teeburu seki de onegaishimasu', pronunciation_chunks: 'tee·bu·ru se·ki de o·ne·gai·shi·ma·su', english: 'Table seat please.', chinese_tc: '桌位' },
-      { speaker: 'you', target: '窓側の席はありますか？', pronunciation: 'madogawa no seki wa arimasu ka', pronunciation_chunks: 'ma·do·ga·wa no se·ki wa a·ri·ma·su ka', english: 'Is there a window seat?', chinese_tc: '有靠窗的座位嗎？' },
-      { speaker: 'staff', target: '少々お待ちください。ご案内いたします', pronunciation: 'shoushou omachi kudasai. go-annai itashimasu', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai. go·an·nai i·ta·shi·ma·su', english: 'One moment. I\'ll show you to your seat.', chinese_tc: '請稍等。帶您入座' },
-    ],
-  },
-
-  // === SC45: Ordering a Set Meal ===
-  {
-    id: 'sc45', lang: 'ja', group: 'restaurant',
-    title: 'Ordering a Set Meal', titleTC: '點套餐/定食',
-    emoji: '🍱', description: 'Set meal options, upgrades, rice size, soup swap',
-    lines: [
-      { speaker: 'staff', target: '定食になさいますか？単品になさいますか？', pronunciation: 'teishoku ni nasaimasu ka? tanpin ni nasaimasu ka?', pronunciation_chunks: 'tei·sho·ku ni na·sai·ma·su ka tan·pin ni na·sai·ma·su ka', english: 'Would you like a set meal or à la carte?', chinese_tc: '要套餐還是單點？', note: '定食 (teishoku) = set meal with rice, soup, side dishes. 単品 (tanpin) = just the main dish.' },
-      { speaker: 'you', target: '定食でお願いします', pronunciation: 'teishoku de onegaishimasu', pronunciation_chunks: 'tei·sho·ku de o·ne·gai·shi·ma·su', english: 'Set meal please.', chinese_tc: '套餐' },
-      { speaker: 'staff', target: 'ドリンクセットにしますか？プラス200円です', pronunciation: 'dorinku setto ni shimasu ka? purasu nihyaku en desu', pronunciation_chunks: 'do·rin·ku set·to ni shi·ma·su ka pu·ra·su ni·hya·ku en de·su', english: 'Would you like the drink set? Plus 200 yen.', chinese_tc: '要飲料套餐嗎？加200日圓' },
-      { speaker: 'you', target: 'はい、コーヒーでお願いします', pronunciation: 'hai, koohii de onegaishimasu', pronunciation_chunks: 'hai koo·hii de o·ne·gai·shi·ma·su', english: 'Yes, coffee please.', chinese_tc: '好，咖啡' },
-      { speaker: 'staff', target: 'ご飯の量はどうしますか？', pronunciation: 'gohan no ryou wa dou shimasu ka', pronunciation_chunks: 'go·han no ryou wa dou shi·ma·su ka', english: 'How much rice would you like?', chinese_tc: '飯量怎麼樣？' },
-      { speaker: 'you', target: '大盛りでお願いします', pronunciation: 'oomori de onegaishimasu', pronunciation_chunks: 'oo·mo·ri de o·ne·gai·shi·ma·su', english: 'Large serving please.', chinese_tc: '大碗', note: '大盛り (oomori) = large. 普通 (futsuu) = regular. 少なめ (sukuname) = smaller. Many places offer 大盛り free!' },
-      { speaker: 'you', target: '味噌汁を豚汁に変更できますか？', pronunciation: 'misoshiru wo tonjiru ni henkou dekimasu ka', pronunciation_chunks: 'mi·so·shi·ru wo ton·ji·ru ni hen·kou de·ki·ma·su ka', english: 'Can I change miso soup to pork soup?', chinese_tc: '味噌湯可以換豬肉湯嗎？', note: '豚汁 (tonjiru) = hearty pork & vegetable soup. Usually +¥100-200 upgrade.' },
-      { speaker: 'staff', target: 'はい、プラス100円で変更できます', pronunciation: 'hai, purasu hyaku en de henkou dekimasu', pronunciation_chunks: 'hai pu·ra·su hya·ku en de hen·kou de·ki·ma·su', english: 'Yes, plus 100 yen for the change.', chinese_tc: '可以，加100日圓' },
     ],
   },
 ];
