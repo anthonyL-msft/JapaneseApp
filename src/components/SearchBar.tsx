@@ -87,14 +87,6 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
               Offline
             </span>
           )}
-
-          {/* Cards shortcut */}
-          <button
-            onClick={onOpenCards}
-            className="shrink-0 text-lg p-1.5 rounded-lg text-slate-500 active:text-slate-300 transition"
-          >
-            🃏
-          </button>
         </div>
       </div>
 
