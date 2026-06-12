@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 
-type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'converter' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs';
+type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening';
 
 const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'gojuon', label: '50 Sounds', emoji: 'あ', desc: 'Hiragana & Katakana chart' },
@@ -14,14 +14,14 @@ const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[]
   { id: 'whquestions', label: 'Question Words', emoji: '🔍', desc: '何 どこ いつ いくら どう' },
 ];
 
-const TOOLS: { id: Section; label: string; emoji: string; desc: string }[] = [
-  { id: 'converter', label: 'Number Converter', emoji: '🔄', desc: 'Type a number → kanji + reading' },
-  { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 (like 量詞)' },
+const KNOWLEDGE: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'patterns', label: 'Sentence Patterns', emoji: '📐', desc: 'お願いします ありますか etc.' },
+  { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 (like 量詞)' },
   { id: 'signs', label: 'Common Signs', emoji: '🪧', desc: '入口 出口 禁煙 営業中' },
+  { id: 'listening', label: 'What You\'ll Hear', emoji: '👂', desc: 'Common staff phrases to recognize' },
 ];
 
-const ALL_SECTIONS = [...LEARN_STEPS, ...TOOLS];
+const ALL_SECTIONS = [...LEARN_STEPS, ...KNOWLEDGE];
 
 type DrawerData = {
   title: string;
@@ -124,7 +124,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
   const [refToggleAll, setRefToggleAll] = useState<number>(0); // increment to toggle
 
   const activeMeta = ALL_SECTIONS.find(s => s.id === panel.value);
-  const hasAccordion = panel.value && !['gojuon', 'numbers', 'converter', 'signs'].includes(panel.value);
+  const hasAccordion = panel.value && !['gojuon', 'numbers', 'signs', 'listening'].includes(panel.value);
 
   return (
     <div className="h-full relative">
@@ -132,7 +132,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
           <h2 className="text-lg font-bold">📚 Quick Reference</h2>
-          <p className="text-base text-slate-400">Grammar & tools for travel</p>
+          <p className="text-base text-slate-400">Grammar & knowledge for travel</p>
         </div>
 
         <div className="p-4 space-y-4">
@@ -157,9 +157,9 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
           </div>
 
           <div>
-            <h3 className="text-base font-semibold text-slate-400 mb-2">🧰 Tools & Reference</h3>
+            <h3 className="text-base font-semibold text-slate-400 mb-2">📚 Knowledge</h3>
             <div className="grid grid-cols-2 gap-2">
-              {TOOLS.map(sec => (
+              {KNOWLEDGE.map(sec => (
                 <button
                   key={sec.id}
                   onClick={() => panel.open(sec.id)}
@@ -196,7 +196,6 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
             {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
             {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'numbers' && <NumbersRef />}
-            {panel.value === 'converter' && <NumberConverter />}
             {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
@@ -204,6 +203,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
             {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'signs' && <SignsRef />}
+            {panel.value === 'listening' && <ListeningRef />}
           </div>
         </div>
       )}
@@ -1331,6 +1331,52 @@ function SignsRef() {
       <RefRow jp="割引" rom="wa·ri·bi·ki" meaning="Discount 折扣" />
       <RefRow jp="税込" rom="zei·ko·mi" meaning="Tax included 含稅" />
       <RefRow jp="税抜" rom="zei·nu·ki" meaning="Tax excluded 未稅" />
+    </div>
+  );
+}
+
+function ListeningRef() {
+  return (
+    <div className="mt-2">
+      <p className="text-base text-slate-500 mb-2">Phrases you'll hear from staff — learn to recognize, not produce</p>
+
+      <p className="text-sm text-slate-500 mt-3 mb-1">🏪 Shops & Convenience Stores</p>
+      <RefRow jp="いらっしゃいませ！" rom="i·ras·shai·ma·se" meaning="Welcome! (no need to reply, just nod)" />
+      <RefRow jp="袋はご利用ですか？" rom="fu·ku·ro wa go·ri·you de·su ka" meaning="Do you need a bag? → はい / いいえ" />
+      <RefRow jp="温めますか？" rom="a·ta·ta·me·ma·su ka" meaning="Heat it up? → はい / いいえ" />
+      <RefRow jp="お箸をお付けしますか？" rom="o·ha·shi wo o·tsu·ke shi·ma·su ka" meaning="Include chopsticks? → はい" />
+      <RefRow jp="ポイントカードはお持ちですか？" rom="poin·to kaa·do wa o·mo·chi de·su ka" meaning="Do you have a points card? → いいえ" />
+      <RefRow jp="○○円になります" rom="○○ en ni na·ri·ma·su" meaning="That'll be ○○ yen" />
+      <RefRow jp="お会計は○○円です" rom="o·kai·kei wa ○○ en de·su" meaning="Your total is ○○ yen" />
+
+      <p className="text-sm text-slate-500 mt-3 mb-1">🍜 Restaurants</p>
+      <RefRow jp="何名様ですか？" rom="nan·mei·sa·ma de·su ka" meaning="How many people? → ふたりです" />
+      <RefRow jp="こちらへどうぞ" rom="ko·chi·ra e dou·zo" meaning="This way please (follow them)" />
+      <RefRow jp="ご注文はお決まりですか？" rom="go·chuu·mon wa o·ki·ma·ri de·su ka" meaning="Ready to order? → はい / もう少し待ってください" />
+      <RefRow jp="少々お待ちください" rom="shou·shou o·ma·chi ku·da·sai" meaning="Please wait a moment" />
+      <RefRow jp="お待たせいたしました" rom="o·ma·ta·se i·ta·shi·ma·shi·ta" meaning="Sorry to keep you waiting (food arriving)" />
+      <RefRow jp="お下げしてもよろしいですか？" rom="o·sa·ge shi·te mo yo·ro·shii de·su ka" meaning="May I clear this? → はい" />
+      <RefRow jp="ラストオーダーです" rom="ra·su·to oo·daa de·su" meaning="Last order (kitchen closing soon)" />
+
+      <p className="text-sm text-slate-500 mt-3 mb-1">🚆 Trains & Stations</p>
+      <RefRow jp="まもなく電車が参ります" rom="ma·mo·na·ku den·sha ga mai·ri·ma·su" meaning="The train is arriving shortly" />
+      <RefRow jp="ドアが閉まります。ご注意ください" rom="do·a ga shi·ma·ri·ma·su go·chuu·i ku·da·sai" meaning="Doors closing. Please be careful" />
+      <RefRow jp="次は○○駅です" rom="tsu·gi wa ○○ e·ki de·su" meaning="Next stop is ○○ station" />
+      <RefRow jp="お忘れ物のないようご注意ください" rom="o·wa·su·re·mo·no no nai you go·chuu·i ku·da·sai" meaning="Please check you have all belongings" />
+      <RefRow jp="この電車は○○行きです" rom="ko·no den·sha wa ○○ i·ki de·su" meaning="This train goes to ○○" />
+
+      <p className="text-sm text-slate-500 mt-3 mb-1">🏨 Hotels</p>
+      <RefRow jp="チェックインでございますか？" rom="chek·ku·in de go·zai·ma·su ka" meaning="Are you checking in?" />
+      <RefRow jp="パスポートをお見せください" rom="pa·su·poo·to wo o·mi·se ku·da·sai" meaning="Please show your passport" />
+      <RefRow jp="お部屋は○○号室です" rom="o·he·ya wa ○○ gou·shi·tsu de·su" meaning="Your room is number ○○" />
+      <RefRow jp="朝食は○時から○時までです" rom="chou·sho·ku wa ○·ji ka·ra ○·ji ma·de de·su" meaning="Breakfast is from ○ to ○" />
+      <RefRow jp="ごゆっくりお過ごしください" rom="go·yuk·ku·ri o·su·go·shi ku·da·sai" meaning="Please enjoy your stay" />
+
+      <p className="text-sm text-slate-500 mt-3 mb-1">🔔 General</p>
+      <RefRow jp="ありがとうございました" rom="a·ri·ga·tou go·zai·ma·shi·ta" meaning="Thank you (past tense — after service)" />
+      <RefRow jp="またお越しくださいませ" rom="ma·ta o·ko·shi ku·da·sai·ma·se" meaning="Please come again" />
+      <RefRow jp="申し訳ございません" rom="mou·shi·wa·ke go·zai·ma·sen" meaning="I'm very sorry (formal apology)" />
+      <RefRow jp="かしこまりました" rom="ka·shi·ko·ma·ri·ma·shi·ta" meaning="Understood / Certainly (formal yes)" />
     </div>
   );
 }
