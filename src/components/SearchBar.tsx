@@ -9,6 +9,7 @@ interface Props {
   onLangChange: (lang: string) => void;
   onOpenCards: () => void;
   onOpenConverter: () => void;
+  onOpenBuilder: () => void;
 }
 
 const SPEED_LABELS: Record<string, string> = {
@@ -19,7 +20,7 @@ const SPEED_LABELS: Record<string, string> = {
   '1': 'Native',
 };
 
-export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter }: Props) {
+export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter, onOpenBuilder }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
@@ -153,6 +154,16 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
                   <div>
                     <p className="text-base text-slate-200">Number Converter</p>
                     <p className="text-sm text-slate-500">Number → kanji + reading</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenBuilder(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🔧</span>
+                  <div>
+                    <p className="text-base text-slate-200">Sentence Builder</p>
+                    <p className="text-sm text-slate-500">Pick a pattern, fill the blank</p>
                   </div>
                 </button>
               </div>

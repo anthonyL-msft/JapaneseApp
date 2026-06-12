@@ -9,6 +9,7 @@ import { MyStuff } from './components/MyStuff';
 import { Reference } from './components/Reference';
 import { Scenarios } from './components/Scenarios';
 import { AskAI } from './components/AskAI';
+import { SentenceBuilder } from './components/SentenceBuilder';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
@@ -120,7 +121,8 @@ function App() {
         lang={lang}
         onLangChange={setLang}
         onOpenCards={() => setTab('cards')}
-        onOpenConverter={() => { setTab('reference'); /* converter opened via ref */ }}
+        onOpenConverter={() => { setTab('reference'); }}
+        onOpenBuilder={() => setTab('builder')}
       />
 
       {/* Main Content */}
@@ -158,6 +160,7 @@ function App() {
         {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
+        {tab === 'builder' && <SentenceBuilder />}
       </div>
 
       {/* Bottom Navigation */}
