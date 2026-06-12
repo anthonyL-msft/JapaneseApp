@@ -39,33 +39,107 @@ html.light body {
   @apply bg-slate-50 text-slate-900;
 }
 
-/* Light mode overrides */
-html.light .bg-slate-950 { background-color: #f8fafc; }
-html.light .bg-slate-950\/95 { background-color: rgba(248, 250, 252, 0.95); }
-html.light .bg-slate-900 { background-color: #f1f5f9; }
+/* ===== Light Mode — Comprehensive Overrides ===== */
+
+/* Backgrounds: dark → light */
+html.light .bg-slate-950 { background-color: #ffffff; }
+html.light .bg-slate-950\/95 { background-color: rgba(255, 255, 255, 0.95); }
+html.light .bg-slate-900 { background-color: #f8fafc; }
 html.light .bg-slate-800 { background-color: #e2e8f0; }
-html.light .bg-slate-800\/60 { background-color: rgba(226, 232, 240, 0.6); }
-html.light .bg-slate-800\/80 { background-color: rgba(226, 232, 240, 0.8); }
-html.light .bg-slate-800\/40 { background-color: rgba(226, 232, 240, 0.4); }
-html.light .bg-slate-700\/40 { background-color: rgba(203, 213, 225, 0.4); }
-html.light .bg-slate-700\/50 { background-color: rgba(203, 213, 225, 0.5); }
-html.light .bg-slate-700\/30 { background-color: rgba(203, 213, 225, 0.3); }
-html.light .bg-slate-700\/20 { background-color: rgba(203, 213, 225, 0.2); }
-html.light .bg-slate-700\/15 { background-color: rgba(203, 213, 225, 0.15); }
-html.light .bg-slate-600\/40 { background-color: rgba(148, 163, 184, 0.25); }
-html.light .bg-slate-600\/30 { background-color: rgba(148, 163, 184, 0.2); }
+html.light .bg-slate-800\/60 { background-color: rgba(241, 245, 249, 0.8); }
+html.light .bg-slate-800\/80 { background-color: rgba(241, 245, 249, 0.9); }
+html.light .bg-slate-800\/40 { background-color: rgba(241, 245, 249, 0.6); }
+html.light .bg-slate-700\/40 { background-color: rgba(226, 232, 240, 0.5); }
+html.light .bg-slate-700\/50 { background-color: rgba(226, 232, 240, 0.6); }
+html.light .bg-slate-700\/30 { background-color: rgba(226, 232, 240, 0.4); }
+html.light .bg-slate-700\/20 { background-color: rgba(226, 232, 240, 0.3); }
+html.light .bg-slate-700\/15 { background-color: rgba(226, 232, 240, 0.2); }
+html.light .bg-slate-700 { background-color: #cbd5e1; }
+html.light .bg-slate-600\/40 { background-color: rgba(203, 213, 225, 0.3); }
+html.light .bg-slate-600\/30 { background-color: rgba(203, 213, 225, 0.25); }
+
+/* Text: light → dark */
 html.light .text-slate-50 { color: #0f172a; }
 html.light .text-slate-100 { color: #1e293b; }
 html.light .text-slate-200 { color: #334155; }
 html.light .text-slate-300 { color: #475569; }
 html.light .text-slate-400 { color: #64748b; }
 html.light .text-slate-500 { color: #94a3b8; }
-html.light .text-slate-600 { color: #cbd5e1; }
+html.light .text-slate-600 { color: #94a3b8; }
+html.light .text-white { color: #ffffff; }
+
+/* Borders */
 html.light .border-slate-800 { border-color: #e2e8f0; }
-html.light .border-slate-700\/40 { border-color: rgba(203, 213, 225, 0.4); }
-html.light .border-slate-700\/50 { border-color: rgba(203, 213, 225, 0.5); }
-html.light .bg-black\/50 { background-color: rgba(0, 0, 0, 0.2); }
+html.light .border-slate-800\/50 { border-color: rgba(226, 232, 240, 0.5); }
+html.light .border-slate-700 { border-color: #e2e8f0; }
+html.light .border-slate-700\/40 { border-color: rgba(203, 213, 225, 0.5); }
+html.light .border-slate-700\/50 { border-color: rgba(203, 213, 225, 0.6); }
+
+/* Overlays & backdrops */
+html.light .bg-black\/50 { background-color: rgba(0, 0, 0, 0.15); }
+
+/* Input placeholders */
 html.light .placeholder-slate-500::placeholder { color: #94a3b8; }
+
+/* Accent backgrounds — slightly stronger for light mode contrast */
+html.light .bg-sakura-500\/60 { background-color: rgba(236, 72, 153, 0.7); }
+html.light .bg-sakura-500\/80 { background-color: rgba(236, 72, 153, 0.85); }
+html.light .bg-sakura-500\/30 { background-color: rgba(236, 72, 153, 0.15); }
+html.light .bg-sakura-500\/20 { background-color: rgba(236, 72, 153, 0.12); }
+html.light .bg-sakura-500\/40 { background-color: rgba(236, 72, 153, 0.2); }
+html.light .text-sakura-300 { color: #db2777; }
+html.light .text-sakura-400 { color: #be185d; }
+html.light .text-sakura-400\/60 { color: rgba(190, 24, 93, 0.6); }
+
+/* Indigo accents */
+html.light .bg-indigo-500\/20 { background-color: rgba(99, 102, 241, 0.1); }
+html.light .bg-indigo-500\/50 { background-color: rgba(99, 102, 241, 0.15); }
+html.light .bg-indigo-500\/60 { background-color: rgba(99, 102, 241, 0.7); }
+html.light .bg-indigo-500\/10 { background-color: rgba(99, 102, 241, 0.08); }
+html.light .text-indigo-300 { color: #4f46e5; }
+html.light .border-indigo-500\/30 { border-color: rgba(99, 102, 241, 0.2); }
+html.light .border-indigo-700\/30 { border-color: rgba(99, 102, 241, 0.2); }
+html.light .bg-indigo-900\/20 { background-color: rgba(99, 102, 241, 0.08); }
+
+/* Emerald accents */
+html.light .bg-emerald-500\/20 { background-color: rgba(16, 185, 129, 0.12); }
+html.light .text-emerald-400 { color: #059669; }
+
+/* Status colors */
+html.light .bg-amber-900\/20 { background-color: rgba(245, 158, 11, 0.08); }
+html.light .text-amber-400 { color: #d97706; }
+html.light .border-amber-700\/30 { border-color: rgba(217, 119, 6, 0.15); }
+
+html.light .bg-blue-500\/30 { background-color: rgba(59, 130, 246, 0.12); }
+html.light .bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.08); }
+html.light .text-blue-300 { color: #2563eb; }
+html.light .text-blue-400 { color: #2563eb; }
+
+html.light .bg-green-500\/30 { background-color: rgba(34, 197, 94, 0.12); }
+html.light .text-green-300 { color: #16a34a; }
+html.light .text-green-400 { color: #16a34a; }
+
+html.light .bg-purple-500\/20 { background-color: rgba(168, 85, 247, 0.1); }
+html.light .text-purple-300 { color: #7c3aed; }
+
+html.light .bg-red-900\/40 { background-color: rgba(239, 68, 68, 0.1); }
+html.light .text-red-300 { color: #dc2626; }
+html.light .text-red-400 { color: #dc2626; }
+
+/* Ring colors */
+html.light .ring-sakura-400\/30 { --tw-ring-color: rgba(244, 114, 182, 0.2); }
+html.light .ring-sakura-400\/50 { --tw-ring-color: rgba(244, 114, 182, 0.3); }
+
+/* Active states */
+html.light .active\:bg-slate-600:active { background-color: rgba(203, 213, 225, 0.5); }
+html.light .active\:bg-slate-700:active { background-color: rgba(203, 213, 225, 0.6); }
+html.light .active\:bg-slate-700\/50:active { background-color: rgba(203, 213, 225, 0.4); }
+html.light .active\:bg-slate-600\/50:active { background-color: rgba(203, 213, 225, 0.4); }
+html.light .active\:bg-slate-800:active { background-color: rgba(226, 232, 240, 0.8); }
+
+/* Scrollbar */
+html.light .scroll-area { scrollbar-color: #cbd5e1 transparent; }
+html.light .scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; }
 
 /* Scrollbar styling */
 .scroll-area {
