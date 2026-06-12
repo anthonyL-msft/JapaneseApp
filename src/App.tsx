@@ -132,7 +132,7 @@ function App() {
           />
         )}
         {tab === 'cards' && (
-          <Flashcards phrases={langPhrases} />
+          <Flashcards phrases={langPhrases.filter(p => learnedItems.some(l => l.id === p.id))} />
         )}
         {tab === 'bookmarks' && (
           <MyStuff
@@ -152,7 +152,6 @@ function App() {
         {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
-        {tab === 'cards' && <Flashcards phrases={langPhrases} />}
       </div>
 
       {/* Bottom Navigation */}

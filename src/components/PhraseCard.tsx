@@ -55,15 +55,17 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
             <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
-              🔊
-            </button>
-            <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-              {isBookmarked ? '⭐' : '☆'}
-            </button>
+          <div className="flex flex-col items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1">
+              <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
+                🔊
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                {isBookmarked ? '⭐' : '☆'}
+              </button>
+            </div>
             {onToggleLearned && (
-              <button onClick={(e) => { e.stopPropagation(); onToggleLearned(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+              <button onClick={(e) => { e.stopPropagation(); onToggleLearned(); }} className="p-1 rounded-lg active:bg-slate-600 text-base">
                 {isLearned ? '✅' : '⬜'}
               </button>
             )}

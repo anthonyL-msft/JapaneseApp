@@ -279,7 +279,19 @@ const KANA_VOCAB: Record<string, { jp: string; hep: string; en: string }[]> = {
 };
 
 function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
-  const [chart, setChart] = useState<'hiragana' | 'katakana' | 'voiced'>('hiragana');
+  const [chart, setChart] = useState<'hiragana' | 'katakana'>('hiragana');
+  const [showVoiced, setShowVoiced] = useState(false);
+
+  // Map: base romanization → voiced version (char + romanization)
+  const voicedMap: Record<string, { h: string; k: string; rom: string }> = {
+    ka: { h: 'が', k: 'ガ', rom: 'ga' }, ki: { h: 'ぎ', k: 'ギ', rom: 'gi' }, ku: { h: 'ぐ', k: 'グ', rom: 'gu' }, ke: { h: 'げ', k: 'ゲ', rom: 'ge' }, ko: { h: 'ご', k: 'ゴ', rom: 'go' },
+    sa: { h: 'ざ', k: 'ザ', rom: 'za' }, shi: { h: 'じ', k: 'ジ', rom: 'ji' }, su: { h: 'ず', k: 'ズ', rom: 'zu' }, se: { h: 'ぜ', k: 'ゼ', rom: 'ze' }, so: { h: 'ぞ', k: 'ゾ', rom: 'zo' },
+    ta: { h: 'だ', k: 'ダ', rom: 'da' }, chi: { h: 'ぢ', k: 'ヂ', rom: 'di' }, tsu: { h: 'づ', k: 'ヅ', rom: 'du' }, te: { h: 'で', k: 'デ', rom: 'de' }, to: { h: 'ど', k: 'ド', rom: 'do' },
+    ha: { h: 'ば', k: 'バ', rom: 'ba' }, hi: { h: 'び', k: 'ビ', rom: 'bi' }, fu: { h: 'ぶ', k: 'ブ', rom: 'bu' }, he: { h: 'べ', k: 'ベ', rom: 'be' }, ho: { h: 'ぼ', k: 'ボ', rom: 'bo' },
+  };
+  const handakutenMap: Record<string, { h: string; k: string; rom: string }> = {
+    ha: { h: 'ぱ', k: 'パ', rom: 'pa' }, hi: { h: 'ぴ', k: 'ピ', rom: 'pi' }, fu: { h: 'ぷ', k: 'プ', rom: 'pu' }, he: { h: 'ぺ', k: 'ペ', rom: 'pe' }, ho: { h: 'ぽ', k: 'ポ', rom: 'po' },
+  };
 
   const hiragana = [
     ['あ a', 'い i', 'う u', 'え e', 'お o'],
@@ -309,15 +321,7 @@ function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
     ['ン n', '', '', '', ''],
   ];
 
-  const voiced = [
-    ['が ga', 'ぎ gi', 'ぐ gu', 'げ ge', 'ご go'],
-    ['ざ za', 'じ ji', 'ず zu', 'ぜ ze', 'ぞ zo'],
-    ['だ da', 'ぢ di', 'づ du', 'で de', 'ど do'],
-    ['ば ba', 'び bi', 'ぶ bu', 'べ be', 'ぼ bo'],
-    ['ぱ pa', 'ぴ pi', 'ぷ pu', 'ぺ pe', 'ぽ po'],
-  ];
-
-  const data = chart === 'hiragana' ? hiragana : chart === 'katakana' ? katakana : voiced;
+  const baseData = chart === 'hiragana' ? hiragana : katakana;
 
   const handleTap = (char: string, rom: string) => {
     speak(char, 'ja-JP');
@@ -342,29 +346,78 @@ function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
         <button onClick={() => setChart('katakana')} className={`flex-1 py-2 rounded-lg text-base transition ${chart === 'katakana' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
           カタカナ
         </button>
-        <button onClick={() => setChart('voiced')} className={`flex-1 py-2 rounded-lg text-base transition ${chart === 'voiced' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
-          Voiced ゛゜
+        <button onClick={() => setShowVoiced(!showVoiced)} className={`flex-1 py-2 rounded-lg text-base transition ${showVoiced ? 'bg-indigo-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+          {showVoiced ? '゛゜ ON' : '゛゜ OFF'}
         </button>
       </div>
-      {chart === 'voiced' && (
-        <div className="mb-2 space-y-1">
-          <p className="text-base text-slate-500">゛ <span className="text-slate-400">Dakuten (voiced)</span> — か→が, さ→ざ, た→だ, は→ば</p>
-          <p className="text-base text-slate-500">゜ <span className="text-slate-400">Handakuten (p-sound)</span> — は→ぱ</p>
+      {showVoiced && (
+        <div className="mb-2 space-y-0.5">
+          <p className="text-base text-indigo-300">゛ Dakuten — か→<span className="text-sakura-300">が</span>　さ→<span className="text-sakura-300">ざ</span>　た→<span className="text-sakura-300">だ</span>　は→<span className="text-sakura-300">ば</span></p>
+          <p className="text-base text-indigo-300">゜ Handakuten — は→<span className="text-sakura-300">ぱ</span></p>
         </div>
       )}
       <div className="grid grid-cols-5 gap-1">
-        {data.flat().map((cell, i) => {
+        {baseData.flat().map((cell, i) => {
           if (!cell) return <div key={i} className="h-14" />;
-          const [char, rom] = [cell.split(' ')[0], cell.split(' ')[1]];
-          const hasVocab = KANA_VOCAB[rom] && KANA_VOCAB[rom].length > 0;
+          const [baseChar, baseRom] = [cell.split(' ')[0], cell.split(' ')[1]];
+
+          // When voiced toggle is ON, show voiced version if available
+          const voiced = showVoiced ? voicedMap[baseRom] : null;
+          const handaku = showVoiced ? handakutenMap[baseRom] : null;
+
+          if (showVoiced && !voiced && !handaku) {
+            // No voiced variant — show dimmed base
+            return (
+              <div key={i} className="rounded-lg h-14 flex flex-col items-center justify-center bg-slate-700/10 opacity-30">
+                <span className="text-lg text-slate-500">{baseChar}</span>
+                <span className="text-base text-slate-600">{baseRom}</span>
+              </div>
+            );
+          }
+
+          if (showVoiced && (voiced || handaku)) {
+            // Show voiced + handakuten variants stacked
+            const isHaRow = !!handaku;
+            return (
+              <div key={i} className="flex flex-col gap-0.5">
+                {voiced && (() => {
+                  const vChar = chart === 'hiragana' ? voiced.h : voiced.k;
+                  return (
+                    <button
+                      onClick={() => handleTap(vChar, voiced.rom)}
+                      className={`rounded-lg flex flex-col items-center justify-center active:bg-indigo-600 transition bg-indigo-500/20 ${isHaRow ? 'h-14' : 'h-14'}`}
+                    >
+                      <span className="text-lg text-slate-100">{vChar}</span>
+                      <span className="text-base text-indigo-300">{voiced.rom}</span>
+                    </button>
+                  );
+                })()}
+                {handaku && (() => {
+                  const pChar = chart === 'hiragana' ? handaku.h : handaku.k;
+                  return (
+                    <button
+                      onClick={() => handleTap(pChar, handaku.rom)}
+                      className="rounded-lg h-14 flex flex-col items-center justify-center active:bg-purple-600 transition bg-purple-500/20"
+                    >
+                      <span className="text-lg text-slate-100">{pChar}</span>
+                      <span className="text-base text-purple-300">{handaku.rom}</span>
+                    </button>
+                  );
+                })()}
+              </div>
+            );
+          }
+
+          // Normal (voiced OFF)
+          const hasVocab = KANA_VOCAB[baseRom] && KANA_VOCAB[baseRom].length > 0;
           return (
             <button
               key={i}
-              onClick={() => handleTap(char, rom)}
+              onClick={() => handleTap(baseChar, baseRom)}
               className={`rounded-lg h-14 flex flex-col items-center justify-center active:bg-slate-600 transition ${hasVocab ? 'bg-slate-700/40' : 'bg-slate-700/20'}`}
             >
-              <span className="text-lg text-slate-100">{char}</span>
-              <span className="text-base text-sakura-300">{rom}</span>
+              <span className="text-lg text-slate-100">{baseChar}</span>
+              <span className="text-base text-sakura-300">{baseRom}</span>
             </button>
           );
         })}
@@ -626,15 +679,17 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
                     <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
                     <p className="text-base text-slate-400 mt-0.5">{ex.en}</p>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-                    {onToggleRefBookmark && (
-                      <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-                        {isBm ? '⭐' : '☆'}
-                      </button>
-                    )}
+                  <div className="flex flex-col items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                      {onToggleRefBookmark && (
+                        <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                          {isBm ? '⭐' : '☆'}
+                        </button>
+                      )}
+                    </div>
                     {onToggleLearned && (
-                      <button onClick={() => onToggleLearned(learnId)} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                      <button onClick={() => onToggleLearned(learnId)} className="p-1 rounded-lg active:bg-slate-600 text-base">
                         {isLearned ? '✅' : '⬜'}
                       </button>
                     )}

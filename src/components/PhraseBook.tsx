@@ -55,6 +55,12 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
     }
   };
 
+  // Default open all when entering a category
+  const prevCategory = panel.value;
+  if (prevCategory && openSituations.size === 0 && situationKeys.length > 0) {
+    setOpenSituations(new Set(situationKeys));
+  }
+
   return (
     <div className="h-full relative">
       {/* L1: Category grid */}
@@ -123,7 +129,17 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
           </div>
 
           <div className="scroll-area flex-1 px-2 py-2 space-y-1.5">
-            {Array.from(situations.entries()).map(([situation, pList]) => {
+            {Array.from(situations.entries())
+              .sort(([a], [b]) => {
+                // Push "Numbers" and "Time" to the bottom
+                const bottomSits = ['Numbers', 'Time'];
+                const aBottom = bottomSits.indexOf(a);
+                const bBottom = bottomSits.indexOf(b);
+                if (aBottom >= 0 && bBottom < 0) return 1;
+                if (bBottom >= 0 && aBottom < 0) return -1;
+                return 0;
+              })
+              .map(([situation, pList]) => {
               const isOpen = openSituations.has(situation);
               return (
                 <div key={situation} className="bg-slate-800/60 rounded-xl overflow-hidden">
