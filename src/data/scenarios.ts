@@ -396,7 +396,20 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: '予約したいのですが', pronunciation: 'yoyaku shitai no desu ga', pronunciation_chunks: 'yo·ya·ku shi·tai no de·su ga', english: 'I\'d like to make a reservation.', chinese_tc: '我想預約' },
       { speaker: 'staff', target: 'いつのご予約ですか？', pronunciation: 'itsu no go-yoyaku desu ka', pronunciation_chunks: 'i·tsu no go·yo·ya·ku de·su ka', english: 'When would you like to reserve?', chinese_tc: '什麼時候的預約？' },
-      { speaker: 'you', target: '今日の7時に二名でお願いします', pronunciation: 'kyou no shichiji ni nimei de onegaishimasu', pronunciation_chunks: 'kyou no shi·chi·ji ni ni·mei de o·ne·gai·shi·ma·su', english: 'Today at 7pm for two people please.', chinese_tc: '今天7點，兩位' },
+      { speaker: 'you', target: '今日の7時に二名でお願いします', pronunciation: 'kyou no shichiji ni nimei de onegaishimasu', pronunciation_chunks: 'kyou no shi·chi·ji ni ni·mei de o·ne·gai·shi·ma·su', english: 'Today at 7pm for two people please.', chinese_tc: '今天7點，兩位', variables: [
+        { placeholder: '7時', label: 'Time', options: [
+          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm' },
+          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm' },
+          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm' },
+          { value: '9時', pronunciation: 'ku·ji', english: '9pm' },
+        ] },
+        { placeholder: '二名', label: 'Party size', options: [
+          { value: '一名', pronunciation: 'i·chi·mei', english: '1 person' },
+          { value: '二名', pronunciation: 'ni·mei', english: '2 people' },
+          { value: '三名', pronunciation: 'san·mei', english: '3 people' },
+          { value: '四名', pronunciation: 'yo·mei', english: '4 people' },
+        ] },
+      ] },
       { speaker: 'staff', target: '少々お待ちください… はい、大丈夫です', pronunciation: 'shoushou omachi kudasai... hai, daijoubu desu', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai hai dai·jou·bu de·su', english: 'One moment please... Yes, that\'s fine.', chinese_tc: '請稍等...好的，可以' },
       { speaker: 'staff', target: 'お名前をお願いします', pronunciation: 'onamae wo onegaishimasu', pronunciation_chunks: 'o·na·ma·e wo o·ne·gai·shi·ma·su', english: 'May I have your name?', chinese_tc: '請問您的名字？' },
       { speaker: 'you', target: 'アンソニーです', pronunciation: 'ansonii desu', pronunciation_chunks: 'an·so·nii de·su', english: 'Anthony.', chinese_tc: 'Anthony', note: 'Just say your name + です. Staff may repeat it back to confirm.' },
@@ -410,7 +423,14 @@ export const scenarios: Scenario[] = [
     emoji: '🪑', description: 'Requesting non-smoking, counter vs table, window seat',
     lines: [
       { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
-      { speaker: 'you', target: '二名です。禁煙席をお願いします', pronunciation: 'nimei desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'ni·mei de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.' },
+      { speaker: 'you', target: '二名です。禁煙席をお願いします', pronunciation: 'nimei desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'ni·mei de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.', variables: [
+        { placeholder: '二名', label: 'Party size', options: [
+          { value: '一名', pronunciation: 'i·chi·mei', english: '1 person' },
+          { value: '二名', pronunciation: 'ni·mei', english: '2 people' },
+          { value: '三名', pronunciation: 'san·mei', english: '3 people' },
+          { value: '四名', pronunciation: 'yo·mei', english: '4 people' },
+        ] },
+      ] },
       { speaker: 'staff', target: 'カウンター席とテーブル席、どちらがよろしいですか？', pronunciation: 'kauntaa seki to teeburu seki, dochira ga yoroshii desu ka', pronunciation_chunks: 'kaun·taa se·ki to tee·bu·ru se·ki do·chi·ra ga yo·ro·shii de·su ka', english: 'Counter or table seat?', chinese_tc: '吧台還是桌位？' },
       { speaker: 'you', target: 'テーブル席でお願いします', pronunciation: 'teeburu seki de onegaishimasu', pronunciation_chunks: 'tee·bu·ru se·ki de o·ne·gai·shi·ma·su', english: 'Table seat please.', chinese_tc: '桌位' },
       { speaker: 'you', target: '窓側の席はありますか？', pronunciation: 'madogawa no seki wa arimasu ka', pronunciation_chunks: 'ma·do·ga·wa no se·ki wa a·ri·ma·su ka', english: 'Is there a window seat?', chinese_tc: '有靠窗的座位嗎？' },
@@ -913,13 +933,29 @@ export const scenarios: Scenario[] = [
     title: 'Karaoke Night Out', titleTC: '卡拉OK',
     emoji: '🎤', description: 'Booking a room, ordering drinks, extending time',
     lines: [
-      { speaker: 'you', target: '二名で一時間お願いします', pronunciation: 'nimei de ichijikan onegaishimasu', pronunciation_chunks: 'ni·mei de i·chi·ji·kan o·ne·gai·shi·ma·su', english: 'Two people, one hour please.', chinese_tc: '兩位，一小時' },
+      { speaker: 'you', target: '二名で一時間お願いします', pronunciation: 'nimei de ichijikan onegaishimasu', pronunciation_chunks: 'ni·mei de i·chi·ji·kan o·ne·gai·shi·ma·su', english: 'Two people, one hour please.', chinese_tc: '兩位，一小時', variables: [
+        { placeholder: '二名', label: 'Party size', options: [
+          { value: '二名', pronunciation: 'ni·mei', english: 'Two people' },
+          { value: '三名', pronunciation: 'san·mei', english: 'Three people' },
+          { value: '四名', pronunciation: 'yo·mei', english: 'Four people' },
+        ] },
+        { placeholder: '一時間', label: 'Duration', options: [
+          { value: '一時間', pronunciation: 'i·chi·ji·kan', english: 'one hour' },
+          { value: '二時間', pronunciation: 'ni·ji·kan', english: 'two hours' },
+          { value: '三時間', pronunciation: 'san·ji·kan', english: 'three hours' },
+        ] },
+      ] },
       { speaker: 'staff', target: 'ドリンクバーのプランでよろしいですか？', pronunciation: 'dorinku baa no puran de yoroshii desu ka', pronunciation_chunks: 'do·rin·ku baa no pu·ran de yo·ro·shii de·su ka', english: 'Is the drink bar plan okay?', chinese_tc: '飲料吧方案可以嗎？', note: 'Most karaoke requires a drink order. ドリンクバー = unlimited drinks, usually best value.' },
       { speaker: 'you', target: 'はい、それでお願いします', pronunciation: 'hai, sore de onegaishimasu', pronunciation_chunks: 'hai so·re de o·ne·gai·shi·ma·su', english: 'Yes, that\'s fine.', chinese_tc: '好的' },
       { speaker: 'staff', target: '305号室です。こちらへどうぞ', pronunciation: 'sanbyaku go gou-shitsu desu. kochira e douzo', pronunciation_chunks: 'san·bya·ku go gou·shi·tsu de·su ko·chi·ra e dou·zo', english: 'Room 305. This way please.', chinese_tc: '305號房。這邊請' },
       { speaker: 'you', target: '延長できますか？', pronunciation: 'enchou dekimasu ka', pronunciation_chunks: 'en·chou de·ki·ma·su ka', english: 'Can we extend?', chinese_tc: '可以延長嗎？' },
       { speaker: 'staff', target: 'はい、30分ごとに延長できます', pronunciation: 'hai, sanjuppun goto ni enchou dekimasu', pronunciation_chunks: 'hai san·jup·pun go·to ni en·chou de·ki·ma·su', english: 'Yes, you can extend in 30-minute blocks.', chinese_tc: '可以，每30分鐘延長一次' },
-      { speaker: 'you', target: 'あと30分お願いします', pronunciation: 'ato sanjuppun onegaishimasu', pronunciation_chunks: 'a·to san·jup·pun o·ne·gai·shi·ma·su', english: '30 more minutes please.', chinese_tc: '再加30分鐘' },
+      { speaker: 'you', target: 'あと30分お願いします', pronunciation: 'ato sanjuppun onegaishimasu', pronunciation_chunks: 'a·to san·jup·pun o·ne·gai·shi·ma·su', english: '30 more minutes please.', chinese_tc: '再加30分鐘', variables: [
+        { placeholder: '30分', label: 'Extension', options: [
+          { value: '30分', pronunciation: 'san·jup·pun', english: '30 minutes' },
+          { value: '一時間', pronunciation: 'i·chi·ji·kan', english: 'one hour' },
+        ] },
+      ] },
     ],
   },
   {
