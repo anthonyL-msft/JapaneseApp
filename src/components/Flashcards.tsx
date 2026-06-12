@@ -130,11 +130,11 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
             {/* All Learned */}
             <button
               onClick={() => startDeck('all')}
-              className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1 col-span-2"
+              className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
             >
               <span className="text-2xl">🎲</span>
               <span className="text-base font-semibold text-slate-100">All Learned</span>
-              <span className="text-sm text-slate-500">{totalLearned} cards — random mix</span>
+              <span className="text-sm text-slate-500">{totalLearned} cards</span>
             </button>
 
             {/* Per-category */}
