@@ -10,6 +10,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - 418+ travel phrases organized by 12 categories
 - Categories: Greetings, Basics & Vocab, Airport & Transit, Hotel, Restaurant, Food & Drinks, Shopping, Directions, Emergency, Small Talk, Culture, Local Specials
 - Hepburn romanization with syllable chunks for easy pronunciation
+- **Sounds breakdown:** expanded cards show kana-to-romaji mapping with proximity-based grouping — vowel lengtheners (よう), nasal ん, and devoiced す render smaller and tighter to show how characters combine into spoken sounds
 - TTS (Text-to-Speech) with adjustable speed
 - Bookmark ☆ and Mark as Learned ✓
 - Default Open All with Close All toggle
