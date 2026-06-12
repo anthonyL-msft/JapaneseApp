@@ -77,7 +77,7 @@ export const scenarios: Scenario[] = [
   // === SC42: Airport Customs ===
   {
     id: 'sc42', lang: 'ja', group: 'airport',
-    title: 'Customs Declaration', titleTC: '海關申報',
+    title: '"Anything to Declare?"', titleTC: '海關申報',
     emoji: '🛃', description: 'Going through customs after immigration',
     lines: [
       { speaker: 'staff', target: '申告するものはありますか？', pronunciation: 'shinkoku suru mono wa arimasu ka', pronunciation_chunks: 'shin·ko·ku su·ru mo·no wa a·ri·ma·su ka', english: 'Do you have anything to declare?', chinese_tc: '有需要申報的東西嗎？' },
@@ -273,7 +273,7 @@ export const scenarios: Scenario[] = [
     id: 'sc06',
     lang: 'ja',
     group: 'hotel',
-    title: 'Hotel Check-in',
+    title: 'Checking In',
     titleTC: '飯店入住',
     emoji: '🏨',
     description: 'Arriving at hotel, checking in for 2',
@@ -316,7 +316,7 @@ export const scenarios: Scenario[] = [
     id: 'sc26',
     lang: 'ja',
     group: 'hotel',
-    title: 'Luggage Forwarding (Takkyubin)',
+    title: '"Send My Bags Ahead"',
     titleTC: '行李宅配（宅急便）',
     emoji: '📦',
     description: 'Send luggage from Hotel A to Hotel B — travel light on the Shinkansen!',
@@ -354,7 +354,7 @@ export const scenarios: Scenario[] = [
     id: 'sc14',
     lang: 'ja',
     group: 'hotel',
-    title: 'Hotel Check-out & Luggage',
+    title: 'Checking Out & Storing Bags',
     titleTC: '退房寄放行李',
     emoji: '🧳',
     description: 'Checking out but leaving luggage for the day',
@@ -383,7 +383,7 @@ export const scenarios: Scenario[] = [
   // === SC33: Restaurant Reservation ===
   {
     id: 'sc33', lang: 'ja', group: 'restaurant',
-    title: 'Making a Reservation', titleTC: '預約餐廳',
+    title: 'Booking a Table', titleTC: '預約餐廳',
     emoji: '📞', description: 'Booking a table at a restaurant by phone or walk-in',
     lines: [
       { speaker: 'you', target: '予約したいのですが', pronunciation: 'yoyaku shitai no desu ga', pronunciation_chunks: 'yo·ya·ku shi·tai no de·su ga', english: 'I\'d like to make a reservation.', chinese_tc: '我想預約' },
@@ -398,7 +398,7 @@ export const scenarios: Scenario[] = [
   // === SC44: Restaurant — Non-smoking ===
   {
     id: 'sc44', lang: 'ja', group: 'restaurant',
-    title: 'Seating Preferences', titleTC: '座位需求',
+    title: 'Choosing Your Seat', titleTC: '座位需求',
     emoji: '🪑', description: 'Requesting non-smoking, counter vs table, window seat',
     lines: [
       { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
@@ -517,7 +517,7 @@ export const scenarios: Scenario[] = [
     id: 'sc04',
     lang: 'ja',
     group: 'restaurant',
-    title: 'Paying the Bill',
+    title: 'Asking for the Check',
     titleTC: '結帳',
     emoji: '💳',
     description: 'Asking for the check and paying',
@@ -694,7 +694,7 @@ export const scenarios: Scenario[] = [
   // === SC35: Department Store / Mall ===
   {
     id: 'sc35', lang: 'ja', group: 'shopping',
-    title: 'Department Store', titleTC: '百貨公司',
+    title: 'Gift Wrapping & Floors', titleTC: '百貨公司',
     emoji: '🏬', description: 'Finding floors, gift wrapping, food hall',
     lines: [
       { speaker: 'you', target: 'お土産売り場は何階ですか？', pronunciation: 'omiyage uriba wa nankai desu ka', pronunciation_chunks: 'o·mi·ya·ge u·ri·ba wa nan·kai de·su ka', english: 'What floor is the souvenir section?', chinese_tc: '伴手禮在幾樓？' },
@@ -708,7 +708,7 @@ export const scenarios: Scenario[] = [
   // === SC40: Shopping Returns ===
   {
     id: 'sc40', lang: 'ja', group: 'shopping',
-    title: 'Returns & Exchange', titleTC: '退換貨',
+    title: '"Can I Return This?"', titleTC: '退換貨',
     emoji: '🔄', description: 'Returning or exchanging an item at a store',
     lines: [
       { speaker: 'you', target: 'すみません、この商品を返品したいのですが', pronunciation: 'sumimasen, kono shouhin wo henpin shitai no desu ga', pronunciation_chunks: 'su·mi·ma·sen ko·no shou·hin wo hen·pin shi·tai no de·su ga', english: 'Excuse me, I\'d like to return this item.', chinese_tc: '不好意思，我想退這個商品' },
@@ -793,7 +793,7 @@ export const scenarios: Scenario[] = [
   // === SC41: Grocery / Market ===
   {
     id: 'sc41', lang: 'ja', group: 'daily',
-    title: 'Grocery & Market', titleTC: '超市與市場',
+    title: 'Asking About Fresh Food', titleTC: '超市與市場',
     emoji: '🛒', description: 'Shopping at a supermarket or local market',
     lines: [
       { speaker: 'you', target: 'お刺身売り場はどこですか？', pronunciation: 'osashimi uriba wa doko desu ka', pronunciation_chunks: 'o·sa·shi·mi u·ri·ba wa do·ko de·su ka', english: 'Where is the sashimi section?', chinese_tc: '生魚片區在哪裡？' },
