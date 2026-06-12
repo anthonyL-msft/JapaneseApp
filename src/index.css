@@ -23,7 +23,7 @@ html {
 }
 
 html.light {
-  background-color: #f8fafc;
+  background-color: #ffffff;
 }
 
 html, body, #root {
@@ -91,11 +91,15 @@ html.light .text-sakura-300 { color: #db2777; }
 html.light .text-sakura-400 { color: #be185d; }
 html.light .text-sakura-400\/60 { color: rgba(190, 24, 93, 0.6); }
 
-/* Indigo accents */
-html.light .bg-indigo-500\/20 { background-color: rgba(99, 102, 241, 0.1); }
-html.light .bg-indigo-500\/50 { background-color: rgba(99, 102, 241, 0.15); }
+/* Difficulty dots */
+html.light .text-slate-700 { color: #cbd5e1; }
+
+/* Indigo accents — voiced ON button stronger */
+html.light .bg-indigo-500\/20 { background-color: rgba(99, 102, 241, 0.12); }
+html.light .bg-indigo-500\/50 { background-color: rgba(99, 102, 241, 0.6); }
 html.light .bg-indigo-500\/60 { background-color: rgba(99, 102, 241, 0.7); }
 html.light .bg-indigo-500\/10 { background-color: rgba(99, 102, 241, 0.08); }
+html.light .text-indigo-200 { color: #ffffff; }
 html.light .text-indigo-300 { color: #4f46e5; }
 html.light .border-indigo-500\/30 { border-color: rgba(99, 102, 241, 0.2); }
 html.light .border-indigo-700\/30 { border-color: rgba(99, 102, 241, 0.2); }
@@ -136,6 +140,30 @@ html.light .active\:bg-slate-700:active { background-color: rgba(203, 213, 225, 
 html.light .active\:bg-slate-700\/50:active { background-color: rgba(203, 213, 225, 0.4); }
 html.light .active\:bg-slate-600\/50:active { background-color: rgba(203, 213, 225, 0.4); }
 html.light .active\:bg-slate-800:active { background-color: rgba(226, 232, 240, 0.8); }
+
+/* Difficulty dots */
+html.light .text-slate-700 { color: #cbd5e1; }
+
+/* Drawer nested card backgrounds — lighter to show hierarchy */
+html.light .bg-slate-800\/80 .bg-slate-700\/40,
+html.light .bg-slate-800 .bg-slate-700\/40 { background-color: rgba(255, 255, 255, 0.7); }
+
+/* Bottom nav active state */
+html.light .active\:bg-indigo-600:active { background-color: rgba(99, 102, 241, 0.3); }
+html.light .active\:bg-purple-600:active { background-color: rgba(168, 85, 247, 0.3); }
+
+/* Conversation bubbles */
+html.light .bg-indigo-900\/60 { background-color: rgba(99, 102, 241, 0.12); }
+html.light .bg-indigo-900\/30 { background-color: rgba(99, 102, 241, 0.08); }
+html.light .bg-amber-900\/50 { background-color: rgba(245, 158, 11, 0.12); }
+html.light .text-amber-300 { color: #d97706; }
+
+/* Flashcard rating buttons */
+html.light .bg-amber-900\/40 { background-color: rgba(245, 158, 11, 0.1); }
+html.light .text-amber-300 { color: #d97706; }
+html.light .bg-green-900\/40 { background-color: rgba(34, 197, 94, 0.1); }
+html.light .bg-emerald-900\/40 { background-color: rgba(16, 185, 129, 0.1); }
+html.light .text-emerald-300 { color: #059669; }
 
 /* Scrollbar */
 html.light .scroll-area { scrollbar-color: #cbd5e1 transparent; }

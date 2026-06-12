@@ -79,7 +79,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
 
       {/* Left Drawer */}
       {drawerOpen && (
-        <div className="fixed inset-0 z-50 flex" onClick={closeDrawer}>
+        <div className="fixed inset-0 z-[60] flex" onClick={closeDrawer}>
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50" />
 

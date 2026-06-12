@@ -472,7 +472,7 @@ function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
 // ============================================================
 // Number Converter
 // ============================================================
-function NumberConverter() {
+export function NumberConverter() {
   const [input, setInput] = useState('');
   const HKD_RATE = 0.054; // 1 JPY ≈ 0.054 HKD
   const CAD_RATE = 0.0096; // 1 JPY ≈ 0.0096 CAD

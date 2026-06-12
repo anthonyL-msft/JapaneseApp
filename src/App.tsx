@@ -6,7 +6,7 @@ import { getBookmarks, addBookmark, removeBookmark, getNotes, saveNote, deleteNo
 import { PhraseBook } from './components/PhraseBook';
 import { Flashcards } from './components/Flashcards';
 import { MyStuff } from './components/MyStuff';
-import { Reference } from './components/Reference';
+import { Reference, NumberConverter } from './components/Reference';
 import { Scenarios } from './components/Scenarios';
 import { AskAI } from './components/AskAI';
 import { SentenceBuilder } from './components/SentenceBuilder';
@@ -123,7 +123,7 @@ function App() {
         onChange={setSearch}
         lang={lang}
         onOpenCards={() => setTab('cards')}
-        onOpenConverter={() => { setTab('reference'); }}
+        onOpenConverter={() => setTab('converter')}
         onOpenBuilder={() => setTab('builder')}
         onOpenNotes={() => setTab('notes')}
         onOpenProgress={() => setTab('progress')}
@@ -169,6 +169,15 @@ function App() {
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
         {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} />}
+        {tab === 'converter' && (
+          <div className="scroll-area h-full">
+            <div className="px-4 py-3 border-b border-slate-800">
+              <h2 className="text-lg font-bold">🔄 Number Converter</h2>
+              <p className="text-base text-slate-400">Type a number → kanji + reading</p>
+            </div>
+            <div className="px-3"><NumberConverter /></div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Navigation */}
