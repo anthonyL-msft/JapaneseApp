@@ -11,6 +11,7 @@ import { Scenarios } from './components/Scenarios';
 import { AskAI } from './components/AskAI';
 import { SentenceBuilder } from './components/SentenceBuilder';
 import { QuickNote } from './components/QuickNote';
+import { Progress } from './components/Progress';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
@@ -125,6 +126,7 @@ function App() {
         onOpenConverter={() => { setTab('reference'); }}
         onOpenBuilder={() => setTab('builder')}
         onOpenNotes={() => setTab('notes')}
+        onOpenProgress={() => setTab('progress')}
       />
 
       {/* Main Content */}
@@ -164,6 +166,7 @@ function App() {
         {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
         {tab === 'builder' && <SentenceBuilder />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
+        {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
       </div>
 
       {/* Bottom Navigation */}

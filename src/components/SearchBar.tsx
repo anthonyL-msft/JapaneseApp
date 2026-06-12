@@ -11,6 +11,7 @@ interface Props {
   onOpenConverter: () => void;
   onOpenBuilder: () => void;
   onOpenNotes: () => void;
+  onOpenProgress: () => void;
 }
 
 const SPEED_LABELS: Record<string, string> = {
@@ -21,7 +22,7 @@ const SPEED_LABELS: Record<string, string> = {
   '1': 'Native',
 };
 
-export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter, onOpenBuilder, onOpenNotes }: Props) {
+export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter, onOpenBuilder, onOpenNotes, onOpenProgress }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
@@ -137,6 +138,16 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
               {/* Tools */}
               <div className="px-4 py-3 border-b border-slate-800/50">
                 <p className="text-sm text-slate-500 mb-2">Tools</p>
+                <button
+                  onClick={() => { closeDrawer(); onOpenProgress(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">📊</span>
+                  <div>
+                    <p className="text-base text-slate-200">My Progress</p>
+                    <p className="text-sm text-slate-500">Track your learning</p>
+                  </div>
+                </button>
                 <button
                   onClick={() => { closeDrawer(); onOpenCards(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"

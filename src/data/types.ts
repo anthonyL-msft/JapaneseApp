@@ -94,4 +94,4 @@ export interface SRSCard {
   lastReview: number;
 }
 
-export type Tab = 'phrases' | 'scenes' | 'cards' | 'bookmarks' | 'notes' | 'reference' | 'ai' | 'builder';
+export type Tab = 'phrases' | 'scenes' | 'cards' | 'bookmarks' | 'notes' | 'reference' | 'ai' | 'builder' | 'progress';
