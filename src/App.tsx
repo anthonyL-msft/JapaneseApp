@@ -12,6 +12,7 @@ import { AskAI } from './components/AskAI';
 import { SentenceBuilder } from './components/SentenceBuilder';
 import { QuickNote } from './components/QuickNote';
 import { Progress } from './components/Progress';
+import { Settings } from './components/Settings';
 import { SearchBar } from './components/SearchBar';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
@@ -121,12 +122,12 @@ function App() {
         value={search}
         onChange={setSearch}
         lang={lang}
-        onLangChange={setLang}
         onOpenCards={() => setTab('cards')}
         onOpenConverter={() => { setTab('reference'); }}
         onOpenBuilder={() => setTab('builder')}
         onOpenNotes={() => setTab('notes')}
         onOpenProgress={() => setTab('progress')}
+        onOpenSettings={() => setTab('settings')}
       />
 
       {/* Main Content */}
@@ -167,6 +168,7 @@ function App() {
         {tab === 'builder' && <SentenceBuilder />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
+        {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} />}
       </div>
 
       {/* Bottom Navigation */}

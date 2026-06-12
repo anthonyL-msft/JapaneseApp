@@ -1,34 +1,23 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { LANGUAGES } from '../data/types';
-import { getTtsRate, setTtsRate, speak } from '../utils/tts';
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
   lang: string;
-  onLangChange: (lang: string) => void;
   onOpenCards: () => void;
   onOpenConverter: () => void;
   onOpenBuilder: () => void;
   onOpenNotes: () => void;
   onOpenProgress: () => void;
+  onOpenSettings: () => void;
 }
 
-const SPEED_LABELS: Record<string, string> = {
-  '0.5': 'Very Slow',
-  '0.6': 'Slow',
-  '0.7': 'Normal',
-  '0.85': 'Fast',
-  '1': 'Native',
-};
-
-export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, onOpenConverter, onOpenBuilder, onOpenNotes, onOpenProgress }: Props) {
+export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenNotes, onOpenProgress, onOpenSettings }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
-  const [rate, setRate] = useState(getTtsRate);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains('light'));
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -47,24 +36,6 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
     setDrawerAnim('animate-slide-out-left');
     setTimeout(() => setDrawerOpen(false), 200);
   }, []);
-
-  const handleRateChange = (newRate: number) => {
-    setRate(newRate);
-    setTtsRate(newRate);
-    speak('こんにちは', currentLang.ttsLang);
-  };
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    if (next) {
-      document.documentElement.classList.remove('light');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.add('light');
-      localStorage.setItem('theme', 'light');
-    }
-  };
 
   return (
     <>
@@ -129,25 +100,6 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
 
             {/* Menu items */}
             <div className="flex-1 overflow-y-auto">
-              {/* Language */}
-              <div className="px-4 py-3 border-b border-slate-800/50">
-                <p className="text-sm text-slate-500 mb-2">Language</p>
-                <div className="space-y-1">
-                  {LANGUAGES.map(l => (
-                    <button
-                      key={l.code}
-                      onClick={() => onLangChange(l.code)}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition ${lang === l.code ? 'bg-sakura-500/20 text-sakura-300' : 'text-slate-400 active:bg-slate-800'}`}
-                    >
-                      <span className="text-lg">{l.flag}</span>
-                      <span className="text-base">{l.name}</span>
-                      <span className="text-sm text-slate-500">{l.nameNative}</span>
-                      {lang === l.code && <span className="ml-auto text-sakura-400">✓</span>}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Tools */}
               <div className="px-4 py-3 border-b border-slate-800/50">
                 <p className="text-sm text-slate-500 mb-2">Tools</p>
@@ -204,42 +156,17 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
               </div>
 
               {/* Settings */}
-              <div className="px-4 py-3">
-                <p className="text-sm text-slate-500 mb-2">Settings</p>
-                <div className="px-3 space-y-3">
-                  {/* Theme toggle */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-base text-slate-400">{isDark ? '🌙' : '☀️'} Appearance</span>
-                    <button
-                      onClick={toggleTheme}
-                      className={`px-3 py-1 rounded-full text-sm transition ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-amber-100 text-amber-700'}`}
-                    >
-                      {isDark ? 'Dark' : 'Light'}
-                    </button>
-                  </div>
-
-                  {/* Speech speed */}
+              <div className="px-4 py-3 border-b border-slate-800/50">
+                <button
+                  onClick={() => { closeDrawer(); onOpenSettings(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">⚙️</span>
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                    <span className="text-base text-slate-400">🔊 Speech Speed</span>
-                    <span className="text-base text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
+                    <p className="text-base text-slate-200">Settings</p>
+                    <p className="text-sm text-slate-500">Theme, language, speech</p>
                   </div>
-                  <input
-                    type="range"
-                    min="0.5"
-                    max="1"
-                    step="0.05"
-                    value={rate}
-                    onChange={e => handleRateChange(parseFloat(e.target.value))}
-                    className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sakura-400"
-                  />
-                  <div className="flex justify-between text-sm text-slate-600 mt-1">
-                    <span>Slow</span>
-                    <span>Normal</span>
-                    <span>Native</span>
-                  </div>
-                  </div>
-                </div>
+                </button>
               </div>
             </div>
 
