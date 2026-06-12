@@ -123,6 +123,10 @@ function App() {
         onOpenCards={() => setTab('cards')}
         onOpenConverter={() => { setTab('reference'); }}
         onOpenBuilder={() => setTab('builder')}
+        onAddNote={(text) => {
+          const now = Date.now();
+          handleSaveNote({ id: `sn_${now}`, text, createdAt: now, updatedAt: now });
+        }}
       />
 
       {/* Main Content */}
