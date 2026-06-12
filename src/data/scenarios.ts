@@ -965,4 +965,36 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: '風邪薬をください', pronunciation: 'kaze-gusuri wo kudasai', pronunciation_chunks: 'ka·ze·gu·su·ri wo ku·da·sai', english: 'Cold medicine please.', chinese_tc: '請給我感冒藥', note: 'Useful: 頭痛薬 (headache), 胃薬 (stomach), 解熱剤 (fever reducer)' },
     ],
   },
+
+  // === SC43: Taking a Bus ===
+  {
+    id: 'sc43', lang: 'ja', group: 'transit',
+    title: 'Taking a Bus', titleTC: '搭公車',
+    emoji: '🚌', description: 'Finding the bus stop, asking about routes and schedules',
+    lines: [
+      { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？' },
+      { speaker: 'staff', target: 'あちらの3番のりばです', pronunciation: 'achira no sanban noriba desu', pronunciation_chunks: 'a·chi·ra no san·ban no·ri·ba de·su', english: 'It\'s at bus stop number 3 over there.', chinese_tc: '在那邊的3號乘車處' },
+      { speaker: 'you', target: '次のバスは何時ですか？', pronunciation: 'tsugi no basu wa nanji desu ka', pronunciation_chunks: 'tsu·gi no ba·su wa nan·ji de·su ka', english: 'What time is the next bus?', chinese_tc: '下一班公車幾點？' },
+      { speaker: 'staff', target: '10分後に来ますよ', pronunciation: 'juppun go ni kimasu yo', pronunciation_chunks: 'jup·pun go ni ki·ma·su yo', english: 'It comes in 10 minutes.', chinese_tc: '10分鐘後來' },
+      { speaker: 'you', target: 'ICカードで乗れますか？', pronunciation: 'ai-shii kaado de noremasu ka', pronunciation_chunks: 'ai·shii kaa·do de no·re·ma·su ka', english: 'Can I ride with an IC card?', chinese_tc: '可以用IC卡搭嗎？', note: 'Most city buses accept IC cards. Tap when boarding (front) or exiting (back) depending on the city.' },
+      { speaker: 'staff', target: 'はい、乗る時にタッチしてください', pronunciation: 'hai, noru toki ni tacchi shite kudasai', pronunciation_chunks: 'hai no·ru to·ki ni tat·chi shi·te ku·da·sai', english: 'Yes, tap when you board.', chinese_tc: '可以，上車時感應一下' },
+      { speaker: 'you', target: '降りたい時はどうすればいいですか？', pronunciation: 'oritai toki wa dou sureba ii desu ka', pronunciation_chunks: 'o·ri·tai to·ki wa dou su·re·ba ii de·su ka', english: 'What should I do when I want to get off?', chinese_tc: '想下車的時候怎麼辦？' },
+      { speaker: 'staff', target: 'ボタンを押してください。次のバス停で降りられます', pronunciation: 'botan wo oshite kudasai. tsugi no basutei de oriraremasu', pronunciation_chunks: 'bo·tan wo o·shi·te ku·da·sai. tsu·gi no ba·su·tei de o·ri·ra·re·ma·su', english: 'Press the button. You can get off at the next stop.', chinese_tc: '按按鈕。在下一站就可以下車' },
+    ],
+  },
+
+  // === SC44: Restaurant — Non-smoking ===
+  {
+    id: 'sc44', lang: 'ja', group: 'restaurant',
+    title: 'Seating Preferences', titleTC: '座位需求',
+    emoji: '🪑', description: 'Requesting non-smoking, counter vs table, window seat',
+    lines: [
+      { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
+      { speaker: 'you', target: '二名です。禁煙席をお願いします', pronunciation: 'nimei desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'ni·mei de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.' },
+      { speaker: 'staff', target: 'カウンター席とテーブル席、どちらがよろしいですか？', pronunciation: 'kauntaa seki to teeburu seki, dochira ga yoroshii desu ka', pronunciation_chunks: 'kaun·taa se·ki to tee·bu·ru se·ki do·chi·ra ga yo·ro·shii de·su ka', english: 'Counter or table seat?', chinese_tc: '吧台還是桌位？' },
+      { speaker: 'you', target: 'テーブル席でお願いします', pronunciation: 'teeburu seki de onegaishimasu', pronunciation_chunks: 'tee·bu·ru se·ki de o·ne·gai·shi·ma·su', english: 'Table seat please.', chinese_tc: '桌位' },
+      { speaker: 'you', target: '窓側の席はありますか？', pronunciation: 'madogawa no seki wa arimasu ka', pronunciation_chunks: 'ma·do·ga·wa no se·ki wa a·ri·ma·su ka', english: 'Is there a window seat?', chinese_tc: '有靠窗的座位嗎？' },
+      { speaker: 'staff', target: '少々お待ちください。ご案内いたします', pronunciation: 'shoushou omachi kudasai. go-annai itashimasu', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai. go·an·nai i·ta·shi·ma·su', english: 'One moment. I\'ll show you to your seat.', chinese_tc: '請稍等。帶您入座' },
+    ],
+  },
 ];
