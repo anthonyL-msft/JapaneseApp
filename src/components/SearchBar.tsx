@@ -44,7 +44,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
           {/* Hamburger */}
           <button
             onClick={openDrawer}
-            className="shrink-0 text-lg p-1.5 rounded-lg text-slate-500 active:text-slate-300 transition"
+            className="shrink-0 text-xl p-2 rounded-lg text-slate-500 active:text-slate-300 transition"
           >
             ☰
           </button>
