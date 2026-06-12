@@ -69,7 +69,15 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: '滞在の目的は何ですか？', pronunciation: 'taizai no mokuteki wa nan desu ka', pronunciation_chunks: 'tai·zai no mo·ku·te·ki wa nan de·su ka', english: 'What is the purpose of your stay?', chinese_tc: '您的停留目的是什麼？' },
       { speaker: 'you', target: '観光です', pronunciation: 'kankou desu', pronunciation_chunks: 'kan·kou de·su', english: 'Sightseeing / Tourism.', chinese_tc: '觀光', note: 'Simple and clear. No need to elaborate.' },
       { speaker: 'staff', target: '何日間の滞在ですか？', pronunciation: 'nannichikan no taizai desu ka', pronunciation_chunks: 'nan·ni·chi·kan no tai·zai de·su ka', english: 'How many days will you stay?', chinese_tc: '停留幾天？' },
-      { speaker: 'you', target: '一週間です', pronunciation: 'isshuukan desu', pronunciation_chunks: 'is·shuu·kan de·su', english: 'One week.', chinese_tc: '一個星期' },
+      { speaker: 'you', target: '一週間です', pronunciation: 'isshuukan desu', pronunciation_chunks: 'is·shuu·kan de·su', english: 'One week.', chinese_tc: '一個星期', variables: [
+        { placeholder: '一週間', label: 'Duration', options: [
+          { value: '一週間', pronunciation: 'is·shuu·kan', english: 'One week' },
+          { value: '三日間', pronunciation: 'mik·ka·kan', english: 'Three days' },
+          { value: '五日間', pronunciation: 'it·su·ka·kan', english: 'Five days' },
+          { value: '十日間', pronunciation: 'too·ka·kan', english: 'Ten days' },
+          { value: '二週間', pronunciation: 'ni·shuu·kan', english: 'Two weeks' },
+        ] },
+      ] },
       { speaker: 'you', target: '荷物の受取所はどこですか？', pronunciation: 'nimotsu no uketori-jo wa doko desu ka', pronunciation_chunks: 'ni·mo·tsu no u·ke·to·ri·jo wa do·ko de·su ka', english: 'Where is the baggage claim?', chinese_tc: '行李提取處在哪裡？' },
       { speaker: 'you', target: '名古屋市内への電車はどこですか？', pronunciation: 'nagoya shinai e no densha wa doko desu ka', pronunciation_chunks: 'na·go·ya shi·nai e no den·sha wa do·ko de·su ka', english: 'Where is the train to Nagoya city?', chinese_tc: '去名古屋市區的電車在哪裡？', note: 'From Chubu Airport: take Meitetsu μ-SKY to Nagoya Station (~28 min)' },
     ],
