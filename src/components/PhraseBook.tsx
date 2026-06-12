@@ -128,7 +128,12 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                 const order: Record<string, number> = {
                   // Food & Drinks
                   'Common dishes': 1, 'Sashimi & Seafood': 2, 'Food vocabulary': 3,
-                  'Flavors': 4, 'Condiments': 5, 'Drinks': 6, 'Winter drinks': 7, 'Table items': 8,
+                  'Flavors & Condiments': 4, 'Drinks': 5, 'Winter drinks': 6, 'Table items': 7,
+                  // Restaurant
+                  'Entering': 1, 'Ordering': 2, 'Allergies': 3, 'Dietary': 4,
+                  'Preferences': 5, 'Takeout vs Dine-in': 6, 'Takeout': 7,
+                  'Getting service': 8, 'Compliments': 9, 'Paying': 10,
+                  "What you'll hear": 11, 'Mistake recovery': 12,
                   // Basics — push numbers/time to bottom
                   'Numbers': 90, 'Time': 91,
                 };
