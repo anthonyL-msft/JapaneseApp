@@ -378,7 +378,7 @@ function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
           if (showVoiced && !voiced && !handaku) {
             // No voiced variant — show dimmed base
             return (
-              <div key={i} className="rounded-lg h-14 flex flex-col items-center justify-center bg-slate-700/10 opacity-30">
+              <div key={i} className="rounded-lg h-14 flex flex-col items-center justify-center bg-slate-700/15 opacity-50">
                 <span className="text-lg text-slate-500">{baseChar}</span>
                 <span className="text-base text-slate-600">{baseRom}</span>
               </div>
