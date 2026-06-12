@@ -24,15 +24,19 @@ export interface ConversationLine {
   variables?: Variable[];      // swappable placeholders (destinations, times, etc.)
 }
 
-export type ScenarioGroup = 'dining' | 'travel' | 'accommodation' | 'shopping' | 'sightseeing' | 'emergency';
+export type ScenarioGroup = 'airport' | 'train' | 'transit' | 'hotel' | 'restaurant' | 'foodspots' | 'shopping' | 'daily' | 'activities' | 'trouble';
 
 export const SCENARIO_GROUPS: Record<ScenarioGroup, { label: string; emoji: string }> = {
-  dining:        { label: 'Dining & Drinks', emoji: '🍽️' },
-  travel:        { label: 'Getting Around', emoji: '🚃' },
-  accommodation: { label: 'Accommodation', emoji: '🏨' },
-  shopping:      { label: 'Shopping & Daily', emoji: '🛍️' },
-  sightseeing:   { label: 'Sightseeing', emoji: '📸' },
-  emergency:     { label: 'Help & Emergency', emoji: '🆘' },
+  airport:    { label: 'Airport', emoji: '🛬' },
+  train:      { label: 'Train', emoji: '🚆' },
+  transit:    { label: 'Bus & Taxi', emoji: '🚕' },
+  hotel:      { label: 'Hotel', emoji: '🏨' },
+  restaurant: { label: 'Restaurant', emoji: '🍜' },
+  foodspots:  { label: 'Food Spots', emoji: '🍣' },
+  shopping:   { label: 'Shopping', emoji: '🛍️' },
+  daily:      { label: 'Daily Life', emoji: '🏪' },
+  activities: { label: 'Activities', emoji: '🎌' },
+  trouble:    { label: 'Trouble', emoji: '🆘' },
 };
 
 export interface Scenario {
@@ -53,7 +57,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc01',
     lang: 'ja',
-    group: 'dining',
+    group: 'restaurant',
     title: 'Entering a Restaurant',
     titleTC: '進入餐廳',
     emoji: '🚪',
@@ -72,7 +76,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc02',
     lang: 'ja',
-    group: 'dining',
+    group: 'restaurant',
     title: 'Entering with Reservation',
     titleTC: '有預約進入餐廳',
     emoji: '📋',
@@ -96,7 +100,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc03',
     lang: 'ja',
-    group: 'dining',
+    group: 'restaurant',
     title: 'Ordering Food',
     titleTC: '點餐',
     emoji: '📝',
@@ -114,7 +118,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc04',
     lang: 'ja',
-    group: 'dining',
+    group: 'restaurant',
     title: 'Paying the Bill',
     titleTC: '結帳',
     emoji: '💳',
@@ -136,7 +140,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc05',
     lang: 'ja',
-    group: 'shopping',
+    group: 'daily',
     title: 'Convenience Store',
     titleTC: '便利商店',
     emoji: '🏪',
@@ -167,7 +171,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc06',
     lang: 'ja',
-    group: 'accommodation',
+    group: 'hotel',
     title: 'Hotel Check-in',
     titleTC: '飯店入住',
     emoji: '🏨',
@@ -195,7 +199,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc07',
     lang: 'ja',
-    group: 'travel',
+    group: 'transit',
     title: 'Taking a Taxi',
     titleTC: '搭計程車',
     emoji: '🚕',
@@ -213,7 +217,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc08',
     lang: 'ja',
-    group: 'travel',
+    group: 'train',
     title: 'Buying Train Tickets',
     titleTC: '買車票',
     emoji: '🚃',
@@ -244,7 +248,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc09',
     lang: 'ja',
-    group: 'travel',
+    group: 'transit',
     title: 'Asking for Directions',
     titleTC: '問路',
     emoji: '🗺️',
@@ -291,7 +295,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc11',
     lang: 'ja',
-    group: 'dining',
+    group: 'foodspots',
     title: 'Ramen Shop',
     titleTC: '拉麵店',
     emoji: '🍜',
@@ -323,7 +327,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc12',
     lang: 'ja',
-    group: 'dining',
+    group: 'foodspots',
     title: 'Izakaya (Japanese Pub)',
     titleTC: '居酒屋',
     emoji: '🍶',
@@ -353,7 +357,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc13',
     lang: 'ja',
-    group: 'dining',
+    group: 'foodspots',
     title: 'Sushi Counter',
     titleTC: '壽司吧台',
     emoji: '🍣',
@@ -380,7 +384,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc14',
     lang: 'ja',
-    group: 'accommodation',
+    group: 'hotel',
     title: 'Hotel Check-out & Luggage',
     titleTC: '退房寄放行李',
     emoji: '🧳',
@@ -410,7 +414,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc15',
     lang: 'ja',
-    group: 'sightseeing',
+    group: 'activities',
     title: 'Visiting a Temple / Shrine',
     titleTC: '參觀寺廟/神社',
     emoji: '⛩️',
@@ -430,7 +434,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc16',
     lang: 'ja',
-    group: 'sightseeing',
+    group: 'activities',
     title: 'Onsen (Hot Spring)',
     titleTC: '溫泉',
     emoji: '♨️',
@@ -448,7 +452,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc17',
     lang: 'ja',
-    group: 'emergency',
+    group: 'trouble',
     title: 'Lost Item / Forgot Something',
     titleTC: '遺失物品',
     emoji: '😰',
@@ -482,7 +486,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc18',
     lang: 'ja',
-    group: 'dining',
+    group: 'foodspots',
     title: 'Café Order',
     titleTC: '咖啡廳點餐',
     emoji: '☕',
@@ -511,7 +515,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc19',
     lang: 'ja',
-    group: 'emergency',
+    group: 'trouble',
     title: 'At the Pharmacy',
     titleTC: '藥局',
     emoji: '💊',
@@ -542,7 +546,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc20',
     lang: 'ja',
-    group: 'sightseeing',
+    group: 'activities',
     title: 'Taking Photos Together',
     titleTC: '請人拍照',
     emoji: '📸',
@@ -569,7 +573,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc21',
     lang: 'ja',
-    group: 'travel',
+    group: 'train',
     title: 'Nagoya to Tokyo Shinkansen',
     titleTC: '名古屋到東京新幹線',
     emoji: '🚅',
@@ -598,7 +602,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc22',
     lang: 'ja',
-    group: 'dining',
+    group: 'foodspots',
     title: 'Nagoya Specialties',
     titleTC: '名古屋特色美食',
     emoji: '🍤',
@@ -619,7 +623,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc23',
     lang: 'ja',
-    group: 'sightseeing',
+    group: 'activities',
     title: 'Nagoya Castle',
     titleTC: '名古屋城',
     emoji: '🏯',
@@ -636,7 +640,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc24',
     lang: 'ja',
-    group: 'sightseeing',
+    group: 'activities',
     title: 'Winter Illumination',
     titleTC: '冬季燈飾',
     emoji: '✨',
@@ -654,7 +658,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc25',
     lang: 'ja',
-    group: 'travel',
+    group: 'activities',
     title: 'Winter Weather Chat',
     titleTC: '冬天氣候對話',
     emoji: '🧣',
@@ -675,7 +679,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc26',
     lang: 'ja',
-    group: 'travel',
+    group: 'transit',
     title: 'Luggage Forwarding (Takkyubin)',
     titleTC: '行李宅配（宅急便）',
     emoji: '📦',
@@ -713,7 +717,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc27',
     lang: 'ja',
-    group: 'travel',
+    group: 'train',
     title: 'Train Ticket Gate Problem',
     titleTC: '車票閘門故障',
     emoji: '🚧',
@@ -738,7 +742,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc28',
     lang: 'ja',
-    group: 'dining',
+    group: 'restaurant',
     title: 'Politely Declining & Correcting',
     titleTC: '禮貌拒絕與更正',
     emoji: '🙅',
@@ -762,7 +766,7 @@ export const scenarios: Scenario[] = [
 
   // === SC29: IC Card Purchase ===
   {
-    id: 'sc29', lang: 'ja', group: 'travel',
+    id: 'sc29', lang: 'ja', group: 'airport',
     title: 'Buying an IC Card', titleTC: '購買IC卡',
     emoji: '💳', description: 'At the station ticket machine, buying and charging a Suica/Manaca',
     lines: [
@@ -778,7 +782,7 @@ export const scenarios: Scenario[] = [
 
   // === SC30: Airport Arrival ===
   {
-    id: 'sc30', lang: 'ja', group: 'travel',
+    id: 'sc30', lang: 'ja', group: 'airport',
     title: 'Airport Arrival', titleTC: '機場入境',
     emoji: '🛬', description: 'Immigration, customs, and finding transport to the city',
     lines: [
@@ -795,7 +799,7 @@ export const scenarios: Scenario[] = [
 
   // === SC31: Feeling Sick / Medical ===
   {
-    id: 'sc31', lang: 'ja', group: 'emergency',
+    id: 'sc31', lang: 'ja', group: 'trouble',
     title: 'Feeling Sick', titleTC: '身體不舒服',
     emoji: '🤒', description: 'Telling hotel staff or a pharmacist about symptoms',
     lines: [
@@ -811,7 +815,7 @@ export const scenarios: Scenario[] = [
 
   // === SC32: Getting Lost on Train ===
   {
-    id: 'sc32', lang: 'ja', group: 'travel',
+    id: 'sc32', lang: 'ja', group: 'train',
     title: 'Wrong Train / Lost', titleTC: '搭錯車',
     emoji: '😰', description: 'Realizing you\'re on the wrong train and asking for help',
     lines: [
@@ -826,7 +830,7 @@ export const scenarios: Scenario[] = [
 
   // === SC33: Restaurant Reservation ===
   {
-    id: 'sc33', lang: 'ja', group: 'dining',
+    id: 'sc33', lang: 'ja', group: 'restaurant',
     title: 'Making a Reservation', titleTC: '預約餐廳',
     emoji: '📞', description: 'Booking a table at a restaurant by phone or walk-in',
     lines: [
@@ -842,7 +846,7 @@ export const scenarios: Scenario[] = [
 
   // === SC34: Convenience Store Detailed ===
   {
-    id: 'sc34', lang: 'ja', group: 'shopping',
+    id: 'sc34', lang: 'ja', group: 'daily',
     title: 'Convenience Store Checkout', titleTC: '便利店結帳',
     emoji: '🏪', description: 'Full checkout flow — heating, bags, payment, eating in',
     lines: [
@@ -874,7 +878,7 @@ export const scenarios: Scenario[] = [
 
   // === SC36: Karaoke ===
   {
-    id: 'sc36', lang: 'ja', group: 'sightseeing',
+    id: 'sc36', lang: 'ja', group: 'activities',
     title: 'Karaoke', titleTC: '卡拉OK',
     emoji: '🎤', description: 'Booking a room, ordering drinks, extending time',
     lines: [
@@ -890,7 +894,7 @@ export const scenarios: Scenario[] = [
 
   // === SC37: ATM / Money ===
   {
-    id: 'sc37', lang: 'ja', group: 'shopping',
+    id: 'sc37', lang: 'ja', group: 'daily',
     title: 'Convenience Store ATM', titleTC: '便利店ATM',
     emoji: '🏧', description: 'Withdrawing money from a convenience store ATM',
     lines: [
@@ -904,13 +908,74 @@ export const scenarios: Scenario[] = [
 
   // === SC38: Vending Machine ===
   {
-    id: 'sc38', lang: 'ja', group: 'shopping',
+    id: 'sc38', lang: 'ja', group: 'daily',
     title: 'Vending Machine', titleTC: '自動販賣機',
     emoji: '🥤', description: 'Using Japan\'s famous vending machines',
     lines: [
       { speaker: 'you', target: 'この自動販売機、ICカードは使えますか？', pronunciation: 'kono jidou hanbaiki, ai-shii kaado wa tsukaemasu ka', pronunciation_chunks: 'ko·no ji·dou han·bai·ki ai·shii kaa·do wa tsu·ka·e·ma·su ka', english: 'Can I use an IC card on this vending machine?', chinese_tc: '這台自動販賣機可以用IC卡嗎？', note: 'Look for the IC card symbol. Tap your Suica/Manaca on the reader, then press your drink.' },
       { speaker: 'staff', target: 'はい、ここにタッチしてからボタンを押してください', pronunciation: 'hai, koko ni tacchi shite kara botan wo oshite kudasai', pronunciation_chunks: 'hai ko·ko ni tat·chi shi·te ka·ra bo·tan wo o·shi·te ku·da·sai', english: 'Yes, tap here first then press the button.', chinese_tc: '可以，先在這裡感應再按按鈕' },
       { speaker: 'you', target: 'ホットとコールド、どっちですか？', pronunciation: 'hotto to koorudo, dotchi desu ka', pronunciation_chunks: 'hot·to to koo·ru·do dot·chi de·su ka', english: 'Is it hot or cold?', chinese_tc: '是熱的還是冷的？', note: 'Red label = hot (あたたかい), Blue label = cold (つめたい). Winter machines have both!' },
+    ],
+  },
+
+  // === SC39: Hotel — Borrowing Items & Services ===
+  {
+    id: 'sc39', lang: 'ja', group: 'hotel',
+    title: 'Hotel Requests', titleTC: '飯店需求',
+    emoji: '🛎️', description: 'Borrowing items, breakfast, late checkout, sending luggage',
+    lines: [
+      { speaker: 'you', target: '充電器を貸していただけますか？', pronunciation: 'juudenki wo kashite itadakemasu ka', pronunciation_chunks: 'juu·den·ki wo ka·shi·te i·ta·da·ke·ma·su ka', english: 'Could I borrow a charger?', chinese_tc: '可以借充電器嗎？', note: 'Hotels often lend: chargers, umbrellas (傘), adapters (変換プラグ), hair dryers (ドライヤー)' },
+      { speaker: 'staff', target: 'はい、フロントにございます', pronunciation: 'hai, furonto ni gozaimasu', pronunciation_chunks: 'hai fu·ron·to ni go·zai·ma·su', english: 'Yes, we have them at the front desk.', chinese_tc: '有，在櫃台' },
+      { speaker: 'you', target: '朝食は何時からですか？', pronunciation: 'choushoku wa nanji kara desu ka', pronunciation_chunks: 'chou·sho·ku wa nan·ji ka·ra de·su ka', english: 'What time does breakfast start?', chinese_tc: '早餐幾點開始？' },
+      { speaker: 'staff', target: '7時から9時までです。2階のレストランです', pronunciation: 'shichiji kara kuji made desu. nikai no resutoran desu', pronunciation_chunks: 'shi·chi·ji ka·ra ku·ji ma·de de·su. ni·kai no re·su·to·ran de·su', english: 'From 7 to 9. It\'s the restaurant on the 2nd floor.', chinese_tc: '7點到9點。在2樓的餐廳' },
+      { speaker: 'you', target: 'レイトチェックアウトはできますか？', pronunciation: 'reito chekkuauto wa dekimasu ka', pronunciation_chunks: 'rei·to chek·ku·au·to wa de·ki·ma·su ka', english: 'Can I have a late checkout?', chinese_tc: '可以延遲退房嗎？' },
+      { speaker: 'staff', target: '12時まで延長可能です。追加料金は1000円です', pronunciation: 'juuniji made enchou kanou desu. tsuika ryoukin wa sen en desu', pronunciation_chunks: 'juu·ni·ji ma·de en·chou ka·nou de·su. tsui·ka ryou·kin wa sen en de·su', english: '12pm is possible. Extra charge is 1000 yen.', chinese_tc: '可以延到12點。追加費用1000日圓' },
+      { speaker: 'you', target: '荷物を先に送りたいのですが', pronunciation: 'nimotsu wo saki ni okuritai no desu ga', pronunciation_chunks: 'ni·mo·tsu wo sa·ki ni o·ku·ri·tai no de·su ga', english: 'I\'d like to send my luggage ahead.', chinese_tc: '我想先把行李寄出去', note: 'Hotels can arrange 宅急便 (takkyubin) to send bags to your next hotel or the airport!' },
+    ],
+  },
+
+  // === SC40: Shopping Returns ===
+  {
+    id: 'sc40', lang: 'ja', group: 'shopping',
+    title: 'Returns & Exchange', titleTC: '退換貨',
+    emoji: '🔄', description: 'Returning or exchanging an item at a store',
+    lines: [
+      { speaker: 'you', target: 'すみません、この商品を返品したいのですが', pronunciation: 'sumimasen, kono shouhin wo henpin shitai no desu ga', pronunciation_chunks: 'su·mi·ma·sen ko·no shou·hin wo hen·pin shi·tai no de·su ga', english: 'Excuse me, I\'d like to return this item.', chinese_tc: '不好意思，我想退這個商品' },
+      { speaker: 'staff', target: 'レシートはお持ちですか？', pronunciation: 'reshiito wa omochi desu ka', pronunciation_chunks: 're·shii·to wa o·mo·chi de·su ka', english: 'Do you have the receipt?', chinese_tc: '有收據嗎？' },
+      { speaker: 'you', target: 'はい、これです', pronunciation: 'hai, kore desu', pronunciation_chunks: 'hai ko·re de·su', english: 'Yes, here it is.', chinese_tc: '有，在這裡' },
+      { speaker: 'you', target: 'サイズを交換したいです', pronunciation: 'saizu wo koukan shitai desu', pronunciation_chunks: 'sai·zu wo kou·kan shi·tai de·su', english: 'I\'d like to exchange the size.', chinese_tc: '我想換尺寸' },
+      { speaker: 'staff', target: 'Mサイズでよろしいですか？', pronunciation: 'emu saizu de yoroshii desu ka', pronunciation_chunks: 'e·mu sai·zu de yo·ro·shii de·su ka', english: 'Is size M okay?', chinese_tc: 'M號可以嗎？' },
+      { speaker: 'you', target: 'はい、それでお願いします', pronunciation: 'hai, sore de onegaishimasu', pronunciation_chunks: 'hai so·re de o·ne·gai·shi·ma·su', english: 'Yes, that\'s fine.', chinese_tc: '好的' },
+    ],
+  },
+
+  // === SC41: Grocery / Market ===
+  {
+    id: 'sc41', lang: 'ja', group: 'daily',
+    title: 'Grocery & Market', titleTC: '超市與市場',
+    emoji: '🛒', description: 'Shopping at a supermarket or local market',
+    lines: [
+      { speaker: 'you', target: 'お刺身売り場はどこですか？', pronunciation: 'osashimi uriba wa doko desu ka', pronunciation_chunks: 'o·sa·shi·mi u·ri·ba wa do·ko de·su ka', english: 'Where is the sashimi section?', chinese_tc: '生魚片區在哪裡？' },
+      { speaker: 'staff', target: '奥の冷蔵コーナーにあります', pronunciation: 'oku no reizou koonaa ni arimasu', pronunciation_chunks: 'o·ku no rei·zou koo·naa ni a·ri·ma·su', english: 'It\'s in the refrigerated corner at the back.', chinese_tc: '在後面的冷藏區' },
+      { speaker: 'you', target: 'これは今日中に食べた方がいいですか？', pronunciation: 'kore wa kyouchuu ni tabeta hou ga ii desu ka', pronunciation_chunks: 'ko·re wa kyou·chuu ni ta·be·ta hou ga ii de·su ka', english: 'Should I eat this by today?', chinese_tc: '這個今天內吃完比較好嗎？', note: 'Check 消費期限 (shouhi kigen) = use by date. 賞味期限 (shoumi kigen) = best before (still OK after).' },
+      { speaker: 'you', target: 'レジ袋はいりません', pronunciation: 'reji bukuro wa irimasen', pronunciation_chunks: 're·ji bu·ku·ro wa i·ri·ma·sen', english: 'I don\'t need a plastic bag.', chinese_tc: '不需要塑膠袋' },
+      { speaker: 'staff', target: 'ポイントカードはお持ちですか？', pronunciation: 'pointo kaado wa omochi desu ka', pronunciation_chunks: 'poin·to kaa·do wa o·mo·chi de·su ka', english: 'Do you have a points card?', chinese_tc: '有集點卡嗎？', note: 'Say いいえ (no). Common at supermarkets and drugstores.' },
+      { speaker: 'you', target: 'いいえ、ありません', pronunciation: 'iie, arimasen', pronunciation_chunks: 'ii·e a·ri·ma·sen', english: 'No, I don\'t.', chinese_tc: '沒有' },
+    ],
+  },
+
+  // === SC42: Airport Customs ===
+  {
+    id: 'sc42', lang: 'ja', group: 'airport',
+    title: 'Customs Declaration', titleTC: '海關申報',
+    emoji: '🛃', description: 'Going through customs after immigration',
+    lines: [
+      { speaker: 'staff', target: '申告するものはありますか？', pronunciation: 'shinkoku suru mono wa arimasu ka', pronunciation_chunks: 'shin·ko·ku su·ru mo·no wa a·ri·ma·su ka', english: 'Do you have anything to declare?', chinese_tc: '有需要申報的東西嗎？' },
+      { speaker: 'you', target: 'いいえ、ありません', pronunciation: 'iie, arimasen', pronunciation_chunks: 'ii·e a·ri·ma·sen', english: 'No, I don\'t.', chinese_tc: '沒有' },
+      { speaker: 'staff', target: 'このバッグの中を見せていただけますか？', pronunciation: 'kono baggu no naka wo misete itadakemasu ka', pronunciation_chunks: 'ko·no bag·gu no na·ka wo mi·se·te i·ta·da·ke·ma·su ka', english: 'May I see inside this bag?', chinese_tc: '可以看一下這個包包裡面嗎？' },
+      { speaker: 'you', target: 'はい、どうぞ', pronunciation: 'hai, douzo', pronunciation_chunks: 'hai dou·zo', english: 'Yes, go ahead.', chinese_tc: '好的，請' },
+      { speaker: 'staff', target: 'これは何ですか？', pronunciation: 'kore wa nan desu ka', pronunciation_chunks: 'ko·re wa nan de·su ka', english: 'What is this?', chinese_tc: '這是什麼？' },
+      { speaker: 'you', target: '個人用のお土産です', pronunciation: 'kojin-you no omiyage desu', pronunciation_chunks: 'ko·jin·you no o·mi·ya·ge de·su', english: 'It\'s personal souvenirs.', chinese_tc: '是個人用的伴手禮', note: 'Duty-free limit: ¥200,000 worth of goods. Alcohol: 3 bottles. Cigarettes: 200.' },
     ],
   },
 ];
