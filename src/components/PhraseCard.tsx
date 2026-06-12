@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Phrase, UserNote } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
+import { breakdownKana, markChunkBoundaries, markLengtheners } from '../utils/kana';
 
 interface Props {
   phrase: Phrase;
@@ -79,24 +80,47 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
       {/* Expanded details */}
       {expanded && (
         <div className="px-3 pb-3 border-t border-slate-700/40 space-y-3">
-          {phrase.pronunciation_chunks && (
+          {phrase.lang === 'ja' && phrase.romanization ? (() => {
+            let units = breakdownKana(phrase.romanization);
+            if (phrase.pronunciation_chunks) {
+              units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+            }
+            units = markLengtheners(units);
+            // Filter out raw spaces — spacing is now handled by chunk/word markers
+            const visible = units.filter(u => !u.isSpace);
+            return (
+              <div className="mt-3 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
+                <span className="text-slate-500 text-xs block mb-1">Sounds</span>
+                <div className="flex flex-wrap items-end">
+                  {visible.map((u, i) => {
+                    return (
+                      <div key={i} className={`flex flex-col items-center py-0.5 ${u.isLengthener ? 'min-w-[0.9rem] -ml-px' : 'min-w-[1.2rem] px-px'} ${u.isLengthener ? '' : u.isWordBreak ? 'ml-4' : u.isChunkStart && i > 0 ? 'ml-2' : ''}`}>
+                        <span className={`leading-tight ${u.isLengthener ? 'text-sm text-slate-300' : 'text-base text-slate-100'}`}>{u.char}</span>
+                        <span className={`leading-none font-mono mt-0.5 ${u.isLengthener ? 'text-[9px] text-slate-500' : 'text-[10px] text-slate-400'}`}>{u.romaji || '·'}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })() : phrase.pronunciation_chunks ? (
             <div className="mt-3 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
               <span className="text-slate-500 text-base">Pronunciation</span>
               <p className="text-base text-indigo-300 font-mono tracking-wide">{phrase.pronunciation_chunks}</p>
             </div>
-          )}
+          ) : null}
 
           <div className="grid grid-cols-2 gap-2 mt-3 text-base">
-            {phrase.romanization && (
+            <div>
+              <span className="text-slate-500 text-base">繁體中文</span>
+              <p className="text-slate-200">{phrase.chinese_tc}</p>
+            </div>
+            {phrase.lang === 'ja' && phrase.romanization && phrase.romanization !== phrase.target && (
               <div>
                 <span className="text-slate-500 text-base">Reading</span>
                 <p className="text-slate-200">{phrase.romanization}</p>
               </div>
             )}
-            <div>
-              <span className="text-slate-500 text-base">繁體中文</span>
-              <p className="text-slate-200">{phrase.chinese_tc}</p>
-            </div>
           </div>
 
           {phrase.native_hint && (
