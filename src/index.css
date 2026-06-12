@@ -36,7 +36,8 @@ body {
 }
 
 html.light body {
-  @apply bg-slate-50 text-slate-900;
+  background-color: #ffffff !important;
+  color: #0f172a;
 }
 
 /* ===== Light Mode — Comprehensive Overrides ===== */
