@@ -174,7 +174,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
           <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
             <div>
               <button onClick={() => deck.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
-                ← Choose Deck
+                ←
               </button>
               <p className="text-base text-slate-400">
                 {reviewMode === 'review'

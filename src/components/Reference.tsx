@@ -177,8 +177,8 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
       {panel.visible && (
         <div className={`absolute inset-0 bg-slate-950 ${panel.animClass} flex flex-col z-40`}>
           <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
-            <button onClick={() => panel.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
-              ← Quick Reference
+            <button onClick={() => panel.close()} className="text-lg text-slate-400 active:text-slate-200 p-1">
+              ←
             </button>
             <h2 className="text-lg font-bold flex-1">{activeMeta?.emoji} {activeMeta?.label}</h2>
           </div>

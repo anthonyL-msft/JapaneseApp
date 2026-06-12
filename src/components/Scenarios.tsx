@@ -212,7 +212,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
           <div className={`absolute inset-0 bg-slate-950 ${groupPanel.animClass} flex flex-col z-40`}>
             <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
               <button onClick={() => groupPanel.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
-                ← All Scenes
+                ←
               </button>
               <h2 className="text-lg font-bold flex-1">{groupInfo.emoji} {groupInfo.label}</h2>
             </div>
@@ -244,7 +244,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
             <div className="flex items-center justify-between">
               <div>
                 <button onClick={handleBack} className="text-base text-slate-400 active:text-slate-200 p-1">
-                  ← {groupPanel.value ? SCENARIO_GROUPS[groupPanel.value].label : 'All Scenes'}
+                  ← {groupPanel.value ? SCENARIO_GROUPS[groupPanel.value].label : ''}
                 </button>
                 <h2 className="text-lg font-bold">{selectedScenario.emoji} {selectedScenario.title}</h2>
                 <p className="text-base text-slate-400">{selectedScenario.titleTC} · {selectedScenario.description}</p>

@@ -115,7 +115,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                   onClick={() => { panel.close(); }}
                   className="text-base text-slate-400 active:text-slate-200 p-1"
                 >
-                  ← All Categories
+                  ←
                 </button>
                 <h2 className="text-lg font-bold">{info.emoji} {info.label}</h2>
                 <p className="text-base text-slate-400">{info.labelTC} · {categoryPhrases.length} phrases</p>
