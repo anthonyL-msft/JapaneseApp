@@ -206,7 +206,15 @@ export const scenarios: Scenario[] = [
     title: 'Wrong Train — What Now?', titleTC: '搭錯車',
     emoji: '😰', description: 'Realizing you\'re on the wrong train and asking for help',
     lines: [
-      { speaker: 'you', target: 'すみません、この電車は東京駅に行きますか？', pronunciation: 'sumimasen, kono densha wa toukyou eki ni ikimasu ka', pronunciation_chunks: 'su·mi·ma·sen ko·no den·sha wa tou·kyou e·ki ni i·ki·ma·su ka', english: 'Excuse me, does this train go to Tokyo Station?', chinese_tc: '請問這班電車有到東京站嗎？' },
+      { speaker: 'you', target: 'すみません、この電車は東京駅に行きますか？', pronunciation: 'sumimasen, kono densha wa toukyou eki ni ikimasu ka', pronunciation_chunks: 'su·mi·ma·sen ko·no den·sha wa tou·kyou e·ki ni i·ki·ma·su ka', english: 'Excuse me, does this train go to Tokyo Station?', chinese_tc: '請問這班電車有到東京站嗎？', variables: [
+        { placeholder: '東京駅', label: 'Destination', options: [
+          { value: '東京駅', pronunciation: 'tou·kyou e·ki', english: 'Tokyo Station' },
+          { value: '渋谷駅', pronunciation: 'shi·bu·ya e·ki', english: 'Shibuya Station' },
+          { value: '新宿駅', pronunciation: 'shin·ju·ku e·ki', english: 'Shinjuku Station' },
+          { value: '名古屋駅', pronunciation: 'na·go·ya e·ki', english: 'Nagoya Station' },
+          { value: '品川駅', pronunciation: 'shi·na·ga·wa e·ki', english: 'Shinagawa Station' },
+        ] },
+      ] },
       { speaker: 'staff', target: 'いいえ、この電車は行きません。次の駅で降りてください', pronunciation: 'iie, kono densha wa ikimasen. tsugi no eki de orite kudasai', pronunciation_chunks: 'ii·e ko·no den·sha wa i·ki·ma·sen. tsu·gi no e·ki de o·ri·te ku·da·sai', english: 'No, this train doesn\'t go there. Please get off at the next station.', chinese_tc: '不是，這班不到。請在下一站下車' },
       { speaker: 'you', target: 'どのホームに行けばいいですか？', pronunciation: 'dono hoomu ni ikeba ii desu ka', pronunciation_chunks: 'do·no hoo·mu ni i·ke·ba ii de·su ka', english: 'Which platform should I go to?', chinese_tc: '應該去哪個月台？' },
       { speaker: 'staff', target: '向かいのホーム、3番線です', pronunciation: 'mukai no hoomu, sanban-sen desu', pronunciation_chunks: 'mu·kai no hoo·mu san·ban·sen de·su', english: 'The opposite platform, line 3.', chinese_tc: '對面月台，3號線' },
@@ -220,7 +228,14 @@ export const scenarios: Scenario[] = [
     title: 'Bus Stop & Riding', titleTC: '搭公車',
     emoji: '🚌', description: 'Finding the bus stop, asking about routes and schedules',
     lines: [
-      { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？' },
+      { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？', variables: [
+        { placeholder: '名古屋城', label: 'Destination', options: [
+          { value: '名古屋城', pronunciation: 'na·go·ya·jou', english: 'Nagoya Castle' },
+          { value: '名古屋駅', pronunciation: 'na·go·ya·e·ki', english: 'Nagoya Station' },
+          { value: '空港', pronunciation: 'kuu·kou', english: 'Airport' },
+          { value: '栄', pronunciation: 'sa·ka·e', english: 'Sakae' },
+        ] },
+      ] },
       { speaker: 'staff', target: 'あちらの3番のりばです', pronunciation: 'achira no sanban noriba desu', pronunciation_chunks: 'a·chi·ra no san·ban no·ri·ba de·su', english: 'It\'s at bus stop number 3 over there.', chinese_tc: '在那邊的3號乘車處' },
       { speaker: 'you', target: '次のバスは何時ですか？', pronunciation: 'tsugi no basu wa nanji desu ka', pronunciation_chunks: 'tsu·gi no ba·su wa nan·ji de·su ka', english: 'What time is the next bus?', chinese_tc: '下一班公車幾點？' },
       { speaker: 'staff', target: '10分後に来ますよ', pronunciation: 'juppun go ni kimasu yo', pronunciation_chunks: 'jup·pun go ni ki·ma·su yo', english: 'It comes in 10 minutes.', chinese_tc: '10分鐘後來' },
@@ -1007,7 +1022,22 @@ export const scenarios: Scenario[] = [
         ] },
       ] },
       { speaker: 'staff', target: '何線をご利用でしたか？何時ごろですか？', pronunciation: 'nanisen wo goriyou deshita ka? nanji goro desu ka?', pronunciation_chunks: 'na·ni·sen wo go·ri·you de·shi·ta ka? nan·ji go·ro de·su ka', english: 'What line were you on? Around what time?', chinese_tc: '您搭什麼線？大約幾點？' },
-      { speaker: 'you', target: '山手線で、2時ごろです', pronunciation: 'yamanote sen de, niji goro desu', pronunciation_chunks: 'ya·ma·no·te sen de, ni·ji go·ro de·su', english: 'Yamanote Line, around 2pm', chinese_tc: '山手線，大約2點' },
+      { speaker: 'you', target: '山手線で、2時ごろです', pronunciation: 'yamanote sen de, niji goro desu', pronunciation_chunks: 'ya·ma·no·te sen de, ni·ji go·ro de·su', english: 'Yamanote Line, around 2pm', chinese_tc: '山手線，大約2點', variables: [
+        { placeholder: '山手線', label: 'Train line', options: [
+          { value: '山手線', pronunciation: 'ya·ma·no·te·sen', english: 'Yamanote Line' },
+          { value: '中央線', pronunciation: 'chuu·ou·sen', english: 'Chuo Line' },
+          { value: '銀座線', pronunciation: 'gin·za·sen', english: 'Ginza Line' },
+          { value: '東海道線', pronunciation: 'tou·kai·dou·sen', english: 'Tokaido Line' },
+          { value: '名城線', pronunciation: 'mei·jou·sen', english: 'Meijo Line' },
+        ] },
+        { placeholder: '2時', label: 'Time', options: [
+          { value: '12時', pronunciation: 'juu·ni·ji', english: '12pm' },
+          { value: '2時', pronunciation: 'ni·ji', english: '2pm' },
+          { value: '4時', pronunciation: 'yo·ji', english: '4pm' },
+          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm' },
+          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm' },
+        ] },
+      ] },
       { speaker: 'staff', target: 'わかりました。忘れ物センターに確認いたします', pronunciation: 'wakarimashita. wasuremono sentaa ni kakunin itashimasu', pronunciation_chunks: 'wa·ka·ri·ma·shi·ta. wa·su·re·mo·no sen·taa ni ka·ku·nin i·ta·shi·ma·su', english: 'Understood. I\'ll check with the lost and found center.', chinese_tc: '了解。我跟失物中心確認', note: 'Japan has amazing lost-item return rates — over 80%! Always report to station staff.' },
       { speaker: 'staff', target: 'お名前と電話番号をお願いします', pronunciation: 'onamae to denwa bangou wo onegaishimasu', pronunciation_chunks: 'o·na·ma·e to den·wa ban·gou wo o·ne·gai·shi·ma·su', english: 'Your name and phone number please.', chinese_tc: '請給我您的姓名和電話號碼' },
       { speaker: 'you', target: 'ホテルの電話番号でもいいですか？', pronunciation: 'hoteru no denwa bangou de mo ii desu ka?', pronunciation_chunks: 'ho·te·ru no den·wa ban·gou de mo ii de·su ka', english: 'Can I give my hotel\'s phone number?', chinese_tc: '可以給飯店的電話嗎？' },
