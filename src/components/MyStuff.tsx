@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Phrase, Bookmark, UserNote, RefBookmark } from '../data/types';
+import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem } from '../data/types';
 import { PhraseCard } from './PhraseCard';
 import { speak } from '../utils/tts';
 
@@ -8,16 +8,18 @@ interface Props {
   bookmarks: Bookmark[];
   notes: UserNote[];
   refBookmarks: RefBookmark[];
+  learnedItems: LearnedItem[];
   onToggleBookmark: (id: string) => void;
   onToggleRefBookmark: (item: { jp: string; hep: string; en: string; section: string }) => void;
+  onToggleLearned: (id: string) => void;
   onSaveNote: (note: UserNote) => void;
   onDeleteNote: (id: string) => void;
   search: string;
 }
 
-type Section = 'bookmarks' | 'refbookmarks' | 'ai' | 'notes';
+type Section = 'bookmarks' | 'refbookmarks' | 'learned' | 'ai' | 'notes';
 
-export function MyStuff({ phrases, bookmarks, notes, refBookmarks, onToggleBookmark, onToggleRefBookmark, onSaveNote, onDeleteNote, search }: Props) {
+export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems, onToggleBookmark, onToggleRefBookmark, onToggleLearned, onSaveNote, onDeleteNote, search }: Props) {
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [newNoteText, setNewNoteText] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, onToggleBookm
     setEditText('');
   };
 
-  const totalItems = bookmarks.length + refBookmarks.length + notes.length;
+  const totalItems = bookmarks.length + refBookmarks.length + learnedItems.length + notes.length;
 
   return (
     <div className="scroll-area h-full">
@@ -173,6 +175,77 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, onToggleBookm
                       <p className="text-base text-slate-600 mt-1">from {rb.section}</p>
                     </div>
                   ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ✅ Learned */}
+        {learnedItems.length > 0 && (
+          <div className="bg-slate-800/60 rounded-xl overflow-hidden">
+            <button
+              onClick={() => toggleSection('learned')}
+              className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
+            >
+              <div>
+                <h3 className="text-base font-semibold text-slate-200">✅ Learned</h3>
+                <p className="text-base text-slate-500">{learnedItems.length} mastered</p>
+              </div>
+              <span className="text-base text-slate-500">{openSections.has('learned') ? '▲' : '▼'}</span>
+            </button>
+            {openSections.has('learned') && (
+              <div className="px-1.5 pb-1.5 space-y-1.5">
+                {learnedItems
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .map(item => {
+                    // Check if it's a phrase or ref example
+                    const phrase = phrases.find(p => p.id === item.id);
+                    if (phrase) {
+                      return (
+                        <PhraseCard
+                          key={item.id}
+                          phrase={phrase}
+                          isBookmarked={bookmarks.some(b => b.phraseId === phrase.id)}
+                          isLearned={true}
+                          notes={notes.filter(n => n.phraseId === phrase.id)}
+                          expanded={false}
+                          onToggleExpand={() => {}}
+                          onToggleBookmark={() => onToggleBookmark(phrase.id)}
+                          onToggleLearned={() => onToggleLearned(item.id)}
+                          onSaveNote={onSaveNote}
+                          onDeleteNote={onDeleteNote}
+                        />
+                      );
+                    }
+                    // Ref example (id starts with ref_)
+                    const refBm = refBookmarks.find(r => r.id === item.id);
+                    if (refBm) {
+                      return (
+                        <div key={item.id} className="bg-slate-700/40 rounded-xl p-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-lg font-medium text-slate-50">{refBm.jp}</p>
+                              <p className="text-base text-sakura-300 mt-0.5">{refBm.hep}</p>
+                              <p className="text-base text-slate-400 mt-0.5">{refBm.en}</p>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button onClick={() => speak(refBm.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                              <button onClick={() => onToggleLearned(item.id)} className="p-1 rounded-lg active:bg-slate-600 text-lg">✅</button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    // Standalone learned id (ref example not bookmarked)
+                    return (
+                      <div key={item.id} className="bg-slate-700/40 rounded-xl p-3">
+                        <div className="flex items-center justify-between">
+                          <p className="text-base text-slate-300">{item.id.replace('ref_', '')}</p>
+                          <button onClick={() => onToggleLearned(item.id)} className="p-1 rounded-lg active:bg-slate-600 text-lg">✅</button>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>

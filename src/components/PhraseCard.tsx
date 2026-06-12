@@ -5,15 +5,17 @@ import { speak, getTtsLang } from '../utils/tts';
 interface Props {
   phrase: Phrase;
   isBookmarked: boolean;
+  isLearned?: boolean;
   notes: UserNote[];
   expanded: boolean;
   onToggleExpand: () => void;
   onToggleBookmark: () => void;
+  onToggleLearned?: () => void;
   onSaveNote: (note: UserNote) => void;
   onDeleteNote: (id: string) => void;
 }
 
-export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpand, onToggleBookmark, onSaveNote, onDeleteNote }: Props) {
+export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, onToggleExpand, onToggleBookmark, onToggleLearned, onSaveNote, onDeleteNote }: Props) {
   const [noteText, setNoteText] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [showBig, setShowBig] = useState(false);
@@ -60,6 +62,11 @@ export function PhraseCard({ phrase, isBookmarked, notes, expanded, onToggleExpa
             <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
               {isBookmarked ? '⭐' : '☆'}
             </button>
+            {onToggleLearned && (
+              <button onClick={(e) => { e.stopPropagation(); onToggleLearned(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                {isLearned ? '✅' : '⬜'}
+              </button>
+            )}
           </div>
         </div>
       </div>

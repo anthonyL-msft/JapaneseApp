@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Tab, Bookmark, UserNote, RefBookmark } from './data/types';
+import type { Tab, Bookmark, UserNote, RefBookmark, LearnedItem } from './data/types';
 import { LANGUAGES } from './data/types';
 import { phrases as allPhrases } from './data/phrases';
-import { getBookmarks, addBookmark, removeBookmark, getNotes, saveNote, deleteNote, getRefBookmarks, addRefBookmark, removeRefBookmark } from './db';
+import { getBookmarks, addBookmark, removeBookmark, getNotes, saveNote, deleteNote, getRefBookmarks, addRefBookmark, removeRefBookmark, getLearnedItems, addLearnedItem, removeLearnedItem } from './db';
 import { PhraseBook } from './components/PhraseBook';
 import { Flashcards } from './components/Flashcards';
 import { MyStuff } from './components/MyStuff';
@@ -14,6 +14,7 @@ import { SearchBar } from './components/SearchBar';
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'phrases', label: 'Phrases', icon: '📖' },
   { id: 'scenes', label: 'Scenes', icon: '🎭' },
+  { id: 'cards', label: 'Cards', icon: '🃏' },
   { id: 'ai', label: 'Ask AI', icon: '🤖' },
   { id: 'bookmarks', label: 'My Stuff', icon: '📌' },
   { id: 'reference', label: 'Ref', icon: '📚' },
@@ -26,12 +27,14 @@ function App() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [notes, setNotes] = useState<UserNote[]>([]);
   const [refBookmarks, setRefBookmarks] = useState<RefBookmark[]>([]);
+  const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   useEffect(() => {
     getBookmarks().then(setBookmarks);
     getNotes().then(setNotes);
     getRefBookmarks().then(setRefBookmarks);
+    getLearnedItems().then(setLearnedItems);
   }, []);
 
   const toggleRefBookmark = useCallback(async (item: { jp: string; hep: string; en: string; section: string }) => {
@@ -46,6 +49,17 @@ function App() {
       setRefBookmarks(prev => [...prev, rb]);
     }
   }, [refBookmarks]);
+
+  const toggleLearned = useCallback(async (id: string) => {
+    const existing = learnedItems.find(l => l.id === id);
+    if (existing) {
+      await removeLearnedItem(id);
+      setLearnedItems(prev => prev.filter(l => l.id !== id));
+    } else {
+      await addLearnedItem(id);
+      setLearnedItems(prev => [...prev, { id, createdAt: Date.now() }]);
+    }
+  }, [learnedItems]);
 
   const toggleBookmark = useCallback(async (phraseId: string) => {
     const existing = bookmarks.find(b => b.phraseId === phraseId);
@@ -113,7 +127,8 @@ function App() {
             onToggleBookmark={toggleBookmark}
             onSaveNote={handleSaveNote}
             onDeleteNote={handleDeleteNote}
-            onShowCards={() => setTab('cards')}
+            learnedIds={new Set(learnedItems.map(l => l.id))}
+            onToggleLearned={toggleLearned}
           />
         )}
         {tab === 'cards' && (
@@ -125,14 +140,16 @@ function App() {
             bookmarks={bookmarks}
             notes={notes}
             refBookmarks={refBookmarks}
+            learnedItems={learnedItems}
             onToggleBookmark={toggleBookmark}
             onToggleRefBookmark={toggleRefBookmark}
+            onToggleLearned={toggleLearned}
             onSaveNote={handleSaveNote}
             onDeleteNote={handleDeleteNote}
             search={search}
           />
         )}
-        {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} />}
+        {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
         {tab === 'cards' && <Flashcards phrases={langPhrases} />}

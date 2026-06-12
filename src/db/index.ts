@@ -1,9 +1,9 @@
 import { openDB } from 'idb';
 import type { IDBPDatabase } from 'idb';
-import type { UserNote, Bookmark, SRSCard, RefBookmark } from '../data/types';
+import type { UserNote, Bookmark, SRSCard, RefBookmark, LearnedItem } from '../data/types';
 
 const DB_NAME = 'nihongo-travel';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -23,6 +23,9 @@ function getDB() {
         }
         if (!db.objectStoreNames.contains('ref-bookmarks')) {
           db.createObjectStore('ref-bookmarks', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('learned')) {
+          db.createObjectStore('learned', { keyPath: 'id' });
         }
       },
     });
@@ -104,4 +107,20 @@ export async function addRefBookmark(item: RefBookmark): Promise<void> {
 export async function removeRefBookmark(id: string): Promise<void> {
   const db = await getDB();
   await db.delete('ref-bookmarks', id);
+}
+
+// Learned Items
+export async function getLearnedItems(): Promise<LearnedItem[]> {
+  const db = await getDB();
+  return db.getAll('learned');
+}
+
+export async function addLearnedItem(id: string): Promise<void> {
+  const db = await getDB();
+  await db.put('learned', { id, createdAt: Date.now() });
+}
+
+export async function removeLearnedItem(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('learned', id);
 }

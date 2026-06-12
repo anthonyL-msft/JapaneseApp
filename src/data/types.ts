@@ -31,6 +31,7 @@ export const LANGUAGES: LanguageConfig[] = [
 
 export type Category =
   | 'greetings'
+  | 'basics'
   | 'airport'
   | 'hotel'
   | 'restaurant'
@@ -41,7 +42,8 @@ export type Category =
   | 'culture';
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; labelTC: string }> = {
-  greetings:  { label: 'Greetings & Basics',     emoji: '👋', labelTC: '問候與基本用語' },
+  greetings:  { label: 'Greetings',              emoji: '👋', labelTC: '問候用語' },
+  basics:     { label: 'Basics & Vocab',          emoji: '🔤', labelTC: '基本單字與用語' },
   airport:    { label: 'Airport & Transit',       emoji: '✈️', labelTC: '機場與交通' },
   hotel:      { label: 'Hotel',                   emoji: '🏨', labelTC: '飯店住宿' },
   restaurant: { label: 'Restaurant & Food',       emoji: '🍜', labelTC: '餐廳與美食' },
@@ -71,6 +73,11 @@ export interface RefBookmark {
   hep: string;
   en: string;
   section: string;
+  createdAt: number;
+}
+
+export interface LearnedItem {
+  id: string;
   createdAt: number;
 }
 
