@@ -55,18 +55,19 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
             <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
           </div>
-          <div className="flex flex-col items-center gap-1 shrink-0">
-            <div className="flex items-center gap-1">
-              <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
-                🔊
-              </button>
-              <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-                {isBookmarked ? '⭐' : '☆'}
-              </button>
-            </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
+              🔊
+            </button>
+            <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+              {isBookmarked ? '⭐' : '☆'}
+            </button>
             {onToggleLearned && (
-              <button onClick={(e) => { e.stopPropagation(); onToggleLearned(); }} className="p-1 rounded-lg active:bg-slate-600 text-base">
-                {isLearned ? '✅' : '⬜'}
+              <button
+                onClick={(e) => { e.stopPropagation(); onToggleLearned(); }}
+                className={`px-2 py-0.5 rounded-full text-sm transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
+              >
+                {isLearned ? '✓' : '···'}
               </button>
             )}
           </div>

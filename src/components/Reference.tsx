@@ -339,23 +339,34 @@ function GojuonRef({ openDrawer }: { openDrawer: DrawerOpener }) {
   return (
     <div className="mt-2">
       <p className="text-base text-slate-500 mb-2">Tap any character to hear it + see real vocab</p>
-      <div className="flex gap-2 mb-3">
+
+      {/* Tablist */}
+      <div className="flex gap-2 mb-2">
         <button onClick={() => setChart('hiragana')} className={`flex-1 py-2 rounded-lg text-base transition ${chart === 'hiragana' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
           ひらがな
         </button>
         <button onClick={() => setChart('katakana')} className={`flex-1 py-2 rounded-lg text-base transition ${chart === 'katakana' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
           カタカナ
         </button>
-        <button onClick={() => setShowVoiced(!showVoiced)} className={`flex-1 py-2 rounded-lg text-base transition ${showVoiced ? 'bg-indigo-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
-          {showVoiced ? '゛゜ ON' : '゛゜ OFF'}
+      </div>
+
+      {/* Voiced toggle banner */}
+      <div className="flex items-center justify-between bg-slate-700/30 rounded-lg px-3 py-2 mb-2">
+        <div className="flex-1">
+          <p className="text-base text-slate-400">Voiced ゛゜</p>
+          {showVoiced && (
+            <p className="text-sm text-indigo-300 mt-0.5">か→が　さ→ざ　た→だ　は→ば/ぱ</p>
+          )}
+        </div>
+        <button
+          onClick={() => setShowVoiced(!showVoiced)}
+          className={`px-3 py-1 rounded-full text-sm transition ${showVoiced ? 'bg-indigo-500/50 text-indigo-200' : 'bg-slate-600/40 text-slate-500'}`}
+        >
+          {showVoiced ? 'ON' : 'OFF'}
         </button>
       </div>
-      {showVoiced && (
-        <div className="mb-2 space-y-0.5">
-          <p className="text-base text-indigo-300">゛ Dakuten — か→<span className="text-sakura-300">が</span>　さ→<span className="text-sakura-300">ざ</span>　た→<span className="text-sakura-300">だ</span>　は→<span className="text-sakura-300">ば</span></p>
-          <p className="text-base text-indigo-300">゜ Handakuten — は→<span className="text-sakura-300">ぱ</span></p>
-        </div>
-      )}
+
+      {/* Grid */}
       <div className="grid grid-cols-5 gap-1">
         {baseData.flat().map((cell, i) => {
           if (!cell) return <div key={i} className="h-14" />;
@@ -679,18 +690,19 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
                     <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
                     <p className="text-base text-slate-400 mt-0.5">{ex.en}</p>
                   </div>
-                  <div className="flex flex-col items-center gap-1 shrink-0">
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-                      {onToggleRefBookmark && (
-                        <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-                          {isBm ? '⭐' : '☆'}
-                        </button>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                    {onToggleRefBookmark && (
+                      <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
+                        {isBm ? '⭐' : '☆'}
+                      </button>
+                    )}
                     {onToggleLearned && (
-                      <button onClick={() => onToggleLearned(learnId)} className="p-1 rounded-lg active:bg-slate-600 text-base">
-                        {isLearned ? '✅' : '⬜'}
+                      <button
+                        onClick={() => onToggleLearned(learnId)}
+                        className={`px-2 py-0.5 rounded-full text-sm transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
+                      >
+                        {isLearned ? '✓' : '···'}
                       </button>
                     )}
                   </div>
