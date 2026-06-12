@@ -132,7 +132,7 @@ function App() {
           />
         )}
         {tab === 'cards' && (
-          <Flashcards phrases={langPhrases.filter(p => learnedItems.some(l => l.id === p.id))} />
+          <Flashcards phrases={langPhrases} learnedIds={new Set(learnedItems.map(l => l.id))} refBookmarks={refBookmarks} />
         )}
         {tab === 'bookmarks' && (
           <MyStuff
