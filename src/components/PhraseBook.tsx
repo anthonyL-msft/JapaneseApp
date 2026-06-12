@@ -124,13 +124,17 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
           <div className="scroll-area flex-1 px-2 py-2 space-y-1.5">
             {Array.from(situations.entries())
               .sort(([a], [b]) => {
-                // Push "Numbers" and "Time" to the bottom
-                const bottomSits = ['Numbers', 'Time'];
-                const aBottom = bottomSits.indexOf(a);
-                const bBottom = bottomSits.indexOf(b);
-                if (aBottom >= 0 && bBottom < 0) return 1;
-                if (bBottom >= 0 && aBottom < 0) return -1;
-                return 0;
+                // Custom ordering for specific situations
+                const order: Record<string, number> = {
+                  // Food & Drinks
+                  'Common dishes': 1, 'Sashimi & Seafood': 2, 'Food vocabulary': 3,
+                  'Flavors': 4, 'Condiments': 5, 'Drinks': 6, 'Winter drinks': 7, 'Table items': 8,
+                  // Basics — push numbers/time to bottom
+                  'Numbers': 90, 'Time': 91,
+                };
+                const aOrder = order[a] ?? 50;
+                const bOrder = order[b] ?? 50;
+                return aOrder - bOrder;
               })
               .map(([situation, pList]) => {
               const isOpen = openSituations.has(situation);
