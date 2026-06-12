@@ -22,15 +22,50 @@ html {
   background-color: #020617;
 }
 
+html.light {
+  background-color: #f8fafc;
+}
+
 html, body, #root {
   height: 100%;
   overflow: hidden;
-  background-color: #020617;
 }
 
 body {
   @apply bg-slate-950 text-slate-100 font-sans;
 }
+
+html.light body {
+  @apply bg-slate-50 text-slate-900;
+}
+
+/* Light mode overrides */
+html.light .bg-slate-950 { background-color: #f8fafc; }
+html.light .bg-slate-950\/95 { background-color: rgba(248, 250, 252, 0.95); }
+html.light .bg-slate-900 { background-color: #f1f5f9; }
+html.light .bg-slate-800 { background-color: #e2e8f0; }
+html.light .bg-slate-800\/60 { background-color: rgba(226, 232, 240, 0.6); }
+html.light .bg-slate-800\/80 { background-color: rgba(226, 232, 240, 0.8); }
+html.light .bg-slate-800\/40 { background-color: rgba(226, 232, 240, 0.4); }
+html.light .bg-slate-700\/40 { background-color: rgba(203, 213, 225, 0.4); }
+html.light .bg-slate-700\/50 { background-color: rgba(203, 213, 225, 0.5); }
+html.light .bg-slate-700\/30 { background-color: rgba(203, 213, 225, 0.3); }
+html.light .bg-slate-700\/20 { background-color: rgba(203, 213, 225, 0.2); }
+html.light .bg-slate-700\/15 { background-color: rgba(203, 213, 225, 0.15); }
+html.light .bg-slate-600\/40 { background-color: rgba(148, 163, 184, 0.25); }
+html.light .bg-slate-600\/30 { background-color: rgba(148, 163, 184, 0.2); }
+html.light .text-slate-50 { color: #0f172a; }
+html.light .text-slate-100 { color: #1e293b; }
+html.light .text-slate-200 { color: #334155; }
+html.light .text-slate-300 { color: #475569; }
+html.light .text-slate-400 { color: #64748b; }
+html.light .text-slate-500 { color: #94a3b8; }
+html.light .text-slate-600 { color: #cbd5e1; }
+html.light .border-slate-800 { border-color: #e2e8f0; }
+html.light .border-slate-700\/40 { border-color: rgba(203, 213, 225, 0.4); }
+html.light .border-slate-700\/50 { border-color: rgba(203, 213, 225, 0.5); }
+html.light .bg-black\/50 { background-color: rgba(0, 0, 0, 0.2); }
+html.light .placeholder-slate-500::placeholder { color: #94a3b8; }
 
 /* Scrollbar styling */
 .scroll-area {

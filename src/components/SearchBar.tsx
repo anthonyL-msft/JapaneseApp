@@ -28,6 +28,7 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
   const [rate, setRate] = useState(getTtsRate);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains('light'));
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -51,6 +52,18 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
     setRate(newRate);
     setTtsRate(newRate);
     speak('こんにちは', currentLang.ttsLang);
+  };
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.remove('light');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
   };
 
   return (
@@ -193,8 +206,21 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
               {/* Settings */}
               <div className="px-4 py-3">
                 <p className="text-sm text-slate-500 mb-2">Settings</p>
-                <div className="px-3">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="px-3 space-y-3">
+                  {/* Theme toggle */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-base text-slate-400">{isDark ? '🌙' : '☀️'} Appearance</span>
+                    <button
+                      onClick={toggleTheme}
+                      className={`px-3 py-1 rounded-full text-sm transition ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-amber-100 text-amber-700'}`}
+                    >
+                      {isDark ? 'Dark' : 'Light'}
+                    </button>
+                  </div>
+
+                  {/* Speech speed */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
                     <span className="text-base text-slate-400">🔊 Speech Speed</span>
                     <span className="text-base text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
                   </div>
@@ -211,6 +237,7 @@ export function SearchBar({ value, onChange, lang, onLangChange, onOpenCards, on
                     <span>Slow</span>
                     <span>Normal</span>
                     <span>Native</span>
+                  </div>
                   </div>
                 </div>
               </div>
