@@ -20,6 +20,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   const panel = useSlidePanel<Category>();
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [openSituations, setOpenSituations] = useState<Set<string>>(new Set());
+  const [initializedCategory, setInitializedCategory] = useState<string | null>(null);
 
   const toggleSituation = (situation: string) => {
     setOpenSituations(prev => {
@@ -55,10 +56,10 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
     }
   };
 
-  // Default open all when entering a category
-  const prevCategory = panel.value;
-  if (prevCategory && openSituations.size === 0 && situationKeys.length > 0) {
+  // Default open all when first entering a category
+  if (panel.value && panel.value !== initializedCategory && situationKeys.length > 0) {
     setOpenSituations(new Set(situationKeys));
+    setInitializedCategory(panel.value);
   }
 
   return (
