@@ -997,4 +997,21 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: '少々お待ちください。ご案内いたします', pronunciation: 'shoushou omachi kudasai. go-annai itashimasu', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai. go·an·nai i·ta·shi·ma·su', english: 'One moment. I\'ll show you to your seat.', chinese_tc: '請稍等。帶您入座' },
     ],
   },
+
+  // === SC45: Ordering a Set Meal ===
+  {
+    id: 'sc45', lang: 'ja', group: 'restaurant',
+    title: 'Ordering a Set Meal', titleTC: '點套餐/定食',
+    emoji: '🍱', description: 'Set meal options, upgrades, rice size, soup swap',
+    lines: [
+      { speaker: 'staff', target: '定食になさいますか？単品になさいますか？', pronunciation: 'teishoku ni nasaimasu ka? tanpin ni nasaimasu ka?', pronunciation_chunks: 'tei·sho·ku ni na·sai·ma·su ka tan·pin ni na·sai·ma·su ka', english: 'Would you like a set meal or à la carte?', chinese_tc: '要套餐還是單點？', note: '定食 (teishoku) = set meal with rice, soup, side dishes. 単品 (tanpin) = just the main dish.' },
+      { speaker: 'you', target: '定食でお願いします', pronunciation: 'teishoku de onegaishimasu', pronunciation_chunks: 'tei·sho·ku de o·ne·gai·shi·ma·su', english: 'Set meal please.', chinese_tc: '套餐' },
+      { speaker: 'staff', target: 'ドリンクセットにしますか？プラス200円です', pronunciation: 'dorinku setto ni shimasu ka? purasu nihyaku en desu', pronunciation_chunks: 'do·rin·ku set·to ni shi·ma·su ka pu·ra·su ni·hya·ku en de·su', english: 'Would you like the drink set? Plus 200 yen.', chinese_tc: '要飲料套餐嗎？加200日圓' },
+      { speaker: 'you', target: 'はい、コーヒーでお願いします', pronunciation: 'hai, koohii de onegaishimasu', pronunciation_chunks: 'hai koo·hii de o·ne·gai·shi·ma·su', english: 'Yes, coffee please.', chinese_tc: '好，咖啡' },
+      { speaker: 'staff', target: 'ご飯の量はどうしますか？', pronunciation: 'gohan no ryou wa dou shimasu ka', pronunciation_chunks: 'go·han no ryou wa dou shi·ma·su ka', english: 'How much rice would you like?', chinese_tc: '飯量怎麼樣？' },
+      { speaker: 'you', target: '大盛りでお願いします', pronunciation: 'oomori de onegaishimasu', pronunciation_chunks: 'oo·mo·ri de o·ne·gai·shi·ma·su', english: 'Large serving please.', chinese_tc: '大碗', note: '大盛り (oomori) = large. 普通 (futsuu) = regular. 少なめ (sukuname) = smaller. Many places offer 大盛り free!' },
+      { speaker: 'you', target: '味噌汁を豚汁に変更できますか？', pronunciation: 'misoshiru wo tonjiru ni henkou dekimasu ka', pronunciation_chunks: 'mi·so·shi·ru wo ton·ji·ru ni hen·kou de·ki·ma·su ka', english: 'Can I change miso soup to pork soup?', chinese_tc: '味噌湯可以換豬肉湯嗎？', note: '豚汁 (tonjiru) = hearty pork & vegetable soup. Usually +¥100-200 upgrade.' },
+      { speaker: 'staff', target: 'はい、プラス100円で変更できます', pronunciation: 'hai, purasu hyaku en de henkou dekimasu', pronunciation_chunks: 'hai pu·ra·su hya·ku en de hen·kou de·ki·ma·su', english: 'Yes, plus 100 yen for the change.', chinese_tc: '可以，加100日圓' },
+    ],
+  },
 ];
