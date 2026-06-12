@@ -121,8 +121,10 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
   const [drawer, setDrawer] = useState<DrawerData>(null);
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
   const closeDrawer = useCallback(() => setDrawer(null), []);
+  const [refToggleAll, setRefToggleAll] = useState<number>(0); // increment to toggle
 
   const activeMeta = ALL_SECTIONS.find(s => s.id === panel.value);
+  const hasAccordion = panel.value && !['gojuon', 'numbers', 'converter', 'signs'].includes(panel.value);
 
   return (
     <div className="h-full relative">
@@ -181,18 +183,26 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
               ←
             </button>
             <h2 className="text-lg font-bold flex-1">{activeMeta?.emoji} {activeMeta?.label}</h2>
+            {hasAccordion && (
+              <button
+                onClick={() => setRefToggleAll(prev => prev + 1)}
+                className="text-base bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg active:bg-slate-700 transition shrink-0"
+              >
+                ▼ Open All
+              </button>
+            )}
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
             {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
-            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
+            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'converter' && <NumberConverter />}
-            {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
-            {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
-            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
-            {panel.value === 'polite' && <PoliteRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
-            {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
-            {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} />}
+            {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'polite' && <PoliteRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'signs' && <SignsRef />}
           </div>
         </div>
@@ -682,6 +692,7 @@ interface RbProps {
   onRbToggle?: (item: { jp: string; hep: string; en: string; section: string }) => void;
   learnedIds?: Set<string>;
   onToggleLearned?: (id: string) => void;
+  toggleSignal?: number;
 }
 
 function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, refBookmarkedIds, onToggleRefBookmark, learnedIds, onToggleLearned }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void; section?: string; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void; learnedIds?: Set<string>; onToggleLearned?: (id: string) => void }) {
@@ -740,9 +751,19 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
   );
 }
 
-function useAccordion(keys: string[]) {
+function useAccordion(keys: string[], externalToggle?: number) {
   const [openSet, setOpenSet] = useState<Set<string>>(new Set());
   const allOpen = keys.length > 0 && keys.every(k => openSet.has(k));
+
+  // React to external toggle signal from header
+  useEffect(() => {
+    if (externalToggle && externalToggle > 0) {
+      setOpenSet(prev => {
+        const currentlyAllOpen = keys.length > 0 && keys.every(k => prev.has(k));
+        return currentlyAllOpen ? new Set() : new Set(keys);
+      });
+    }
+  }, [externalToggle]);
 
   const toggle = (key: string) => {
     setOpenSet(prev => {
@@ -761,22 +782,10 @@ function useAccordion(keys: string[]) {
   return { openSet, allOpen, toggle, toggleAll };
 }
 
-function AccordionHeader({ label, allOpen, toggleAll }: { label: string; allOpen: boolean; toggleAll: () => void }) {
-  return (
-    <div className="flex items-center justify-between mb-2">
-      <p className="text-base text-slate-500">{label}</p>
-      <button onClick={toggleAll} className="text-base bg-slate-700/40 text-slate-400 px-2.5 py-1 rounded-lg active:bg-slate-600 transition">
-        {allOpen ? '▲ Close All' : '▼ Open All'}
-      </button>
-    </div>
-  );
-}
-
-function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで']);
+function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
-      <AccordionHeader label="Tap a particle to see examples" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
@@ -853,11 +862,10 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProp
   );
 }
 
-function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜つ','〜人','〜枚','〜本','〜杯','〜個','〜台','〜泊','〜名','〜階']);
+function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['〜つ','〜人','〜枚','〜本','〜杯','〜個','〜台','〜泊','〜名','〜階'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
-      <AccordionHeader label="Counters (like Chinese 量詞)" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="〜つ" jp="〜つ" rom="-tsu" meaning="General counter (1-10)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'ひとつください', hep: 'hi·to·tsu ku·da·sai', en: 'One please' },
@@ -922,11 +930,10 @@ function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps
   );
 }
 
-function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○をお願いします','○○はありますか','○○はどこですか','○○してもいいですか','○○てください','○○がわかりません','○○たいです']);
+function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['○○をお願いします','○○はありますか','○○はどこですか','○○してもいいですか','○○てください','○○がわかりません','○○たいです'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
-      <AccordionHeader label="Tap a pattern to see real examples" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="○○をお願いします" jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '水をお願いします', hep: 'mi·zu wo o·ne·gai·shi·ma·su', en: 'Water please' },
@@ -974,11 +981,10 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps
   );
 }
 
-function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['〜ます','〜ません','〜ました','〜です','〜てください','〜てもいいですか']);
+function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['〜ます','〜ません','〜ました','〜です','〜てください','〜てもいいですか'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
-      <AccordionHeader label="Use ます form — polite and always safe" allOpen={allOpen} toggleAll={toggleAll} />
       <AccordionRow id="〜ます" jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
@@ -1024,8 +1030,8 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) 
 // ============================================================
 // Sentence Structure (Step 2)
 // ============================================================
-function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['O を V ます','V ます','S は O を V ます','Place で V ます','Place に V ます','S は ... です']);
+function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['O を V ます','V ます','S は O を V ます','Place で V ます','Place に V ます','S は ... です'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
@@ -1043,7 +1049,6 @@ function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps)
         <p className="text-base text-slate-500 text-center mt-1">Subject (I/you) is usually dropped — it's understood!</p>
       </div>
 
-      <AccordionHeader label="Tap to see examples of each structure" allOpen={allOpen} toggleAll={toggleAll} />
 
       <AccordionRow id="O を V ます" jp="O を V ます" rom="O wo V ma·su" meaning="Most common: Object + Verb (subject dropped)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1099,8 +1104,8 @@ function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps)
 // ============================================================
 // Yes/No Questions (Step 6)
 // ============================================================
-function YesNoRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
-  const { openSet, allOpen, toggle, toggleAll } = useAccordion(['○○ですか？','○○ますか？','○○ありますか？']);
+function YesNoRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['○○ですか？','○○ますか？','○○ありますか？'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Take any statement, add か (ka) at the end = question. That's it!</p>
@@ -1138,7 +1143,6 @@ function YesNoRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
         </div>
       </div>
 
-      <AccordionHeader label="Tap to see examples" allOpen={allOpen} toggleAll={toggleAll} />
 
       <AccordionRow id="○○ですか？" jp="○○ですか？" rom="○○ de·su ka" meaning="Is it ○○? / Are you ○○?"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1175,10 +1179,10 @@ function YesNoRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
 // ============================================================
 // WH Question Words (Step 7)
 // ============================================================
-function WHQuestionsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbProps) {
+function WHQuestionsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
   const [tab, setTab] = useState<'thing' | 'action'>('thing');
-  const thingAcc = useAccordion(['何 / なに','どこ','いつ','いくら','どれ','どっち / どちら']);
-  const actionAcc = useAccordion(['どう','だれ','なぜ / どうして']);
+  const thingAcc = useAccordion(['何 / なに','どこ','いつ','いくら','どれ','どっち / どちら'], toggleSignal);
+  const actionAcc = useAccordion(['どう','だれ','なぜ / どうして'], toggleSignal);
   const acc = tab === 'thing' ? thingAcc : actionAcc;
 
   return (
@@ -1211,7 +1215,6 @@ function WHQuestionsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbPr
             </div>
           </div>
 
-          <AccordionHeader label="Question words" allOpen={acc.allOpen} toggleAll={acc.toggleAll} />
 
           <AccordionRow id="何 / なに" jp="何 / なに" rom="na·ni" meaning="What?"
             openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1281,7 +1284,6 @@ function WHQuestionsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned }: RbPr
             </div>
           </div>
 
-          <AccordionHeader label="Question words" allOpen={acc.allOpen} toggleAll={acc.toggleAll} />
 
           <AccordionRow id="どう" jp="どう" rom="dou" meaning="How? (method/manner)"
             openSet={acc.openSet} toggle={acc.toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
