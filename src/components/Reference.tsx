@@ -124,7 +124,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
   const [refToggleAll, setRefToggleAll] = useState<number>(0); // increment to toggle
 
   const activeMeta = ALL_SECTIONS.find(s => s.id === panel.value);
-  const hasAccordion = panel.value && !['gojuon', 'numbers', 'signs', 'listening'].includes(panel.value);
+  const hasAccordion = panel.value && !['gojuon', 'numbers', 'signs'].includes(panel.value);
 
   return (
     <div className="h-full relative">
@@ -203,7 +203,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
             {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'signs' && <SignsRef />}
-            {panel.value === 'listening' && <ListeningRef />}
+            {panel.value === 'listening' && <ListeningRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
           </div>
         </div>
       )}
@@ -1335,48 +1335,59 @@ function SignsRef() {
   );
 }
 
-function ListeningRef() {
+function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['shops', 'restaurants', 'trains', 'hotels', 'general'], toggleSignal);
   return (
-    <div className="mt-2">
+    <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-2">Phrases you'll hear from staff — learn to recognize, not produce</p>
 
-      <p className="text-sm text-slate-500 mt-3 mb-1">🏪 Shops & Convenience Stores</p>
-      <RefRow jp="いらっしゃいませ！" rom="i·ras·shai·ma·se" meaning="Welcome! (no need to reply, just nod)" />
-      <RefRow jp="袋はご利用ですか？" rom="fu·ku·ro wa go·ri·you de·su ka" meaning="Do you need a bag? → はい / いいえ" />
-      <RefRow jp="温めますか？" rom="a·ta·ta·me·ma·su ka" meaning="Heat it up? → はい / いいえ" />
-      <RefRow jp="お箸をお付けしますか？" rom="o·ha·shi wo o·tsu·ke shi·ma·su ka" meaning="Include chopsticks? → はい" />
-      <RefRow jp="ポイントカードはお持ちですか？" rom="poin·to kaa·do wa o·mo·chi de·su ka" meaning="Do you have a points card? → いいえ" />
-      <RefRow jp="○○円になります" rom="○○ en ni na·ri·ma·su" meaning="That'll be ○○ yen" />
-      <RefRow jp="お会計は○○円です" rom="o·kai·kei wa ○○ en de·su" meaning="Your total is ○○ yen" />
+      <AccordionRow id="shops" jp="🏪 Shops & Convenience Stores" rom="" meaning="Greetings, bags, heating, points cards, totals"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'いらっしゃいませ！', hep: 'i·ras·shai·ma·se', en: 'Welcome! (no need to reply, just nod)' },
+          { jp: '袋はご利用ですか？', hep: 'fu·ku·ro wa go·ri·you de·su ka', en: 'Do you need a bag? → はい / いいえ' },
+          { jp: '温めますか？', hep: 'a·ta·ta·me·ma·su ka', en: 'Heat it up? → はい / いいえ' },
+          { jp: 'お箸をお付けしますか？', hep: 'o·ha·shi wo o·tsu·ke shi·ma·su ka', en: 'Include chopsticks? → はい' },
+          { jp: 'ポイントカードはお持ちですか？', hep: 'poin·to kaa·do wa o·mo·chi de·su ka', en: 'Do you have a points card? → いいえ' },
+          { jp: '○○円になります', hep: '○○ en ni na·ri·ma·su', en: "That'll be ○○ yen" },
+          { jp: 'お会計は○○円です', hep: 'o·kai·kei wa ○○ en de·su', en: 'Your total is ○○ yen' },
+        ]} />
 
-      <p className="text-sm text-slate-500 mt-3 mb-1">🍜 Restaurants</p>
-      <RefRow jp="何名様ですか？" rom="nan·mei·sa·ma de·su ka" meaning="How many people? → ふたりです" />
-      <RefRow jp="こちらへどうぞ" rom="ko·chi·ra e dou·zo" meaning="This way please (follow them)" />
-      <RefRow jp="ご注文はお決まりですか？" rom="go·chuu·mon wa o·ki·ma·ri de·su ka" meaning="Ready to order? → はい / もう少し待ってください" />
-      <RefRow jp="少々お待ちください" rom="shou·shou o·ma·chi ku·da·sai" meaning="Please wait a moment" />
-      <RefRow jp="お待たせいたしました" rom="o·ma·ta·se i·ta·shi·ma·shi·ta" meaning="Sorry to keep you waiting (food arriving)" />
-      <RefRow jp="お下げしてもよろしいですか？" rom="o·sa·ge shi·te mo yo·ro·shii de·su ka" meaning="May I clear this? → はい" />
-      <RefRow jp="ラストオーダーです" rom="ra·su·to oo·daa de·su" meaning="Last order (kitchen closing soon)" />
+      <AccordionRow id="restaurants" jp="🍜 Restaurants" rom="" meaning="Seating, ordering, clearing, last order"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '何名様ですか？', hep: 'nan·mei·sa·ma de·su ka', en: 'How many people? → ふたりです' },
+          { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please (follow them)' },
+          { jp: 'ご注文はお決まりですか？', hep: 'go·chuu·mon wa o·ki·ma·ri de·su ka', en: 'Ready to order? → はい / もう少し待ってください' },
+          { jp: '少々お待ちください', hep: 'shou·shou o·ma·chi ku·da·sai', en: 'Please wait a moment' },
+          { jp: 'お待たせいたしました', hep: 'o·ma·ta·se i·ta·shi·ma·shi·ta', en: 'Sorry to keep you waiting (food arriving)' },
+          { jp: 'お下げしてもよろしいですか？', hep: 'o·sa·ge shi·te mo yo·ro·shii de·su ka', en: 'May I clear this? → はい' },
+          { jp: 'ラストオーダーです', hep: 'ra·su·to oo·daa de·su', en: 'Last order (kitchen closing soon)' },
+        ]} />
 
-      <p className="text-sm text-slate-500 mt-3 mb-1">🚆 Trains & Stations</p>
-      <RefRow jp="まもなく電車が参ります" rom="ma·mo·na·ku den·sha ga mai·ri·ma·su" meaning="The train is arriving shortly" />
-      <RefRow jp="ドアが閉まります。ご注意ください" rom="do·a ga shi·ma·ri·ma·su go·chuu·i ku·da·sai" meaning="Doors closing. Please be careful" />
-      <RefRow jp="次は○○駅です" rom="tsu·gi wa ○○ e·ki de·su" meaning="Next stop is ○○ station" />
-      <RefRow jp="お忘れ物のないようご注意ください" rom="o·wa·su·re·mo·no no nai you go·chuu·i ku·da·sai" meaning="Please check you have all belongings" />
-      <RefRow jp="この電車は○○行きです" rom="ko·no den·sha wa ○○ i·ki de·su" meaning="This train goes to ○○" />
+      <AccordionRow id="trains" jp="🚆 Trains & Stations" rom="" meaning="Arrivals, doors, next stop, belongings"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'まもなく電車が参ります', hep: 'ma·mo·na·ku den·sha ga mai·ri·ma·su', en: 'The train is arriving shortly' },
+          { jp: 'ドアが閉まります。ご注意ください', hep: 'do·a ga shi·ma·ri·ma·su go·chuu·i ku·da·sai', en: 'Doors closing. Please be careful' },
+          { jp: '次は○○駅です', hep: 'tsu·gi wa ○○ e·ki de·su', en: 'Next stop is ○○ station' },
+          { jp: 'お忘れ物のないようご注意ください', hep: 'o·wa·su·re·mo·no no nai you go·chuu·i ku·da·sai', en: 'Please check you have all belongings' },
+          { jp: 'この電車は○○行きです', hep: 'ko·no den·sha wa ○○ i·ki de·su', en: 'This train goes to ○○' },
+        ]} />
 
-      <p className="text-sm text-slate-500 mt-3 mb-1">🏨 Hotels</p>
-      <RefRow jp="チェックインでございますか？" rom="chek·ku·in de go·zai·ma·su ka" meaning="Are you checking in?" />
-      <RefRow jp="パスポートをお見せください" rom="pa·su·poo·to wo o·mi·se ku·da·sai" meaning="Please show your passport" />
-      <RefRow jp="お部屋は○○号室です" rom="o·he·ya wa ○○ gou·shi·tsu de·su" meaning="Your room is number ○○" />
-      <RefRow jp="朝食は○時から○時までです" rom="chou·sho·ku wa ○·ji ka·ra ○·ji ma·de de·su" meaning="Breakfast is from ○ to ○" />
-      <RefRow jp="ごゆっくりお過ごしください" rom="go·yuk·ku·ri o·su·go·shi ku·da·sai" meaning="Please enjoy your stay" />
+      <AccordionRow id="hotels" jp="🏨 Hotels" rom="" meaning="Check-in, passport, room, breakfast, farewell"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'チェックインでございますか？', hep: 'chek·ku·in de go·zai·ma·su ka', en: 'Are you checking in?' },
+          { jp: 'パスポートをお見せください', hep: 'pa·su·poo·to wo o·mi·se ku·da·sai', en: 'Please show your passport' },
+          { jp: 'お部屋は○○号室です', hep: 'o·he·ya wa ○○ gou·shi·tsu de·su', en: 'Your room is number ○○' },
+          { jp: '朝食は○時から○時までです', hep: 'chou·sho·ku wa ○·ji ka·ra ○·ji ma·de de·su', en: 'Breakfast is from ○ to ○' },
+          { jp: 'ごゆっくりお過ごしください', hep: 'go·yuk·ku·ri o·su·go·shi ku·da·sai', en: 'Please enjoy your stay' },
+        ]} />
 
-      <p className="text-sm text-slate-500 mt-3 mb-1">🔔 General</p>
-      <RefRow jp="ありがとうございました" rom="a·ri·ga·tou go·zai·ma·shi·ta" meaning="Thank you (past tense — after service)" />
-      <RefRow jp="またお越しくださいませ" rom="ma·ta o·ko·shi ku·da·sai·ma·se" meaning="Please come again" />
-      <RefRow jp="申し訳ございません" rom="mou·shi·wa·ke go·zai·ma·sen" meaning="I'm very sorry (formal apology)" />
-      <RefRow jp="かしこまりました" rom="ka·shi·ko·ma·ri·ma·shi·ta" meaning="Understood / Certainly (formal yes)" />
+      <AccordionRow id="general" jp="🔔 General" rom="" meaning="Thanks, come again, apologies, understood"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'ありがとうございました', hep: 'a·ri·ga·tou go·zai·ma·shi·ta', en: 'Thank you (past tense — after service)' },
+          { jp: 'またお越しくださいませ', hep: 'ma·ta o·ko·shi ku·da·sai·ma·se', en: 'Please come again' },
+          { jp: '申し訳ございません', hep: 'mou·shi·wa·ke go·zai·ma·sen', en: "I'm very sorry (formal apology)" },
+          { jp: 'かしこまりました', hep: 'ka·shi·ko·ma·ri·ma·shi·ta', en: 'Understood / Certainly (formal yes)' },
+        ]} />
     </div>
   );
 }
