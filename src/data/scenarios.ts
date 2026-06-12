@@ -679,7 +679,7 @@ export const scenarios: Scenario[] = [
   {
     id: 'sc26',
     lang: 'ja',
-    group: 'transit',
+    group: 'hotel',
     title: 'Luggage Forwarding (Takkyubin)',
     titleTC: '行李宅配（宅急便）',
     emoji: '📦',
