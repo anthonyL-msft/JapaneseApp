@@ -301,14 +301,21 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                     .map(note => {
                       const phrase = phrases.find(p => p.id === note.phraseId);
                       return (
-                        <div key={note.id} className="bg-slate-700/30 rounded-xl p-3">
+                        <div key={note.id} className="bg-slate-700/30 rounded-xl overflow-hidden">
                           {phrase && (
-                            <p className="text-base text-sakura-400 mb-1">
-                              {phrase.target} · {phrase.pronunciation}
-                            </p>
+                            <div className="p-3 pb-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
+                                  <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
+                                  <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
+                                </div>
+                                <button onClick={() => speak(phrase.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                              </div>
+                            </div>
                           )}
-                          <div className="flex items-start gap-2">
-                            <p className="text-base text-slate-300 flex-1">{note.text}</p>
+                          <div className="p-3 pt-2 flex items-start gap-2">
+                            <p className="text-base text-slate-300 flex-1">📝 {note.text}</p>
                             <button
                               onClick={() => onDeleteNote(note.id)}
                               className="text-base text-slate-500 hover:text-red-400 shrink-0"
