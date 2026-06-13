@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem } from '../data/types';
 import { PhraseCard } from './PhraseCard';
+import { RefItem } from './Reference';
 import { speak } from '../utils/tts';
 
 interface Props {
@@ -111,19 +112,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                     const refBm = refBookmarks.find(r => r.id === item.id);
                     if (refBm) {
                       return (
-                        <div key={item.id} className="bg-slate-700/40 rounded-xl p-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-lg font-medium text-slate-50">{refBm.jp}</p>
-                              <p className="text-base text-sakura-300 mt-0.5">{refBm.hep}</p>
-                              <p className="text-base text-slate-400 mt-0.5">{refBm.en}</p>
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button onClick={() => speak(refBm.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-                              <button onClick={() => onToggleLearned(item.id)} className="p-1 rounded-lg active:bg-slate-600 text-lg">✅</button>
-                            </div>
-                          </div>
-                        </div>
+                        <RefItem key={item.id} ex={{ jp: refBm.jp, hep: refBm.hep, en: refBm.en }} data={{ title: refBm.section }} isBm={undefined} isLearned={true} onToggleLearned={() => onToggleLearned(item.id)} />
                       );
                     }
                     return (
@@ -198,18 +187,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                     return rb.jp.toLowerCase().includes(q) || rb.hep.toLowerCase().includes(q) || rb.en.toLowerCase().includes(q);
                   })
                   .map(rb => (
-                    <div key={rb.id} className="bg-slate-700/40 rounded-xl p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <p className="text-lg font-medium text-slate-50">{rb.jp}</p>
-                          <p className="text-base text-sakura-300 mt-0.5">{rb.hep}</p>
-                          <p className="text-base text-slate-400 mt-0.5">{rb.en}</p>
-                        </div>
-                        <button onClick={() => speak(rb.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
-                        <button onClick={() => onToggleRefBookmark({ jp: rb.jp, hep: rb.hep, en: rb.en, section: rb.section })} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">⭐</button>
-                      </div>
-                      <p className="text-base text-slate-600 mt-1">from {rb.section}</p>
-                    </div>
+                    <RefItem key={rb.id} ex={{ jp: rb.jp, hep: rb.hep, en: rb.en }} data={{ title: rb.section }} isBm={true} isLearned={undefined} onToggleRefBookmark={() => onToggleRefBookmark({ jp: rb.jp, hep: rb.hep, en: rb.en, section: rb.section })} />
                   ))}
               </div>
             )}
