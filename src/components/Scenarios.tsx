@@ -328,6 +328,12 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
   const hasOptions = line.options && line.options.length > 0;
   const hasVariables = line.variables && line.variables.length > 0;
 
+  // Find which option matches the placeholder (the default value shown in the line)
+  const findDefaultIdx = (v: { placeholder: string; options: { value: string }[] }) => {
+    const idx = v.options.findIndex(o => o.value === v.placeholder);
+    return idx >= 0 ? idx : 0;
+  };
+
   // Apply variable substitutions to the display text
   const applyVarSubstitutions = (text: string) => {
     if (!hasVariables) return text;
@@ -348,10 +354,17 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
     for (const v of line.variables!) {
       const selectedIdx = varSelections[v.placeholder];
       if (selectedIdx !== undefined) {
-        const defaultPron = v.options[0].pronunciation;
+        const defIdx = findDefaultIdx(v);
+        const defaultPron = v.options[defIdx].pronunciation;
         const selectedPron = v.options[selectedIdx].pronunciation;
         if (defaultPron !== selectedPron) {
+          // Try with dots first, then without dots (pronunciation field has no dots)
           result = result.replaceAll(defaultPron, selectedPron);
+          const defaultNoDots = defaultPron.replaceAll('·', '');
+          const selectedNoDots = selectedPron.replaceAll('·', '');
+          if (defaultNoDots !== selectedNoDots) {
+            result = result.replaceAll(defaultNoDots, selectedNoDots);
+          }
         }
         result = result.replaceAll(v.placeholder, v.options[selectedIdx].value);
       }
@@ -366,7 +379,8 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
     for (const v of line.variables!) {
       const selectedIdx = varSelections[v.placeholder];
       if (selectedIdx !== undefined) {
-        const defaultEng = v.options[0].english;
+        const defIdx = findDefaultIdx(v);
+        const defaultEng = v.options[defIdx].english;
         const selectedEng = v.options[selectedIdx].english;
         if (defaultEng !== selectedEng) {
           result = result.replaceAll(defaultEng, selectedEng);
@@ -384,7 +398,8 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
     for (const v of line.variables!) {
       const selectedIdx = varSelections[v.placeholder];
       if (selectedIdx !== undefined) {
-        const defaultOpt = v.options[0];
+        const defIdx = findDefaultIdx(v);
+        const defaultOpt = v.options[defIdx];
         const selectedOpt = v.options[selectedIdx];
         if (defaultOpt.chinese_tc && selectedOpt.chinese_tc) {
           result = result.replaceAll(defaultOpt.chinese_tc, selectedOpt.chinese_tc);
