@@ -93,9 +93,16 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
 
       setRevealedCount(i + 1);
 
+      // If this line has options (user needs to choose), pause autoplay
+      const line = selectedScenario.lines[i];
+      if (line.options && line.options.length > 0) {
+        setIsAutoPlaying(false);
+        autoPlayRef.current = false;
+        break;
+      }
+
       // Speak and wait
       await new Promise<void>((resolve) => {
-        const line = selectedScenario.lines[i];
         if (line.target.startsWith('（')) {
           // Action line, skip TTS
           setTimeout(resolve, 1500);
@@ -370,6 +377,25 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
     return result;
   };
 
+  // Apply variable substitutions to Chinese (use chinese_tc from options if available, otherwise fallback to placeholder swap)
+  const applyCnSubstitutions = (text: string) => {
+    if (!hasVariables) return text;
+    let result = text;
+    for (const v of line.variables!) {
+      const selectedIdx = varSelections[v.placeholder];
+      if (selectedIdx !== undefined) {
+        const defaultOpt = v.options[0];
+        const selectedOpt = v.options[selectedIdx];
+        if (defaultOpt.chinese_tc && selectedOpt.chinese_tc) {
+          result = result.replaceAll(defaultOpt.chinese_tc, selectedOpt.chinese_tc);
+        } else {
+          result = result.replaceAll(v.placeholder, selectedOpt.value);
+        }
+      }
+    }
+    return result;
+  };
+
   const baseDisplayLine = hasOptions && selectedOption !== null
     ? { ...line, ...line.options![selectedOption] }
     : line;
@@ -382,7 +408,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
       ? applyPronSubstitutions(baseDisplayLine.pronunciation_chunks)
       : undefined,
     english: applyEngSubstitutions(baseDisplayLine.english),
-    chinese_tc: applyVarSubstitutions(baseDisplayLine.chinese_tc),
+    chinese_tc: applyCnSubstitutions(baseDisplayLine.chinese_tc),
   };
 
   const handleSpeak = (e: React.MouseEvent) => {

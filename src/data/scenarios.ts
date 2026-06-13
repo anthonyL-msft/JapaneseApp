@@ -9,7 +9,7 @@ export interface ResponseOption {
 export interface Variable {
   placeholder: string;       // the text to replace, e.g. "京都"
   label: string;             // "Destination"
-  options: { value: string; pronunciation: string; english: string }[];
+  options: { value: string; pronunciation: string; english: string; chinese_tc?: string }[];
 }
 
 export interface ConversationLine {
@@ -67,15 +67,19 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'パスポートをお見せください', pronunciation: 'pasupooto wo omise kudasai', pronunciation_chunks: 'pa·su·poo·to wo o·mi·se ku·da·sai', english: 'Please show your passport.', chinese_tc: '請出示護照' },
       { speaker: 'you', target: 'はい、どうぞ', pronunciation: 'hai, douzo', pronunciation_chunks: 'hai dou·zo', english: 'Here you go.', chinese_tc: '好的，請' },
       { speaker: 'staff', target: '滞在の目的は何ですか？', pronunciation: 'taizai no mokuteki wa nan desu ka', pronunciation_chunks: 'tai·zai no mo·ku·te·ki wa nan de·su ka', english: 'What is the purpose of your stay?', chinese_tc: '您的停留目的是什麼？' },
-      { speaker: 'you', target: '観光です', pronunciation: 'kankou desu', pronunciation_chunks: 'kan·kou de·su', english: 'Sightseeing / Tourism.', chinese_tc: '觀光', note: 'Simple and clear. No need to elaborate.' },
+      { speaker: 'you', target: '観光です', pronunciation: 'kankou desu', pronunciation_chunks: 'kan·kou de·su', english: 'Sightseeing / Tourism.', chinese_tc: '觀光', note: 'Simple and clear. No need to elaborate.', options: [
+        { target: '観光です', pronunciation: 'kankou desu', pronunciation_chunks: 'kan·kou de·su', english: 'Sightseeing / Tourism', chinese_tc: '觀光' },
+        { target: '仕事です', pronunciation: 'shigoto desu', pronunciation_chunks: 'shi·go·to de·su', english: 'Business', chinese_tc: '工作' },
+        { target: '友人に会いに来ました', pronunciation: 'yuujin ni ai ni kimashita', pronunciation_chunks: 'yuu·jin ni ai ni ki·ma·shi·ta', english: 'Visiting a friend', chinese_tc: '來拜訪朋友' },
+      ] },
       { speaker: 'staff', target: '何日間の滞在ですか？', pronunciation: 'nannichikan no taizai desu ka', pronunciation_chunks: 'nan·ni·chi·kan no tai·zai de·su ka', english: 'How many days will you stay?', chinese_tc: '停留幾天？' },
       { speaker: 'you', target: '一週間です', pronunciation: 'isshuukan desu', pronunciation_chunks: 'is·shuu·kan de·su', english: 'One week.', chinese_tc: '一個星期', variables: [
         { placeholder: '一週間', label: 'Duration', options: [
-          { value: '一週間', pronunciation: 'is·shuu·kan', english: 'One week' },
-          { value: '三日間', pronunciation: 'mik·ka·kan', english: 'Three days' },
-          { value: '五日間', pronunciation: 'it·su·ka·kan', english: 'Five days' },
-          { value: '十日間', pronunciation: 'too·ka·kan', english: 'Ten days' },
-          { value: '二週間', pronunciation: 'ni·shuu·kan', english: 'Two weeks' },
+          { value: '一週間', pronunciation: 'is·shuu·kan', english: 'One week', chinese_tc: '一個星期' },
+          { value: '三日間', pronunciation: 'mik·ka·kan', english: 'Three days', chinese_tc: '三天' },
+          { value: '五日間', pronunciation: 'it·su·ka·kan', english: 'Five days', chinese_tc: '五天' },
+          { value: '十日間', pronunciation: 'too·ka·kan', english: 'Ten days', chinese_tc: '十天' },
+          { value: '二週間', pronunciation: 'ni·shuu·kan', english: 'Two weeks', chinese_tc: '兩個星期' },
         ] },
       ] },
       { speaker: 'you', target: '荷物の受取所はどこですか？', pronunciation: 'nimotsu no uketori-jo wa doko desu ka', pronunciation_chunks: 'ni·mo·tsu no u·ke·to·ri·jo wa do·ko de·su ka', english: 'Where is the baggage claim?', chinese_tc: '行李提取處在哪裡？' },
@@ -122,13 +126,13 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: 'すみません、京都までの新幹線の切符を二枚お願いします', pronunciation: 'sumimasen, kyouto made no shinkansen no kippu wo nimai onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, kyou·to ma·de no shin·kan·sen no kip·pu wo ni·mai o·ne·gai·shi·ma·su', english: 'Two Shinkansen tickets to Kyoto please', chinese_tc: '請給我兩張到京都的新幹線車票', variables: [
         { placeholder: '京都', label: 'Destination', options: [
-          { value: '京都', pronunciation: 'kyou·to', english: 'Kyoto' },
-          { value: '大阪', pronunciation: 'oo·sa·ka', english: 'Osaka' },
-          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo' },
-          { value: '名古屋', pronunciation: 'na·go·ya', english: 'Nagoya' },
-          { value: '広島', pronunciation: 'hi·ro·shi·ma', english: 'Hiroshima' },
-          { value: '新大阪', pronunciation: 'shin·oo·sa·ka', english: 'Shin-Osaka' },
-          { value: '博多', pronunciation: 'ha·ka·ta', english: 'Hakata (Fukuoka)' },
+          { value: '京都', pronunciation: 'kyou·to', english: 'Kyoto', chinese_tc: '京都' },
+          { value: '大阪', pronunciation: 'oo·sa·ka', english: 'Osaka', chinese_tc: '大阪' },
+          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo', chinese_tc: '東京' },
+          { value: '名古屋', pronunciation: 'na·go·ya', english: 'Nagoya', chinese_tc: '名古屋' },
+          { value: '広島', pronunciation: 'hi·ro·shi·ma', english: 'Hiroshima', chinese_tc: '廣島' },
+          { value: '新大阪', pronunciation: 'shin·oo·sa·ka', english: 'Shin-Osaka', chinese_tc: '新大阪' },
+          { value: '博多', pronunciation: 'ha·ka·ta', english: 'Hakata (Fukuoka)', chinese_tc: '博多(福岡)' },
         ] },
       ] },
       { speaker: 'staff', target: '指定席ですか、自由席ですか？', pronunciation: 'shiteiseki desu ka, jiyuuseki desu ka?', pronunciation_chunks: 'shi·tei·se·ki de·su ka, ji·yuu·se·ki de·su ka', english: 'Reserved or non-reserved seat?', chinese_tc: '對號座還是自由座？' },
@@ -157,11 +161,11 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: 'すみません、名古屋から東京までの新幹線の切符を二枚お願いします', pronunciation: 'sumimasen, nagoya kara toukyou made no shinkansen no kippu wo nimai onegaishimasu', pronunciation_chunks: 'su·mi·ma·sen, na·go·ya ka·ra tou·kyou ma·de no shin·kan·sen no kip·pu wo ni·mai o·ne·gai·shi·ma·su', english: 'Two Shinkansen tickets from Nagoya to Tokyo please', chinese_tc: '請給我兩張名古屋到東京的新幹線車票', variables: [
         { placeholder: '東京', label: 'Destination', options: [
-          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo' },
-          { value: '品川', pronunciation: 'shi·na·ga·wa', english: 'Shinagawa' },
-          { value: '新横浜', pronunciation: 'shin·yo·ko·ha·ma', english: 'Shin-Yokohama' },
-          { value: '京都', pronunciation: 'kyou·to', english: 'Kyoto' },
-          { value: '新大阪', pronunciation: 'shin·oo·sa·ka', english: 'Shin-Osaka' },
+          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo', chinese_tc: '東京' },
+          { value: '品川', pronunciation: 'shi·na·ga·wa', english: 'Shinagawa', chinese_tc: '品川' },
+          { value: '新横浜', pronunciation: 'shin·yo·ko·ha·ma', english: 'Shin-Yokohama', chinese_tc: '新橫濱' },
+          { value: '京都', pronunciation: 'kyou·to', english: 'Kyoto', chinese_tc: '京都' },
+          { value: '新大阪', pronunciation: 'shin·oo·sa·ka', english: 'Shin-Osaka', chinese_tc: '新大阪' },
         ] },
       ] },
       { speaker: 'staff', target: 'のぞみでよろしいですか？指定席と自由席、どちらにしますか？', pronunciation: 'nozomi de yoroshii desu ka? shiteiseki to jiyuuseki, dochira ni shimasu ka?', pronunciation_chunks: 'no·zo·mi de yo·ro·shii de·su ka? shi·tei·se·ki to ji·yuu·se·ki, do·chi·ra ni shi·ma·su ka', english: 'Nozomi OK? Reserved or non-reserved?', chinese_tc: '搭希望號可以嗎？對號座還是自由座？' },
@@ -188,10 +192,10 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: '切符を見せてもらえますか？', pronunciation: 'kippu wo misete moraemasu ka?', pronunciation_chunks: 'kip·pu wo mi·se·te mo·ra·e·ma·su ka', english: 'Can I see your ticket?', chinese_tc: '可以讓我看看車票嗎？' },
       { speaker: 'you', target: 'はい、これです。○日間パスです', pronunciation: 'hai, kore desu. ○nichikan pasu desu', pronunciation_chunks: 'hai, ko·re de·su. ○·ni·chi·kan pa·su de·su', english: 'Yes, here it is. It\'s a ○-day pass.', chinese_tc: '好的，這是○日券', variables: [
         { placeholder: '○日間', label: 'Pass type', options: [
-          { value: '3日間', pronunciation: 'mik·ka·kan', english: '3-day' },
-          { value: '5日間', pronunciation: 'i·tsu·ka·kan', english: '5-day' },
-          { value: '7日間', pronunciation: 'na·no·ka·kan', english: '7-day' },
-          { value: '14日間', pronunciation: 'juu·yok·ka·kan', english: '14-day' },
+          { value: '3日間', pronunciation: 'mik·ka·kan', english: '3-day', chinese_tc: '3日券' },
+          { value: '5日間', pronunciation: 'i·tsu·ka·kan', english: '5-day', chinese_tc: '5日券' },
+          { value: '7日間', pronunciation: 'na·no·ka·kan', english: '7-day', chinese_tc: '7日券' },
+          { value: '14日間', pronunciation: 'juu·yok·ka·kan', english: '14-day', chinese_tc: '14日券' },
         ] },
       ] },
       { speaker: 'staff', target: 'このパスは有人改札をお通りください', pronunciation: 'kono pasu wa yuujin kaisatsu wo otoori kudasai', pronunciation_chunks: 'ko·no pa·su wa yuu·jin kai·sa·tsu wo o·too·ri ku·da·sai', english: 'Please use the staffed gate for this pass.', chinese_tc: '這種票請走人工閘門', note: 'Some passes (like JR Pass) can\'t go through automatic gates — always use the staffed gate window.' },
@@ -208,11 +212,11 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: 'すみません、この電車は東京駅に行きますか？', pronunciation: 'sumimasen, kono densha wa toukyou eki ni ikimasu ka', pronunciation_chunks: 'su·mi·ma·sen ko·no den·sha wa tou·kyou e·ki ni i·ki·ma·su ka', english: 'Excuse me, does this train go to Tokyo Station?', chinese_tc: '請問這班電車有到東京站嗎？', variables: [
         { placeholder: '東京駅', label: 'Destination', options: [
-          { value: '東京駅', pronunciation: 'tou·kyou e·ki', english: 'Tokyo Station' },
-          { value: '渋谷駅', pronunciation: 'shi·bu·ya e·ki', english: 'Shibuya Station' },
-          { value: '新宿駅', pronunciation: 'shin·ju·ku e·ki', english: 'Shinjuku Station' },
-          { value: '名古屋駅', pronunciation: 'na·go·ya e·ki', english: 'Nagoya Station' },
-          { value: '品川駅', pronunciation: 'shi·na·ga·wa e·ki', english: 'Shinagawa Station' },
+          { value: '東京駅', pronunciation: 'tou·kyou e·ki', english: 'Tokyo Station', chinese_tc: '東京站' },
+          { value: '渋谷駅', pronunciation: 'shi·bu·ya e·ki', english: 'Shibuya Station', chinese_tc: '渋谷站' },
+          { value: '新宿駅', pronunciation: 'shin·ju·ku e·ki', english: 'Shinjuku Station', chinese_tc: '新宿站' },
+          { value: '名古屋駅', pronunciation: 'na·go·ya e·ki', english: 'Nagoya Station', chinese_tc: '名古屋站' },
+          { value: '品川駅', pronunciation: 'shi·na·ga·wa e·ki', english: 'Shinagawa Station', chinese_tc: '品川站' },
         ] },
       ] },
       { speaker: 'staff', target: 'いいえ、この電車は行きません。次の駅で降りてください', pronunciation: 'iie, kono densha wa ikimasen. tsugi no eki de orite kudasai', pronunciation_chunks: 'ii·e ko·no den·sha wa i·ki·ma·sen. tsu·gi no e·ki de o·ri·te ku·da·sai', english: 'No, this train doesn\'t go there. Please get off at the next station.', chinese_tc: '不是，這班不到。請在下一站下車' },
@@ -230,10 +234,10 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: 'すみません、名古屋城行きのバスはどこですか？', pronunciation: 'sumimasen, nagoya-jou iki no basu wa doko desu ka', pronunciation_chunks: 'su·mi·ma·sen na·go·ya·jou i·ki no ba·su wa do·ko de·su ka', english: 'Excuse me, where is the bus to Nagoya Castle?', chinese_tc: '請問去名古屋城的公車在哪裡？', variables: [
         { placeholder: '名古屋城', label: 'Destination', options: [
-          { value: '名古屋城', pronunciation: 'na·go·ya·jou', english: 'Nagoya Castle' },
-          { value: '名古屋駅', pronunciation: 'na·go·ya·e·ki', english: 'Nagoya Station' },
-          { value: '空港', pronunciation: 'kuu·kou', english: 'Airport' },
-          { value: '栄', pronunciation: 'sa·ka·e', english: 'Sakae' },
+          { value: '名古屋城', pronunciation: 'na·go·ya·jou', english: 'Nagoya Castle', chinese_tc: '名古屋城' },
+          { value: '名古屋駅', pronunciation: 'na·go·ya·e·ki', english: 'Nagoya Station', chinese_tc: '名古屋站' },
+          { value: '空港', pronunciation: 'kuu·kou', english: 'Airport', chinese_tc: '機場' },
+          { value: '栄', pronunciation: 'sa·ka·e', english: 'Sakae', chinese_tc: '榮' },
         ] },
       ] },
       { speaker: 'staff', target: 'あちらの3番のりばです', pronunciation: 'achira no sanban noriba desu', pronunciation_chunks: 'a·chi·ra no san·ban no·ri·ba de·su', english: 'It\'s at bus stop number 3 over there.', chinese_tc: '在那邊的3號乘車處' },
@@ -257,14 +261,14 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: 'すみません、ちょっとお聞きしたいのですが', pronunciation: 'sumimasen, chotto okiki shitai no desu ga', pronunciation_chunks: 'su·mi·ma·sen, chot·to o·ki·ki shi·tai no de·su ga', english: 'Excuse me, may I ask you something?', chinese_tc: '不好意思，想請問一下', note: 'Polite way to approach a stranger' },
       { speaker: 'you', target: '○○駅はどこですか？', pronunciation: '○○ eki wa doko desu ka?', pronunciation_chunks: '○○ e·ki wa do·ko de·su ka', english: 'Where is ○○ station?', chinese_tc: '○○站在哪裡？', variables: [
         { placeholder: '○○', label: 'Station', options: [
-          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo' },
-          { value: '渋谷', pronunciation: 'shi·bu·ya', english: 'Shibuya' },
-          { value: '新宿', pronunciation: 'shin·ju·ku', english: 'Shinjuku' },
-          { value: '池袋', pronunciation: 'i·ke·bu·ku·ro', english: 'Ikebukuro' },
-          { value: '品川', pronunciation: 'shi·na·ga·wa', english: 'Shinagawa' },
-          { value: '上野', pronunciation: 'u·e·no', english: 'Ueno' },
-          { value: '浅草', pronunciation: 'a·sa·ku·sa', english: 'Asakusa' },
-          { value: '秋葉原', pronunciation: 'a·ki·ha·ba·ra', english: 'Akihabara' },
+          { value: '東京', pronunciation: 'tou·kyou', english: 'Tokyo', chinese_tc: '東京' },
+          { value: '渋谷', pronunciation: 'shi·bu·ya', english: 'Shibuya', chinese_tc: '渋谷' },
+          { value: '新宿', pronunciation: 'shin·ju·ku', english: 'Shinjuku', chinese_tc: '新宿' },
+          { value: '池袋', pronunciation: 'i·ke·bu·ku·ro', english: 'Ikebukuro', chinese_tc: '池袋' },
+          { value: '品川', pronunciation: 'shi·na·ga·wa', english: 'Shinagawa', chinese_tc: '品川' },
+          { value: '上野', pronunciation: 'u·e·no', english: 'Ueno', chinese_tc: '上野' },
+          { value: '浅草', pronunciation: 'a·sa·ku·sa', english: 'Asakusa', chinese_tc: '淺草' },
+          { value: '秋葉原', pronunciation: 'a·ki·ha·ba·ra', english: 'Akihabara', chinese_tc: '秋葉原' },
         ] },
       ] },
       { speaker: 'staff', target: 'あそこの信号を右に曲がってください', pronunciation: 'asoko no shingou wo migi ni magatte kudasai', pronunciation_chunks: 'a·so·ko no shin·gou wo mi·gi ni ma·gat·te ku·da·sai', english: 'Turn right at that traffic light over there', chinese_tc: '在那邊的紅綠燈右轉' },
@@ -305,11 +309,11 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'ご予約のお名前をお願いします', pronunciation: 'go-yoyaku no onamae wo onegaishimasu', pronunciation_chunks: 'go·yo·ya·ku no o·na·ma·e wo o·ne·gai·shi·ma·su', english: 'Your reservation name please', chinese_tc: '請問預約的姓名' },
       { speaker: 'you', target: '予約した○○です。二泊です', pronunciation: 'yoyaku shita ○○ desu. nihaku desu', pronunciation_chunks: 'yo·ya·ku shi·ta ○○ de·su. ni·ha·ku de·su', english: 'Reservation under ○○. Two nights.', chinese_tc: '我有預約，姓○○。住兩晚', note: 'Show your booking confirmation on your phone', variables: [
         { placeholder: '二泊', label: 'Nights', options: [
-          { value: '一泊', pronunciation: 'ip·pa·ku', english: '1 night' },
-          { value: '二泊', pronunciation: 'ni·ha·ku', english: '2 nights' },
-          { value: '三泊', pronunciation: 'san·pa·ku', english: '3 nights' },
-          { value: '四泊', pronunciation: 'yon·ha·ku', english: '4 nights' },
-          { value: '五泊', pronunciation: 'go·ha·ku', english: '5 nights' },
+          { value: '一泊', pronunciation: 'ip·pa·ku', english: '1 night', chinese_tc: '一晚' },
+          { value: '二泊', pronunciation: 'ni·ha·ku', english: '2 nights', chinese_tc: '兩晚' },
+          { value: '三泊', pronunciation: 'san·pa·ku', english: '3 nights', chinese_tc: '三晚' },
+          { value: '四泊', pronunciation: 'yon·ha·ku', english: '4 nights', chinese_tc: '四晚' },
+          { value: '五泊', pronunciation: 'go·ha·ku', english: '5 nights', chinese_tc: '五晚' },
         ] },
       ] },
       { speaker: 'staff', target: 'はい、確認できました。パスポートをお願いします', pronunciation: 'hai, kakunin dekimashita. pasupooto wo onegaishimasu', pronunciation_chunks: 'hai, ka·ku·nin de·ki·ma·shi·ta. pa·su·poo·to wo o·ne·gai·shi·ma·su', english: 'Confirmed. Passport please.', chinese_tc: '確認了。請出示護照' },
@@ -350,13 +354,13 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'はい、届け先のホテル名と住所をお願いします。お届け日はいつがよろしいですか？', pronunciation: 'hai, todokesaki no hoteru mei to juusho wo onegaishimasu. otodoke bi wa itsu ga yoroshii desu ka?', pronunciation_chunks: 'hai, to·do·ke·sa·ki no ho·te·ru mei to juu·sho wo o·ne·gai·shi·ma·su. o·to·do·ke bi wa i·tsu ga yo·ro·shii de·su ka', english: 'Yes, the destination hotel name and address please. What delivery date would you like?', chinese_tc: '是的，請寫收件飯店名稱和地址。希望哪天送到？' },
       { speaker: 'you', target: '明後日の午前中にお願いします', pronunciation: 'asatte no gozenchuu ni onegaishimasu', pronunciation_chunks: 'a·sat·te no go·zen·chuu ni o·ne·gai·shi·ma·su', english: 'Day after tomorrow morning please', chinese_tc: '請後天上午送到', variables: [
         { placeholder: '明後日', label: 'Delivery day', options: [
-          { value: '明日', pronunciation: 'a·shi·ta', english: 'Tomorrow' },
-          { value: '明後日', pronunciation: 'a·sat·te', english: 'Day after tomorrow' },
+          { value: '明日', pronunciation: 'a·shi·ta', english: 'Tomorrow', chinese_tc: '明天' },
+          { value: '明後日', pronunciation: 'a·sat·te', english: 'Day after tomorrow', chinese_tc: '後天' },
         ] },
         { placeholder: '午前中', label: 'Time', options: [
-          { value: '午前中', pronunciation: 'go·zen·chuu', english: 'Morning' },
-          { value: '午後', pronunciation: 'go·go', english: 'Afternoon' },
-          { value: '夕方', pronunciation: 'yuu·ga·ta', english: 'Evening' },
+          { value: '午前中', pronunciation: 'go·zen·chuu', english: 'Morning', chinese_tc: '上午' },
+          { value: '午後', pronunciation: 'go·go', english: 'Afternoon', chinese_tc: '下午' },
+          { value: '夕方', pronunciation: 'yuu·ga·ta', english: 'Evening', chinese_tc: '傍晚' },
         ] },
       ] },
       { speaker: 'staff', target: 'スーツケース一つですか？', pronunciation: 'suutsukeesu hitotsu desu ka?', pronunciation_chunks: 'suu·tsu·kee·su hi·to·tsu de·su ka', english: 'One suitcase?', chinese_tc: '一個行李箱嗎？' },
@@ -392,11 +396,11 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'はい、もちろんです。何時ごろお戻りですか？', pronunciation: 'hai, mochiron desu. nanji goro omodori desu ka?', pronunciation_chunks: 'hai, mo·chi·ron de·su. nan·ji go·ro o·mo·do·ri de·su ka', english: 'Yes, of course. Around what time will you return?', chinese_tc: '好的，當然可以。大約幾點回來？' },
       { speaker: 'you', target: '夕方5時ごろ戻ります', pronunciation: 'yuugata goji goro modorimasu', pronunciation_chunks: 'yuu·ga·ta go·ji go·ro mo·do·ri·ma·su', english: 'I\'ll be back around 5pm', chinese_tc: '傍晚5點左右回來', variables: [
         { placeholder: '5時', label: 'Pickup time', options: [
-          { value: '3時', pronunciation: 'san·ji', english: '3pm' },
-          { value: '4時', pronunciation: 'yo·ji', english: '4pm' },
-          { value: '5時', pronunciation: 'go·ji', english: '5pm' },
-          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm' },
-          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm' },
+          { value: '3時', pronunciation: 'san·ji', english: '3pm', chinese_tc: '3點' },
+          { value: '4時', pronunciation: 'yo·ji', english: '4pm', chinese_tc: '4點' },
+          { value: '5時', pronunciation: 'go·ji', english: '5pm', chinese_tc: '5點' },
+          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm', chinese_tc: '6點' },
+          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm', chinese_tc: '7點' },
         ] },
       ] },
       { speaker: 'staff', target: 'かしこまりました。こちらの番号札をお持ちください', pronunciation: 'kashikomarimashita. kochira no bangou fuda wo omochi kudasai', pronunciation_chunks: 'ka·shi·ko·ma·ri·ma·shi·ta. ko·chi·ra no ban·gou fu·da wo o·mo·chi ku·da·sai', english: 'Certainly. Please take this number tag.', chinese_tc: '好的。請拿這個號碼牌' },
@@ -411,18 +415,18 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: '予約したいのですが', pronunciation: 'yoyaku shitai no desu ga', pronunciation_chunks: 'yo·ya·ku shi·tai no de·su ga', english: 'I\'d like to make a reservation.', chinese_tc: '我想預約' },
       { speaker: 'staff', target: 'いつのご予約ですか？', pronunciation: 'itsu no go-yoyaku desu ka', pronunciation_chunks: 'i·tsu no go·yo·ya·ku de·su ka', english: 'When would you like to reserve?', chinese_tc: '什麼時候的預約？' },
-      { speaker: 'you', target: '今日の7時に二名でお願いします', pronunciation: 'kyou no shichiji ni nimei de onegaishimasu', pronunciation_chunks: 'kyou no shi·chi·ji ni ni·mei de o·ne·gai·shi·ma·su', english: 'Today at 7pm for two people please.', chinese_tc: '今天7點，兩位', variables: [
+      { speaker: 'you', target: '今日の7時にふたりでお願いします', pronunciation: 'kyou no shichiji ni futari de onegaishimasu', pronunciation_chunks: 'kyou no shi·chi·ji ni fu·ta·ri de o·ne·gai·shi·ma·su', english: 'Today at 7pm for two people please.', chinese_tc: '今天7點，兩位', variables: [
         { placeholder: '7時', label: 'Time', options: [
-          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm' },
-          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm' },
-          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm' },
-          { value: '9時', pronunciation: 'ku·ji', english: '9pm' },
+          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm', chinese_tc: '6點' },
+          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm', chinese_tc: '7點' },
+          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm', chinese_tc: '8點' },
+          { value: '9時', pronunciation: 'ku·ji', english: '9pm', chinese_tc: '9點' },
         ] },
-        { placeholder: '二名', label: 'Party size', options: [
-          { value: '一名', pronunciation: 'i·chi·mei', english: '1 person' },
-          { value: '二名', pronunciation: 'ni·mei', english: '2 people' },
-          { value: '三名', pronunciation: 'san·mei', english: '3 people' },
-          { value: '四名', pronunciation: 'yo·mei', english: '4 people' },
+        { placeholder: 'ふたり', label: 'Party size', options: [
+          { value: 'ひとり', pronunciation: 'hi·to·ri', english: '1 person', chinese_tc: '一位' },
+          { value: 'ふたり', pronunciation: 'fu·ta·ri', english: '2 people', chinese_tc: '兩位' },
+          { value: 'さんにん', pronunciation: 'san·nin', english: '3 people', chinese_tc: '三位' },
+          { value: 'よにん', pronunciation: 'yo·nin', english: '4 people', chinese_tc: '四位' },
         ] },
       ] },
       { speaker: 'staff', target: '少々お待ちください… はい、大丈夫です', pronunciation: 'shoushou omachi kudasai... hai, daijoubu desu', pronunciation_chunks: 'shou·shou o·ma·chi ku·da·sai hai dai·jou·bu de·su', english: 'One moment please... Yes, that\'s fine.', chinese_tc: '請稍等...好的，可以' },
@@ -438,12 +442,12 @@ export const scenarios: Scenario[] = [
     emoji: '🪑', description: 'Requesting non-smoking, counter vs table, window seat',
     lines: [
       { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
-      { speaker: 'you', target: '二名です。禁煙席をお願いします', pronunciation: 'nimei desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'ni·mei de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.', variables: [
-        { placeholder: '二名', label: 'Party size', options: [
-          { value: '一名', pronunciation: 'i·chi·mei', english: '1 person' },
-          { value: '二名', pronunciation: 'ni·mei', english: '2 people' },
-          { value: '三名', pronunciation: 'san·mei', english: '3 people' },
-          { value: '四名', pronunciation: 'yo·mei', english: '4 people' },
+      { speaker: 'you', target: 'ふたりです。禁煙席をお願いします', pronunciation: 'futari desu. kinen seki wo onegaishimasu', pronunciation_chunks: 'fu·ta·ri de·su. ki·nen se·ki wo o·ne·gai·shi·ma·su', english: 'Two people. Non-smoking seat please.', chinese_tc: '兩位。請給我禁煙座位', note: 'Since 2020, most indoor restaurants in Japan are fully non-smoking. But some izakaya still have smoking areas.', variables: [
+        { placeholder: 'ふたり', label: 'Party size', options: [
+          { value: 'ひとり', pronunciation: 'hi·to·ri', english: '1 person', chinese_tc: '一位' },
+          { value: 'ふたり', pronunciation: 'fu·ta·ri', english: '2 people', chinese_tc: '兩位' },
+          { value: 'さんにん', pronunciation: 'san·nin', english: '3 people', chinese_tc: '三位' },
+          { value: 'よにん', pronunciation: 'yo·nin', english: '4 people', chinese_tc: '四位' },
         ] },
       ] },
       { speaker: 'staff', target: 'カウンター席とテーブル席、どちらがよろしいですか？', pronunciation: 'kauntaa seki to teeburu seki, dochira ga yoroshii desu ka', pronunciation_chunks: 'kaun·taa se·ki to tee·bu·ru se·ki do·chi·ra ga yo·ro·shii de·su ka', english: 'Counter or table seat?', chinese_tc: '吧台還是桌位？' },
@@ -487,11 +491,11 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: '何名様ですか？', pronunciation: 'nanmei sama desu ka?', pronunciation_chunks: 'nan·mei sa·ma de·su ka', english: 'How many people?', chinese_tc: '請問幾位？' },
       { speaker: 'you', target: '6時に予約した○○です', pronunciation: 'roku-ji ni yoyaku shita ○○ desu', pronunciation_chunks: 'ro·ku·ji ni yo·ya·ku shi·ta ○○ de·su', english: 'I have a 6 o\'clock reservation, name is ○○', chinese_tc: '我預約了6點，姓○○', note: 'Replace ○○ with your name', variables: [
         { placeholder: '6時', label: 'Time', options: [
-          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm' },
-          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm' },
-          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm' },
-          { value: '12時', pronunciation: 'juu·ni·ji', english: '12pm' },
-          { value: '1時', pronunciation: 'i·chi·ji', english: '1pm' },
+          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm', chinese_tc: '6點' },
+          { value: '7時', pronunciation: 'shi·chi·ji', english: '7pm', chinese_tc: '7點' },
+          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm', chinese_tc: '8點' },
+          { value: '12時', pronunciation: 'juu·ni·ji', english: '12pm', chinese_tc: '12點' },
+          { value: '1時', pronunciation: 'i·chi·ji', english: '1pm', chinese_tc: '1點' },
         ] },
       ] },
       { speaker: 'staff', target: 'はい、確認いたしました。お席へご案内いたします', pronunciation: 'hai, kakunin itashimashita. oseki e go-annai itashimasu', pronunciation_chunks: 'hai, ka·ku·nin i·ta·shi·ma·shi·ta. o·se·ki e go·an·nai i·ta·shi·ma·su', english: 'Yes, confirmed. I\'ll show you to your seat.', chinese_tc: '好的，確認了。帶您到座位' },
@@ -948,16 +952,16 @@ export const scenarios: Scenario[] = [
     title: 'Karaoke Night Out', titleTC: '卡拉OK',
     emoji: '🎤', description: 'Booking a room, ordering drinks, extending time',
     lines: [
-      { speaker: 'you', target: '二名で一時間お願いします', pronunciation: 'nimei de ichijikan onegaishimasu', pronunciation_chunks: 'ni·mei de i·chi·ji·kan o·ne·gai·shi·ma·su', english: 'Two people, one hour please.', chinese_tc: '兩位，一小時', variables: [
-        { placeholder: '二名', label: 'Party size', options: [
-          { value: '二名', pronunciation: 'ni·mei', english: 'Two people' },
-          { value: '三名', pronunciation: 'san·mei', english: 'Three people' },
-          { value: '四名', pronunciation: 'yo·mei', english: 'Four people' },
+      { speaker: 'you', target: 'ふたりで一時間お願いします', pronunciation: 'futari de ichijikan onegaishimasu', pronunciation_chunks: 'fu·ta·ri de i·chi·ji·kan o·ne·gai·shi·ma·su', english: 'Two people, one hour please.', chinese_tc: '兩位，一小時', variables: [
+        { placeholder: 'ふたり', label: 'Party size', options: [
+          { value: 'ふたり', pronunciation: 'fu·ta·ri', english: 'Two people', chinese_tc: '兩位' },
+          { value: 'さんにん', pronunciation: 'san·nin', english: 'Three people', chinese_tc: '三位' },
+          { value: 'よにん', pronunciation: 'yo·nin', english: 'Four people', chinese_tc: '四位' },
         ] },
         { placeholder: '一時間', label: 'Duration', options: [
-          { value: '一時間', pronunciation: 'i·chi·ji·kan', english: 'one hour' },
-          { value: '二時間', pronunciation: 'ni·ji·kan', english: 'two hours' },
-          { value: '三時間', pronunciation: 'san·ji·kan', english: 'three hours' },
+          { value: '一時間', pronunciation: 'i·chi·ji·kan', english: 'one hour', chinese_tc: '一小時' },
+          { value: '二時間', pronunciation: 'ni·ji·kan', english: 'two hours', chinese_tc: '兩小時' },
+          { value: '三時間', pronunciation: 'san·ji·kan', english: 'three hours', chinese_tc: '三小時' },
         ] },
       ] },
       { speaker: 'staff', target: 'ドリンクバーのプランでよろしいですか？', pronunciation: 'dorinku baa no puran de yoroshii desu ka', pronunciation_chunks: 'do·rin·ku baa no pu·ran de yo·ro·shii de·su ka', english: 'Is the drink bar plan okay?', chinese_tc: '飲料吧方案可以嗎？', note: 'Most karaoke requires a drink order. ドリンクバー = unlimited drinks, usually best value.' },
@@ -967,8 +971,8 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: 'はい、30分ごとに延長できます', pronunciation: 'hai, sanjuppun goto ni enchou dekimasu', pronunciation_chunks: 'hai san·jup·pun go·to ni en·chou de·ki·ma·su', english: 'Yes, you can extend in 30-minute blocks.', chinese_tc: '可以，每30分鐘延長一次' },
       { speaker: 'you', target: 'あと30分お願いします', pronunciation: 'ato sanjuppun onegaishimasu', pronunciation_chunks: 'a·to san·jup·pun o·ne·gai·shi·ma·su', english: '30 more minutes please.', chinese_tc: '再加30分鐘', variables: [
         { placeholder: '30分', label: 'Extension', options: [
-          { value: '30分', pronunciation: 'san·jup·pun', english: '30 minutes' },
-          { value: '一時間', pronunciation: 'i·chi·ji·kan', english: 'one hour' },
+          { value: '30分', pronunciation: 'san·jup·pun', english: '30 minutes', chinese_tc: '30分鐘' },
+          { value: '一時間', pronunciation: 'i·chi·ji·kan', english: 'one hour', chinese_tc: '一小時' },
         ] },
       ] },
     ],
@@ -1007,35 +1011,35 @@ export const scenarios: Scenario[] = [
       { speaker: 'staff', target: '何をお忘れになりましたか？', pronunciation: 'nani wo owasure ni narimashita ka?', pronunciation_chunks: 'na·ni wo o·wa·su·re ni na·ri·ma·shi·ta ka', english: 'What did you leave behind?', chinese_tc: '您忘了什麼？' },
       { speaker: 'you', target: '黒い鞄を電車の中に忘れました', pronunciation: 'kuroi kaban wo densha no naka ni wasuremashita', pronunciation_chunks: 'ku·roi ka·ban wo den·sha no na·ka ni wa·su·re·ma·shi·ta', english: 'I left a black bag on the train', chinese_tc: '我把黑色包包忘在電車裡了', variables: [
         { placeholder: '黒い鞄', label: 'Item', options: [
-          { value: '黒い鞄', pronunciation: 'ku·roi ka·ban', english: 'black bag' },
-          { value: '傘', pronunciation: 'ka·sa', english: 'umbrella' },
-          { value: '携帯電話', pronunciation: 'kei·tai·den·wa', english: 'mobile phone' },
-          { value: '財布', pronunciation: 'sai·fu', english: 'wallet' },
-          { value: 'カメラ', pronunciation: 'ka·me·ra', english: 'camera' },
-          { value: '帽子', pronunciation: 'bou·shi', english: 'hat' },
+          { value: '黒い鞄', pronunciation: 'ku·roi ka·ban', english: 'black bag', chinese_tc: '黑色包包' },
+          { value: '傘', pronunciation: 'ka·sa', english: 'umbrella', chinese_tc: '雨傘' },
+          { value: '携帯電話', pronunciation: 'kei·tai·den·wa', english: 'mobile phone', chinese_tc: '手機' },
+          { value: '財布', pronunciation: 'sai·fu', english: 'wallet', chinese_tc: '錢包' },
+          { value: 'カメラ', pronunciation: 'ka·me·ra', english: 'camera', chinese_tc: '相機' },
+          { value: '帽子', pronunciation: 'bou·shi', english: 'hat', chinese_tc: '帽子' },
         ] },
         { placeholder: '電車の中', label: 'Location', options: [
-          { value: '電車の中', pronunciation: 'den·sha no na·ka', english: 'on the train' },
-          { value: 'タクシーの中', pronunciation: 'ta·ku·shii no na·ka', english: 'in the taxi' },
-          { value: 'レストラン', pronunciation: 're·su·to·ran', english: 'at the restaurant' },
-          { value: 'ホテルの部屋', pronunciation: 'ho·te·ru no he·ya', english: 'in the hotel room' },
+          { value: '電車の中', pronunciation: 'den·sha no na·ka', english: 'on the train', chinese_tc: '電車上' },
+          { value: 'タクシーの中', pronunciation: 'ta·ku·shii no na·ka', english: 'in the taxi', chinese_tc: '計程車裡' },
+          { value: 'レストラン', pronunciation: 're·su·to·ran', english: 'at the restaurant', chinese_tc: '餐廳' },
+          { value: 'ホテルの部屋', pronunciation: 'ho·te·ru no he·ya', english: 'in the hotel room', chinese_tc: '飯店房間' },
         ] },
       ] },
       { speaker: 'staff', target: '何線をご利用でしたか？何時ごろですか？', pronunciation: 'nanisen wo goriyou deshita ka? nanji goro desu ka?', pronunciation_chunks: 'na·ni·sen wo go·ri·you de·shi·ta ka? nan·ji go·ro de·su ka', english: 'What line were you on? Around what time?', chinese_tc: '您搭什麼線？大約幾點？' },
       { speaker: 'you', target: '山手線で、2時ごろです', pronunciation: 'yamanote sen de, niji goro desu', pronunciation_chunks: 'ya·ma·no·te sen de, ni·ji go·ro de·su', english: 'Yamanote Line, around 2pm', chinese_tc: '山手線，大約2點', variables: [
         { placeholder: '山手線', label: 'Train line', options: [
-          { value: '山手線', pronunciation: 'ya·ma·no·te·sen', english: 'Yamanote Line' },
-          { value: '中央線', pronunciation: 'chuu·ou·sen', english: 'Chuo Line' },
-          { value: '銀座線', pronunciation: 'gin·za·sen', english: 'Ginza Line' },
-          { value: '東海道線', pronunciation: 'tou·kai·dou·sen', english: 'Tokaido Line' },
-          { value: '名城線', pronunciation: 'mei·jou·sen', english: 'Meijo Line' },
+          { value: '山手線', pronunciation: 'ya·ma·no·te·sen', english: 'Yamanote Line', chinese_tc: '山手線' },
+          { value: '中央線', pronunciation: 'chuu·ou·sen', english: 'Chuo Line', chinese_tc: '中央線' },
+          { value: '銀座線', pronunciation: 'gin·za·sen', english: 'Ginza Line', chinese_tc: '銀座線' },
+          { value: '東海道線', pronunciation: 'tou·kai·dou·sen', english: 'Tokaido Line', chinese_tc: '東海道線' },
+          { value: '名城線', pronunciation: 'mei·jou·sen', english: 'Meijo Line', chinese_tc: '名城線' },
         ] },
         { placeholder: '2時', label: 'Time', options: [
-          { value: '12時', pronunciation: 'juu·ni·ji', english: '12pm' },
-          { value: '2時', pronunciation: 'ni·ji', english: '2pm' },
-          { value: '4時', pronunciation: 'yo·ji', english: '4pm' },
-          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm' },
-          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm' },
+          { value: '12時', pronunciation: 'juu·ni·ji', english: '12pm', chinese_tc: '12點' },
+          { value: '2時', pronunciation: 'ni·ji', english: '2pm', chinese_tc: '2點' },
+          { value: '4時', pronunciation: 'yo·ji', english: '4pm', chinese_tc: '4點' },
+          { value: '6時', pronunciation: 'ro·ku·ji', english: '6pm', chinese_tc: '6點' },
+          { value: '8時', pronunciation: 'ha·chi·ji', english: '8pm', chinese_tc: '8點' },
         ] },
       ] },
       { speaker: 'staff', target: 'わかりました。忘れ物センターに確認いたします', pronunciation: 'wakarimashita. wasuremono sentaa ni kakunin itashimasu', pronunciation_chunks: 'wa·ka·ri·ma·shi·ta. wa·su·re·mo·no sen·taa ni ka·ku·nin i·ta·shi·ma·su', english: 'Understood. I\'ll check with the lost and found center.', chinese_tc: '了解。我跟失物中心確認', note: 'Japan has amazing lost-item return rates — over 80%! Always report to station staff.' },
@@ -1054,14 +1058,14 @@ export const scenarios: Scenario[] = [
     lines: [
       { speaker: 'you', target: 'すみません、頭痛薬はありますか？', pronunciation: 'sumimasen, zutsuu yaku wa arimasu ka?', pronunciation_chunks: 'su·mi·ma·sen, zu·tsuu ya·ku wa a·ri·ma·su ka', english: 'Excuse me, do you have headache medicine?', chinese_tc: '不好意思，有頭痛藥嗎？', variables: [
         { placeholder: '頭痛薬', label: 'Medicine', options: [
-          { value: '頭痛薬', pronunciation: 'zu·tsuu ya·ku', english: 'headache medicine' },
-          { value: '胃薬', pronunciation: 'i·gu·su·ri', english: 'stomach medicine' },
-          { value: '風邪薬', pronunciation: 'ka·ze·gu·su·ri', english: 'cold medicine' },
-          { value: '下痢止め', pronunciation: 'ge·ri·do·me', english: 'anti-diarrhea' },
-          { value: '酔い止め', pronunciation: 'yo·i·do·me', english: 'motion sickness' },
-          { value: '目薬', pronunciation: 'me·gu·su·ri', english: 'eye drops' },
-          { value: '絆創膏', pronunciation: 'ban·sou·kou', english: 'bandaid' },
-          { value: '日焼け止め', pronunciation: 'hi·ya·ke·do·me', english: 'sunscreen' },
+          { value: '頭痛薬', pronunciation: 'zu·tsuu ya·ku', english: 'headache medicine', chinese_tc: '頭痛藥' },
+          { value: '胃薬', pronunciation: 'i·gu·su·ri', english: 'stomach medicine', chinese_tc: '胃藥' },
+          { value: '風邪薬', pronunciation: 'ka·ze·gu·su·ri', english: 'cold medicine', chinese_tc: '感冒藥' },
+          { value: '下痢止め', pronunciation: 'ge·ri·do·me', english: 'anti-diarrhea', chinese_tc: '止瀉藥' },
+          { value: '酔い止め', pronunciation: 'yo·i·do·me', english: 'motion sickness', chinese_tc: '暈車藥' },
+          { value: '目薬', pronunciation: 'me·gu·su·ri', english: 'eye drops', chinese_tc: '眼藥水' },
+          { value: '絆創膏', pronunciation: 'ban·sou·kou', english: 'bandaid', chinese_tc: 'OK繃' },
+          { value: '日焼け止め', pronunciation: 'hi·ya·ke·do·me', english: 'sunscreen', chinese_tc: '防曬' },
         ] },
       ] },
       { speaker: 'staff', target: 'こちらにございます。何か他に症状はございますか？', pronunciation: 'kochira ni gozaimasu. nanika hoka ni shoujou wa gozaimasu ka?', pronunciation_chunks: 'ko·chi·ra ni go·zai·ma·su. na·ni·ka ho·ka ni shou·jou wa go·zai·ma·su ka', english: 'It\'s right here. Do you have any other symptoms?', chinese_tc: '在這裡。有其他症狀嗎？' },
