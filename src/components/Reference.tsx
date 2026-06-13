@@ -84,11 +84,6 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
   );
 }
 
-/** Check if text is all kana (hiragana/katakana), spaces, and punctuation — no kanji */
-function isAllKana(text: string): boolean {
-  return /^[\u3040-\u309F\u30A0-\u30FF\u3000-\u303F\s\u3001\u3002\uFF01-\uFF5E\u30FB\u30FC○〇ー（）()、。！？]+$/.test(text);
-}
-
 export function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onToggleLearned }: {
   ex: { jp: string; hep: string; en: string };
   data: { title: string };
