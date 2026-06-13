@@ -98,11 +98,11 @@ function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onToggleLearn
   onToggleLearned?: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const canBreakdown = isAllKana(ex.jp);
+  const hasChunks = ex.hep.includes('·') || ex.hep.includes(' ');
 
   return (
     <div className="bg-slate-700/40 rounded-xl overflow-hidden">
-      <div className="p-3 cursor-pointer active:bg-slate-700/50 transition" onClick={() => canBreakdown && setExpanded(!expanded)}>
+      <div className="p-3 cursor-pointer active:bg-slate-700/50 transition" onClick={() => hasChunks && setExpanded(!expanded)}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-lg font-medium text-slate-50">{ex.jp}</p>
@@ -129,29 +129,51 @@ function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onToggleLearn
           )}
         </div>
       </div>
-      {expanded && canBreakdown && (() => {
-        let units = breakdownKana(ex.jp);
-        // Use hep as pronunciation_chunks if it contains dots
-        if (ex.hep.includes('·')) {
+      {expanded && hasChunks && (() => {
+        const canBreakdownKana = isAllKana(ex.jp);
+        if (canBreakdownKana) {
+          // Full kana breakdown with character mapping
+          let units = breakdownKana(ex.jp);
           units = markChunkBoundaries(units, ex.hep);
-        }
-        units = markLengtheners(units);
-        const visible = units.filter(u => !u.isSpace);
-        return (
-          <div className="px-3 pb-3 border-t border-slate-700/40">
-            <div className="mt-2 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
-              <span className="text-slate-500 text-xs block mb-1">Sounds</span>
-              <div className="flex flex-wrap items-end">
-                {visible.map((u, i) => (
-                  <div key={i} className={`flex flex-col items-center py-0.5 ${u.isLengthener ? 'min-w-[0.9rem] -ml-px' : 'min-w-[1.2rem] px-px'} ${u.isLengthener ? '' : u.isWordBreak ? 'ml-4' : u.isChunkStart && i > 0 ? 'ml-2' : ''}`}>
-                    <span className={`leading-tight ${u.isLengthener ? 'text-sm text-slate-300' : 'text-base text-slate-100'}`}>{u.char}</span>
-                    <span className={`leading-none font-mono mt-0.5 ${u.isLengthener ? 'text-[9px] text-slate-500' : 'text-[10px] text-slate-400'}`}>{u.romaji || '·'}</span>
-                  </div>
-                ))}
+          units = markLengtheners(units);
+          const visible = units.filter(u => !u.isSpace);
+          return (
+            <div className="px-3 pb-3 border-t border-slate-700/40">
+              <div className="mt-2 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
+                <span className="text-slate-500 text-xs block mb-1">Sounds</span>
+                <div className="flex flex-wrap items-end">
+                  {visible.map((u, i) => (
+                    <div key={i} className={`flex flex-col items-center py-0.5 ${u.isLengthener ? 'min-w-[0.9rem] -ml-px' : 'min-w-[1.2rem] px-px'} ${u.isLengthener ? '' : u.isWordBreak ? 'ml-4' : u.isChunkStart && i > 0 ? 'ml-2' : ''}`}>
+                      <span className={`leading-tight ${u.isLengthener ? 'text-sm text-slate-300' : 'text-base text-slate-100'}`}>{u.char}</span>
+                      <span className={`leading-none font-mono mt-0.5 ${u.isLengthener ? 'text-[9px] text-slate-500' : 'text-[10px] text-slate-400'}`}>{u.romaji || '·'}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        );
+          );
+        } else {
+          // Romaji-only chunks for kanji items
+          const wordGroups = ex.hep.split(/\s+/);
+          return (
+            <div className="px-3 pb-3 border-t border-slate-700/40">
+              <div className="mt-2 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
+                <span className="text-slate-500 text-xs block mb-1">Sounds</span>
+                <div className="flex flex-wrap items-end gap-3">
+                  {wordGroups.map((word, wi) => (
+                    <div key={wi} className="flex items-end">
+                      {word.split('·').map((chunk, ci) => (
+                        <div key={ci} className={`flex flex-col items-center min-w-[1.2rem] py-0.5 px-px ${ci > 0 ? 'ml-0.5' : ''}`}>
+                          <span className="text-base leading-tight text-indigo-300 font-mono">{chunk}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
       })()}
     </div>
   );
@@ -764,33 +786,7 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
             const learnId = `ref_${ex.jp}`;
             const isLearned = learnedIds?.has(learnId);
             return (
-              <div key={i} className="bg-slate-700/40 rounded-xl p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-lg font-medium text-slate-50">{ex.jp}</p>
-                    <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-                    {onToggleRefBookmark && (
-                      <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-                        {isBm ? '⭐' : '☆'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-0.5">
-                  <p className="text-base text-slate-400 flex-1">{ex.en}</p>
-                  {onToggleLearned && (
-                    <button
-                      onClick={() => onToggleLearned(learnId)}
-                      className={`text-sm px-2 py-0.5 rounded-full transition shrink-0 ml-2 ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}
-                    >
-                      {isLearned ? 'Learned ✓' : 'Mark learned'}
-                    </button>
-                  )}
-                </div>
-              </div>
+              <RefItem key={i} ex={ex} data={{ title: section || id }} isBm={isBm} isLearned={isLearned} onToggleRefBookmark={onToggleRefBookmark} onToggleLearned={onToggleLearned} />
             );
           })}
         </div>
