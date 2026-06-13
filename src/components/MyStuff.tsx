@@ -307,7 +307,6 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1 min-w-0">
                                   <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
-                                  <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
                                   <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
                                 </div>
                                 <button onClick={() => speak(phrase.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
