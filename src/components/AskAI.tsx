@@ -298,7 +298,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-semibold text-slate-100 truncate">{followUpPhrase.target}</p>
-                    <p className="text-sm text-sakura-300 truncate">{followUpPhrase.pronunciation_chunks || followUpPhrase.pronunciation}</p>
+                    <p className="text-sm text-sakura-300 truncate">{followUpPhrase.pronunciation}</p>
                     <p className="text-sm text-slate-500 truncate">{followUpPhrase.english}</p>
                   </div>
                   <button onClick={() => setFollowUpOpen(false)} className="text-xl text-slate-400 p-2 shrink-0">✕</button>
