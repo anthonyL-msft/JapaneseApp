@@ -20,13 +20,17 @@ function markWordBoundaries(units: KanaUnit[], pronunciation: string): KanaUnit[
     if (wi > 0) {
       nonSpace[ki].isWordBreak = true;
     }
-    // Accumulate romaji from kana units until we match this word
+    // Accumulate romaji from kana units until we match this word exactly
+    const wordClean = words[wi].replace(/[·\-ー]/g, '').toLowerCase();
     let acc = '';
-    const wordClean = words[wi].replace(/[·\-]/g, '').toLowerCase();
     while (ki < nonSpace.length) {
-      acc += (nonSpace[ki].romaji || '').toLowerCase();
+      const rom = (nonSpace[ki].romaji || '').replace(/[–·]/g, '');
+      acc += rom.toLowerCase();
       ki++;
-      if (acc.length >= wordClean.length) break;
+      // Only break when we've matched the full word
+      if (acc === wordClean) break;
+      // Safety: if we've accumulated more chars than the word, we overshot — break
+      if (acc.length > wordClean.length + 2) break;
     }
   }
   return result;
