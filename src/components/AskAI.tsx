@@ -379,7 +379,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       )}
 
       {followUpOpen && followUpPhrase && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative bg-slate-900 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
@@ -455,7 +455,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                 </div>
               )}
             </div>
-            <div className="shrink-0 px-4 py-3 border-t border-slate-700/50 space-y-2">
+            <div className="shrink-0 px-4 py-3 border-t border-slate-700/50 space-y-2" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}>
               <div className="flex gap-2">
                 <textarea value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }} placeholder="Ask a follow-up..." rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={followUpLoading} />
                 <button onClick={() => handleFollowUp()} disabled={followUpLoading || !followUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
