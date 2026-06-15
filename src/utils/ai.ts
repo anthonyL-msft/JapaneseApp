@@ -14,6 +14,10 @@ export interface AIPhrase {
   native_hint?: string;
 }
 
+export type BreakdownBlock =
+  | { type: 'text'; content: string }
+  | { type: 'phrase'; phrase: AIPhrase };
+
 export function isAIConfigured(): boolean {
   return !!(ENDPOINT && API_KEY && API_KEY !== 'PASTE_YOUR_API_KEY_HERE' && DEPLOYMENT);
 }
@@ -267,4 +271,83 @@ Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...
     notes: safeStr(item.notes),
     native_hint: item.native_hint ? safeStr(item.native_hint) : undefined,
   }));
+}
+
+/** Break down a phrase into pattern explanation + example phrases */
+export async function askBreakdown(
+  originalPhrase: AIPhrase,
+  lang: string,
+): Promise<BreakdownBlock[]> {
+  if (!isAIConfigured()) throw new Error('AI not configured.');
+
+  const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
+
+  const systemPrompt = `You are a travel language tutor for beginners. Break down the given ${langName} phrase into a mini-lesson.
+
+Return a JSON array of blocks. Each block is one of:
+
+1. Text block: { "type": "text", "content": "explanation text here" }
+2. Phrase block: { "type": "phrase", "target": "...", ${lang === 'ja' ? '"romanization": "hiragana reading", ' : ''}"pronunciation": "...", "pronunciation_chunks": "syllable·broken", "english": "...", "chinese_tc": "...", "notes": "brief note" }
+
+Structure your response as:
+1. A text block explaining the pattern/grammar structure (identify the reusable pattern like 〇〇してもらえますか)
+2. A text block breaking down each part of the original phrase (what each word/particle means)
+3. 3 phrase blocks showing the same pattern applied to different situations (practical travel examples)
+4. A text block with a tip on how to use this pattern
+
+${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep examples practical for travel.' : ''}
+
+Respond ONLY with a valid JSON array. No markdown wrapping.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Break down this phrase: ${originalPhrase.target} (${originalPhrase.pronunciation}) = "${originalPhrase.english}"` },
+  ];
+
+  const url = `${ENDPOINT}/openai/deployments/${DEPLOYMENT}/chat/completions?api-version=${API_VERSION}`;
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
+    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 1000 }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`AI request failed: ${resp.status} ${errText}`);
+  }
+
+  const resData = await resp.json();
+  const resContent = resData.choices?.[0]?.message?.content?.trim();
+  if (!resContent) throw new Error('Empty response from AI');
+
+  const jsonStr = resContent.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed;
+  try { parsed = JSON.parse(jsonStr); } catch {
+    const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
+    if (arrMatch) { try { parsed = JSON.parse(arrMatch[0]); } catch { throw new Error('Could not parse AI response.'); } }
+    else throw new Error('AI returned invalid response.');
+  }
+
+  if (!Array.isArray(parsed)) parsed = [parsed];
+
+  return parsed.map((block: Record<string, unknown>): BreakdownBlock => {
+    if (block.type === 'text') {
+      return { type: 'text', content: safeStr(block.content) };
+    }
+    // Treat as phrase block
+    return {
+      type: 'phrase',
+      phrase: {
+        target: safeStr(block.target),
+        romanization: block.romanization ? safeStr(block.romanization) : undefined,
+        pronunciation: safeStr(block.pronunciation),
+        pronunciation_chunks: safeStr(block.pronunciation_chunks),
+        english: safeStr(block.english),
+        chinese_tc: safeStr(block.chinese_tc),
+        notes: safeStr(block.notes),
+        native_hint: block.native_hint ? safeStr(block.native_hint) : undefined,
+      },
+    };
+  });
 }

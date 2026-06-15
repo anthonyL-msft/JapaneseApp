@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { askHowToSay, askFollowUp, askFollowUpMulti, isAIConfigured } from '../utils/ai';
-import type { AIPhrase, FollowUpMessage } from '../utils/ai';
+import { askHowToSay, askFollowUp, askFollowUpMulti, askBreakdown, isAIConfigured } from '../utils/ai';
+import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
 import { LANGUAGES } from '../data/types';
@@ -80,11 +80,45 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
   );
 }
 
+/** Render a breakdown as a section layout — text blocks + phrase cards */
+function BreakdownSection({ blocks, lang, onSave, onSpeak, savedAIPhrases }: {
+  blocks: BreakdownBlock[];
+  lang: string;
+  onSave: (phrase: AIPhrase, query: string) => void;
+  onSpeak: (text: string) => void;
+  savedAIPhrases: SavedAIPhrase[];
+}) {
+  return (
+    <div className="space-y-2">
+      {blocks.map((block, i) => {
+        if (block.type === 'text') {
+          return (
+            <div key={i} className="bg-slate-800/60 rounded-xl px-3 py-2.5">
+              <p className="text-base text-slate-300 whitespace-pre-wrap leading-relaxed">{block.content}</p>
+            </div>
+          );
+        }
+        return (
+          <AIResultCard
+            key={i}
+            phrase={block.phrase}
+            lang={lang}
+            onSave={() => onSave(block.phrase, 'Breakdown example')}
+            onSpeak={() => onSpeak(block.phrase.target)}
+            isSaved={savedAIPhrases.some(s => s.target === block.phrase.target)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 const FOLLOW_UP_CHIPS = [
-  { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', multi: false },
-  { label: 'As a question', prompt: 'How do I turn this into a question?', multi: false },
-  { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects or contexts. Keep the grammar structure the same.', multi: true },
-  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead? Show me 3-5 alternatives that convey a similar meaning.', multi: true },
+  { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', mode: 'single' as const },
+  { label: 'As a question', prompt: 'How do I turn this into a question?', mode: 'single' as const },
+  { label: 'Break it down', prompt: '', mode: 'breakdown' as const },
+  { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects or contexts. Keep the grammar structure the same.', mode: 'multi' as const },
+  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead? Show me 3-5 alternatives that convey a similar meaning.', mode: 'multi' as const },
 ];
 
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase }: Props) {
@@ -98,7 +132,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
   const [followUpPhrase, setFollowUpPhrase] = useState<AIPhrase | null>(null);
   const [followUpQuery, setFollowUpQuery] = useState('');
   const [followUpLoading, setFollowUpLoading] = useState(false);
-  const [followUpResults, setFollowUpResults] = useState<{ query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; error?: string }[]>([]);
+  const [followUpResults, setFollowUpResults] = useState<{ query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; error?: string }[]>([]);
   const [followUpHistory, setFollowUpHistory] = useState<FollowUpMessage[]>([]);
   const followUpScrollRef = useRef<HTMLDivElement>(null);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
@@ -126,21 +160,25 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
     setFollowUpPhrase(phrase); setFollowUpResults([]); setFollowUpHistory([]); setFollowUpQuery(''); setFollowUpOpen(true);
   };
 
-  const handleFollowUp = async (promptText?: string, multi?: boolean) => {
+  const handleFollowUp = async (promptText?: string, mode: 'single' | 'multi' | 'breakdown' = 'single') => {
     const q = promptText || followUpQuery.trim();
-    if (!q || !followUpPhrase || followUpLoading) return;
+    if ((!q && mode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
     setFollowUpLoading(true); setFollowUpQuery('');
+    const displayQuery = mode === 'breakdown' ? 'Break it down' : q;
     try {
-      if (multi) {
+      if (mode === 'breakdown') {
+        const blocks = await askBreakdown(followUpPhrase, lang);
+        setFollowUpResults(prev => [...prev, { query: displayQuery, blocks }]);
+      } else if (mode === 'multi') {
         const responses = await askFollowUpMulti(followUpPhrase, q, lang);
-        setFollowUpResults(prev => [...prev, { query: q, phrases: responses }]);
+        setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
       } else {
         const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang);
-        setFollowUpResults(prev => [...prev, { query: q, phrase: response }]);
+        setFollowUpResults(prev => [...prev, { query: displayQuery, phrase: response }]);
         setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: JSON.stringify(response) }]);
       }
     } catch (err) {
-      setFollowUpResults(prev => [...prev, { query: q, error: err instanceof Error ? err.message : 'Error' }]);
+      setFollowUpResults(prev => [...prev, { query: displayQuery, error: err instanceof Error ? err.message : 'Error' }]);
     } finally { setFollowUpLoading(false); }
   };
 
@@ -258,20 +296,20 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
                       <p className="text-base text-slate-200">{r.query}</p>
                     </div>
                   </div>
-                  {/* AI response — left */}
-                  <div className="flex justify-start">
-                    <div className="max-w-[95%] space-y-1.5">
-                      {r.error ? (
-                        <div className="bg-red-900/30 border border-red-700/40 rounded-2xl rounded-tl-sm px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
-                      ) : r.phrases ? (
-                        r.phrases.map((p, pi) => (
-                          <AIResultCard key={pi} phrase={p} lang={lang} onSave={() => handleSave(p, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(p.target)} isSaved={savedAIPhrases.some(s => s.target === p.target)} />
-                        ))
-                      ) : r.phrase?.target ? (
-                        <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase!, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase!.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase!.target)} />
-                      ) : null}
+                  {/* AI response */}
+                  {r.error ? (
+                    <div className="bg-red-900/30 border border-red-700/40 rounded-2xl px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
+                  ) : r.blocks ? (
+                    <BreakdownSection blocks={r.blocks} lang={lang} onSave={handleSave} onSpeak={handleSpeak} savedAIPhrases={savedAIPhrases} />
+                  ) : r.phrases ? (
+                    <div className="space-y-1.5">
+                      {r.phrases.map((p, pi) => (
+                        <AIResultCard key={pi} phrase={p} lang={lang} onSave={() => handleSave(p, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(p.target)} isSaved={savedAIPhrases.some(s => s.target === p.target)} />
+                      ))}
                     </div>
-                  </div>
+                  ) : r.phrase?.target ? (
+                    <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase!, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase!.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase!.target)} />
+                  ) : null}
                 </div>
               ))}
               {followUpLoading && (
@@ -296,7 +334,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {FOLLOW_UP_CHIPS.map(chip => (
-                  <button key={chip.label} onClick={() => handleFollowUp(chip.prompt, chip.multi)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
+                  <button key={chip.label} onClick={() => handleFollowUp(chip.prompt || undefined, chip.mode)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
                 ))}
               </div>
             </div>
