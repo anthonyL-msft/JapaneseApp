@@ -185,14 +185,13 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
               onClick={handleCopy}
               className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition"
             >{copied ? '✓ Copied' : '📋 Copy'}</button>
+            {onAskMore && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onAskMore(); }}
+                className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition"
+              >💬 Ask more</button>
+            )}
           </div>
-
-          {onAskMore && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onAskMore(); }}
-              className="w-full bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition"
-            >💬 Ask more</button>
-          )}
 
           {/* Difficulty indicator */}
           <div className="flex items-center gap-2 text-base text-slate-500">
