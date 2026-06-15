@@ -14,9 +14,10 @@ interface Props {
   onShowCards?: () => void;
   learnedIds?: Set<string>;
   onToggleLearned?: (id: string) => void;
+  onAskMore?: (phrase: Phrase) => void;
 }
 
-export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, onSaveNote, onDeleteNote, onShowCards, learnedIds, onToggleLearned }: Props) {
+export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, onSaveNote, onDeleteNote, onShowCards, learnedIds, onToggleLearned, onAskMore }: Props) {
   const panel = useSlidePanel<Category>();
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [openSituations, setOpenSituations] = useState<Set<string>>(new Set());
@@ -170,6 +171,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                           onToggleLearned={onToggleLearned ? () => onToggleLearned(phrase.id) : undefined}
                           onSaveNote={onSaveNote}
                           onDeleteNote={onDeleteNote}
+                          onAskMore={onAskMore ? () => onAskMore(phrase) : undefined}
                         />
                       ))}
                     </div>

@@ -14,9 +14,10 @@ interface Props {
   onToggleLearned?: () => void;
   onSaveNote: (note: UserNote) => void;
   onDeleteNote: (id: string) => void;
+  onAskMore?: () => void;
 }
 
-export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, onToggleExpand, onToggleBookmark, onToggleLearned, onSaveNote, onDeleteNote }: Props) {
+export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, onToggleExpand, onToggleBookmark, onToggleLearned, onSaveNote, onDeleteNote, onAskMore }: Props) {
   const [noteText, setNoteText] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [showBig, setShowBig] = useState(false);
@@ -185,6 +186,13 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
               className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition"
             >{copied ? '✓ Copied' : '📋 Copy'}</button>
           </div>
+
+          {onAskMore && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onAskMore(); }}
+              className="w-full bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition"
+            >💬 Ask more</button>
+          )}
 
           {/* Difficulty indicator */}
           <div className="flex items-center gap-2 text-base text-slate-500">

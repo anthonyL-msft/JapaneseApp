@@ -11,6 +11,8 @@ interface Props {
   savedAIPhrases: SavedAIPhrase[];
   onSaveAIPhrase: (phrase: SavedAIPhrase) => void;
   onDeleteAIPhrase: (id: string) => void;
+  askMorePhrase?: { target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null;
+  onClearAskMore?: () => void;
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
@@ -51,7 +53,10 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
             <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
           </div>
-          <button onClick={(e) => { e.stopPropagation(); onSpeak(); }} className="text-xl p-1 active:scale-110 transition-transform shrink-0">🔊</button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button onClick={(e) => { e.stopPropagation(); onSpeak(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+            <button onClick={(e) => { e.stopPropagation(); onSave(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">{isSaved ? '⭐' : '☆'}</button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-2 mt-2 text-base">
           <div><span className="text-slate-500">English</span><p className="text-slate-400">{phrase.english}</p></div>
@@ -66,13 +71,10 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
           {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">💡 {phrase.notes}</p></div>}
           <div className="flex gap-2 pt-1">
             <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">{copied ? '✓ Copied' : '📋 Copy'}</button>
-            <button onClick={(e) => { e.stopPropagation(); onSave(); }} className={`flex-1 text-base py-1.5 rounded-lg transition ${isSaved ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sakura-500/30 text-sakura-300 active:bg-sakura-500/50'}`}>{isSaved ? '✓ Saved' : '📌 Save'}</button>
+            {onShowBig && <button onClick={(e) => { e.stopPropagation(); onShowBig(); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">📺 Show Big</button>}
           </div>
-          {(onFollowUp || onShowBig) && (
-            <div className="flex gap-2">
-              {onFollowUp && <button onClick={(e) => { e.stopPropagation(); onFollowUp(); }} className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition">💬 Ask more</button>}
-              {onShowBig && <button onClick={(e) => { e.stopPropagation(); onShowBig(); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">📺 Show Big</button>}
-            </div>
+          {onFollowUp && (
+            <button onClick={(e) => { e.stopPropagation(); onFollowUp(); }} className="w-full bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition">💬 Ask more</button>
           )}
         </div>
       )}
@@ -121,7 +123,7 @@ const FOLLOW_UP_CHIPS = [
   { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead? Show me 3-5 alternatives that convey a similar meaning.', mode: 'multi' as const },
 ];
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase, askMorePhrase, onClearAskMore }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [loading, setLoading] = useState(false);
@@ -137,6 +139,26 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
   const followUpScrollRef = useRef<HTMLDivElement>(null);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const configured = isAIConfigured();
+
+  // Auto-open follow-up drawer when askMorePhrase is passed from PhraseCard
+  useEffect(() => {
+    if (askMorePhrase) {
+      const phrase: AIPhrase = {
+        target: askMorePhrase.target,
+        pronunciation: askMorePhrase.pronunciation,
+        pronunciation_chunks: askMorePhrase.pronunciation_chunks,
+        english: askMorePhrase.english,
+        chinese_tc: '',
+        notes: '',
+      };
+      setFollowUpPhrase(phrase);
+      setFollowUpResults([]);
+      setFollowUpHistory([]);
+      setFollowUpQuery('');
+      setFollowUpOpen(true);
+      onClearAskMore?.();
+    }
+  }, [askMorePhrase, onClearAskMore]);
 
   const handleAsk = async () => {
     if (!query.trim() || loading) return;

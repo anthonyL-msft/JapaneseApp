@@ -32,6 +32,7 @@ function App() {
   const [refBookmarks, setRefBookmarks] = useState<RefBookmark[]>([]);
   const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
   const [savedAIPhrases, setSavedAIPhrases] = useState<SavedAIPhrase[]>([]);
+  const [askMorePhrase, setAskMorePhrase] = useState<{ target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null>(null);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   useEffect(() => {
@@ -154,6 +155,10 @@ function App() {
             onDeleteNote={handleDeleteNote}
             learnedIds={new Set(learnedItems.map(l => l.id))}
             onToggleLearned={toggleLearned}
+            onAskMore={(phrase) => {
+              setAskMorePhrase({ target: phrase.target, pronunciation: phrase.pronunciation, pronunciation_chunks: phrase.pronunciation_chunks || phrase.pronunciation, english: phrase.english });
+              setTab('ai');
+            }}
           />
         )}
         {tab === 'cards' && (
@@ -178,7 +183,7 @@ function App() {
         )}
         {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
-        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} />}
+        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} />}
         {tab === 'builder' && <SentenceBuilder />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
