@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { askHowToSay, askFollowUp, isAIConfigured } from '../utils/ai';
+import { askHowToSay, askFollowUp, askFollowUpMulti, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
@@ -81,13 +81,14 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
 }
 
 const FOLLOW_UP_CHIPS = [
-  { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?' },
-  { label: 'More polite', prompt: 'How would I say this more politely?' },
-  { label: 'Casual', prompt: 'What\'s the casual/informal version?' },
-  { label: 'As a question', prompt: 'How do I turn this into a question?' },
-  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead?' },
-  { label: 'Swap object', prompt: 'Keep the same sentence pattern but change the object/thing to something different. Show me 2-3 variations with different objects.' },
-  { label: 'Swap subject', prompt: 'Keep the same sentence pattern but change the subject/person. For example change from "I" to "we", "he", "she", or "they". Show me 2-3 variations.' },
+  { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', multi: false },
+  { label: 'More polite', prompt: 'How would I say this more politely?', multi: false },
+  { label: 'Casual', prompt: 'What\'s the casual/informal version?', multi: false },
+  { label: 'As a question', prompt: 'How do I turn this into a question?', multi: false },
+  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead?', multi: true },
+  { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects or contexts. Keep the grammar structure the same.', multi: true },
+  { label: 'Swap object', prompt: 'Keep the same sentence pattern but change the object/thing to something different. Show me 3 variations with different objects.', multi: true },
+  { label: 'Swap subject', prompt: 'Keep the same sentence pattern but change the subject/person. Show me 3 variations (we, he/she, they).', multi: true },
 ];
 
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase }: Props) {
@@ -101,7 +102,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
   const [followUpPhrase, setFollowUpPhrase] = useState<AIPhrase | null>(null);
   const [followUpQuery, setFollowUpQuery] = useState('');
   const [followUpLoading, setFollowUpLoading] = useState(false);
-  const [followUpResults, setFollowUpResults] = useState<{ query: string; phrase: AIPhrase }[]>([]);
+  const [followUpResults, setFollowUpResults] = useState<{ query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; error?: string }[]>([]);
   const [followUpHistory, setFollowUpHistory] = useState<FollowUpMessage[]>([]);
   const followUpScrollRef = useRef<HTMLDivElement>(null);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
@@ -129,16 +130,21 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
     setFollowUpPhrase(phrase); setFollowUpResults([]); setFollowUpHistory([]); setFollowUpQuery(''); setFollowUpOpen(true);
   };
 
-  const handleFollowUp = async (promptText?: string) => {
+  const handleFollowUp = async (promptText?: string, multi?: boolean) => {
     const q = promptText || followUpQuery.trim();
     if (!q || !followUpPhrase || followUpLoading) return;
     setFollowUpLoading(true); setFollowUpQuery('');
     try {
-      const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang);
-      setFollowUpResults(prev => [...prev, { query: q, phrase: response }]);
-      setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: JSON.stringify(response) }]);
+      if (multi) {
+        const responses = await askFollowUpMulti(followUpPhrase, q, lang);
+        setFollowUpResults(prev => [...prev, { query: q, phrases: responses }]);
+      } else {
+        const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang);
+        setFollowUpResults(prev => [...prev, { query: q, phrase: response }]);
+        setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: JSON.stringify(response) }]);
+      }
     } catch (err) {
-      setFollowUpResults(prev => [...prev, { query: q, phrase: { target: '', pronunciation: '', pronunciation_chunks: '', english: err instanceof Error ? err.message : 'Error', chinese_tc: '', notes: '' } }]);
+      setFollowUpResults(prev => [...prev, { query: q, error: err instanceof Error ? err.message : 'Error' }]);
     } finally { setFollowUpLoading(false); }
   };
 
@@ -256,14 +262,18 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
                       <p className="text-base text-slate-200">{r.query}</p>
                     </div>
                   </div>
-                  {/* AI bubble — left */}
+                  {/* AI response — left */}
                   <div className="flex justify-start">
-                    <div className="max-w-[95%]">
-                      {r.phrase.target ? (
-                        <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase.target)} />
-                      ) : (
-                        <div className="bg-red-900/30 border border-red-700/40 rounded-2xl rounded-tl-sm px-3 py-2"><p className="text-base text-red-300">{r.phrase.english}</p></div>
-                      )}
+                    <div className="max-w-[95%] space-y-1.5">
+                      {r.error ? (
+                        <div className="bg-red-900/30 border border-red-700/40 rounded-2xl rounded-tl-sm px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
+                      ) : r.phrases ? (
+                        r.phrases.map((p, pi) => (
+                          <AIResultCard key={pi} phrase={p} lang={lang} onSave={() => handleSave(p, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(p.target)} isSaved={savedAIPhrases.some(s => s.target === p.target)} />
+                        ))
+                      ) : r.phrase?.target ? (
+                        <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase!, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase!.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase!.target)} />
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -290,7 +300,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {FOLLOW_UP_CHIPS.map(chip => (
-                  <button key={chip.label} onClick={() => handleFollowUp(chip.prompt)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
+                  <button key={chip.label} onClick={() => handleFollowUp(chip.prompt, chip.multi)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
                 ))}
               </div>
             </div>

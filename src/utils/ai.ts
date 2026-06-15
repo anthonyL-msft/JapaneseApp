@@ -200,3 +200,71 @@ Respond ONLY with valid JSON. No markdown, no explanation.`;
 
   return parseAIResponse(content);
 }
+
+/** Send a follow-up that expects multiple phrase examples back */
+export async function askFollowUpMulti(
+  originalPhrase: AIPhrase,
+  followUpQuery: string,
+  lang: string,
+): Promise<AIPhrase[]> {
+  if (!isAIConfigured()) throw new Error('AI not configured.');
+
+  const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
+
+  const systemPrompt = `You are a travel language tutor. The user wants to see multiple examples using the same sentence pattern as the original phrase, but with different objects/subjects/contexts.
+
+Return a JSON array of 3-5 phrase objects. Each object has:
+- "target": the phrase in ${langName} (for Japanese: kanji + kana)
+${lang === 'ja' ? '- "romanization": hiragana reading\n' : ''}- "pronunciation": romanized pronunciation
+- "pronunciation_chunks": syllable-broken with · separators
+- "english": English translation
+- "chinese_tc": Traditional Chinese translation
+- "notes": brief note on when/where to use this variation
+${lang === 'ja' ? '- "native_hint": kanji bridge for Chinese speakers (if applicable)\n' : ''}
+${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and practical for travel.' : ''}
+
+Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...].`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Original phrase: ${originalPhrase.target} (${originalPhrase.pronunciation}) = "${originalPhrase.english}"\n\n${followUpQuery}` },
+  ];
+
+  const url = `${ENDPOINT}/openai/deployments/${DEPLOYMENT}/chat/completions?api-version=${API_VERSION}`;
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
+    body: JSON.stringify({ messages, temperature: 0.4, max_tokens: 800 }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`AI request failed: ${resp.status} ${errText}`);
+  }
+
+  const resData = await resp.json();
+  const resContent = resData.choices?.[0]?.message?.content?.trim();
+  if (!resContent) throw new Error('Empty response from AI');
+
+  const jsonStr = resContent.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed;
+  try { parsed = JSON.parse(jsonStr); } catch {
+    const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
+    if (arrMatch) { try { parsed = JSON.parse(arrMatch[0]); } catch { throw new Error('Could not parse AI response.'); } }
+    else throw new Error('AI returned non-array response.');
+  }
+
+  if (!Array.isArray(parsed)) parsed = [parsed];
+
+  return parsed.map((item: Record<string, unknown>) => ({
+    target: safeStr(item.target),
+    romanization: item.romanization ? safeStr(item.romanization) : undefined,
+    pronunciation: safeStr(item.pronunciation),
+    pronunciation_chunks: safeStr(item.pronunciation_chunks),
+    english: safeStr(item.english),
+    chinese_tc: safeStr(item.chinese_tc),
+    notes: safeStr(item.notes),
+    native_hint: item.native_hint ? safeStr(item.native_hint) : undefined,
+  }));
+}
