@@ -368,10 +368,18 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3" ref={followUpScrollRef}>
+              {/* Original phrase card */}
+              <AIResultCard
+                phrase={followUpPhrase}
+                lang={lang}
+                onSave={() => handleSave(followUpPhrase, 'Original')}
+                onSpeak={() => handleSpeak(followUpPhrase.target)}
+                isSaved={savedAIPhrases.some(s => s.target === followUpPhrase.target)}
+                defaultExpanded={followUpResults.length === 0}
+              />
               {followUpResults.length === 0 && !followUpLoading && (
-                <div className="text-center py-8">
-                  <p className="text-base text-slate-500">Tap a chip or type a question below</p>
-                  <p className="text-sm text-slate-600 mt-1">e.g., &quot;Can I make this shorter?&quot; or &quot;How to use with different food?&quot;</p>
+                <div className="text-center py-4">
+                  <p className="text-sm text-slate-600">Tap a chip or type a question below</p>
                 </div>
               )}
               {followUpResults.map((r, i) => (
