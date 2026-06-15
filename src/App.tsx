@@ -206,8 +206,8 @@ function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="bg-slate-900" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        <nav className="flex border-t border-slate-800">
+      <div className="bg-slate-900">
+        <nav className="flex border-t border-slate-800" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
           {TABS.map(t => (
             <button
               key={t.id}
