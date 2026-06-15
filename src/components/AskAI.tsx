@@ -4,7 +4,7 @@ import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
 import { LANGUAGES } from '../data/types';
-import { breakdownKana, markChunkBoundaries, markLengtheners, romajiToHiragana } from '../utils/kana';
+import { breakdownKana, markLengtheners } from '../utils/kana';
 
 interface Props {
   lang: string;
@@ -18,17 +18,10 @@ interface Props {
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
   // Only show Sounds when we have a proper hiragana romanization
+  // Derive everything from our own kana logic — don't depend on AI chunk formatting
   const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
-  if (phrase.pronunciation_chunks && phrase.pronunciation_chunks.includes(' ')) {
-    // Normalize AI chunks: " · " → "·", then ensure word boundaries are clean spaces
-    const cleanChunks = phrase.pronunciation_chunks
-      .replace(/\s*·\s*/g, '·')  // "ko · no" → "ko·no"
-      .replace(/\s+/g, ' ')       // collapse multiple spaces
-      .trim();
-    units = markChunkBoundaries(units, cleanChunks);
-  }
   units = markLengtheners(units);
   const visible = units.filter(u => !u.isSpace);
   if (visible.length === 0) return null;
