@@ -160,7 +160,7 @@ ${lang === 'ja' ? '- "romanization": hiragana reading (e.g. "このせきはあ�
 ${lang === 'ja' ? '- "native_hint": IN ENGLISH, kanji meaning bridge for Chinese speakers (if applicable)\n' : ''}
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and easy for beginners.' : ''}
 
-IMPORTANT: ${explainLang === 'zh-TW' ? '"notes" and "native_hint" MUST be in Traditional Chinese (繁體中文).' : '"notes" and "native_hint" MUST be in English.'} "pronunciation" MUST have spaces between words.
+IMPORTANT: ${explainLang === 'zh-TW' ? '"notes" and "native_hint" MUST be in Traditional Chinese (繁體中文).' : '"notes" and "native_hint" MUST be in English.'} "pronunciation" MUST have spaces between words. ${lang === 'ja' ? '"romanization" is REQUIRED — always include the full hiragana reading.' : ''}
 
 Respond ONLY with valid JSON. No markdown, no explanation.`;
 
@@ -226,13 +226,13 @@ export async function askFollowUpMulti(
 
 Return a JSON array of 3-5 phrase objects. Each object has:
 - "target": the phrase in ${langName} (for Japanese: kanji + kana)
-${lang === 'ja' ? '- "romanization": hiragana reading\n' : ''}- "pronunciation": romanized pronunciation with spaces between words
-- "pronunciation_chunks": syllable-broken with · separators and spaces between words
+${lang === 'ja' ? '- "romanization": REQUIRED hiragana reading (e.g. "このせきはあいていますか")\n' : ''}- "pronunciation": romanized pronunciation with spaces between words
+- "pronunciation_chunks": syllable-broken with · separators and spaces between words (e.g. "ko·no se·ki wa ai·te i·ma·su ka")
 - "english": English translation
 - "chinese_tc": Traditional Chinese translation
 - "notes": brief note IN ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'ENGLISH'} on when/where to use this variation
 ${lang === 'ja' ? `- "native_hint": IN ${explainLang === 'zh-TW' ? 'Traditional Chinese' : 'ENGLISH'}, kanji bridge for Chinese speakers (if applicable)\n` : ''}
-${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and practical for travel.' : ''}
+${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and practical for travel. "romanization" is REQUIRED for every phrase.' : ''}
 
 Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...].`;
 
@@ -305,7 +305,7 @@ export async function askBreakdown(
 Return a JSON array of blocks. Each block is one of:
 
 1. Text block: { "type": "text", "content": "explanation text here" }
-2. Phrase block: { "type": "phrase", "target": "...", ${lang === 'ja' ? '"romanization": "hiragana reading", ' : ''}"pronunciation": "...", "pronunciation_chunks": "syllable·broken", "english": "...", "chinese_tc": "...", "notes": "brief note" }
+2. Phrase block: { "type": "phrase", "target": "...", ${lang === 'ja' ? '"romanization": "REQUIRED hiragana reading", ' : ''}"pronunciation": "romaji with spaces between words", "pronunciation_chunks": "syllable·broken with spaces between words", "english": "...", "chinese_tc": "...", "notes": "brief note" }
 
 Structure your response as:
 1. A text block IN ENGLISH explaining the pattern/grammar structure (identify the reusable pattern like 〇〇してもらえますか)

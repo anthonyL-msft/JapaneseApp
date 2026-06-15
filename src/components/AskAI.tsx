@@ -17,12 +17,12 @@ interface Props {
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
-  // Use romanization (hiragana) if available, otherwise convert from pronunciation_chunks
-  // AI pronunciation_chunks may lack word-boundary spaces, so use pronunciation field for conversion
-  const reading = phrase.romanization || (phrase.pronunciation ? romajiToHiragana(phrase.pronunciation) : '');
+  // Only show Sounds when we have a proper hiragana romanization
+  // AI-generated pronunciation_chunks without word spaces produce garbage
+  const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
-  if (phrase.pronunciation_chunks) {
+  if (phrase.pronunciation_chunks && phrase.pronunciation_chunks.includes(' ')) {
     units = markChunkBoundaries(units, phrase.pronunciation_chunks);
   }
   units = markLengtheners(units);
