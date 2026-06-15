@@ -381,7 +381,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       {followUpOpen && followUpPhrase && (
         <div className="fixed inset-0 z-[60] flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative bg-slate-900 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
+          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
               <div className="flex justify-center pt-2 pb-1"><div className="w-10 h-1 rounded-full bg-slate-600" /></div>
               <div className="px-4 pb-3 border-b border-slate-700/50">
