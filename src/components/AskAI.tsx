@@ -16,7 +16,9 @@ interface Props {
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
-  const reading = phrase.romanization || (phrase.pronunciation_chunks ? romajiToHiragana(phrase.pronunciation_chunks) : '');
+  // Use romanization (hiragana) if available, otherwise convert from pronunciation_chunks
+  // AI pronunciation_chunks may lack word-boundary spaces, so use pronunciation field for conversion
+  const reading = phrase.romanization || (phrase.pronunciation ? romajiToHiragana(phrase.pronunciation) : '');
   if (!reading) return null;
   let units = breakdownKana(reading);
   if (phrase.pronunciation_chunks) {
@@ -286,7 +288,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
       {followUpOpen && followUpPhrase && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative bg-slate-900 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '80vh' }} onClick={e => e.stopPropagation()}>
+          <div className="relative bg-slate-900 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100vh' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
               <div className="flex justify-center pt-2 pb-1"><div className="w-10 h-1 rounded-full bg-slate-600" /></div>
               <div className="px-4 pb-3 border-b border-slate-700/50">
@@ -309,15 +311,11 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
               )}
               {followUpResults.map((r, i) => (
                 <div key={i} className="space-y-2">
-                  {/* User bubble — right */}
-                  <div className="flex justify-end">
-                    <div className="bg-indigo-900/60 rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-                      <p className="text-base text-slate-200">{r.query}</p>
-                    </div>
-                  </div>
-                  {/* AI response */}
+                  {/* User query label */}
+                  <p className="text-sm text-indigo-400 font-medium">💬 {r.query}</p>
+                  {/* AI response as section */}
                   {r.error ? (
-                    <div className="bg-red-900/30 border border-red-700/40 rounded-2xl px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
+                    <div className="bg-red-900/30 border border-red-700/40 rounded-xl px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
                   ) : r.blocks ? (
                     <BreakdownSection blocks={r.blocks} lang={lang} onSave={handleSave} onSpeak={handleSpeak} savedAIPhrases={savedAIPhrases} />
                   ) : r.phrases ? (
@@ -329,6 +327,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
                   ) : r.phrase?.target ? (
                     <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase!, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase!.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase!.target)} />
                   ) : null}
+                  {i < followUpResults.length - 1 && <div className="border-t border-slate-800/50 my-1" />}
                 </div>
               ))}
               {followUpLoading && (

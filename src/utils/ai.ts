@@ -148,13 +148,15 @@ export async function askFollowUp(
 
 Always respond with a valid JSON object in this exact format:
 - "target": the phrase in ${langName} (for Japanese: kanji + kana)
-${lang === 'ja' ? '- "romanization": hiragana reading\n' : ''}- "pronunciation": romanized pronunciation
-- "pronunciation_chunks": syllable-broken with · separators
+${lang === 'ja' ? '- "romanization": hiragana reading (e.g. "このせきはあいていますか")\n' : ''}- "pronunciation": romanized pronunciation with spaces between words (e.g. "kono seki wa aite imasu ka")
+- "pronunciation_chunks": syllable-broken with · separators and spaces between words (e.g. "ko·no se·ki wa ai·te i·ma·su ka")
 - "english": English translation
 - "chinese_tc": Traditional Chinese translation
-- "notes": explanation of how this differs from the original, usage tips
-${lang === 'ja' ? '- "native_hint": kanji meaning bridge for Chinese speakers (if applicable)\n' : ''}
+- "notes": explanation IN ENGLISH of how this differs from the original, usage tips
+${lang === 'ja' ? '- "native_hint": IN ENGLISH, kanji meaning bridge for Chinese speakers (if applicable)\n' : ''}
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and easy for beginners.' : ''}
+
+IMPORTANT: "notes" and "native_hint" MUST be in English. "pronunciation" MUST have spaces between words.
 
 Respond ONLY with valid JSON. No markdown, no explanation.`;
 
@@ -219,12 +221,12 @@ export async function askFollowUpMulti(
 
 Return a JSON array of 3-5 phrase objects. Each object has:
 - "target": the phrase in ${langName} (for Japanese: kanji + kana)
-${lang === 'ja' ? '- "romanization": hiragana reading\n' : ''}- "pronunciation": romanized pronunciation
-- "pronunciation_chunks": syllable-broken with · separators
+${lang === 'ja' ? '- "romanization": hiragana reading\n' : ''}- "pronunciation": romanized pronunciation with spaces between words
+- "pronunciation_chunks": syllable-broken with · separators and spaces between words
 - "english": English translation
 - "chinese_tc": Traditional Chinese translation
-- "notes": brief note on when/where to use this variation
-${lang === 'ja' ? '- "native_hint": kanji bridge for Chinese speakers (if applicable)\n' : ''}
+- "notes": brief note IN ENGLISH on when/where to use this variation
+${lang === 'ja' ? '- "native_hint": IN ENGLISH, kanji bridge for Chinese speakers (if applicable)\n' : ''}
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and practical for travel.' : ''}
 
 Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...].`;
@@ -256,9 +258,19 @@ Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...
   try { parsed = JSON.parse(jsonStr); } catch {
     const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
     if (arrMatch) { try { parsed = JSON.parse(arrMatch[0]); } catch { throw new Error('Could not parse AI response.'); } }
-    else throw new Error('AI returned non-array response.');
+    else throw new Error('Could not parse AI response. Try again.');
   }
 
+  // AI sometimes wraps array in an object like { "phrases": [...] } or { "examples": [...] }
+  if (!Array.isArray(parsed) && typeof parsed === 'object') {
+    const vals = Object.values(parsed as Record<string, unknown>);
+    const arrVal = vals.find(v => Array.isArray(v));
+    if (arrVal) {
+      parsed = arrVal;
+    } else {
+      parsed = [parsed];
+    }
+  }
   if (!Array.isArray(parsed)) parsed = [parsed];
 
   return parsed.map((item: Record<string, unknown>) => ({
@@ -290,11 +302,12 @@ Return a JSON array of blocks. Each block is one of:
 2. Phrase block: { "type": "phrase", "target": "...", ${lang === 'ja' ? '"romanization": "hiragana reading", ' : ''}"pronunciation": "...", "pronunciation_chunks": "syllable·broken", "english": "...", "chinese_tc": "...", "notes": "brief note" }
 
 Structure your response as:
-1. A text block explaining the pattern/grammar structure (identify the reusable pattern like 〇〇してもらえますか)
-2. A text block breaking down each part of the original phrase (what each word/particle means)
-3. 3 phrase blocks showing the same pattern applied to different situations (practical travel examples)
-4. A text block with a tip on how to use this pattern
+1. A text block IN ENGLISH explaining the pattern/grammar structure (identify the reusable pattern like 〇〇してもらえますか)
+2. A text block IN ENGLISH breaking down each part of the original phrase (what each word/particle means)
+3. 3 phrase blocks showing the same pattern applied to different situations (practical travel examples). Each phrase block MUST have \"pronunciation\" with spaces between words.
+4. A text block IN ENGLISH with a tip on how to use this pattern
 
+IMPORTANT: All text block content MUST be in English. Phrase blocks have \"notes\" in English.
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep examples practical for travel.' : ''}
 
 Respond ONLY with a valid JSON array. No markdown wrapping.`;
@@ -326,9 +339,15 @@ Respond ONLY with a valid JSON array. No markdown wrapping.`;
   try { parsed = JSON.parse(jsonStr); } catch {
     const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
     if (arrMatch) { try { parsed = JSON.parse(arrMatch[0]); } catch { throw new Error('Could not parse AI response.'); } }
-    else throw new Error('AI returned invalid response.');
+    else throw new Error('Could not parse AI response. Try again.');
   }
 
+  // AI sometimes wraps array in an object
+  if (!Array.isArray(parsed) && typeof parsed === 'object') {
+    const vals = Object.values(parsed as Record<string, unknown>);
+    const arrVal = vals.find(v => Array.isArray(v));
+    if (arrVal) { parsed = arrVal; } else { parsed = [parsed]; }
+  }
   if (!Array.isArray(parsed)) parsed = [parsed];
 
   return parsed.map((block: Record<string, unknown>): BreakdownBlock => {
