@@ -51,7 +51,7 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
-            <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
+            <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <button onClick={(e) => { e.stopPropagation(); onSpeak(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
