@@ -322,14 +322,13 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
             <h3 className="text-base text-slate-500 mb-2">Recent translations</h3>
             <div className="space-y-1.5">
               {history.map((h, i) => (
-                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 flex items-center gap-2 active:bg-slate-700/50 transition cursor-pointer" onClick={() => setResult(h)}>
+                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 flex items-center gap-2 active:bg-slate-700/50 transition cursor-pointer" onClick={() => openFollowUp(h)}>
                   <button onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }} className="text-base shrink-0">🔊</button>
                   <div className="flex-1 min-w-0">
                     <p className="text-base text-slate-200 truncate">{h.target}</p>
-                    <p className="text-base text-sakura-300 truncate">{h.pronunciation_chunks || h.pronunciation}</p>
+                    <p className="text-base text-sakura-300 truncate">{h.pronunciation}</p>
                     <p className="text-base text-slate-500 truncate">{h.english}</p>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); openFollowUp(h); }} className="text-base text-indigo-400 shrink-0 p-1">💬</button>
                 </div>
               ))}
             </div>
