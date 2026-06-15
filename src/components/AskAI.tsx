@@ -115,9 +115,8 @@ function BreakdownSection({ blocks, lang, onSave, onSpeak, savedAIPhrases }: {
 const FOLLOW_UP_CHIPS = [
   { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', mode: 'single' as const },
   { label: 'As a question', prompt: 'How do I turn this into a question?', mode: 'single' as const },
+  { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects, contexts, or similar expressions.', mode: 'multi' as const },
   { label: 'Break it down', prompt: '', mode: 'breakdown' as const },
-  { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects or contexts. Keep the grammar structure the same.', mode: 'multi' as const },
-  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead? Show me 3-5 alternatives that convey a similar meaning.', mode: 'multi' as const },
 ];
 
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en' }: Props) {
