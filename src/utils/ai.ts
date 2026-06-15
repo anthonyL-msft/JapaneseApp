@@ -18,6 +18,38 @@ export function isAIConfigured(): boolean {
   return !!(ENDPOINT && API_KEY && API_KEY !== 'PASTE_YOUR_API_KEY_HERE' && DEPLOYMENT);
 }
 
+const safeStr = (v: unknown): string => {
+  if (typeof v === 'string') return v;
+  if (v == null) return '';
+  if (typeof v === 'object') return Object.values(v as Record<string, unknown>).map(safeStr).join('');
+  return String(v);
+};
+
+function parseAIResponse(content: string): AIPhrase {
+  const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch {
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try { parsed = JSON.parse(jsonMatch[0]); } catch { throw new Error('Could not parse AI response. Try a simpler question.'); }
+    } else {
+      throw new Error('AI returned non-JSON response. Try again.');
+    }
+  }
+  return {
+    target: safeStr(parsed.target),
+    romanization: parsed.romanization ? safeStr(parsed.romanization) : undefined,
+    pronunciation: safeStr(parsed.pronunciation),
+    pronunciation_chunks: safeStr(parsed.pronunciation_chunks),
+    english: safeStr(parsed.english),
+    chinese_tc: safeStr(parsed.chinese_tc),
+    notes: safeStr(parsed.notes),
+    native_hint: parsed.native_hint ? safeStr(parsed.native_hint) : undefined,
+  };
+}
+
 export async function askHowToSay(query: string, lang: string): Promise<AIPhrase> {
   if (!isAIConfigured()) {
     throw new Error('AI not configured. Add your Azure OpenAI key in settings.');
@@ -87,28 +119,7 @@ Respond ONLY with a valid JSON object. No markdown, no explanation, just the JSO
     throw new Error('Empty response from AI');
   }
 
-  // Parse JSON — strip markdown fences if present
-  const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
-  const parsed = JSON.parse(jsonStr);
-
-  // Safety: ensure all values are strings (AI sometimes returns objects)
-  const safeStr = (v: unknown): string => {
-    if (typeof v === 'string') return v;
-    if (v == null) return '';
-    if (typeof v === 'object') return Object.values(v as Record<string, unknown>).map(safeStr).join('');
-    return String(v);
-  };
-
-  return {
-    target: safeStr(parsed.target),
-    romanization: parsed.romanization ? safeStr(parsed.romanization) : undefined,
-    pronunciation: safeStr(parsed.pronunciation),
-    pronunciation_chunks: safeStr(parsed.pronunciation_chunks),
-    english: safeStr(parsed.english),
-    chinese_tc: safeStr(parsed.chinese_tc),
-    notes: safeStr(parsed.notes),
-    native_hint: parsed.native_hint ? safeStr(parsed.native_hint) : undefined,
-  };
+  return parseAIResponse(content);
 }
 
 export interface FollowUpMessage {
@@ -187,24 +198,5 @@ Respond ONLY with valid JSON. No markdown, no explanation.`;
     throw new Error('Empty response from AI');
   }
 
-  const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
-  const parsed = JSON.parse(jsonStr);
-
-  const safeStr = (v: unknown): string => {
-    if (typeof v === 'string') return v;
-    if (v == null) return '';
-    if (typeof v === 'object') return Object.values(v as Record<string, unknown>).map(safeStr).join('');
-    return String(v);
-  };
-
-  return {
-    target: safeStr(parsed.target),
-    romanization: parsed.romanization ? safeStr(parsed.romanization) : undefined,
-    pronunciation: safeStr(parsed.pronunciation),
-    pronunciation_chunks: safeStr(parsed.pronunciation_chunks),
-    english: safeStr(parsed.english),
-    chinese_tc: safeStr(parsed.chinese_tc),
-    notes: safeStr(parsed.notes),
-    native_hint: parsed.native_hint ? safeStr(parsed.native_hint) : undefined,
-  };
+  return parseAIResponse(content);
 }

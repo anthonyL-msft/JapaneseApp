@@ -256,15 +256,38 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
               )}
               {followUpResults.map((r, i) => (
                 <div key={i} className="space-y-2">
-                  <p className="text-sm text-slate-500 text-right">💬 {r.query}</p>
-                  {r.phrase.target ? (
-                    <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase.target)} />
-                  ) : (
-                    <div className="bg-red-900/30 border border-red-700/40 rounded-xl p-3"><p className="text-base text-red-300">{r.phrase.english}</p></div>
-                  )}
+                  {/* User bubble — right */}
+                  <div className="flex justify-end">
+                    <div className="bg-indigo-900/60 rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%]">
+                      <p className="text-base text-slate-200">{r.query}</p>
+                    </div>
+                  </div>
+                  {/* AI bubble — left */}
+                  <div className="flex justify-start">
+                    <div className="max-w-[95%]">
+                      {r.phrase.target ? (
+                        <AIResultCard phrase={r.phrase} lang={lang} onSave={() => handleSave(r.phrase, `Follow-up: ${r.query}`)} onSpeak={() => handleSpeak(r.phrase.target)} isSaved={savedAIPhrases.some(s => s.target === r.phrase.target)} />
+                      ) : (
+                        <div className="bg-red-900/30 border border-red-700/40 rounded-2xl rounded-tl-sm px-3 py-2"><p className="text-base text-red-300">{r.phrase.english}</p></div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
-              {followUpLoading && <div className="flex items-center justify-center py-4"><div className="animate-pulse text-slate-400 text-base">Thinking...</div></div>}
+              {followUpLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-slate-800 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                      <span className="text-sm text-slate-400">Thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="shrink-0 px-4 py-3 border-t border-slate-700/50">
               <div className="flex gap-2">
