@@ -86,7 +86,8 @@ const FOLLOW_UP_CHIPS = [
   { label: 'Casual', prompt: 'What\'s the casual/informal version?' },
   { label: 'As a question', prompt: 'How do I turn this into a question?' },
   { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead?' },
-  { label: 'Change S/O', prompt: 'How do I change the subject or object in this sentence? Show me a variation.' },
+  { label: 'Swap object', prompt: 'Keep the same sentence pattern but change the object/thing to something different. Show me 2-3 variations with different objects.' },
+  { label: 'Swap subject', prompt: 'Keep the same sentence pattern but change the subject/person. For example change from "I" to "we", "he", "she", or "they". Show me 2-3 variations.' },
 ];
 
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase }: Props) {
