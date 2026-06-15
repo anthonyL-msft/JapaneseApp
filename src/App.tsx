@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Tab, Bookmark, UserNote, RefBookmark, LearnedItem } from './data/types';
+import type { Tab, Bookmark, UserNote, RefBookmark, LearnedItem, SavedAIPhrase } from './data/types';
 import { LANGUAGES } from './data/types';
 import { phrases as allPhrases } from './data/phrases';
-import { getBookmarks, addBookmark, removeBookmark, getNotes, saveNote, deleteNote, getRefBookmarks, addRefBookmark, removeRefBookmark, getLearnedItems, addLearnedItem, removeLearnedItem } from './db';
+import { getBookmarks, addBookmark, removeBookmark, getNotes, saveNote, deleteNote, getRefBookmarks, addRefBookmark, removeRefBookmark, getLearnedItems, addLearnedItem, removeLearnedItem, getSavedAIPhrases, saveAIPhrase, deleteAIPhrase } from './db';
 import { PhraseBook } from './components/PhraseBook';
 import { Flashcards } from './components/Flashcards';
 import { MyStuff } from './components/MyStuff';
@@ -31,6 +31,7 @@ function App() {
   const [notes, setNotes] = useState<UserNote[]>([]);
   const [refBookmarks, setRefBookmarks] = useState<RefBookmark[]>([]);
   const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
+  const [savedAIPhrases, setSavedAIPhrases] = useState<SavedAIPhrase[]>([]);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   useEffect(() => {
@@ -38,6 +39,7 @@ function App() {
     getNotes().then(setNotes);
     getRefBookmarks().then(setRefBookmarks);
     getLearnedItems().then(setLearnedItems);
+    getSavedAIPhrases().then(setSavedAIPhrases);
   }, []);
 
   const toggleRefBookmark = useCallback(async (item: { jp: string; hep: string; en: string; section: string }) => {
@@ -91,6 +93,16 @@ function App() {
   const handleDeleteNote = useCallback(async (id: string) => {
     await deleteNote(id);
     setNotes(prev => prev.filter(n => n.id !== id));
+  }, []);
+
+  const handleSaveAIPhrase = useCallback(async (phrase: SavedAIPhrase) => {
+    await saveAIPhrase(phrase);
+    setSavedAIPhrases(prev => [...prev, phrase]);
+  }, []);
+
+  const handleDeleteAIPhrase = useCallback(async (id: string) => {
+    await deleteAIPhrase(id);
+    setSavedAIPhrases(prev => prev.filter(p => p.id !== id));
   }, []);
 
   const bookmarkedIds = new Set(bookmarks.map(b => b.phraseId));
@@ -154,17 +166,19 @@ function App() {
             notes={notes}
             refBookmarks={refBookmarks}
             learnedItems={learnedItems}
+            savedAIPhrases={savedAIPhrases}
             onToggleBookmark={toggleBookmark}
             onToggleRefBookmark={toggleRefBookmark}
             onToggleLearned={toggleLearned}
             onSaveNote={handleSaveNote}
             onDeleteNote={handleDeleteNote}
+            onDeleteAIPhrase={handleDeleteAIPhrase}
             search={search}
           />
         )}
         {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
-        {tab === 'ai' && <AskAI lang={lang} onSaveNote={handleSaveNote} />}
+        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} />}
         {tab === 'builder' && <SentenceBuilder />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}

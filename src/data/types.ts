@@ -94,4 +94,19 @@ export interface SRSCard {
   lastReview: number;
 }
 
+export interface SavedAIPhrase {
+  id: string;
+  lang: string;
+  target: string;
+  romanization?: string;
+  pronunciation: string;
+  pronunciation_chunks: string;
+  english: string;
+  chinese_tc: string;
+  notes: string;
+  native_hint?: string;
+  query: string;           // the original question
+  createdAt: number;
+}
+
 export type Tab = 'phrases' | 'scenes' | 'cards' | 'bookmarks' | 'notes' | 'reference' | 'ai' | 'builder' | 'progress' | 'settings' | 'converter';

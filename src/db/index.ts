@@ -1,9 +1,9 @@
 import { openDB } from 'idb';
 import type { IDBPDatabase } from 'idb';
-import type { UserNote, Bookmark, SRSCard, RefBookmark, LearnedItem } from '../data/types';
+import type { UserNote, Bookmark, SRSCard, RefBookmark, LearnedItem, SavedAIPhrase } from '../data/types';
 
 const DB_NAME = 'nihongo-travel';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -26,6 +26,9 @@ function getDB() {
         }
         if (!db.objectStoreNames.contains('learned')) {
           db.createObjectStore('learned', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('ai-phrases')) {
+          db.createObjectStore('ai-phrases', { keyPath: 'id' });
         }
       },
     });
@@ -123,4 +126,20 @@ export async function addLearnedItem(id: string): Promise<void> {
 export async function removeLearnedItem(id: string): Promise<void> {
   const db = await getDB();
   await db.delete('learned', id);
+}
+
+// AI Saved Phrases
+export async function getSavedAIPhrases(): Promise<SavedAIPhrase[]> {
+  const db = await getDB();
+  return db.getAll('ai-phrases');
+}
+
+export async function saveAIPhrase(phrase: SavedAIPhrase): Promise<void> {
+  const db = await getDB();
+  await db.put('ai-phrases', phrase);
+}
+
+export async function deleteAIPhrase(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('ai-phrases', id);
 }

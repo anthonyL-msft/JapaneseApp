@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem } from '../data/types';
+import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem, SavedAIPhrase } from '../data/types';
 import { PhraseCard } from './PhraseCard';
 import { RefItem } from './Reference';
 import { speak } from '../utils/tts';
+import { breakdownKana, markChunkBoundaries, markLengtheners, romajiToHiragana } from '../utils/kana';
 
 interface Props {
   phrases: Phrase[];
@@ -10,17 +11,19 @@ interface Props {
   notes: UserNote[];
   refBookmarks: RefBookmark[];
   learnedItems: LearnedItem[];
+  savedAIPhrases: SavedAIPhrase[];
   onToggleBookmark: (id: string) => void;
   onToggleRefBookmark: (item: { jp: string; hep: string; en: string; section: string }) => void;
   onToggleLearned: (id: string) => void;
   onSaveNote: (note: UserNote) => void;
   onDeleteNote: (id: string) => void;
+  onDeleteAIPhrase: (id: string) => void;
   search: string;
 }
 
 type Section = 'bookmarks' | 'refbookmarks' | 'learned' | 'ai' | 'notes';
 
-export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems, onToggleBookmark, onToggleRefBookmark, onToggleLearned, onSaveNote, onDeleteNote, search }: Props) {
+export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems, savedAIPhrases, onToggleBookmark, onToggleRefBookmark, onToggleLearned, onSaveNote, onDeleteNote, onDeleteAIPhrase, search }: Props) {
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
@@ -53,6 +56,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
   const aiNotes = notes.filter(n => !n.phraseId && n.text.startsWith('🤖'));
   const standaloneNotes = notes.filter(n => !n.phraseId && !n.text.startsWith('🤖'));
   const phraseNotes = notes.filter(n => n.phraseId);
+  const allAI = [...savedAIPhrases].sort((a, b) => b.createdAt - a.createdAt);
 
   const handleSaveEdit = () => {
     if (!editText.trim() || !editingId) return;
@@ -195,7 +199,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
         )}
 
         {/* 🤖 AI Translations */}
-        {aiNotes.length > 0 && (
+        {(allAI.length > 0 || aiNotes.length > 0) && (
           <div className="bg-slate-800/60 rounded-xl overflow-hidden">
             <button
               onClick={() => toggleSection('ai')}
@@ -203,16 +207,18 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
             >
               <div>
                 <h3 className="text-base font-semibold text-slate-200">🤖 AI Translations</h3>
-                <p className="text-base text-slate-500">{aiNotes.length} saved</p>
+                <p className="text-base text-slate-500">{allAI.length + aiNotes.length} saved</p>
               </div>
               <span className="text-base text-slate-500">{openSections.has('ai') ? '▲' : '▼'}</span>
             </button>
             {openSections.has('ai') && (
               <div className="px-1.5 pb-1.5 space-y-1.5">
+                {allAI.map(ai => (
+                  <SavedAICard key={ai.id} phrase={ai} onDelete={() => onDeleteAIPhrase(ai.id)} />
+                ))}
                 {aiNotes
                   .sort((a, b) => b.updatedAt - a.updatedAt)
                   .map(note => {
-                    // Parse: 🤖 target (pronunciation) — english / chinese_tc
                     const text = note.text.replace(/^🤖\s*/, '');
                     const parenMatch = text.match(/^(.+?)\s*\(([^)]+)\)\s*—\s*(.+)$/);
                     const target = parenMatch ? parenMatch[1].trim() : text;
@@ -329,6 +335,59 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const reading = phrase.romanization || (phrase.pronunciation_chunks ? romajiToHiragana(phrase.pronunciation_chunks) : '');
+
+  return (
+    <div className="bg-slate-700/40 rounded-xl overflow-hidden">
+      <div className="p-3 cursor-pointer active:bg-slate-700/50 transition" onClick={() => setExpanded(!expanded)}>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
+            <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button onClick={(e) => { e.stopPropagation(); speak(phrase.target, 'ja-JP'); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+            <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🗑️</button>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 mt-1 text-base">
+          <p className="text-slate-400">{phrase.english}</p>
+          <p className="text-slate-200">{phrase.chinese_tc}</p>
+        </div>
+      </div>
+      {expanded && (
+        <div className="px-3 pb-3 border-t border-slate-700/40 space-y-2 pt-2">
+          {reading && (() => {
+            let units = breakdownKana(reading);
+            if (phrase.pronunciation_chunks) units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+            units = markLengtheners(units);
+            const visible = units.filter(u => !u.isSpace);
+            if (visible.length === 0) return null;
+            return (
+              <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
+                <span className="text-slate-500 text-xs block mb-1">Sounds</span>
+                <div className="flex flex-wrap items-end">
+                  {visible.map((u, i) => (
+                    <div key={i} className={`flex flex-col items-center py-0.5 ${u.isLengthener ? 'min-w-[0.9rem] -ml-px' : 'min-w-[1.2rem] px-px'} ${u.isLengthener ? '' : u.isWordBreak ? 'ml-4' : u.isChunkStart && i > 0 ? 'ml-2' : ''}`}>
+                      <span className={`leading-tight ${u.isLengthener ? 'text-sm text-slate-300' : 'text-base text-slate-100'}`}>{u.char}</span>
+                      <span className={`leading-none font-mono mt-0.5 ${u.isLengthener ? 'text-[9px] text-slate-500' : 'text-[10px] text-slate-400'}`}>{u.romaji || '·'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+          {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">🌉 {phrase.native_hint}</p></div>}
+          {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">💡 {phrase.notes}</p></div>}
+          <p className="text-xs text-slate-600">Asked: "{phrase.query}"</p>
+        </div>
+      )}
     </div>
   );
 }
