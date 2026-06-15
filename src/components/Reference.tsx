@@ -97,7 +97,7 @@ export function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onTogg
 
   return (
     <div className="bg-slate-700/40 rounded-xl overflow-hidden">
-      <div className="p-3 cursor-pointer active:bg-slate-700/50 transition" onClick={() => hasChunks && setExpanded(!expanded)}>
+      <div className="p-3 cursor-pointer active:bg-slate-700/50 transition" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-lg font-medium text-slate-50">{ex.jp}</p>

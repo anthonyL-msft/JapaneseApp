@@ -341,6 +341,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
 
 function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: () => void }) {
   const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
   const reading = phrase.romanization || (phrase.pronunciation_chunks ? romajiToHiragana(phrase.pronunciation_chunks) : '');
 
   return (
@@ -356,10 +357,7 @@ function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: ()
             <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🗑️</button>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 mt-1 text-base">
-          <p className="text-slate-400">{phrase.english}</p>
-          <p className="text-slate-200">{phrase.chinese_tc}</p>
-        </div>
+        <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
       </div>
       {expanded && (
         <div className="px-3 pb-3 border-t border-slate-700/40 space-y-2 pt-2">
@@ -383,8 +381,17 @@ function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: ()
               </div>
             );
           })()}
+          <div className="grid grid-cols-2 gap-2 text-base">
+            <div><span className="text-slate-500 text-base">繁體中文</span><p className="text-slate-200">{phrase.chinese_tc}</p></div>
+          </div>
           {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">🌉 {phrase.native_hint}</p></div>}
           {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">💡 {phrase.notes}</p></div>}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+              className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition"
+            >{copied ? '✓ Copied' : '📋 Copy'}</button>
+          </div>
           <p className="text-xs text-slate-600">Asked: "{phrase.query}"</p>
         </div>
       )}
