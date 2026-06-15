@@ -52,7 +52,7 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
     <div className={`fixed inset-0 z-50 flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose}>
       <div className="absolute inset-0 bg-black/50" />
       <div
-        className={`relative bg-slate-800 rounded-t-2xl max-h-[80vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`}
+        className={`relative bg-slate-950 rounded-t-2xl max-h-[80vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-center pt-2 pb-1">
