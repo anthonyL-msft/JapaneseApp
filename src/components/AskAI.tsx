@@ -4,7 +4,33 @@ import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
 import { LANGUAGES } from '../data/types';
-import { breakdownKana, markLengtheners } from '../utils/kana';
+import { breakdownKana, markLengtheners, type KanaUnit } from '../utils/kana';
+
+/** Mark word boundaries in kana units using the pronunciation field (which has word spaces) */
+function markWordBoundaries(units: KanaUnit[], pronunciation: string): KanaUnit[] {
+  // Split pronunciation into words by spaces
+  const words = pronunciation.trim().split(/\s+/);
+  const result = units.map(u => ({ ...u }));
+  const nonSpace = result.filter(u => !u.isSpace);
+
+  let ki = 0;
+  for (let wi = 0; wi < words.length; wi++) {
+    if (ki >= nonSpace.length) break;
+    // Mark first kana in this word as word break (except first word)
+    if (wi > 0) {
+      nonSpace[ki].isWordBreak = true;
+    }
+    // Accumulate romaji from kana units until we match this word
+    let acc = '';
+    const wordClean = words[wi].replace(/[·\-]/g, '').toLowerCase();
+    while (ki < nonSpace.length) {
+      acc += (nonSpace[ki].romaji || '').toLowerCase();
+      ki++;
+      if (acc.length >= wordClean.length) break;
+    }
+  }
+  return result;
+}
 
 interface Props {
   lang: string;
@@ -18,10 +44,13 @@ interface Props {
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
   // Only show Sounds when we have a proper hiragana romanization
-  // Derive everything from our own kana logic — don't depend on AI chunk formatting
   const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
+  // Use pronunciation field (has word spaces) to mark word boundaries
+  if (phrase.pronunciation) {
+    units = markWordBoundaries(units, phrase.pronunciation);
+  }
   units = markLengtheners(units);
   const visible = units.filter(u => !u.isSpace);
   if (visible.length === 0) return null;
