@@ -325,6 +325,25 @@ export const scenarios: Scenario[] = [
     ],
   },
   // === SC39: Hotel — Borrowing Items & Services ===
+  // === SC46: Hotel — Early Arrival / Leave Luggage ===
+  {
+    id: 'sc46', lang: 'ja', group: 'hotel',
+    title: 'Too Early to Check In', titleTC: '提早到飯店寄放行李',
+    emoji: '🕐', description: 'Arriving before check-in time and leaving luggage at the hotel',
+    lines: [
+      { speaker: 'you', target: 'すみません、チェックインは何時からですか？', pronunciation: 'sumimasen, chekkuin wa nanji kara desu ka', pronunciation_chunks: 'su·mi·ma·sen chek·ku·in wa nan·ji ka·ra de·su ka', english: 'Excuse me, what time is check-in from?', chinese_tc: '不好意思，幾點可以辦理入住？' },
+      { speaker: 'staff', target: 'チェックインは3時からになります', pronunciation: 'chekkuin wa sanji kara ni narimasu', pronunciation_chunks: 'chek·ku·in wa san·ji ka·ra ni na·ri·ma·su', english: 'Check-in is from 3pm.', chinese_tc: '入住是下午3點開始' },
+      { speaker: 'you', target: '予約した○○です。まだ早いのですが、荷物を預けてもいいですか？', pronunciation: 'yoyaku shita ○○ desu. mada hayai no desu ga, nimotsu wo azukete mo ii desu ka', pronunciation_chunks: 'yo·ya·ku shi·ta ○○ de·su. ma·da ha·yai no de·su ga ni·mo·tsu wo a·zu·ke·te mo ii de·su ka', english: 'I have a reservation under ○○. It\'s still early, but can I leave my luggage?', chinese_tc: '我有預約，姓○○。時間還早，可以先寄放行李嗎？' },
+      { speaker: 'staff', target: 'はい、もちろんです。こちらでお預かりします', pronunciation: 'hai, mochiron desu. kochira de oazukari shimasu', pronunciation_chunks: 'hai mo·chi·ron de·su. ko·chi·ra de o·a·zu·ka·ri shi·ma·su', english: 'Yes, of course. We\'ll keep it here for you.', chinese_tc: '好的，當然可以。我們幫您保管' },
+      { speaker: 'you', target: 'スーツケース二つお願いします', pronunciation: 'suutsukeesu futatsu onegaishimasu', pronunciation_chunks: 'suu·tsu·kee·su fu·ta·tsu o·ne·gai·shi·ma·su', english: 'Two suitcases please.', chinese_tc: '兩個行李箱', options: [
+        { target: 'スーツケース一つお願いします', pronunciation: 'suutsukeesu hitotsu onegaishimasu', pronunciation_chunks: 'suu·tsu·kee·su hi·to·tsu o·ne·gai·shi·ma·su', english: 'One suitcase please', chinese_tc: '一個行李箱' },
+        { target: 'スーツケース二つお願いします', pronunciation: 'suutsukeesu futatsu onegaishimasu', pronunciation_chunks: 'suu·tsu·kee·su fu·ta·tsu o·ne·gai·shi·ma·su', english: 'Two suitcases please', chinese_tc: '兩個行李箱' },
+        { target: 'スーツケース二つとリュック一つお願いします', pronunciation: 'suutsukeesu futatsu to ryukku hitotsu onegaishimasu', pronunciation_chunks: 'suu·tsu·kee·su fu·ta·tsu to ryuk·ku hi·to·tsu o·ne·gai·shi·ma·su', english: 'Two suitcases and one backpack please', chinese_tc: '兩個行李箱和一個背包' },
+      ] },
+      { speaker: 'staff', target: 'かしこまりました。お戻りの際にフロントにお声がけください', pronunciation: 'kashikomarimashita. omodori no sai ni furonto ni okoe gake kudasai', pronunciation_chunks: 'ka·shi·ko·ma·ri·ma·shi·ta. o·mo·do·ri no sai ni fu·ron·to ni o·ko·e·ga·ke ku·da·sai', english: 'Certainly. Please come to the front desk when you return.', chinese_tc: '好的。回來時請到前台告知' },
+      { speaker: 'you', target: '3時に戻ります。ありがとうございます', pronunciation: 'sanji ni modorimasu. arigatou gozaimasu', pronunciation_chunks: 'san·ji ni mo·do·ri·ma·su. a·ri·ga·tou go·zai·ma·su', english: 'I\'ll be back at 3. Thank you.', chinese_tc: '3點回來。謝謝', note: 'Most hotels happily store luggage before check-in — it\'s free! Go explore while you wait.' },
+    ],
+  },
   {
     id: 'sc39', lang: 'ja', group: 'hotel',
     title: 'Room Service & Requests', titleTC: '飯店需求',
