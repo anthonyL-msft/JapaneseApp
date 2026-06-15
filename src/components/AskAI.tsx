@@ -18,12 +18,16 @@ interface Props {
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
   // Only show Sounds when we have a proper hiragana romanization
-  // AI-generated pronunciation_chunks without word spaces produce garbage
   const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
   if (phrase.pronunciation_chunks && phrase.pronunciation_chunks.includes(' ')) {
-    units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+    // Normalize AI chunks: " · " → "·", then ensure word boundaries are clean spaces
+    const cleanChunks = phrase.pronunciation_chunks
+      .replace(/\s*·\s*/g, '·')  // "ko · no" → "ko·no"
+      .replace(/\s+/g, ' ')       // collapse multiple spaces
+      .trim();
+    units = markChunkBoundaries(units, cleanChunks);
   }
   units = markLengtheners(units);
   const visible = units.filter(u => !u.isSpace);
