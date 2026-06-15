@@ -38,10 +38,10 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   );
 }
 
-function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved }: {
-  phrase: AIPhrase; lang: string; onSave: () => void; onSpeak: () => void; isSaved: boolean;
+function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded, onFollowUp, onShowBig }: {
+  phrase: AIPhrase; lang: string; onSave: () => void; onSpeak: () => void; isSaved: boolean; defaultExpanded?: boolean; onFollowUp?: () => void; onShowBig?: () => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded ?? false);
   const [copied, setCopied] = useState(false);
   return (
     <div className="bg-slate-800/80 rounded-xl overflow-hidden">
@@ -68,6 +68,12 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved }: {
             <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">{copied ? '✓ Copied' : '📋 Copy'}</button>
             <button onClick={(e) => { e.stopPropagation(); onSave(); }} className={`flex-1 text-base py-1.5 rounded-lg transition ${isSaved ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sakura-500/30 text-sakura-300 active:bg-sakura-500/50'}`}>{isSaved ? '✓ Saved' : '📌 Save'}</button>
           </div>
+          {(onFollowUp || onShowBig) && (
+            <div className="flex gap-2">
+              {onFollowUp && <button onClick={(e) => { e.stopPropagation(); onFollowUp(); }} className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition">💬 Ask more</button>}
+              {onShowBig && <button onClick={(e) => { e.stopPropagation(); onShowBig(); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">📺 Show Big</button>}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -175,11 +181,16 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
 
         {result && (
           <div className="space-y-2">
-            <AIResultCard phrase={result} lang={lang} onSave={() => handleSave(result, query)} onSpeak={() => handleSpeak(result.target)} isSaved={savedAIPhrases.some(s => s.target === result.target)} />
-            <div className="flex gap-2">
-              <button onClick={() => openFollowUp(result)} className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-2 rounded-lg active:bg-indigo-800/50 transition">💬 Ask more</button>
-              <button onClick={() => setShowBig(result.target)} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-2 rounded-lg active:bg-slate-600 transition">📺 Show Big</button>
-            </div>
+            <AIResultCard
+              phrase={result}
+              lang={lang}
+              onSave={() => handleSave(result, query)}
+              onSpeak={() => handleSpeak(result.target)}
+              isSaved={savedAIPhrases.some(s => s.target === result.target)}
+              defaultExpanded={true}
+              onFollowUp={() => openFollowUp(result)}
+              onShowBig={() => setShowBig(result.target)}
+            />
           </div>
         )}
 
