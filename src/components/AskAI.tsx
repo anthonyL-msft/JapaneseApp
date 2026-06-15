@@ -66,7 +66,6 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
       {expanded && (
         <div className="px-3 pb-3 border-t border-slate-700/40 space-y-2 pt-2">
           {lang === 'ja' && <AISounds phrase={phrase} />}
-          {phrase.romanization && <div><span className="text-slate-500 text-base">Reading</span><p className="text-base text-slate-200">{phrase.romanization}</p></div>}
           {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">🌉 {phrase.native_hint}</p></div>}
           {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">💡 {phrase.notes}</p></div>}
           <div className="flex gap-2 pt-1">
