@@ -312,9 +312,13 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
               )}
               {followUpResults.map((r, i) => (
                 <div key={i} className="space-y-2">
-                  {/* User query label */}
-                  <p className="text-sm text-indigo-400 font-medium">💬 {r.query}</p>
-                  {/* AI response as section */}
+                  {/* User bubble — right */}
+                  <div className="flex justify-end">
+                    <div className="bg-indigo-900/60 rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%]">
+                      <p className="text-base text-slate-200">{r.query}</p>
+                    </div>
+                  </div>
+                  {/* AI response as section (no bubble) */}
                   {r.error ? (
                     <div className="bg-red-900/30 border border-red-700/40 rounded-xl px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
                   ) : r.blocks ? (
