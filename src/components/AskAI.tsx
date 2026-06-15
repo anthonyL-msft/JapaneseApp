@@ -240,13 +240,6 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
                 </div>
               </div>
             </div>
-            <div className="px-4 py-2 border-b border-slate-800/50 shrink-0">
-              <div className="flex flex-wrap gap-1.5">
-                {FOLLOW_UP_CHIPS.map(chip => (
-                  <button key={chip.label} onClick={() => handleFollowUp(chip.prompt)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1.5 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
-                ))}
-              </div>
-            </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3" ref={followUpScrollRef}>
               {followUpResults.length === 0 && !followUpLoading && (
                 <div className="text-center py-8">
@@ -289,10 +282,15 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
                 </div>
               )}
             </div>
-            <div className="shrink-0 px-4 py-3 border-t border-slate-700/50">
+            <div className="shrink-0 px-4 py-3 border-t border-slate-700/50 space-y-2">
               <div className="flex gap-2">
-                <input type="text" value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleFollowUp()} placeholder="Ask a follow-up..." className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition" disabled={followUpLoading} />
-                <button onClick={() => handleFollowUp()} disabled={followUpLoading || !followUpQuery.trim()} className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0">Ask</button>
+                <textarea value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }} placeholder="Ask a follow-up..." rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={followUpLoading} />
+                <button onClick={() => handleFollowUp()} disabled={followUpLoading || !followUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {FOLLOW_UP_CHIPS.map(chip => (
+                  <button key={chip.label} onClick={() => handleFollowUp(chip.prompt)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
+                ))}
               </div>
             </div>
           </div>
