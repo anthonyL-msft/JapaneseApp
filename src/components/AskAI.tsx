@@ -119,18 +119,61 @@ const FOLLOW_UP_CHIPS = [
   { label: 'Break it down', prompt: '', mode: 'breakdown' as const },
 ];
 
+const HISTORY_KEY = 'ai_history';
+const THREADS_KEY = 'ai_threads';
+const MAX_HISTORY = 10;
+const MAX_THREADS = 5;
+
+type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; error?: string };
+
+function loadHistory(): AIPhrase[] {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+}
+
+function saveHistory(history: AIPhrase[]) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
+}
+
+function loadThread(target: string): FollowUpResult[] {
+  try {
+    const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
+    return threads[target] || [];
+  } catch { return []; }
+}
+
+function saveThread(target: string, results: FollowUpResult[]) {
+  try {
+    const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
+    threads[target] = results;
+    // Cap at MAX_THREADS — keep most recent
+    const keys = Object.keys(threads);
+    if (keys.length > MAX_THREADS) {
+      delete threads[keys[0]];
+    }
+    localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
+  } catch { /* ignore */ }
+}
+
+function clearThread(target: string) {
+  try {
+    const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
+    delete threads[target];
+    localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
+  } catch { /* ignore */ }
+}
+
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en' }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBig, setShowBig] = useState<string | null>(null);
-  const [history, setHistory] = useState<AIPhrase[]>([]);
+  const [history, setHistory] = useState<AIPhrase[]>(loadHistory);
   const [followUpOpen, setFollowUpOpen] = useState(false);
   const [followUpPhrase, setFollowUpPhrase] = useState<AIPhrase | null>(null);
   const [followUpQuery, setFollowUpQuery] = useState('');
   const [followUpLoading, setFollowUpLoading] = useState(false);
-  const [followUpResults, setFollowUpResults] = useState<{ query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; error?: string }[]>([]);
+  const [followUpResults, setFollowUpResults] = useState<FollowUpResult[]>([]);
   const [followUpHistory, setFollowUpHistory] = useState<FollowUpMessage[]>([]);
   const followUpScrollRef = useRef<HTMLDivElement>(null);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
@@ -148,7 +191,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         notes: '',
       };
       setFollowUpPhrase(phrase);
-      setFollowUpResults([]);
+      setFollowUpResults(loadThread(phrase.target));
       setFollowUpHistory([]);
       setFollowUpQuery('');
       setFollowUpOpen(true);
@@ -162,7 +205,11 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     try {
       const phrase = await askHowToSay(query.trim(), lang, aiExplainLang);
       setResult(phrase);
-      setHistory(prev => [phrase, ...prev.slice(0, 9)]);
+      setHistory(prev => {
+        const next = [phrase, ...prev.filter(h => h.target !== phrase.target).slice(0, MAX_HISTORY - 1)];
+        saveHistory(next);
+        return next;
+      });
     } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong'); }
     finally { setLoading(false); }
   };
@@ -181,7 +228,11 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   }, [lang, onSaveAIPhrase, onDeleteAIPhrase, savedAIPhrases]);
 
   const openFollowUp = (phrase: AIPhrase) => {
-    setFollowUpPhrase(phrase); setFollowUpResults([]); setFollowUpHistory([]); setFollowUpQuery(''); setFollowUpOpen(true);
+    setFollowUpPhrase(phrase);
+    setFollowUpResults(loadThread(phrase.target));
+    setFollowUpHistory([]);
+    setFollowUpQuery('');
+    setFollowUpOpen(true);
   };
 
   const handleFollowUp = async (promptText?: string, mode: 'single' | 'multi' | 'breakdown' = 'single') => {
@@ -205,6 +256,13 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       setFollowUpResults(prev => [...prev, { query: displayQuery, error: err instanceof Error ? err.message : 'Error' }]);
     } finally { setFollowUpLoading(false); }
   };
+
+  // Persist follow-up thread to localStorage whenever results change
+  useEffect(() => {
+    if (followUpPhrase && followUpResults.length > 0) {
+      saveThread(followUpPhrase.target, followUpResults);
+    }
+  }, [followUpResults, followUpPhrase]);
 
   useEffect(() => {
     if (followUpScrollRef.current) followUpScrollRef.current.scrollTop = followUpScrollRef.current.scrollHeight;
@@ -301,7 +359,12 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     <p className="text-sm text-sakura-300 truncate">{followUpPhrase.pronunciation}</p>
                     <p className="text-sm text-slate-500 truncate">{followUpPhrase.english}</p>
                   </div>
-                  <button onClick={() => setFollowUpOpen(false)} className="text-xl text-slate-400 p-2 shrink-0">✕</button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {followUpResults.length > 0 && (
+                      <button onClick={() => { setFollowUpResults([]); setFollowUpHistory([]); clearThread(followUpPhrase.target); }} className="text-sm text-slate-500 px-2 py-1 rounded-lg active:bg-slate-700 transition">Clear</button>
+                    )}
+                    <button onClick={() => setFollowUpOpen(false)} className="text-xl text-slate-400 p-2">✕</button>
+                  </div>
                 </div>
               </div>
             </div>
