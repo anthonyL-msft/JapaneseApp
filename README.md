@@ -23,10 +23,11 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Tools: Counters, Sentence Patterns, Common Signs
 
 ### 🎭 Conversations
-- 45 real-world dialogue scenarios across 10 groups
+- 46 real-world dialogue scenarios across 10 groups
 - Groups: Airport, Train, Bus & Taxi, Hotel, Restaurant, Food Spots, Shopping, Daily Life, Activities, Trouble
-- Step-by-step reveal with auto-play TTS
+- Step-by-step reveal with auto-play TTS (pauses at choice points)
 - Variable swap (change destinations, times, party sizes, durations in conversations)
+- Chinese translations update dynamically when swapping variables
 - Speaker labels (Staff vs You) with chat bubble UI
 
 ### 🃏 Flashcards
@@ -44,8 +45,16 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 
 ### 🤖 Ask AI
 - "How do I say...?" powered by Azure OpenAI
-- Returns target language + romanization + English + Chinese (Traditional)
-- Save translations to My Stuff
+- Returns target language + romanization + Sounds breakdown + English + Chinese
+- **Follow-up conversations:** tap "Ask more" on any phrase to open follow-up drawer
+- Quick chips: Simpler? / As a question / More examples / Break it down
+- **Break it down:** AI generates mini-lesson with pattern explanation + example phrases
+- **More examples:** returns 3-5 pattern variations as stacked cards
+- Follow-up threads auto-persist per phrase in localStorage (up to 5 threads)
+- Recent translations persist across tab switches (last 10)
+- Star ⭐ to save structured phrases to My Stuff (toggle on/off)
+- "Ask more" available from Learn phrases, Reference examples, and AI results
+- AI explanation language configurable: English or 繁體中文 (in Settings)
 
 ### 📌 My Stuff
 - ✅ Learned items (phrases + reference examples)
