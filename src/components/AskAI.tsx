@@ -119,7 +119,7 @@ const FOLLOW_UP_CHIPS = [
   { label: 'Break it down', prompt: '', mode: 'breakdown' as const },
 ];
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en' }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en' }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [loading, setLoading] = useState(false);
@@ -170,9 +170,15 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
   const handleSpeak = (text: string) => speak(text, currentLang.ttsLang);
 
   const handleSave = useCallback((phrase: AIPhrase, originalQuery: string) => {
-    const id = `ai_${Date.now()}`;
-    onSaveAIPhrase({ id, lang, target: phrase.target, romanization: phrase.romanization, pronunciation: phrase.pronunciation, pronunciation_chunks: phrase.pronunciation_chunks, english: phrase.english, chinese_tc: phrase.chinese_tc, notes: phrase.notes, native_hint: phrase.native_hint, query: originalQuery, createdAt: Date.now() });
-  }, [lang, onSaveAIPhrase]);
+    // Toggle: if already saved, delete it; otherwise save
+    const existing = savedAIPhrases.find(s => s.target === phrase.target);
+    if (existing) {
+      onDeleteAIPhrase(existing.id);
+    } else {
+      const id = `ai_${Date.now()}`;
+      onSaveAIPhrase({ id, lang, target: phrase.target, romanization: phrase.romanization, pronunciation: phrase.pronunciation, pronunciation_chunks: phrase.pronunciation_chunks, english: phrase.english, chinese_tc: phrase.chinese_tc, notes: phrase.notes, native_hint: phrase.native_hint, query: originalQuery, createdAt: Date.now() });
+    }
+  }, [lang, onSaveAIPhrase, onDeleteAIPhrase, savedAIPhrases]);
 
   const openFollowUp = (phrase: AIPhrase) => {
     setFollowUpPhrase(phrase); setFollowUpResults([]); setFollowUpHistory([]); setFollowUpQuery(''); setFollowUpOpen(true);
