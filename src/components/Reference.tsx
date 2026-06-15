@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
-import { breakdownKana, markChunkBoundaries, markLengtheners } from '../utils/kana';
+import { breakdownKana, markChunkBoundaries, markLengtheners, romajiToHiragana } from '../utils/kana';
 
 type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening';
 
@@ -148,18 +148,21 @@ export function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onTogg
             </div>
           );
         }
-        // Kanji items: show romaji sound blocks grouped by word
-        const wordGroups = ex.hep.split(/\s+/);
+        // Kanji items: convert romaji→hiragana, then do the same kana breakdown
+        const reading = romajiToHiragana(ex.hep);
+        let units = breakdownKana(reading);
+        units = markChunkBoundaries(units, ex.hep);
+        units = markLengtheners(units);
+        const visible = units.filter(u => !u.isSpace);
         return (
           <div className="px-3 pb-3 border-t border-slate-700/40">
             <div className="mt-2 bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2">
               <span className="text-slate-500 text-xs block mb-1">Sounds</span>
-              <div className="flex flex-wrap items-end gap-3">
-                {wordGroups.map((word, wi) => (
-                  <div key={wi} className="flex items-end gap-0.5">
-                    {word.split('·').map((chunk, ci) => (
-                      <span key={ci} className="text-base leading-tight text-indigo-300 font-mono">{chunk}</span>
-                    ))}
+              <div className="flex flex-wrap items-end">
+                {visible.map((u, i) => (
+                  <div key={i} className={`flex flex-col items-center py-0.5 ${u.isLengthener ? 'min-w-[0.9rem] -ml-px' : 'min-w-[1.2rem] px-px'} ${u.isLengthener ? '' : u.isWordBreak ? 'ml-4' : u.isChunkStart && i > 0 ? 'ml-2' : ''}`}>
+                    <span className={`leading-tight ${u.isLengthener ? 'text-sm text-slate-300' : 'text-base text-slate-100'}`}>{u.char}</span>
+                    <span className={`leading-none font-mono mt-0.5 ${u.isLengthener ? 'text-[9px] text-slate-500' : 'text-[10px] text-slate-400'}`}>{u.romaji || '·'}</span>
                   </div>
                 ))}
               </div>
