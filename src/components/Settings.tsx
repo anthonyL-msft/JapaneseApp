@@ -5,6 +5,8 @@ import { getTtsRate, setTtsRate, speak } from '../utils/tts';
 interface Props {
   lang: string;
   onLangChange: (lang: string) => void;
+  aiExplainLang: string;
+  onAiExplainLangChange: (lang: string) => void;
 }
 
 const SPEED_LABELS: Record<string, string> = {
@@ -15,7 +17,7 @@ const SPEED_LABELS: Record<string, string> = {
   '1': 'Native',
 };
 
-export function Settings({ lang, onLangChange }: Props) {
+export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangChange }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [rate, setRate] = useState(getTtsRate);
   const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains('light'));
@@ -108,6 +110,26 @@ export function Settings({ lang, onLangChange }: Props) {
         </div>
 
         {/* About */}
+        <div className="bg-slate-800/60 rounded-xl p-4">
+          <p className="text-base font-semibold text-slate-300 mb-3">🤖 AI Explanations</p>
+          <p className="text-sm text-slate-500 mb-2">Language for notes, tips, and grammar breakdowns</p>
+          <div className="flex gap-2">
+            {[
+              { code: 'en', label: 'English' },
+              { code: 'zh-TW', label: '繁體中文' },
+            ].map(opt => (
+              <button
+                key={opt.code}
+                onClick={() => onAiExplainLangChange(opt.code)}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-base transition ${aiExplainLang === opt.code ? 'bg-sakura-500/20 text-sakura-300' : 'bg-slate-700/50 text-slate-400 active:bg-slate-700'}`}
+              >
+                <span>{opt.label}</span>
+                {aiExplainLang === opt.code && <span className="text-sakura-400">✓</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="bg-slate-800/60 rounded-xl p-4">
           <p className="text-base font-semibold text-slate-300 mb-2">About</p>
           <p className="text-base text-slate-400">Travel Language Companion</p>

@@ -13,6 +13,7 @@ interface Props {
   onDeleteAIPhrase: (id: string) => void;
   askMorePhrase?: { target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null;
   onClearAskMore?: () => void;
+  aiExplainLang?: string;
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
@@ -122,7 +123,7 @@ const FOLLOW_UP_CHIPS = [
   { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead? Show me 3-5 alternatives that convey a similar meaning.', mode: 'multi' as const },
 ];
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase, askMorePhrase, onClearAskMore }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en' }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [loading, setLoading] = useState(false);
@@ -163,7 +164,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
     if (!query.trim() || loading) return;
     setLoading(true); setError(null); setResult(null);
     try {
-      const phrase = await askHowToSay(query.trim(), lang);
+      const phrase = await askHowToSay(query.trim(), lang, aiExplainLang);
       setResult(phrase);
       setHistory(prev => [phrase, ...prev.slice(0, 9)]);
     } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong'); }
@@ -188,13 +189,13 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: 
     const displayQuery = mode === 'breakdown' ? 'Break it down' : q;
     try {
       if (mode === 'breakdown') {
-        const blocks = await askBreakdown(followUpPhrase, lang);
+        const blocks = await askBreakdown(followUpPhrase, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, blocks }]);
       } else if (mode === 'multi') {
-        const responses = await askFollowUpMulti(followUpPhrase, q, lang);
+        const responses = await askFollowUpMulti(followUpPhrase, q, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
       } else {
-        const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang);
+        const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrase: response }]);
         setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: JSON.stringify(response) }]);
       }

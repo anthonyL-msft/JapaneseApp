@@ -54,17 +54,19 @@ function parseAIResponse(content: string): AIPhrase {
   };
 }
 
-export async function askHowToSay(query: string, lang: string): Promise<AIPhrase> {
+export async function askHowToSay(query: string, lang: string, explainLang: string = 'en'): Promise<AIPhrase> {
   if (!isAIConfigured()) {
     throw new Error('AI not configured. Add your Azure OpenAI key in settings.');
   }
+
+  const explainInstr = explainLang === 'zh-TW' ? 'Write "notes" and "native_hint" in Traditional Chinese (繁體中文).' : 'Write "notes" and "native_hint" in English.';
 
   const langInstructions: Record<string, string> = {
     ja: `Translate to Japanese. Include:
 - "target": the phrase in Japanese (kanji + kana)
 - "romanization": hiragana reading
-- "pronunciation": romaji (Hepburn)
-- "pronunciation_chunks": syllable-broken romaji with · separators (e.g., "su·mi·ma·sen")
+- "pronunciation": romaji (Hepburn) with spaces between words
+- "pronunciation_chunks": syllable-broken romaji with · separators and spaces between words
 - "english": English translation
 - "chinese_tc": Traditional Chinese translation
 - "notes": usage tips, politeness level, or context
@@ -72,7 +74,8 @@ export async function askHowToSay(query: string, lang: string): Promise<AIPhrase
 Use CASUAL POLITE (丁寧語/masu form) — NOT humble/honorific (謙譲語/尊敬語). 
 Keep phrases short and easy to say for beginners. 
 Prefer 〜てもらえますか over 〜ていただけますか, 〜でいいですか over 〜でよろしいでしょうか.
-Default to 2 people context. Avoid unnecessarily long or formal expressions.`,
+Default to 2 people context. Avoid unnecessarily long or formal expressions.
+${explainInstr}`,
     es: `Translate to Spanish. Include:
 - "target": the phrase in Spanish
 - "pronunciation": phonetic pronunciation guide
@@ -137,6 +140,7 @@ export async function askFollowUp(
   followUpQuery: string,
   conversationHistory: FollowUpMessage[],
   lang: string,
+  explainLang: string = 'en',
 ): Promise<AIPhrase> {
   if (!isAIConfigured()) {
     throw new Error('AI not configured.');
@@ -156,7 +160,7 @@ ${lang === 'ja' ? '- "romanization": hiragana reading (e.g. "このせきはあ�
 ${lang === 'ja' ? '- "native_hint": IN ENGLISH, kanji meaning bridge for Chinese speakers (if applicable)\n' : ''}
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and easy for beginners.' : ''}
 
-IMPORTANT: "notes" and "native_hint" MUST be in English. "pronunciation" MUST have spaces between words.
+IMPORTANT: ${explainLang === 'zh-TW' ? '"notes" and "native_hint" MUST be in Traditional Chinese (繁體中文).' : '"notes" and "native_hint" MUST be in English.'} "pronunciation" MUST have spaces between words.
 
 Respond ONLY with valid JSON. No markdown, no explanation.`;
 
@@ -212,6 +216,7 @@ export async function askFollowUpMulti(
   originalPhrase: AIPhrase,
   followUpQuery: string,
   lang: string,
+  explainLang: string = 'en',
 ): Promise<AIPhrase[]> {
   if (!isAIConfigured()) throw new Error('AI not configured.');
 
@@ -225,8 +230,8 @@ ${lang === 'ja' ? '- "romanization": hiragana reading\n' : ''}- "pronunciation":
 - "pronunciation_chunks": syllable-broken with · separators and spaces between words
 - "english": English translation
 - "chinese_tc": Traditional Chinese translation
-- "notes": brief note IN ENGLISH on when/where to use this variation
-${lang === 'ja' ? '- "native_hint": IN ENGLISH, kanji bridge for Chinese speakers (if applicable)\n' : ''}
+- "notes": brief note IN ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'ENGLISH'} on when/where to use this variation
+${lang === 'ja' ? `- "native_hint": IN ${explainLang === 'zh-TW' ? 'Traditional Chinese' : 'ENGLISH'}, kanji bridge for Chinese speakers (if applicable)\n` : ''}
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep phrases short and practical for travel.' : ''}
 
 Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...].`;
@@ -289,6 +294,7 @@ Respond ONLY with a valid JSON array. No markdown, no wrapping object, just [...
 export async function askBreakdown(
   originalPhrase: AIPhrase,
   lang: string,
+  explainLang: string = 'en',
 ): Promise<BreakdownBlock[]> {
   if (!isAIConfigured()) throw new Error('AI not configured.');
 
@@ -307,7 +313,7 @@ Structure your response as:
 3. 3 phrase blocks showing the same pattern applied to different situations (practical travel examples). Each phrase block MUST have \"pronunciation\" with spaces between words.
 4. A text block IN ENGLISH with a tip on how to use this pattern
 
-IMPORTANT: All text block content MUST be in English. Phrase blocks have \"notes\" in English.
+IMPORTANT: All text block content MUST be in ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'}. Phrase blocks have \"notes\" in ${explainLang === 'zh-TW' ? 'Traditional Chinese' : 'English'}.
 ${lang === 'ja' ? 'Use CASUAL POLITE (丁寧語/masu form). Keep examples practical for travel.' : ''}
 
 Respond ONLY with a valid JSON array. No markdown wrapping.`;

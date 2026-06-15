@@ -33,6 +33,12 @@ function App() {
   const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
   const [savedAIPhrases, setSavedAIPhrases] = useState<SavedAIPhrase[]>([]);
   const [askMorePhrase, setAskMorePhrase] = useState<{ target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null>(null);
+  const [aiExplainLang, setAiExplainLang] = useState(() => localStorage.getItem('aiExplainLang') || 'en');
+
+  const handleAiExplainLangChange = useCallback((newLang: string) => {
+    setAiExplainLang(newLang);
+    localStorage.setItem('aiExplainLang', newLang);
+  }, []);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   useEffect(() => {
@@ -183,11 +189,11 @@ function App() {
         )}
         {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
-        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} />}
+        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} />}
         {tab === 'builder' && <SentenceBuilder />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
-        {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} />}
+        {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} />}
         {tab === 'converter' && (
           <div className="scroll-area h-full">
             <div className="px-4 py-3 border-b border-slate-800">
