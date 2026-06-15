@@ -82,13 +82,9 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
 
 const FOLLOW_UP_CHIPS = [
   { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', multi: false },
-  { label: 'More polite', prompt: 'How would I say this more politely?', multi: false },
-  { label: 'Casual', prompt: 'What\'s the casual/informal version?', multi: false },
   { label: 'As a question', prompt: 'How do I turn this into a question?', multi: false },
-  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead?', multi: true },
   { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects or contexts. Keep the grammar structure the same.', multi: true },
-  { label: 'Swap object', prompt: 'Keep the same sentence pattern but change the object/thing to something different. Show me 3 variations with different objects.', multi: true },
-  { label: 'Swap subject', prompt: 'Keep the same sentence pattern but change the subject/person. Show me 3 variations (we, he/she, they).', multi: true },
+  { label: 'Similar phrases', prompt: 'What are similar expressions I could use instead? Show me 3-5 alternatives that convey a similar meaning.', multi: true },
 ];
 
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase: _onDeleteAIPhrase }: Props) {
