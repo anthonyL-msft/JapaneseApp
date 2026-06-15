@@ -95,7 +95,7 @@ function BreakdownSection({ blocks, lang, onSave, onSpeak, savedAIPhrases }: {
       {blocks.map((block, i) => {
         if (block.type === 'text') {
           return (
-            <div key={i} className="bg-slate-800/60 rounded-xl px-3 py-2.5">
+            <div key={i} className="px-1 py-1">
               <p className="text-base text-slate-300 whitespace-pre-wrap leading-relaxed">{block.content}</p>
             </div>
           );
