@@ -84,7 +84,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
         {/* Grouped category grid */}
         {[
           { title: 'Getting Started', cats: ['greetings', 'basics', 'smalltalk', 'vocab'] },
-          { title: 'Travel', cats: ['airport', 'hotel', 'directions'] },
+          { title: 'Travel', cats: ['airport', 'directions', 'hotel'] },
           { title: 'Food & Shopping', cats: ['restaurant', 'food', 'drinks', 'shopping'] },
           { title: 'Culture & Safety', cats: ['culture', 'local', 'emergency'] },
         ].map(group => (
