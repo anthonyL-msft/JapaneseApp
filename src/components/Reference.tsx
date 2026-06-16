@@ -1484,7 +1484,31 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
 }
 
 const QUICK_TIPS = [
-  { group: 'Trains', emoji: '🚃', tips: [
+  { group: 'Learning Japanese', emoji: '🧠', tips: [
+    'Japanese word order is Subject-Object-Verb. Think "I sushi eat" not "I eat sushi."',
+    'は (wa) marks the topic, が (ga) marks the subject. When in doubt, use は — it covers 80% of travel situations.',
+    'Adding か (ka) to any statement makes it a question. いいです → いいですか？ (Is it okay?)',
+    'です (desu) = is/am. ます (masu) = verb ending. Both make your sentence polite — always use them with strangers.',
+    'Learn set phrases first, grammar second. You don\'t need to understand WHY "お願いします" works to USE it.',
+    'Japanese has no plurals, no articles (a/the), and often drops the subject. 水ください = "[I\'d like] water [please]."',
+  ]},
+  { group: 'Pronunciation', emoji: '🗣️', tips: [
+    'Every Japanese syllable has equal length and stress. Don\'t emphasize any syllable like English.',
+    'u at the end of です (desu) and ます (masu) is almost silent. Say "des" and "mas" not "desu" and "masu."',
+    'R sounds are between English L and R — tap your tongue once on the roof of your mouth.',
+    'Long vowels matter! おばさん (obasan = aunt) vs おばあさん (obaasan = grandmother).',
+  ]},
+  { group: 'Reading', emoji: '📖', tips: [
+    'As a Chinese speaker, you can read most kanji signs! 出口, 入口, 駅, 空港, 注意 — all readable.',
+    'Katakana = foreign words. Learn it and you can read menus: コーヒー (coffee), ビール (beer), ラーメン (ramen).',
+    'Hiragana on top of kanji (furigana) is your friend — it tells you the pronunciation.',
+  ]},
+  { group: 'Practice Strategy', emoji: '🎯', tips: [
+    'Master 5 patterns and you can handle 80% of travel: お願いします, ありますか, どこですか, してもいいですか, たいです.',
+    'Listen for いらっしゃいませ (welcome) — you don\'t need to respond. Just nod or say こんにちは.',
+    'When confused, say すみません (sumimasen) + show your phone screen with text. Japanese people are very helpful!',
+  ]},
+  { group: 'Travel Tips', emoji: '🚃', tips: [
     'Stand on the left side of escalators (right in Osaka). Never talk on your phone on the train.',
     'Get a Suica or Pasmo IC card — tap on/off at gates, use it to pay at convenience stores and vending machines.',
     'Last trains run around midnight. Miss it and you\'re stuck until 5 AM — plan ahead or budget for a taxi.',
