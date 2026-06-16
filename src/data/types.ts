@@ -32,32 +32,34 @@ export const LANGUAGES: LanguageConfig[] = [
 export type Category =
   | 'greetings'
   | 'basics'
-  | 'vocab'
   | 'airport'
   | 'hotel'
   | 'restaurant'
   | 'food'
+  | 'drinks'
   | 'shopping'
   | 'directions'
   | 'emergency'
   | 'smalltalk'
   | 'culture'
-  | 'local';
+  | 'local'
+  | 'vocab';
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; labelTC: string }> = {
   greetings:  { label: 'Greetings',              emoji: '👋', labelTC: '問候用語' },
   basics:     { label: 'Basics',                  emoji: '🗣️', labelTC: '基本用語' },
-  vocab:      { label: 'Vocabulary',              emoji: '🔤', labelTC: '基本單字' },
   airport:    { label: 'Airport & Transit',       emoji: '✈️', labelTC: '機場與交通' },
   hotel:      { label: 'Hotel',                   emoji: '🏨', labelTC: '飯店住宿' },
   restaurant: { label: 'Restaurant',               emoji: '🍜', labelTC: '餐廳用餐' },
-  food:       { label: 'Food & Drinks',             emoji: '🍱', labelTC: '食物與飲品' },
+  food:       { label: 'Food',                      emoji: '🍱', labelTC: '食物' },
+  drinks:     { label: 'Drinks & Table',            emoji: '🍵', labelTC: '飲品與餐具' },
   shopping:   { label: 'Shopping',                emoji: '🛍️', labelTC: '購物' },
   directions: { label: 'Directions & Navigation', emoji: '🗺️', labelTC: '問路與導航' },
   emergency:  { label: 'Emergency & Health',      emoji: '🚑', labelTC: '緊急與醫療' },
   smalltalk:  { label: 'Small Talk & Politeness', emoji: '💬', labelTC: '閒聊與禮貌' },
   culture:    { label: 'Culture Tips',            emoji: '⛩️', labelTC: '文化禮儀' },
   local:      { label: 'Local Specials',          emoji: '📍', labelTC: '當地特色' },
+  vocab:      { label: 'Vocabulary',              emoji: '🔤', labelTC: '基本單字' },
 };
 
 export interface UserNote {
