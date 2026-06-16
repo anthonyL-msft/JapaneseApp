@@ -237,10 +237,11 @@ function isExplanationQuestion(q: string): boolean {
     return false;
   }
 
-  return /why|difference|grammar|particle|what\s+does|part\s+of\s+speech|word class|usage/.test(normalized)
-    || /\bcan\s+i\s+use\s+(this|it|that)\b/.test(normalized)
+  return /why|difference|grammar|particle|what\s+does|part\s+of\s+speech|word class|usage|meaning/.test(normalized)
+    || /\bcan\s+i\s+use\b/.test(normalized)
     || /\b(is|does)\s+(this|it|that)\b/.test(normalized)
-    || /\bwhen\s+(do|can|should)\s+i\s+use\s+(this|it|that)\b/.test(normalized)
+    || /\bwhen\s+(do|can|should)\s+i\s+use\b/.test(normalized)
+    || /\bdo\s+i\s+(need|have)\s+to\b/.test(normalized)
     || /\buse\s+(this|it|that)\s+for\b/.test(normalized)
     || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|用法|可以用在|能用在|什麼時候用|適合用在/.test(q);
 }
