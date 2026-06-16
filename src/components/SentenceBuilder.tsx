@@ -79,11 +79,6 @@ const PATTERNS: Pattern[] = [
     meaning: 'Can I ○○? (possible?)', slotType: 'action', slotLabel: 'What do you want to do?',
     build: (v) => ({ jp: `${v.jp}できますか？`, rom: `${v.rom} de·ki·ma·su ka`, en: `Can I ${v.en.toLowerCase()}?` }),
   },
-  {
-    id: 'count', group: 'request', template: '○○を○個お願いします', templateRom: '○○ wo ○·ko o·ne·gai·shi·ma·su',
-    meaning: '[item] × [number] please', slotType: 'food', slotLabel: 'What do you want to order?',
-    build: (v) => ({ jp: `${v.jp}をお願いします`, rom: `${v.rom} wo o·ne·gai·shi·ma·su`, en: `${v.en} please` }),
-  },
   // Negative forms
   {
     id: 'iranai', group: 'request', template: '○○はいりません', templateRom: '○○ wa i·ri·ma·sen',
@@ -233,31 +228,14 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
   const [tab, setTab] = useState<'request' | 'question' | 'want'>('request');
   const [moreExamples, setMoreExamples] = useState<AIPhrase[] | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [lastFood, setLastFood] = useState<Vocab | null>(null);
 
   const handleSelectVocab = useCallback((vocab: Vocab) => {
     if (!selectedPattern) return;
-    // For the count pattern: if a food was already selected and user taps a quantity, combine them
-    if (selectedPattern.id === 'count') {
-      if (vocab.rom && VOCAB.quantity.some(q => q.jp === vocab.jp)) {
-        // Quantity picked — combine with last food
-        if (lastFood) {
-          const built = { jp: `${lastFood.jp}を${vocab.jp}お願いします`, rom: `${lastFood.rom} wo ${vocab.rom} o·ne·gai·shi·ma·su`, en: `${vocab.en} ${lastFood.en.toLowerCase()} please` };
-          setResult(built);
-          setMoreExamples(null);
-          speak(built.jp, 'ja-JP');
-          return;
-        }
-      } else {
-        // Food picked — remember it and build without quantity
-        setLastFood(vocab);
-      }
-    }
     const built = selectedPattern.build(vocab);
     setResult(built);
     setMoreExamples(null);
     speak(built.jp, 'ja-JP');
-  }, [selectedPattern, lastFood]);
+  }, [selectedPattern]);
 
   const handleCopy = useCallback(() => {
     if (!result) return;
@@ -270,7 +248,6 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
     setSelectedPattern(null);
     setResult(null);
     setMoreExamples(null);
-    setLastFood(null);
   };
 
   const handleMoreExamples = async () => {
@@ -328,7 +305,7 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
   const extraTypes: SlotType[] = selectedPattern.slotType === 'noun'
     ? ['food', 'drink']
     : selectedPattern.slotType === 'food'
-    ? ['drink', 'quantity']
+    ? ['drink']
     : [];
 
   return (
