@@ -329,6 +329,9 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   const [aiMode, setAiMode] = useState<'translate' | 'grammar'>('translate');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [grammarResult, setGrammarResult] = useState<{ question: string; answer: string; example?: AIPhrase } | null>(null);
+  const [grammarThread, setGrammarThread] = useState<{ question: string; answer: string; example?: AIPhrase }[]>([]);
+  const [grammarFollowUpQuery, setGrammarFollowUpQuery] = useState('');
+  const [grammarFollowUpLoading, setGrammarFollowUpLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBig, setShowBig] = useState<string | null>(null);
@@ -373,7 +376,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
 
   const handleAsk = async () => {
     if (!query.trim() || loading) return;
-    setLoading(true); setError(null); setResult(null); setGrammarResult(null);
+    setLoading(true); setError(null); setResult(null); setGrammarResult(null); setGrammarThread([]);
     const q = query.trim();
     try {
       // Use toggle mode: grammar mode always explains, translate mode always translates
@@ -399,6 +402,18 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   };
 
   const handleSpeak = (text: string) => speak(text, currentLang.ttsLang);
+
+  const handleGrammarFollowUp = async (promptText?: string) => {
+    const q = promptText || grammarFollowUpQuery.trim();
+    if (!q || grammarFollowUpLoading || !grammarResult) return;
+    setGrammarFollowUpLoading(true); setGrammarFollowUpQuery('');
+    try {
+      const resp = await askGrammarQuestion(q, lang, aiExplainLang);
+      const item = { question: q, answer: resp.answer, example: resp.example };
+      setGrammarThread(prev => [...prev, item]);
+    } catch { /* ignore */ }
+    finally { setGrammarFollowUpLoading(false); }
+  };
 
   const handleSave = useCallback((phrase: AIPhrase, originalQuery: string) => {
     // Toggle: if already saved, delete it; otherwise save
@@ -536,6 +551,39 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               <p className="text-sm text-slate-400 italic">{grammarResult.question}</p>
             </div>
             <ExplanationBubble text={grammarResult.answer} example={grammarResult.example} onSpeak={handleSpeak} />
+
+            {/* Grammar follow-up thread */}
+            {grammarThread.map((t, i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex justify-end">
+                  <div className="bg-indigo-900/60 rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%]">
+                    <p className="text-base text-slate-200">{t.question}</p>
+                  </div>
+                </div>
+                <ExplanationBubble text={t.answer} example={t.example} onSpeak={handleSpeak} />
+              </div>
+            ))}
+
+            {grammarFollowUpLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-800 rounded-2xl rounded-tl-sm px-4 py-3">
+                  <span className="text-sm text-slate-400 animate-pulse">Thinking...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Follow-up input */}
+            <div className="space-y-2 pt-1">
+              <div className="flex flex-wrap gap-1.5">
+                {['Give me more examples', 'Compare with が', 'When NOT to use it?'].map(chip => (
+                  <button key={chip} onClick={() => handleGrammarFollowUp(chip)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip}</button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input type="text" value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up..." className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition" disabled={grammarFollowUpLoading} />
+                <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 py-2.5">Ask</button>
+              </div>
+            </div>
           </div>
         )}
 
