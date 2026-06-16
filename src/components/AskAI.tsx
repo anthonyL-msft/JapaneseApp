@@ -110,29 +110,31 @@ function ExplanationBubble({ text, example, onSpeak }: { text: string; example?:
   };
 
   return (
-    <div className="bg-slate-800 rounded-2xl rounded-tl-sm px-3 py-2 space-y-2">
-      <p className="text-base text-slate-200 whitespace-pre-wrap leading-relaxed">
-        {parts.map((part, i) => {
-          const quoted = parseQuoted(part);
-          if (!quoted) return <span key={i}>{part}</span>;
-          const inner = quoted.inner;
-          const hepburn = toHepburnFromKana(inner);
-          if (!hepburn) return <span key={i}>{quoted.raw}</span>;
+    <div className="space-y-2">
+      <div className="px-1 py-1">
+        <p className="text-base text-slate-300 whitespace-pre-wrap leading-relaxed">
+          {parts.map((part, i) => {
+            const quoted = parseQuoted(part);
+            if (!quoted) return <span key={i}>{part}</span>;
+            const inner = quoted.inner;
+            const hepburn = toHepburnFromKana(inner);
+            if (!hepburn) return <span key={i}>{quoted.raw}</span>;
 
-          const isActive = activeTerm === inner;
-          return (
-            <button
-              key={i}
-              onClick={() => setActiveTerm(prev => (prev === inner ? null : inner))}
-              className={`inline rounded-md px-1 py-0.5 mx-0.5 transition ${isActive ? 'bg-indigo-700/40 text-indigo-200' : 'bg-indigo-900/20 text-indigo-300 active:bg-indigo-800/40'}`}
-              title="Tap to show Hepburn"
-              type="button"
-            >
-              {quoted.raw}
-            </button>
-          );
-        })}
-      </p>
+            const isActive = activeTerm === inner;
+            return (
+              <button
+                key={i}
+                onClick={() => setActiveTerm(prev => (prev === inner ? null : inner))}
+                className={`inline rounded-md px-1 py-0.5 mx-0.5 transition ${isActive ? 'bg-indigo-700/40 text-indigo-200' : 'bg-indigo-900/20 text-indigo-300 active:bg-indigo-800/40'}`}
+                title="Tap to show Hepburn"
+                type="button"
+              >
+                {quoted.raw}
+              </button>
+            );
+          })}
+        </p>
+      </div>
       {activeTerm && (
         <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg px-2.5 py-1.5">
           <p className="text-xs text-slate-500">Hepburn</p>
@@ -140,14 +142,14 @@ function ExplanationBubble({ text, example, onSpeak }: { text: string; example?:
         </div>
       )}
       {example && (
-        <div className="bg-slate-700/40 rounded-lg p-2.5 mt-1">
+        <div className="bg-slate-800/80 rounded-xl p-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-slate-100">{example.target}</p>
               <p className="text-sm text-sakura-300">{example.pronunciation}</p>
               <p className="text-sm text-slate-400">{example.english}</p>
             </div>
-            {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-base shrink-0">🔊</button>}
+            {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>}
           </div>
         </div>
       )}
