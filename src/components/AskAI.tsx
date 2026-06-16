@@ -252,6 +252,7 @@ function isExplanationQuestion(q: string): boolean {
   }
 
   return /why|difference|grammar|particle|what\s+does|what\s+is|part\s+of\s+speech|word class|usage|meaning/.test(normalized)
+    || /\bhow\s+to\s+use\b/.test(normalized)
     || /\bcan\s+i\s+use\b/.test(normalized)
     || /\b(is|does)\s+(this|it|that)\b/.test(normalized)
     || /\bwhen\s+(do|can|should|would)\s+i\s+use\b/.test(normalized)
@@ -262,7 +263,8 @@ function isExplanationQuestion(q: string): boolean {
     || /\bis\s+(this|it)\s+(rude|polite|formal|casual|natural|correct|wrong|ok|okay)\b/.test(normalized)
     || /\buse\s+(this|it|that)\s+for\b/.test(normalized)
     || /\bso\s+(i|we|you)\s+(just|can|should|need)\b/.test(normalized)
-    || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|用法|可以用在|能用在|什麼時候用|適合用在/.test(q);
+    || /怎麼用|如何使用|用法|什麼時候用/.test(q)
+    || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|可以用在|能用在|適合用在/.test(q);
 }
 
 function getThreadKey(phrase: AIPhrase): string {
