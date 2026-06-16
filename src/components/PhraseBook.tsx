@@ -32,8 +32,6 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
     });
   };
 
-  const categories = Object.entries(CATEGORY_INFO) as [Category, typeof CATEGORY_INFO[Category]][];
-
   // Phrase list for selected category
   const categoryPhrases = panel.value ? phrases.filter(p => p.category === panel.value) : [];
   const info = panel.value ? CATEGORY_INFO[panel.value] : null;
@@ -83,27 +81,40 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {categories.map(([key, catInfo]) => {
-            const catPhrases = phrases.filter(p => p.category === key);
-            const bookmarked = catPhrases.filter(p => bookmarkedIds.has(p.id)).length;
-            return (
-              <button
-                key={key}
-                onClick={() => { panel.open(key); setOpenSituations(new Set()); setExpandedPhrase(null); }}
-                className="bg-slate-800/80 rounded-xl p-4 text-left active:bg-slate-700 transition-colors"
-              >
-                <span className="text-2xl">{catInfo.emoji}</span>
-                <h3 className="text-base font-semibold mt-2 text-slate-100">{catInfo.label}</h3>
-                <p className="text-base text-slate-400 mt-0.5">{catInfo.labelTC}</p>
-                <p className="text-base text-slate-500 mt-1">
-                  {catPhrases.length} phrases
-                  {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
-                </p>
-              </button>
-            );
-          })}
-        </div>
+        {/* Grouped category grid */}
+        {[
+          { title: 'Getting Started', cats: ['greetings', 'basics', 'vocab'] },
+          { title: 'Travel', cats: ['airport', 'hotel', 'directions'] },
+          { title: 'Food & Shopping', cats: ['restaurant', 'food', 'drinks', 'shopping'] },
+          { title: 'Social & Culture', cats: ['smalltalk', 'culture', 'local', 'emergency'] },
+        ].map(group => (
+          <div key={group.title} className="mb-4">
+            <h3 className="text-sm text-slate-500 font-medium mb-1.5 px-1">{group.title}</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {group.cats.map(key => {
+                const catInfo = CATEGORY_INFO[key as Category];
+                if (!catInfo) return null;
+                const catPhrases = phrases.filter(p => p.category === key);
+                const bookmarked = catPhrases.filter(p => bookmarkedIds.has(p.id)).length;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => { panel.open(key as Category); setOpenSituations(new Set()); setExpandedPhrase(null); }}
+                    className="bg-slate-800/80 rounded-xl p-4 text-left active:bg-slate-700 transition-colors"
+                  >
+                    <span className="text-2xl">{catInfo.emoji}</span>
+                    <h3 className="text-base font-semibold mt-2 text-slate-100">{catInfo.label}</h3>
+                    <p className="text-base text-slate-400 mt-0.5">{catInfo.labelTC}</p>
+                    <p className="text-base text-slate-500 mt-1">
+                      {catPhrases.length} phrases
+                      {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* L2: Full-page slide-in for selected category */}
