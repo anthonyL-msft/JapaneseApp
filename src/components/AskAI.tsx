@@ -231,9 +231,15 @@ type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; 
 function isExplanationQuestion(q: string): boolean {
   const text = q.toLowerCase();
   const normalized = text.replace(/\s+/g, ' ').trim();
+
+  // Phrase-generation intent takes priority — NOT explanation
+  if (/\b(give\s+me|make\s+it|say\s+it|version|simpler|shorter|polite|casual|formal|turn\s+(this|it)\s+into|how\s+do\s+i\s+(say|ask)|how\s+to\s+say)\b/.test(normalized)) {
+    return false;
+  }
+
   return /why|difference|grammar|particle|what\s+does|part\s+of\s+speech|word class|usage/.test(normalized)
     || /\bcan\s+i\s+use\s+(this|it|that)\b/.test(normalized)
-    || /\b(is|are|can|should|do|does)\b.*\b(this|it|that)\b/.test(normalized)
+    || /\b(is|does)\s+(this|it|that)\b/.test(normalized)
     || /\bwhen\s+(do|can|should)\s+i\s+use\s+(this|it|that)\b/.test(normalized)
     || /\buse\s+(this|it|that)\s+for\b/.test(normalized)
     || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|用法|可以用在|能用在|什麼時候用|適合用在/.test(q);
@@ -373,7 +379,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         const responses = await askFollowUpMulti(followUpPhrase, q, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
       } else {
-        const shouldExplain = aiTutorMode === 'teacher' ? isExplanationQuestion(q) || q.includes('?') : isExplanationQuestion(q);
+        const shouldExplain = isExplanationQuestion(q);
         if (shouldExplain) {
           const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
           setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer }]);
