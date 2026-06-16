@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { speak } from '../utils/tts';
+import { askFollowUpMulti, isAIConfigured } from '../utils/ai';
+import type { AIPhrase } from '../utils/ai';
 
 // === Pattern Templates ===
 interface Pattern {
@@ -184,16 +186,19 @@ const SLOT_LABELS: Record<SlotType, string> = {
   action: '🎯 Actions',
 };
 
-export function SentenceBuilder() {
+export function SentenceBuilder({ onAskMore }: { onAskMore?: (phrase: { jp: string; rom: string; en: string }) => void }) {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [result, setResult] = useState<{ jp: string; rom: string; en: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState<'request' | 'question' | 'want'>('request');
+  const [moreExamples, setMoreExamples] = useState<AIPhrase[] | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const handleSelectVocab = useCallback((vocab: Vocab) => {
     if (!selectedPattern) return;
     const built = selectedPattern.build(vocab);
     setResult(built);
+    setMoreExamples(null);
     speak(built.jp, 'ja-JP');
   }, [selectedPattern]);
 
@@ -207,6 +212,18 @@ export function SentenceBuilder() {
   const handleBack = () => {
     setSelectedPattern(null);
     setResult(null);
+    setMoreExamples(null);
+  };
+
+  const handleMoreExamples = async () => {
+    if (!result || !selectedPattern || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const phrase: AIPhrase = { target: result.jp, pronunciation: result.rom.replace(/·/g, ' '), pronunciation_chunks: result.rom, english: result.en, chinese_tc: '', notes: '' };
+      const examples = await askFollowUpMulti(phrase, `Show me 3-5 more examples using the pattern ${selectedPattern.template} but with different objects/situations.`, 'ja', 'zh-TW');
+      setMoreExamples(examples);
+    } catch { setMoreExamples(null); }
+    finally { setLoadingMore(false); }
   };
 
   // Step 1: Pattern picker
@@ -284,6 +301,18 @@ export function SentenceBuilder() {
                 </button>
               </div>
             </div>
+            <div className="flex gap-2 mt-2">
+              {isAIConfigured() && (
+                <button onClick={handleMoreExamples} disabled={loadingMore} className="flex-1 bg-indigo-900/40 text-indigo-300 text-sm py-1.5 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">
+                  {loadingMore ? '...' : '✨ More like this'}
+                </button>
+              )}
+              {onAskMore && (
+                <button onClick={() => onAskMore(result)} className="flex-1 bg-indigo-900/40 text-indigo-300 text-sm py-1.5 rounded-lg active:bg-indigo-800/50 transition">
+                  💬 Ask more
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="bg-slate-800/40 rounded-xl p-3 border border-dashed border-slate-700">
@@ -294,6 +323,31 @@ export function SentenceBuilder() {
 
       {/* Scrollable vocab chips */}
       <div className="scroll-area flex-1 p-4 space-y-4">
+        {/* AI-generated examples */}
+        {moreExamples && moreExamples.length > 0 && (
+          <div>
+            <p className="text-sm text-slate-500 mb-2">✨ More examples using this pattern</p>
+            <div className="space-y-1.5">
+              {moreExamples.map((ex, i) => (
+                <div key={i} className="bg-slate-800/80 rounded-xl p-2.5 active:bg-slate-700/50 transition">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-medium text-slate-100">{ex.target}</p>
+                      <p className="text-sm text-sakura-300">{ex.pronunciation}</p>
+                      <p className="text-sm text-slate-400">{ex.english}</p>
+                    </div>
+                    <button onClick={() => speak(ex.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-base shrink-0">🔊</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {loadingMore && (
+          <div className="flex justify-center py-3">
+            <span className="text-sm text-slate-500 animate-pulse">Generating examples...</span>
+          </div>
+        )}
         <div>
           <p className="text-sm text-slate-500 mb-2">{SLOT_LABELS[selectedPattern.slotType]}</p>
           <div className="flex flex-wrap gap-1.5">
