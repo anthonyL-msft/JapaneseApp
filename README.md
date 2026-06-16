@@ -43,18 +43,20 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Sticky result card with TTS + Copy
 - Smart vocab: noun patterns also show food/drink chips
 
-### 🤖 Ask AI
-- "How do I say...?" powered by Azure OpenAI
+### 🤖 AI Language Tutor
+- Translate anything to the target language powered by Azure OpenAI
 - Returns target language + romanization + Sounds breakdown + English + Chinese
 - **Follow-up conversations:** tap "Ask more" on any phrase to open follow-up drawer
 - Quick chips: Simpler? / As a question / More examples / Break it down
 - **Break it down:** AI generates mini-lesson with pattern explanation + example phrases
 - **More examples:** returns 3-5 pattern variations as stacked cards
+- **Teacher mode:** grammar/usage questions (why, can I use this, what does…) get direct answers first — answer → reason → example — not just alternative phrases
+- **Inline Hepburn hints:** tappable 「quoted」terms in AI explanations reveal Hepburn reading inline for beginners
 - Follow-up threads auto-persist per phrase in localStorage (up to 5 threads)
 - Recent translations persist across tab switches (last 10)
 - Star ⭐ to save structured phrases to My Stuff (toggle on/off)
 - "Ask more" available from Learn phrases, Reference examples, and AI results
-- AI explanation language configurable: English or 繁體中文 (in Settings)
+- AI explanation language: English or 繁體中文; follow-up style: Teacher or Phrase First (in Settings)
 
 ### 📌 My Stuff
 - ✅ Learned items (phrases + reference examples)
@@ -69,7 +71,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - 🔄 Number Converter
 - 🔧 Sentence Builder
 - 📝 Quick Note
-- ⚙️ Settings — light/dark mode, language, speech speed
+- ⚙️ Settings — light/dark mode, language, speech speed, AI explanation language, AI follow-up style
 
 ## Tech Stack
 
