@@ -3,7 +3,7 @@ import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 import { breakdownKana, markChunkBoundaries, markLengtheners, romajiToHiragana } from '../utils/kana';
 
-type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening';
+type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening' | 'tips';
 
 const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'gojuon', label: '50 Sounds', emoji: 'あ', desc: 'Hiragana & Katakana chart' },
@@ -20,6 +20,7 @@ const KNOWLEDGE: { id: Section; label: string; emoji: string; desc: string }[] =
   { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 (like 量詞)' },
   { id: 'signs', label: 'Common Signs', emoji: '🪧', desc: '入口 出口 禁煙 営業中' },
   { id: 'listening', label: 'What You\'ll Hear', emoji: '👂', desc: 'Common staff phrases to recognize' },
+  { id: 'tips', label: 'Quick Tips', emoji: '💡', desc: 'Practical survival tips for Japan' },
 ];
 
 const ALL_SECTIONS = [...LEARN_STEPS, ...KNOWLEDGE];
@@ -276,6 +277,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
             {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} onAskMore={onAskMore} />}
             {panel.value === 'signs' && <SignsRef />}
             {panel.value === 'listening' && <ListeningRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} onAskMore={onAskMore} />}
+            {panel.value === 'tips' && <QuickTipsRef />}
           </div>
         </div>
       )}
@@ -1477,6 +1479,57 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '申し訳ございません', hep: 'mou·shi·wa·ke go·zai·ma·sen', en: "I'm very sorry (formal apology)" },
           { jp: 'かしこまりました', hep: 'ka·shi·ko·ma·ri·ma·shi·ta', en: 'Understood / Certainly (formal yes)' },
         ]} />
+    </div>
+  );
+}
+
+const QUICK_TIPS = [
+  { group: 'Trains', emoji: '🚃', tips: [
+    'Stand on the left side of escalators (right in Osaka). Never talk on your phone on the train.',
+    'Get a Suica or Pasmo IC card — tap on/off at gates, use it to pay at convenience stores and vending machines.',
+    'Last trains run around midnight. Miss it and you\'re stuck until 5 AM — plan ahead or budget for a taxi.',
+  ]},
+  { group: 'Money', emoji: '💴', tips: [
+    'Japan is still very cash-heavy. Always carry ¥10,000+ in cash; many small shops don\'t take cards.',
+    '7-Eleven and Japan Post ATMs reliably accept foreign cards. Most bank ATMs do not.',
+  ]},
+  { group: 'Restaurants', emoji: '🍜', tips: [
+    'Never tip — it\'s not expected and can cause confusion. The price on the menu is what you pay (plus tax).',
+    'Many restaurants have you pay at the register near the door, not at your table. Look for the cashier on exit.',
+  ]},
+  { group: 'Daily Life', emoji: '🏪', tips: [
+    'There are almost no public trash bins. Carry a small bag and dispose at convenience stores or your hotel.',
+    'If you see a row of slippers or a raised floor at an entrance, take your shoes off. Look before you step up.',
+    'Konbini (7-Eleven, Lawson, FamilyMart) are everywhere — hot meals, ATMs, tickets, clean restrooms 24/7.',
+    'Japanese queue for everything — trains, elevators, ramen. Look for line markings on the ground.',
+  ]},
+  { group: 'Culture', emoji: '⛩️', tips: [
+    'At a shrine: toss a coin, bow twice, clap twice, bow once. At a temple: just bow — no clapping.',
+    'Onsen: wash and rinse completely before entering. Towels never go in the water — place on your head.',
+  ]},
+  { group: 'Shopping', emoji: '🛍️', tips: [
+    'Spend ¥5,000+ at one store? Show your passport for tax-free (8-10% off). Look for \'Tax Free\' signs.',
+  ]},
+  { group: 'Emergencies', emoji: '🚨', tips: [
+    'Police: 110. Fire/Ambulance: 119. English support available — state your location clearly.',
+  ]},
+];
+
+function QuickTipsRef() {
+  return (
+    <div className="mt-2 space-y-4">
+      {QUICK_TIPS.map(group => (
+        <div key={group.group}>
+          <h3 className="text-sm text-slate-500 font-medium mb-2">{group.emoji} {group.group}</h3>
+          <div className="space-y-1.5">
+            {group.tips.map((tip, i) => (
+              <div key={i} className="bg-slate-700/40 rounded-xl p-3">
+                <p className="text-base text-slate-200 leading-relaxed">{tip}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
