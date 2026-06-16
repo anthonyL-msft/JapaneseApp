@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
 import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';
@@ -244,76 +245,78 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
         );
       })()}
 
-      {/* L3: Slide-in conversation view */}
-      {conversationPanel.visible && selectedScenario && (
-        <div className={`absolute inset-0 bg-slate-950 ${conversationPanel.animClass} flex flex-col z-50`}>
-          <div className="bg-slate-950/95 backdrop-blur-sm px-4 py-3 border-b border-slate-800 shrink-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <button onClick={handleBack} className="text-base text-slate-400 active:text-slate-200 p-1">
-                  ← {groupPanel.value ? SCENARIO_GROUPS[groupPanel.value].label : ''}
-                </button>
-                <h2 className="text-lg font-bold">{selectedScenario.emoji} {selectedScenario.title}</h2>
-                <p className="text-base text-slate-400">{selectedScenario.titleTC} · {selectedScenario.description}</p>
-              </div>
-              <div className="flex gap-1.5 shrink-0">
-                <button
-                  onClick={handleReset}
-                  className="text-base bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700"
-                >
-                  ↺
-                </button>
-                <button
-                  onClick={handleAutoPlay}
-                  className={`text-base px-3 py-1.5 rounded-lg transition ${
-                    isAutoPlaying
-                      ? 'bg-red-900/60 text-red-300 active:bg-red-800'
-                      : 'bg-sakura-500/80 text-white active:bg-sakura-600'
-                  }`}
-                >
-                  {isAutoPlaying ? '⏹ Stop' : '▶ Play All'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 scroll-area p-4 space-y-3" ref={scrollRef}>
-            {selectedScenario.lines.slice(0, revealedCount).map((line, idx) => (
-              <ConversationBubble key={idx} line={line} index={idx} ttsLang={langConfig.ttsLang} />
-            ))}
-
-            {!allRevealed && !isAutoPlaying && (
-              <button
-                onClick={revealNext}
-                className="w-full py-4 text-center text-base text-slate-500 active:text-slate-300 transition"
-              >
-                <span className="bg-slate-800/80 px-4 py-2 rounded-xl">
-                  Tap to reveal next line ({revealedCount + 1}/{selectedScenario.lines.length})
-                </span>
-              </button>
-            )}
-
-            {allRevealed && (
-              <div className="text-center py-4">
-                <p className="text-base text-slate-500 mb-3">🎉 Conversation complete!</p>
-                <div className="flex gap-2 justify-center">
+      {/* L3: Bottom drawer conversation view */}
+      {conversationPanel.visible && selectedScenario && createPortal(
+        <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={handleBack}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up h-full" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
+            <div className="shrink-0 px-4 pt-3 pb-3 border-b border-slate-700/50">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-base font-semibold text-slate-100 truncate">{selectedScenario.emoji} {selectedScenario.title}</h2>
+                  <p className="text-sm text-slate-400 truncate">{selectedScenario.titleTC} · {selectedScenario.description}</p>
+                </div>
+                <div className="flex gap-1.5 shrink-0">
                   <button
                     onClick={handleReset}
-                    className="text-base bg-slate-800 text-slate-300 px-4 py-2 rounded-xl active:bg-slate-700"
+                    className="text-base bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700"
                   >
-                    ↺ Start Over
+                    ↺
                   </button>
                   <button
-                    onClick={() => { handleReset(); handleAutoPlay(); }}
-                    className="text-base bg-sakura-500/80 text-white px-4 py-2 rounded-xl active:bg-sakura-600"
+                    onClick={handleAutoPlay}
+                    className={`text-base px-3 py-1.5 rounded-lg transition ${
+                      isAutoPlaying
+                        ? 'bg-red-900/60 text-red-300 active:bg-red-800'
+                        : 'bg-sakura-500/80 text-white active:bg-sakura-600'
+                    }`}
                   >
-                    ▶ Auto Play
+                    {isAutoPlaying ? '⏹ Stop' : '▶ Play'}
                   </button>
+                  <button onClick={handleBack} className="text-xl text-slate-400 p-1">✕</button>
                 </div>
               </div>
-            )}
+            </div>
+
+            <div className="flex-1 scroll-area p-4 space-y-3" ref={scrollRef}>
+              {selectedScenario.lines.slice(0, revealedCount).map((line, idx) => (
+                <ConversationBubble key={idx} line={line} index={idx} ttsLang={langConfig.ttsLang} />
+              ))}
+
+              {!allRevealed && !isAutoPlaying && (
+                <button
+                  onClick={revealNext}
+                  className="w-full py-4 text-center text-base text-slate-500 active:text-slate-300 transition"
+                >
+                  <span className="bg-slate-800/80 px-4 py-2 rounded-xl">
+                    Tap to reveal next ({revealedCount + 1}/{selectedScenario.lines.length})
+                  </span>
+                </button>
+              )}
+
+              {allRevealed && (
+                <div className="text-center py-4">
+                  <p className="text-base text-slate-500 mb-3">🎉 Conversation complete!</p>
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      onClick={handleReset}
+                      className="text-base bg-slate-800 text-slate-300 px-4 py-2 rounded-xl active:bg-slate-700"
+                    >
+                      ↺ Start Over
+                    </button>
+                    <button
+                      onClick={() => { handleReset(); handleAutoPlay(); }}
+                      className="text-base bg-sakura-500/80 text-white px-4 py-2 rounded-xl active:bg-sakura-600"
+                    >
+                      ▶ Auto Play
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
