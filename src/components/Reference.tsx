@@ -835,6 +835,7 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
   const { openSet, toggle } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
+      <p className="text-sm text-slate-500 font-medium px-1 pt-1">Sentence Roles</p>
       <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
@@ -853,6 +854,7 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
         ]} />
+      <p className="text-sm text-slate-500 font-medium px-1 pt-2">Place & Direction</p>
       <AccordionRow id="に" jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
           { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
@@ -895,6 +897,7 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           </div>
         </div>
       </div>
+      <p className="text-sm text-slate-500 font-medium px-1 pt-2">Connecting</p>
       <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
           { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
@@ -913,6 +916,7 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
           { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
         ]} />
+      <p className="text-sm text-slate-500 font-medium px-1 pt-2">Questions & Range</p>
       <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
           { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
