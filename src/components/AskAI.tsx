@@ -601,8 +601,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
-              <div className="flex justify-center pt-2 pb-1"><div className="w-10 h-1 rounded-full bg-slate-600" /></div>
-              <div className="px-4 pb-3 border-b border-slate-700/50">
+              <div className="px-4 pt-3 pb-3 border-b border-slate-700/50">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-semibold text-slate-100 truncate">{followUpPhrase.target}</p>
@@ -696,8 +695,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
-              <div className="flex justify-center pt-2 pb-1"><div className="w-10 h-1 rounded-full bg-slate-600" /></div>
-              <div className="px-4 pb-3 border-b border-slate-700/50">
+              <div className="px-4 pt-3 pb-3 border-b border-slate-700/50">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-indigo-400">Grammar Q&A</p>
