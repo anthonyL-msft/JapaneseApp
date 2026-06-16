@@ -368,6 +368,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
 
   const handleFollowUp = async (promptText?: string, mode: 'single' | 'multi' | 'breakdown' = 'single') => {
     const q = promptText || followUpQuery.trim();
+    const isFromChip = !!promptText; // chips pass promptText; textbox does not
     if ((!q && mode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
     setFollowUpLoading(true); setFollowUpQuery('');
     const displayQuery = mode === 'breakdown' ? 'Break it down' : q;
@@ -379,7 +380,8 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         const responses = await askFollowUpMulti(followUpPhrase, q, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
       } else {
-        const shouldExplain = isExplanationQuestion(q);
+        // Chips always generate phrases; textbox uses intent detection
+        const shouldExplain = !isFromChip && isExplanationQuestion(q);
         if (shouldExplain) {
           const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
           setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer }]);
