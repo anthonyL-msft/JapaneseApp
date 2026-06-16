@@ -315,6 +315,7 @@ function clearThread(threadKey: string, legacyTarget?: string) {
 
 export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher', onGoBack }: Props) {
   const [query, setQuery] = useState('');
+  const [aiMode, setAiMode] = useState<'translate' | 'grammar'>('translate');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [grammarResult, setGrammarResult] = useState<{ question: string; answer: string; example?: AIPhrase } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -363,8 +364,8 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     setLoading(true); setError(null); setResult(null); setGrammarResult(null);
     const q = query.trim();
     try {
-      // Auto-detect: if user asks a grammar/structure question, use grammar Q&A
-      if (isExplanationQuestion(q)) {
+      // Use toggle mode: grammar mode always explains, translate mode always translates
+      if (aiMode === 'grammar') {
         const resp = await askGrammarQuestion(q, lang, aiExplainLang);
         setGrammarResult({ question: q, answer: resp.answer, example: resp.example });
       } else {
@@ -469,8 +470,13 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         <p className="text-base text-slate-400">Translate, ask follow-ups, and learn {currentLang.name} naturally</p>
       </div>
       <div className="p-4 space-y-4">
+        {/* Mode toggle */}
+        <div className="flex gap-1 bg-slate-800/60 p-1 rounded-lg">
+          <button onClick={() => setAiMode('translate')} className={`flex-1 py-1.5 text-sm rounded-md transition ${aiMode === 'translate' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}>🗣️ Translate</button>
+          <button onClick={() => setAiMode('grammar')} className={`flex-1 py-1.5 text-sm rounded-md transition ${aiMode === 'grammar' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}>📐 Grammar</button>
+        </div>
         <div className="flex gap-2">
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAsk()} placeholder="Translate or ask grammar..." className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition" disabled={loading} />
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAsk()} placeholder={aiMode === 'grammar' ? 'e.g., how to use は? / why に not で?' : 'e.g., I want to split the bill'} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition" disabled={loading} />
           <button onClick={handleAsk} disabled={loading || !query.trim()} className="bg-sakura-500/80 text-white px-4 py-3 rounded-xl text-base font-medium disabled:opacity-30 active:bg-sakura-600 transition shrink-0">{loading ? '...' : 'Ask'}</button>
         </div>
 
