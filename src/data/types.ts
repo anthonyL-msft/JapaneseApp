@@ -39,10 +39,10 @@ export type Category =
   | 'drinks'
   | 'shopping'
   | 'directions'
-  | 'emergency'
   | 'smalltalk'
   | 'culture'
   | 'local'
+  | 'emergency'
   | 'vocab';
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; labelTC: string }> = {
@@ -52,13 +52,13 @@ export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; lab
   hotel:      { label: 'Hotel',                   emoji: '🏨', labelTC: '飯店住宿' },
   restaurant: { label: 'Restaurant',               emoji: '🍜', labelTC: '餐廳用餐' },
   food:       { label: 'Food',                      emoji: '🍱', labelTC: '食物' },
-  drinks:     { label: 'Drinks & Table',            emoji: '🍵', labelTC: '飲品與餐具' },
+  drinks:     { label: 'Drinks',                    emoji: '🍵', labelTC: '飲品' },
   shopping:   { label: 'Shopping',                emoji: '🛍️', labelTC: '購物' },
   directions: { label: 'Directions & Navigation', emoji: '🗺️', labelTC: '問路與導航' },
-  emergency:  { label: 'Emergency & Health',      emoji: '🚑', labelTC: '緊急與醫療' },
   smalltalk:  { label: 'Small Talk & Politeness', emoji: '💬', labelTC: '閒聊與禮貌' },
   culture:    { label: 'Culture Tips',            emoji: '⛩️', labelTC: '文化禮儀' },
   local:      { label: 'Local Specials',          emoji: '📍', labelTC: '當地特色' },
+  emergency:  { label: 'Emergency & Health',      emoji: '🚑', labelTC: '緊急與醫療' },
   vocab:      { label: 'Vocabulary',              emoji: '🔤', labelTC: '基本單字' },
 };
 
