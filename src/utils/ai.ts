@@ -134,6 +134,10 @@ export interface FollowUpMessage {
   content: string;
 }
 
+export interface FollowUpExplanation {
+  answer: string;
+}
+
 /** Send a follow-up question about a previously translated phrase */
 export async function askFollowUp(
   originalPhrase: AIPhrase,
@@ -209,6 +213,98 @@ Respond ONLY with valid JSON. No markdown, no explanation.`;
   }
 
   return parseAIResponse(content);
+}
+
+/** Answer grammar/usage follow-up questions without forcing a new translated phrase */
+export async function askFollowUpExplain(
+  originalPhrase: AIPhrase,
+  followUpQuery: string,
+  lang: string,
+  explainLang: string = 'en',
+  tutorMode: string = 'teacher',
+): Promise<FollowUpExplanation> {
+  if (!isAIConfigured()) {
+    throw new Error('AI not configured.');
+  }
+
+  const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
+
+  const teacherRules = tutorMode === 'teacher'
+    ? `
+Teaching style requirements:
+- Start with a direct answer in the first sentence (for yes/no questions, begin with Yes or No).
+- Then explain why in 1-2 short sentences.
+- End with one short practical example if helpful.
+- Do not answer with only an alternative phrase; always answer the actual question first.`
+    : '';
+
+  const systemPrompt = `You are a travel language tutor. The user asks a grammar/meaning/word-choice question about an existing ${langName} phrase.
+
+Return a valid JSON object only:
+{ "answer": "..." }
+
+Rules:
+- "answer" must directly answer the user question.
+- Keep it concise and practical for a beginner traveler.
+- If useful, include a very short example sentence inline in the answer text.
+- Do NOT return phrase fields like target/pronunciation unless naturally embedded as plain text in the answer.
+- Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'} for the answer.
+${teacherRules}`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Original phrase: ${originalPhrase.target} (${originalPhrase.pronunciation}) = "${originalPhrase.english}"` },
+    { role: 'user', content: followUpQuery },
+  ];
+
+  const url = `${ENDPOINT}/openai/deployments/${DEPLOYMENT}/chat/completions?api-version=${API_VERSION}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': API_KEY,
+    },
+    body: JSON.stringify({
+      messages,
+      temperature: 0.3,
+      max_tokens: 350,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`AI request failed: ${response.status} ${err}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content?.trim();
+  if (!content) throw new Error('Empty response from AI');
+
+  const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed: Record<string, unknown> | null = null;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch {
+    const objMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (objMatch) {
+      try {
+        parsed = JSON.parse(objMatch[0]);
+      } catch {
+        parsed = null;
+      }
+    }
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    return { answer: content };
+  }
+
+  const answer = safeStr(parsed.answer).trim();
+  if (!answer) {
+    return { answer: content };
+  }
+  return { answer };
 }
 
 /** Send a follow-up that expects multiple phrase examples back */

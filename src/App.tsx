@@ -34,10 +34,16 @@ function App() {
   const [savedAIPhrases, setSavedAIPhrases] = useState<SavedAIPhrase[]>([]);
   const [askMorePhrase, setAskMorePhrase] = useState<{ target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null>(null);
   const [aiExplainLang, setAiExplainLang] = useState(() => localStorage.getItem('aiExplainLang') || 'en');
+  const [aiTutorMode, setAiTutorMode] = useState(() => localStorage.getItem('aiTutorMode') || 'teacher');
 
   const handleAiExplainLangChange = useCallback((newLang: string) => {
     setAiExplainLang(newLang);
     localStorage.setItem('aiExplainLang', newLang);
+  }, []);
+
+  const handleAiTutorModeChange = useCallback((newMode: string) => {
+    setAiTutorMode(newMode);
+    localStorage.setItem('aiTutorMode', newMode);
   }, []);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
@@ -189,11 +195,11 @@ function App() {
         )}
         {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); setTab('ai'); }} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
-        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} />}
+        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} />}
         {tab === 'builder' && <SentenceBuilder />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
-        {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} />}
+        {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} aiTutorMode={aiTutorMode} onAiTutorModeChange={handleAiTutorModeChange} />}
         {tab === 'converter' && (
           <div className="scroll-area h-full">
             <div className="px-4 py-3 border-b border-slate-800">

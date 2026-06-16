@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { askHowToSay, askFollowUp, askFollowUpMulti, askBreakdown, isAIConfigured } from '../utils/ai';
+import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
@@ -44,6 +44,7 @@ interface Props {
   askMorePhrase?: { target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null;
   onClearAskMore?: () => void;
   aiExplainLang?: string;
+  aiTutorMode?: string;
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
@@ -69,6 +70,73 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function toHepburnFromKana(term: string): string | null {
+  const units = markLengtheners(breakdownKana(term));
+  const hasReadable = units.some(u => !!u.romaji);
+  if (!hasReadable) return null;
+
+  // If token contains kanji/non-kana only chars with no reading map, skip clickable reading.
+  const hasUnmappedSymbol = units.some(u => !u.isSpace && !u.romaji && /[\u3400-\u9FFF々]/.test(u.char));
+  if (hasUnmappedSymbol) return null;
+
+  const parts = units
+    .filter(u => !u.isSpace && !!u.romaji)
+    .map(u => (u.romaji === '–' ? '-' : u.romaji));
+
+  if (parts.length === 0) return null;
+  return parts.join(' ');
+}
+
+function ExplanationBubble({ text }: { text: string }) {
+  const [activeTerm, setActiveTerm] = useState<string | null>(null);
+  const parts = text.split(/(「[^」]+」|『[^』]+』|“[^”]+”|"[^"]+")/g).filter(Boolean);
+
+  const parseQuoted = (part: string): { inner: string; raw: string } | null => {
+    let m = part.match(/^「([^」]+)」$/);
+    if (m) return { inner: m[1], raw: part };
+    m = part.match(/^『([^』]+)』$/);
+    if (m) return { inner: m[1], raw: part };
+    m = part.match(/^“([^”]+)”$/);
+    if (m) return { inner: m[1], raw: part };
+    m = part.match(/^"([^"]+)"$/);
+    if (m) return { inner: m[1], raw: part };
+    return null;
+  };
+
+  return (
+    <div className="bg-slate-800 rounded-2xl rounded-tl-sm px-3 py-2 space-y-2">
+      <p className="text-base text-slate-200 whitespace-pre-wrap leading-relaxed">
+        {parts.map((part, i) => {
+          const quoted = parseQuoted(part);
+          if (!quoted) return <span key={i}>{part}</span>;
+          const inner = quoted.inner;
+          const hepburn = toHepburnFromKana(inner);
+          if (!hepburn) return <span key={i}>{quoted.raw}</span>;
+
+          const isActive = activeTerm === inner;
+          return (
+            <button
+              key={i}
+              onClick={() => setActiveTerm(prev => (prev === inner ? null : inner))}
+              className={`inline rounded-md px-1 py-0.5 mx-0.5 transition ${isActive ? 'bg-indigo-700/40 text-indigo-200' : 'bg-indigo-900/20 text-indigo-300 active:bg-indigo-800/40'}`}
+              title="Tap to show Hepburn"
+              type="button"
+            >
+              {quoted.raw}
+            </button>
+          );
+        })}
+      </p>
+      {activeTerm && (
+        <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg px-2.5 py-1.5">
+          <p className="text-xs text-slate-500">Hepburn</p>
+          <p className="text-sm text-indigo-200 font-mono">{toHepburnFromKana(activeTerm)}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -157,7 +225,25 @@ const THREADS_KEY = 'ai_threads';
 const MAX_HISTORY = 10;
 const MAX_THREADS = 5;
 
-type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; error?: string };
+type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; explanation?: string; error?: string };
+
+function isExplanationQuestion(q: string): boolean {
+  const text = q.toLowerCase();
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  return /why|difference|grammar|particle|what\s+does|part\s+of\s+speech|word class|usage/.test(normalized)
+    || /\bcan\s+i\s+use\s+(this|it|that)\b/.test(normalized)
+    || /\b(is|are|can|should|do|does)\b.*\b(this|it|that)\b/.test(normalized)
+    || /\bwhen\s+(do|can|should)\s+i\s+use\s+(this|it|that)\b/.test(normalized)
+    || /\buse\s+(this|it|that)\s+for\b/.test(normalized)
+    || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|用法|可以用在|能用在|什麼時候用|適合用在/.test(q);
+}
+
+function getThreadKey(phrase: AIPhrase): string {
+  const target = phrase.target.trim().toLowerCase();
+  const pron = phrase.pronunciation.trim().toLowerCase();
+  const en = phrase.english.trim().toLowerCase();
+  return `${target}||${pron}||${en}`;
+}
 
 function loadHistory(): AIPhrase[] {
   try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
@@ -167,17 +253,19 @@ function saveHistory(history: AIPhrase[]) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
 }
 
-function loadThread(target: string): FollowUpResult[] {
+function loadThread(threadKey: string, legacyTarget?: string): FollowUpResult[] {
   try {
     const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
-    return threads[target] || [];
+    if (threads[threadKey]) return threads[threadKey];
+    if (legacyTarget && threads[legacyTarget]) return threads[legacyTarget];
+    return [];
   } catch { return []; }
 }
 
-function saveThread(target: string, results: FollowUpResult[]) {
+function saveThread(threadKey: string, results: FollowUpResult[]) {
   try {
     const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
-    threads[target] = results;
+    threads[threadKey] = results;
     // Cap at MAX_THREADS — keep most recent
     const keys = Object.keys(threads);
     if (keys.length > MAX_THREADS) {
@@ -187,15 +275,16 @@ function saveThread(target: string, results: FollowUpResult[]) {
   } catch { /* ignore */ }
 }
 
-function clearThread(target: string) {
+function clearThread(threadKey: string, legacyTarget?: string) {
   try {
     const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
-    delete threads[target];
+    delete threads[threadKey];
+    if (legacyTarget) delete threads[legacyTarget];
     localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
   } catch { /* ignore */ }
 }
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en' }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher' }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
   const [loading, setLoading] = useState(false);
@@ -223,8 +312,9 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         chinese_tc: '',
         notes: '',
       };
+      const threadKey = getThreadKey(phrase);
       setFollowUpPhrase(phrase);
-      setFollowUpResults(loadThread(phrase.target));
+      setFollowUpResults(loadThread(threadKey, phrase.target));
       setFollowUpHistory([]);
       setFollowUpQuery('');
       setFollowUpOpen(true);
@@ -261,8 +351,9 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   }, [lang, onSaveAIPhrase, onDeleteAIPhrase, savedAIPhrases]);
 
   const openFollowUp = (phrase: AIPhrase) => {
+    const threadKey = getThreadKey(phrase);
     setFollowUpPhrase(phrase);
-    setFollowUpResults(loadThread(phrase.target));
+    setFollowUpResults(loadThread(threadKey, phrase.target));
     setFollowUpHistory([]);
     setFollowUpQuery('');
     setFollowUpOpen(true);
@@ -281,9 +372,16 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         const responses = await askFollowUpMulti(followUpPhrase, q, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
       } else {
-        const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang, aiExplainLang);
-        setFollowUpResults(prev => [...prev, { query: displayQuery, phrase: response }]);
-        setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: JSON.stringify(response) }]);
+        const shouldExplain = aiTutorMode === 'teacher' ? isExplanationQuestion(q) || q.includes('?') : isExplanationQuestion(q);
+        if (shouldExplain) {
+          const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
+          setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer }]);
+          setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: explanation.answer }]);
+        } else {
+          const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang, aiExplainLang);
+          setFollowUpResults(prev => [...prev, { query: displayQuery, phrase: response }]);
+          setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: JSON.stringify(response) }]);
+        }
       }
     } catch (err) {
       setFollowUpResults(prev => [...prev, { query: displayQuery, error: err instanceof Error ? err.message : 'Error' }]);
@@ -293,7 +391,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   // Persist follow-up thread to localStorage whenever results change
   useEffect(() => {
     if (followUpPhrase && followUpResults.length > 0) {
-      saveThread(followUpPhrase.target, followUpResults);
+      saveThread(getThreadKey(followUpPhrase), followUpResults);
     }
   }, [followUpResults, followUpPhrase]);
 
@@ -370,7 +468,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       </div>
 
       {showBig && (
-        <div onClick={() => setShowBig(null)} className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer">
+        <div onClick={() => setShowBig(null)} className="fixed inset-0 z-[90] bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer">
           <p className="text-4xl font-bold text-white text-center leading-relaxed">{showBig}</p>
           <p className="text-lg text-sakura-300 mt-4 text-center">{result?.pronunciation_chunks || result?.pronunciation}</p>
           <button onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }} className="mt-6 text-4xl active:scale-110 transition-transform">🔊</button>
@@ -379,7 +477,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       )}
 
       {followUpOpen && followUpPhrase && (
-        <div className="fixed inset-0 z-[60] flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
+        <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
@@ -393,7 +491,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {followUpResults.length > 0 && (
-                      <button onClick={() => { setFollowUpResults([]); setFollowUpHistory([]); clearThread(followUpPhrase.target); }} className="text-sm text-slate-500 px-2 py-1 rounded-lg active:bg-slate-700 transition">Clear</button>
+                      <button onClick={() => { setFollowUpResults([]); setFollowUpHistory([]); clearThread(getThreadKey(followUpPhrase), followUpPhrase.target); }} className="text-sm text-slate-500 px-2 py-1 rounded-lg active:bg-slate-700 transition">Clear</button>
                     )}
                     <button onClick={() => setFollowUpOpen(false)} className="text-xl text-slate-400 p-2">✕</button>
                   </div>
@@ -428,6 +526,8 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     <div className="bg-red-900/30 border border-red-700/40 rounded-xl px-3 py-2"><p className="text-base text-red-300">{r.error}</p></div>
                   ) : r.blocks ? (
                     <BreakdownSection blocks={r.blocks} lang={lang} onSave={handleSave} onSpeak={handleSpeak} savedAIPhrases={savedAIPhrases} />
+                  ) : r.explanation ? (
+                    <ExplanationBubble text={r.explanation} />
                   ) : r.phrases ? (
                     <div className="space-y-1.5">
                       {r.phrases.map((p, pi) => (

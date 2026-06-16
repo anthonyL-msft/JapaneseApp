@@ -7,6 +7,8 @@ interface Props {
   onLangChange: (lang: string) => void;
   aiExplainLang: string;
   onAiExplainLangChange: (lang: string) => void;
+  aiTutorMode: string;
+  onAiTutorModeChange: (mode: string) => void;
 }
 
 const SPEED_LABELS: Record<string, string> = {
@@ -17,7 +19,7 @@ const SPEED_LABELS: Record<string, string> = {
   '1': 'Native',
 };
 
-export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangChange }: Props) {
+export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangChange, aiTutorMode, onAiTutorModeChange }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [rate, setRate] = useState(getTtsRate);
   const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains('light'));
@@ -125,6 +127,29 @@ export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangCha
               >
                 <span>{opt.label}</span>
                 {aiExplainLang === opt.code && <span className="text-sakura-400">✓</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-slate-800/60 rounded-xl p-4">
+          <p className="text-base font-semibold text-slate-300 mb-3">🧑‍🏫 AI Follow-up Style</p>
+          <p className="text-sm text-slate-500 mb-2">How AI answers your Ask more questions</p>
+          <div className="space-y-2">
+            {[
+              { code: 'teacher', label: 'Teacher', desc: 'Answer first, then explain why, then give a short example' },
+              { code: 'phrase', label: 'Phrase First', desc: 'Prioritize alternative phrase generation' },
+            ].map(opt => (
+              <button
+                key={opt.code}
+                onClick={() => onAiTutorModeChange(opt.code)}
+                className={`w-full px-3 py-2.5 rounded-lg text-left transition ${aiTutorMode === opt.code ? 'bg-sakura-500/20 text-sakura-300' : 'bg-slate-700/50 text-slate-400 active:bg-slate-700'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-base">{opt.label}</span>
+                  {aiTutorMode === opt.code && <span className="text-sakura-400">✓</span>}
+                </div>
+                <p className="text-sm text-slate-500 mt-0.5">{opt.desc}</p>
               </button>
             ))}
           </div>
