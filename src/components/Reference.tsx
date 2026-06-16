@@ -833,108 +833,160 @@ function useAccordion(keys: string[], externalToggle?: number) {
 
 function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, onAskMore }: RbProps) {
   const { openSet, toggle } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで'], toggleSignal);
+  const [pTab, setPTab] = useState<'roles' | 'place' | 'connect' | 'range'>('roles');
   return (
-    <div className="mt-2 space-y-1.5">
-      <p className="text-sm text-slate-500 font-medium px-1 pt-1">Sentence Roles</p>
-      <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
-          { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
-          { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
-        ]} />
-      <AccordionRow id="が" jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
-          { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
-          { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
-        ]} />
-      <AccordionRow id="を" jp="を" rom="wo" meaning="Object marker — marks what receives the action"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
-          { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
-          { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
-        ]} />
-      <p className="text-sm text-slate-500 font-medium px-1 pt-2">Place & Direction</p>
-      <AccordionRow id="に" jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
-          { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
-          { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'I send luggage to the hotel' },
-        ]} />
-      <AccordionRow id="で" jp="で" rom="de" meaning="Location of action / by means of"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica' },
-          { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
-          { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train' },
-        ]} />
-      <AccordionRow id="へ" jp="へ" rom="e" meaning="Towards (direction)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo' },
-          { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
-          { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'I\'m heading to the exit' },
-        ]} />
-      {/* Comparison card: に vs で vs へ */}
-      <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3 mt-2 mb-2">
-        <p className="text-sm font-semibold text-amber-400 mb-2">💡 に vs で vs へ — When to use which?</p>
-        <div className="space-y-2 text-sm">
-          <div className="bg-slate-800/50 rounded-lg p-2">
-            <p className="text-indigo-300 font-medium">に = target point (destination/goal)</p>
-            <p className="text-slate-400">Focus on WHERE you arrive. Used with movement verbs + existence.</p>
-            <p className="text-slate-300 mt-1">東京<span className="text-indigo-300">に</span>行く = Go to Tokyo <span className="text-slate-500">(Tokyo is the goal)</span></p>
+    <div className="mt-2 space-y-2">
+      {/* Tab bar */}
+      <div className="flex gap-1 bg-slate-800/60 p-1 rounded-lg">
+        {([['roles','Roles'],['place','Place'],['connect','Connect'],['range','Range']] as const).map(([id, label]) => (
+          <button key={id} onClick={() => setPTab(id)} className={`flex-1 py-1.5 text-sm rounded-md transition ${pTab === id ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}>{label}</button>
+        ))}
+      </div>
+
+      {/* Sentence Roles tab */}
+      {pTab === 'roles' && <>
+        <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3">
+          <p className="text-sm font-semibold text-amber-400 mb-1">💡 Sentence Roles — Who does what?</p>
+          <div className="text-sm text-slate-300 space-y-1">
+            <p><span className="text-indigo-300 font-medium">は</span> = topic (what you're talking about) — "Speaking of X..."</p>
+            <p><span className="text-emerald-300 font-medium">が</span> = subject (who/what does it) — "It's X that..."</p>
+            <p><span className="text-sakura-300 font-medium">を</span> = object (receives the action) — "doing Y to X"</p>
           </div>
-          <div className="bg-slate-800/50 rounded-lg p-2">
-            <p className="text-emerald-300 font-medium">へ = direction/movement toward</p>
-            <p className="text-slate-400">Focus on the JOURNEY, not arrival. Interchangeable with に for direction.</p>
-            <p className="text-slate-300 mt-1">東京<span className="text-emerald-300">へ</span>行く = Head toward Tokyo <span className="text-slate-500">(emphasizes movement)</span></p>
-          </div>
-          <div className="bg-slate-800/50 rounded-lg p-2">
-            <p className="text-sakura-300 font-medium">で = where the action happens</p>
-            <p className="text-slate-400">Place of activity. Cannot be used with movement verbs (行く/来る).</p>
-            <p className="text-slate-300 mt-1">レストラン<span className="text-sakura-300">で</span>食べる = Eat at a restaurant <span className="text-slate-500">(action location)</span></p>
-          </div>
-          <div className="bg-slate-700/30 rounded-lg p-2">
-            <p className="text-slate-400 text-xs">Key difference: 庭<span className="text-indigo-300">に</span>花を植える (plant INTO the garden) vs 庭<span className="text-sakura-300">で</span>花を植える (plant flowers IN the garden — maybe into a pot)</p>
+          <div className="mt-2 bg-slate-800/50 rounded-lg p-2">
+            <p className="text-xs text-slate-400">Quick rule: New info → が. Known/topic info → は.</p>
+            <p className="text-xs text-slate-400 mt-0.5">昔々、おじいさん<span className="text-emerald-300">が</span>いました。おじいさん<span className="text-indigo-300">は</span>山へ行きました。</p>
+            <p className="text-xs text-slate-500">(Once there WAS an old man. The old man WENT to the mountain.)</p>
           </div>
         </div>
-      </div>
-      <p className="text-sm text-slate-500 font-medium px-1 pt-2">Connecting</p>
-      <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
-          { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
-          { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
-        ]} />
-      <AccordionRow id="と" jp="と" rom="to" meaning="And, with (listing/companion)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
-          { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
-          { jp: '朝と夜、二食付きです', hep: 'a·sa to yo·ru ni·sho·ku tsu·ki de·su', en: 'Breakfast and dinner included' },
-        ]} />
-      <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
-          { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
-          { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
-        ]} />
-      <p className="text-sm text-slate-500 font-medium px-1 pt-2">Questions & Range</p>
-      <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
-          { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
-          { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
-        ]} />
-      <AccordionRow id="から" jp="から" rom="ka·ra" meaning="From (place/time)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
-          { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
-          { jp: 'ここから駅まで歩けますか？', hep: 'ko·ko ka·ra e·ki ma·de a·ru·ke·ma·su ka', en: 'Can I walk from here to the station?' },
-        ]} />
-      <AccordionRow id="まで" jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
-          { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
-          { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
-          { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
-        ]} />
+        <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
+            { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
+            { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
+          ]} />
+        <AccordionRow id="が" jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
+            { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
+            { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
+          ]} />
+        <AccordionRow id="を" jp="を" rom="wo" meaning="Object marker — marks what receives the action"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
+            { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
+            { jp: '家を出る', hep: 'ie wo de·ru', en: 'Leave the house (starting point)' },
+          ]} />
+      </>}
+
+      {/* Place & Direction tab */}
+      {pTab === 'place' && <>
+        <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3">
+          <p className="text-sm font-semibold text-amber-400 mb-1">💡 Place & Direction — Where and how?</p>
+          <div className="text-sm space-y-1.5">
+            <div className="bg-slate-800/50 rounded-lg p-2">
+              <p className="text-indigo-300 font-medium">に = target point (destination/goal)</p>
+              <p className="text-slate-400 text-xs">Focus on WHERE you arrive. Also: time, existence (ある/いる).</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-lg p-2">
+              <p className="text-emerald-300 font-medium">へ = direction/movement toward</p>
+              <p className="text-slate-400 text-xs">Focus on the JOURNEY. Interchangeable with に for direction.</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-lg p-2">
+              <p className="text-sakura-300 font-medium">で = where the action happens</p>
+              <p className="text-slate-400 text-xs">Place of activity. ⚠️ Cannot use with movement verbs (行く/来る).</p>
+            </div>
+          </div>
+          <div className="mt-2 bg-slate-700/30 rounded-lg p-2">
+            <p className="text-xs text-slate-400">庭<span className="text-indigo-300">に</span>花を植える = plant INTO the garden</p>
+            <p className="text-xs text-slate-400">庭<span className="text-sakura-300">で</span>花を植える = plant IN the garden (maybe into a pot)</p>
+            <p className="text-xs text-slate-500 mt-1">✓ 海<span className="text-sakura-300">で</span>泳ぐ (swim in sea) ✗ 海<span className="text-indigo-300">に</span>泳ぐ</p>
+            <p className="text-xs text-slate-500">✓ 右<span className="text-indigo-300">に</span>行く (go right) ✗ 右<span className="text-sakura-300">で</span>行く</p>
+          </div>
+        </div>
+        <AccordionRow id="に" jp="に" rom="ni" meaning="Target point — to, at, in, on (destination/time/existence)"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock (time)' },
+            { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo (destination)' },
+            { jp: 'あそこに机がある', hep: 'a·so·ko ni tsu·kue ga a·ru', en: 'There\'s a desk over there (existence)' },
+            { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'Send luggage to the hotel (target)' },
+          ]} />
+        <AccordionRow id="で" jp="で" rom="de" meaning="Action location / means — at, by, with, using"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here (location of action)' },
+            { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica (means)' },
+            { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train (method)' },
+            { jp: '雪で電車が遅れる', hep: 'yu·ki de den·sha ga o·ku·re·ru', en: 'Train delayed due to snow (cause)' },
+          ]} />
+        <AccordionRow id="へ" jp="へ" rom="e" meaning="Towards — direction of movement (focus on journey)"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo (movement)' },
+            { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
+            { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'Heading to the exit' },
+          ]} />
+      </>}
+
+      {/* Connecting tab */}
+      {pTab === 'connect' && <>
+        <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3">
+          <p className="text-sm font-semibold text-amber-400 mb-1">💡 Connecting — Linking things together</p>
+          <div className="text-sm text-slate-300 space-y-1">
+            <p><span className="text-indigo-300 font-medium">の</span> = possession/connection — A's B, B of A</p>
+            <p><span className="text-emerald-300 font-medium">と</span> = and, with — listing items or companion</p>
+            <p><span className="text-sakura-300 font-medium">も</span> = also, too — adding on, inclusion</p>
+          </div>
+        </div>
+        <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
+            { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
+            { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
+          ]} />
+        <AccordionRow id="と" jp="と" rom="to" meaning="And, with (listing/companion)"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
+            { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
+            { jp: '朝と夜、二食付きです', hep: 'a·sa to yo·ru ni·sho·ku tsu·ki de·su', en: 'Breakfast and dinner included' },
+          ]} />
+        <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
+            { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
+            { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
+          ]} />
+      </>}
+
+      {/* Questions & Range tab */}
+      {pTab === 'range' && <>
+        <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3">
+          <p className="text-sm font-semibold text-amber-400 mb-1">💡 Questions & Range — Asking + limits</p>
+          <div className="text-sm text-slate-300 space-y-1">
+            <p><span className="text-indigo-300 font-medium">か</span> = question marker — add to end of any statement</p>
+            <p><span className="text-emerald-300 font-medium">から</span> = from — starting point (place or time)</p>
+            <p><span className="text-sakura-300 font-medium">まで</span> = until, to — endpoint</p>
+          </div>
+          <div className="mt-2 bg-slate-800/50 rounded-lg p-2">
+            <p className="text-xs text-slate-400">Pair them: 名古屋<span className="text-emerald-300">から</span>東京<span className="text-sakura-300">まで</span> = From Nagoya to Tokyo</p>
+          </div>
+        </div>
+        <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
+            { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
+            { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
+          ]} />
+        <AccordionRow id="から" jp="から" rom="ka·ra" meaning="From (place/time)"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
+            { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
+            { jp: 'ここから駅まで歩けますか？', hep: 'ko·ko ka·ra e·ki ma·de a·ru·ke·ma·su ka', en: 'Can I walk from here to the station?' },
+          ]} />
+        <AccordionRow id="まで" jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+            { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
+            { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
+            { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
+          ]} />
+      </>}
     </div>
   );
 }
