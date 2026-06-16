@@ -332,6 +332,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   const [grammarThread, setGrammarThread] = useState<{ question: string; answer: string; example?: AIPhrase }[]>([]);
   const [grammarFollowUpQuery, setGrammarFollowUpQuery] = useState('');
   const [grammarFollowUpLoading, setGrammarFollowUpLoading] = useState(false);
+  const [grammarDrawerOpen, setGrammarDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBig, setShowBig] = useState<string | null>(null);
@@ -382,9 +383,13 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       // Use toggle mode: grammar mode always explains, translate mode always translates
       if (aiMode === 'grammar') {
         const resp = await askGrammarQuestion(q, lang, aiExplainLang);
-        setGrammarResult({ question: q, answer: resp.answer, example: resp.example });
+        const item = { question: q, answer: resp.answer, example: resp.example };
+        setGrammarResult(item);
+        setGrammarThread([]);
+        setGrammarFollowUpQuery('');
+        setGrammarDrawerOpen(true);
         setGrammarHistory(prev => {
-          const next = [{ question: q, answer: resp.answer, example: resp.example }, ...prev.filter(h => h.question !== q).slice(0, MAX_HISTORY - 1)];
+          const next = [item, ...prev.filter(h => h.question !== q).slice(0, MAX_HISTORY - 1)];
           saveGrammarHistory(next);
           return next;
         });
@@ -544,48 +549,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
           </div>
         )}
 
-        {grammarResult && (
-          <div className="space-y-2">
-            <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-xl px-3 py-2">
-              <p className="text-xs text-indigo-400 mb-1">Grammar Q&A</p>
-              <p className="text-sm text-slate-400 italic">{grammarResult.question}</p>
-            </div>
-            <ExplanationBubble text={grammarResult.answer} example={grammarResult.example} onSpeak={handleSpeak} />
-
-            {/* Grammar follow-up thread */}
-            {grammarThread.map((t, i) => (
-              <div key={i} className="space-y-2">
-                <div className="flex justify-end">
-                  <div className="bg-indigo-900/60 rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-                    <p className="text-base text-slate-200">{t.question}</p>
-                  </div>
-                </div>
-                <ExplanationBubble text={t.answer} example={t.example} onSpeak={handleSpeak} />
-              </div>
-            ))}
-
-            {grammarFollowUpLoading && (
-              <div className="flex justify-start">
-                <div className="bg-slate-800 rounded-2xl rounded-tl-sm px-4 py-3">
-                  <span className="text-sm text-slate-400 animate-pulse">Thinking...</span>
-                </div>
-              </div>
-            )}
-
-            {/* Follow-up input */}
-            <div className="space-y-2 pt-1">
-              <div className="flex flex-wrap gap-1.5">
-                {['Give me more examples', 'Compare with が', 'When NOT to use it?'].map(chip => (
-                  <button key={chip} onClick={() => handleGrammarFollowUp(chip)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip}</button>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input type="text" value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up..." className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition" disabled={grammarFollowUpLoading} />
-                <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 py-2.5">Ask</button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Grammar results shown in drawer below */}
 
         {aiMode === 'translate' && history.length > 0 && (
           <div>
@@ -610,7 +574,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
             <h3 className="text-base text-slate-500 mb-2">History</h3>
             <div className="space-y-1.5">
               {grammarHistory.map((h, i) => (
-                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 cursor-pointer active:bg-slate-700/50 transition" onClick={() => setGrammarResult(h)}>
+                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 cursor-pointer active:bg-slate-700/50 transition" onClick={() => { setGrammarResult(h); setGrammarThread([]); setGrammarFollowUpQuery(''); setGrammarDrawerOpen(true); }}>
                   <p className="text-base text-slate-200 truncate">{h.question}</p>
                   <p className="text-base text-slate-500 truncate">{h.answer.slice(0, 60)}...</p>
                 </div>
@@ -718,6 +682,60 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                 {FOLLOW_UP_CHIPS.map(chip => (
                   <button key={chip.label} onClick={() => handleFollowUp(chip.prompt || undefined, chip.mode)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {grammarDrawerOpen && grammarResult && createPortal(
+        <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={() => setGrammarDrawerOpen(false)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
+            <div className="shrink-0">
+              <div className="flex justify-center pt-2 pb-1"><div className="w-10 h-1 rounded-full bg-slate-600" /></div>
+              <div className="px-4 pb-3 border-b border-slate-700/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-indigo-400">Grammar Q&A</p>
+                    <p className="text-base font-semibold text-slate-100 truncate">{grammarResult.question}</p>
+                  </div>
+                  <button onClick={() => setGrammarDrawerOpen(false)} className="text-xl text-slate-400 p-2">✕</button>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <ExplanationBubble text={grammarResult.answer} example={grammarResult.example} onSpeak={handleSpeak} />
+
+              {grammarThread.map((t, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex justify-end">
+                    <div className="bg-indigo-900/60 rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%]">
+                      <p className="text-base text-slate-200">{t.question}</p>
+                    </div>
+                  </div>
+                  <ExplanationBubble text={t.answer} example={t.example} onSpeak={handleSpeak} />
+                </div>
+              ))}
+
+              {grammarFollowUpLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-slate-800 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <span className="text-sm text-slate-400 animate-pulse">Thinking...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="shrink-0 px-4 pt-3 pb-2 border-t border-slate-700/50 space-y-2">
+              <div className="flex flex-wrap gap-1.5">
+                {['More examples', 'Compare with が', 'When NOT to use?'].map(chip => (
+                  <button key={chip} onClick={() => handleGrammarFollowUp(chip)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip}</button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <textarea value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up..." rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={grammarFollowUpLoading} />
+                <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
               </div>
             </div>
           </div>
