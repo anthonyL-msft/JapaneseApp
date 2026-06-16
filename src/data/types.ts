@@ -32,6 +32,7 @@ export const LANGUAGES: LanguageConfig[] = [
 export type Category =
   | 'greetings'
   | 'basics'
+  | 'vocab'
   | 'airport'
   | 'hotel'
   | 'restaurant'
@@ -45,7 +46,8 @@ export type Category =
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; labelTC: string }> = {
   greetings:  { label: 'Greetings',              emoji: '👋', labelTC: '問候用語' },
-  basics:     { label: 'Basics & Vocab',          emoji: '🔤', labelTC: '基本單字與用語' },
+  basics:     { label: 'Basics',                  emoji: '🗣️', labelTC: '基本用語' },
+  vocab:      { label: 'Vocabulary',              emoji: '🔤', labelTC: '基本單字' },
   airport:    { label: 'Airport & Transit',       emoji: '✈️', labelTC: '機場與交通' },
   hotel:      { label: 'Hotel',                   emoji: '🏨', labelTC: '飯店住宿' },
   restaurant: { label: 'Restaurant',               emoji: '🍜', labelTC: '餐廳用餐' },
