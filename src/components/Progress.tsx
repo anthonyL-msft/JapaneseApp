@@ -114,24 +114,36 @@ export function Progress({ phrases, learnedItems }: Props) {
         {/* Per-category breakdown */}
         <div className="bg-slate-800/60 rounded-xl p-3">
           <p className="text-base text-slate-300 mb-3">By Category</p>
-          <div className="space-y-3">
-            {categoryStats.map(s => {
-              const pct = s.total > 0 ? Math.round((s.learned / s.total) * 100) : 0;
-              return (
-                <div key={s.cat}>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-base text-slate-400">{s.emoji} {s.label}</span>
-                    <span className="text-sm text-slate-500">{s.learned}/{s.total}</span>
-                  </div>
-                  <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : pct > 0 ? 'bg-sakura-400' : 'bg-slate-600'}`}
-                      style={{ width: `${Math.max(pct, 0)}%` }}
-                    />
-                  </div>
+          <div className="space-y-4">
+            {[
+              { title: 'Getting Started', cats: ['greetings', 'basics', 'smalltalk', 'vocab'] },
+              { title: 'Travel', cats: ['airport', 'directions', 'hotel'] },
+              { title: 'Food & Shopping', cats: ['restaurant', 'food', 'drinks', 'shopping'] },
+              { title: 'Culture & Safety', cats: ['culture', 'local', 'emergency'] },
+            ].map(group => (
+              <div key={group.title}>
+                <p className="text-sm text-slate-500 mb-1.5">{group.title}</p>
+                <div className="space-y-2.5">
+                  {categoryStats.filter(s => group.cats.includes(s.cat)).map(s => {
+                    const pct = s.total > 0 ? Math.round((s.learned / s.total) * 100) : 0;
+                    return (
+                      <div key={s.cat}>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-base text-slate-400">{s.emoji} {s.label}</span>
+                          <span className="text-sm text-slate-500">{s.learned}/{s.total}</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : pct > 0 ? 'bg-sakura-400' : 'bg-slate-600'}`}
+                            style={{ width: `${Math.max(pct, 0)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
 
