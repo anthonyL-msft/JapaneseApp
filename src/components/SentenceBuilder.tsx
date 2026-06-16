@@ -107,9 +107,9 @@ const PATTERNS: Pattern[] = [
     build: (v) => ({ jp: `${v.jp}は何時ですか？`, rom: `${v.rom} wa nan·ji de·su ka`, en: `What time is ${v.en.toLowerCase()}?` }),
   },
   {
-    id: 'ni-ikitai', group: 'want', template: '○○に○○に行きたいです', templateRom: '○○ ni ○○ ni i·ki·tai de·su',
-    meaning: 'I want to go to ○○ at [time]', slotType: 'place', slotLabel: 'Where do you want to go?',
-    build: (v) => ({ jp: `${v.jp}に行きたいです`, rom: `${v.rom} ni i·ki·tai de·su`, en: `I want to go to ${v.en.toLowerCase()}` }),
+    id: 'made', group: 'question', template: '○○は何時までですか？', templateRom: '○○ wa nan·ji ma·de de·su ka',
+    meaning: 'Until what time is ○○?', slotType: 'time', slotLabel: 'What closes/ends?',
+    build: (v) => ({ jp: `${v.jp}は何時までですか？`, rom: `${v.rom} wa nan·ji ma·de de·su ka`, en: `Until what time is ${v.en.toLowerCase()}?` }),
   },
 ];
 
