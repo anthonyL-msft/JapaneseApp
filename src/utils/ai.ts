@@ -136,6 +136,7 @@ export interface FollowUpMessage {
 
 export interface FollowUpExplanation {
   answer: string;
+  example?: AIPhrase;
 }
 
 /** Send a follow-up question about a previously translated phrase */
@@ -240,15 +241,17 @@ Teaching style requirements:
 
   const systemPrompt = `You are a travel language tutor. The user asks a grammar/meaning/word-choice question about an existing ${langName} phrase.
 
-Return a valid JSON object only:
-{ "answer": "..." }
+Return a valid JSON object:
+{
+  "answer": "direct answer to the question",
+  "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "English translation" }
+}
 
 Rules:
-- "answer" must directly answer the user question.
+- "answer" must directly answer the user question. Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'}.
 - Keep it concise and practical for a beginner traveler.
-- If useful, include a very short example sentence inline in the answer text.
-- Do NOT return phrase fields like target/pronunciation unless naturally embedded as plain text in the answer.
-- Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'} for the answer.
+- "example" is OPTIONAL — include it only when a practical example sentence would help illustrate the answer. Omit "example" entirely if the answer is self-explanatory.
+- For ${langName === 'Japanese' ? '"romanization" must be the hiragana reading. "pronunciation" must be romaji with spaces between words.' : '"pronunciation" must be phonetic guide.'}
 ${teacherRules}`;
 
   const messages = [
@@ -304,7 +307,105 @@ ${teacherRules}`;
   if (!answer) {
     return { answer: content };
   }
-  return { answer };
+
+  // Parse optional example phrase
+  let example: AIPhrase | undefined;
+  if (parsed.example && typeof parsed.example === 'object') {
+    const ex = parsed.example as Record<string, unknown>;
+    if (ex.target) {
+      example = {
+        target: safeStr(ex.target),
+        romanization: ex.romanization ? safeStr(ex.romanization) : undefined,
+        pronunciation: safeStr(ex.pronunciation),
+        pronunciation_chunks: safeStr(ex.pronunciation_chunks),
+        english: safeStr(ex.english),
+        chinese_tc: safeStr(ex.chinese_tc),
+        notes: safeStr(ex.notes),
+      };
+    }
+  }
+
+  return { answer, example };
+}
+
+/** Answer a standalone grammar question without needing a specific phrase */
+export async function askGrammarQuestion(
+  question: string,
+  lang: string,
+  explainLang: string = 'en',
+): Promise<FollowUpExplanation> {
+  if (!isAIConfigured()) {
+    throw new Error('AI not configured.');
+  }
+
+  const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
+
+  const systemPrompt = `You are a travel language tutor for ${langName}. The user asks a grammar, structure, or usage question. They may ask in English, Chinese, or ${langName}.
+
+Return a valid JSON object:
+{
+  "answer": "direct answer explaining the grammar point",
+  "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "English translation" }
+}
+
+Rules:
+- "answer" must directly answer the question. Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'}.
+- Keep it concise and practical for a beginner traveler.
+- "example" is OPTIONAL — include when a practical example illustrates the answer.
+- For Japanese: "romanization" = hiragana reading, "pronunciation" = romaji with spaces between words.
+- Start with a direct answer. Then explain why in 1-2 sentences. End with the example if helpful.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: question },
+  ];
+
+  const url = `${ENDPOINT}/openai/deployments/${DEPLOYMENT}/chat/completions?api-version=${API_VERSION}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
+    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 400 }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`AI request failed: ${response.status} ${err}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content?.trim();
+  if (!content) throw new Error('Empty response from AI');
+
+  const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed: Record<string, unknown> | null = null;
+  try { parsed = JSON.parse(jsonStr); } catch {
+    const objMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (objMatch) { try { parsed = JSON.parse(objMatch[0]); } catch { parsed = null; } }
+  }
+
+  if (!parsed || typeof parsed !== 'object') return { answer: content };
+
+  const answer = safeStr(parsed.answer).trim();
+  if (!answer) return { answer: content };
+
+  let example: AIPhrase | undefined;
+  if (parsed.example && typeof parsed.example === 'object') {
+    const ex = parsed.example as Record<string, unknown>;
+    if (ex.target) {
+      example = {
+        target: safeStr(ex.target),
+        romanization: ex.romanization ? safeStr(ex.romanization) : undefined,
+        pronunciation: safeStr(ex.pronunciation),
+        pronunciation_chunks: safeStr(ex.pronunciation_chunks),
+        english: safeStr(ex.english),
+        chinese_tc: safeStr(ex.chinese_tc),
+        notes: safeStr(ex.notes),
+      };
+    }
+  }
+
+  return { answer, example };
 }
 
 /** Send a follow-up that expects multiple phrase examples back */

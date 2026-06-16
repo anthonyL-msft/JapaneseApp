@@ -871,6 +871,30 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
           { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'I\'m heading to the exit' },
         ]} />
+      {/* Comparison card: に vs で vs へ */}
+      <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3 mt-2 mb-2">
+        <p className="text-sm font-semibold text-amber-400 mb-2">💡 に vs で vs へ — When to use which?</p>
+        <div className="space-y-2 text-sm">
+          <div className="bg-slate-800/50 rounded-lg p-2">
+            <p className="text-indigo-300 font-medium">に = target point (destination/goal)</p>
+            <p className="text-slate-400">Focus on WHERE you arrive. Used with movement verbs + existence.</p>
+            <p className="text-slate-300 mt-1">東京<span className="text-indigo-300">に</span>行く = Go to Tokyo <span className="text-slate-500">(Tokyo is the goal)</span></p>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-2">
+            <p className="text-emerald-300 font-medium">へ = direction/movement toward</p>
+            <p className="text-slate-400">Focus on the JOURNEY, not arrival. Interchangeable with に for direction.</p>
+            <p className="text-slate-300 mt-1">東京<span className="text-emerald-300">へ</span>行く = Head toward Tokyo <span className="text-slate-500">(emphasizes movement)</span></p>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-2">
+            <p className="text-sakura-300 font-medium">で = where the action happens</p>
+            <p className="text-slate-400">Place of activity. Cannot be used with movement verbs (行く/来る).</p>
+            <p className="text-slate-300 mt-1">レストラン<span className="text-sakura-300">で</span>食べる = Eat at a restaurant <span className="text-slate-500">(action location)</span></p>
+          </div>
+          <div className="bg-slate-700/30 rounded-lg p-2">
+            <p className="text-slate-400 text-xs">Key difference: 庭<span className="text-indigo-300">に</span>花を植える (plant INTO the garden) vs 庭<span className="text-sakura-300">で</span>花を植える (plant flowers IN the garden — maybe into a pot)</p>
+          </div>
+        </div>
+      </div>
       <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
           { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },

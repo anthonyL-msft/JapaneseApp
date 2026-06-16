@@ -33,6 +33,7 @@ function App() {
   const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
   const [savedAIPhrases, setSavedAIPhrases] = useState<SavedAIPhrase[]>([]);
   const [askMorePhrase, setAskMorePhrase] = useState<{ target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null>(null);
+  const [previousTab, setPreviousTab] = useState<Tab | null>(null);
   const [aiExplainLang, setAiExplainLang] = useState(() => localStorage.getItem('aiExplainLang') || 'en');
   const [aiTutorMode, setAiTutorMode] = useState(() => localStorage.getItem('aiTutorMode') || 'teacher');
 
@@ -169,6 +170,7 @@ function App() {
             onToggleLearned={toggleLearned}
             onAskMore={(phrase) => {
               setAskMorePhrase({ target: phrase.target, pronunciation: phrase.pronunciation, pronunciation_chunks: phrase.pronunciation_chunks || phrase.pronunciation, english: phrase.english });
+              setPreviousTab(tab);
               setTab('ai');
             }}
           />
@@ -193,11 +195,12 @@ function App() {
             search={search}
           />
         )}
-        {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); setTab('ai'); }} />}
+        {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); setPreviousTab(tab); setTab('ai'); }} />}
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
-        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} />}
+        {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} onGoBack={previousTab ? () => { setTab(previousTab); setPreviousTab(null); } : undefined} />}
         {tab === 'builder' && <SentenceBuilder onAskMore={(phrase) => {
               setAskMorePhrase({ target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ''), pronunciation_chunks: phrase.rom, english: phrase.en });
+              setPreviousTab(tab);
               setTab('ai');
             }} onSave={(phrase) => {
               const id = `ai_${Date.now()}`;

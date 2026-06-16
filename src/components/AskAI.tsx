@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, isAIConfigured } from '../utils/ai';
+import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, askGrammarQuestion, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
@@ -46,6 +46,7 @@ interface Props {
   onClearAskMore?: () => void;
   aiExplainLang?: string;
   aiTutorMode?: string;
+  onGoBack?: () => void;
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
@@ -92,7 +93,7 @@ function toHepburnFromKana(term: string): string | null {
   return parts.join(' ');
 }
 
-function ExplanationBubble({ text }: { text: string }) {
+function ExplanationBubble({ text, example, onSpeak }: { text: string; example?: AIPhrase; onSpeak?: (text: string) => void }) {
   const [activeTerm, setActiveTerm] = useState<string | null>(null);
   const parts = text.split(/(「[^」]+」|『[^』]+』|“[^”]+”|"[^"]+")/g).filter(Boolean);
 
@@ -136,6 +137,18 @@ function ExplanationBubble({ text }: { text: string }) {
         <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg px-2.5 py-1.5">
           <p className="text-xs text-slate-500">Hepburn</p>
           <p className="text-sm text-indigo-200 font-mono">{toHepburnFromKana(activeTerm)}</p>
+        </div>
+      )}
+      {example && (
+        <div className="bg-slate-700/40 rounded-lg p-2.5 mt-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-medium text-slate-100">{example.target}</p>
+              <p className="text-sm text-sakura-300">{example.pronunciation}</p>
+              <p className="text-sm text-slate-400">{example.english}</p>
+            </div>
+            {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-base shrink-0">🔊</button>}
+          </div>
         </div>
       )}
     </div>
@@ -227,7 +240,7 @@ const THREADS_KEY = 'ai_threads';
 const MAX_HISTORY = 10;
 const MAX_THREADS = 5;
 
-type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; explanation?: string; error?: string };
+type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; explanation?: string; explanationExample?: AIPhrase; error?: string };
 
 function isExplanationQuestion(q: string): boolean {
   const text = q.toLowerCase();
@@ -298,9 +311,10 @@ function clearThread(threadKey: string, legacyTarget?: string) {
   } catch { /* ignore */ }
 }
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher' }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher', onGoBack }: Props) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AIPhrase | null>(null);
+  const [grammarResult, setGrammarResult] = useState<{ question: string; answer: string; example?: AIPhrase } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBig, setShowBig] = useState<string | null>(null);
@@ -332,21 +346,34 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       setFollowUpHistory([]);
       setFollowUpQuery('');
       setFollowUpOpen(true);
+      // Save to history so it appears in Recent Translations
+      setHistory(prev => {
+        const next = [phrase, ...prev.filter(h => h.target !== phrase.target).slice(0, MAX_HISTORY - 1)];
+        saveHistory(next);
+        return next;
+      });
       onClearAskMore?.();
     }
   }, [askMorePhrase, onClearAskMore]);
 
   const handleAsk = async () => {
     if (!query.trim() || loading) return;
-    setLoading(true); setError(null); setResult(null);
+    setLoading(true); setError(null); setResult(null); setGrammarResult(null);
+    const q = query.trim();
     try {
-      const phrase = await askHowToSay(query.trim(), lang, aiExplainLang);
-      setResult(phrase);
-      setHistory(prev => {
-        const next = [phrase, ...prev.filter(h => h.target !== phrase.target).slice(0, MAX_HISTORY - 1)];
-        saveHistory(next);
-        return next;
-      });
+      // Auto-detect: if user asks a grammar/structure question, use grammar Q&A
+      if (isExplanationQuestion(q)) {
+        const resp = await askGrammarQuestion(q, lang, aiExplainLang);
+        setGrammarResult({ question: q, answer: resp.answer, example: resp.example });
+      } else {
+        const phrase = await askHowToSay(q, lang, aiExplainLang);
+        setResult(phrase);
+        setHistory(prev => {
+          const next = [phrase, ...prev.filter(h => h.target !== phrase.target).slice(0, MAX_HISTORY - 1)];
+          saveHistory(next);
+          return next;
+        });
+      }
     } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong'); }
     finally { setLoading(false); }
   };
@@ -363,6 +390,11 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       onSaveAIPhrase({ id, lang, target: phrase.target, romanization: phrase.romanization, pronunciation: phrase.pronunciation, pronunciation_chunks: phrase.pronunciation_chunks, english: phrase.english, chinese_tc: phrase.chinese_tc, notes: phrase.notes, native_hint: phrase.native_hint, query: originalQuery, createdAt: Date.now() });
     }
   }, [lang, onSaveAIPhrase, onDeleteAIPhrase, savedAIPhrases]);
+
+  const closeFollowUpDrawer = useCallback(() => {
+    setFollowUpOpen(false);
+    if (onGoBack) onGoBack();
+  }, [onGoBack]);
 
   const openFollowUp = (phrase: AIPhrase) => {
     const threadKey = getThreadKey(phrase);
@@ -389,14 +421,14 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       } else if (mode === 'explain') {
         // Explicit explanation mode (from chip or forced)
         const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
-        setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer }]);
+        setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer, explanationExample: explanation.example }]);
         setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: explanation.answer }]);
       } else {
         // Chips always generate phrases; textbox uses intent detection
         const shouldExplain = !isFromChip && isExplanationQuestion(q);
         if (shouldExplain) {
           const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
-          setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer }]);
+          setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer, explanationExample: explanation.example }]);
           setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: explanation.answer }]);
         } else {
           const response = await askFollowUp(followUpPhrase, q, followUpHistory, lang, aiExplainLang);
@@ -436,7 +468,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       </div>
       <div className="p-4 space-y-4">
         <div className="flex gap-2">
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAsk()} placeholder="e.g., I want to split the bill" className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition" disabled={loading} />
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAsk()} placeholder="Translate or ask grammar..." className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition" disabled={loading} />
           <button onClick={handleAsk} disabled={loading || !query.trim()} className="bg-sakura-500/80 text-white px-4 py-3 rounded-xl text-base font-medium disabled:opacity-30 active:bg-sakura-600 transition shrink-0">{loading ? '...' : 'Ask'}</button>
         </div>
 
@@ -466,6 +498,16 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               onFollowUp={() => openFollowUp(result)}
               onShowBig={() => setShowBig(result.target)}
             />
+          </div>
+        )}
+
+        {grammarResult && (
+          <div className="space-y-2">
+            <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-xl px-3 py-2">
+              <p className="text-xs text-indigo-400 mb-1">Grammar Q&A</p>
+              <p className="text-sm text-slate-400 italic">{grammarResult.question}</p>
+            </div>
+            <ExplanationBubble text={grammarResult.answer} example={grammarResult.example} onSpeak={handleSpeak} />
           </div>
         )}
 
@@ -499,7 +541,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       )}
 
       {followUpOpen && followUpPhrase && createPortal(
-        <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
+        <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={closeFollowUpDrawer}>
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
@@ -515,7 +557,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     {followUpResults.length > 0 && (
                       <button onClick={() => { setFollowUpResults([]); setFollowUpHistory([]); clearThread(getThreadKey(followUpPhrase), followUpPhrase.target); }} className="text-sm text-slate-500 px-2 py-1 rounded-lg active:bg-slate-700 transition">Clear</button>
                     )}
-                    <button onClick={() => setFollowUpOpen(false)} className="text-xl text-slate-400 p-2">✕</button>
+                    <button onClick={closeFollowUpDrawer} className="text-xl text-slate-400 p-2">✕</button>
                   </div>
                 </div>
               </div>
@@ -549,7 +591,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                   ) : r.blocks ? (
                     <BreakdownSection blocks={r.blocks} lang={lang} onSave={handleSave} onSpeak={handleSpeak} savedAIPhrases={savedAIPhrases} />
                   ) : r.explanation ? (
-                    <ExplanationBubble text={r.explanation} />
+                    <ExplanationBubble text={r.explanation} example={r.explanationExample} onSpeak={handleSpeak} />
                   ) : r.phrases ? (
                     <div className="space-y-1.5">
                       {r.phrases.map((p, pi) => (
