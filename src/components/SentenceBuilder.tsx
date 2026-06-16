@@ -79,6 +79,21 @@ const PATTERNS: Pattern[] = [
     meaning: 'Can I ○○? (possible?)', slotType: 'action', slotLabel: 'What do you want to do?',
     build: (v) => ({ jp: `${v.jp}できますか？`, rom: `${v.rom} de·ki·ma·su ka`, en: `Can I ${v.en.toLowerCase()}?` }),
   },
+  {
+    id: 'douitte', group: 'question', template: '○○はどうやって行きますか？', templateRom: '○○ wa dou yat·te i·ki·ma·su ka',
+    meaning: 'How do I get to ○○?', slotType: 'place', slotLabel: 'Where do you want to go?',
+    build: (v) => ({ jp: `${v.jp}はどうやって行きますか？`, rom: `${v.rom} wa dou yat·te i·ki·ma·su ka`, en: `How do I get to ${v.en.toLowerCase()}?` }),
+  },
+  {
+    id: 'moraeru', group: 'request', template: '○○をもらえますか？', templateRom: '○○ wo mo·ra·e·ma·su ka',
+    meaning: 'Can I have ○○? (polite)', slotType: 'noun', slotLabel: 'What would you like?',
+    build: (v) => ({ jp: `${v.jp}をもらえますか？`, rom: `${v.rom} wo mo·ra·e·ma·su ka`, en: `Can I have ${v.en.toLowerCase()}?` }),
+  },
+  {
+    id: 'sagashi', group: 'want', template: '○○を探しています', templateRom: '○○ wo sa·ga·shi·te i·ma·su',
+    meaning: "I'm looking for ○○", slotType: 'noun', slotLabel: 'What are you looking for?',
+    build: (v) => ({ jp: `${v.jp}を探しています`, rom: `${v.rom} wo sa·ga·shi·te i·ma·su`, en: `I'm looking for ${v.en.toLowerCase()}` }),
+  },
   // Negative forms
   {
     id: 'iranai', group: 'request', template: '○○はいりません', templateRom: '○○ wa i·ri·ma·sen',
