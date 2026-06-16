@@ -199,6 +199,9 @@ function App() {
         {tab === 'builder' && <SentenceBuilder onAskMore={(phrase) => {
               setAskMorePhrase({ target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ''), pronunciation_chunks: phrase.rom, english: phrase.en });
               setTab('ai');
+            }} onSave={(phrase) => {
+              const id = `ai_${Date.now()}`;
+              handleSaveAIPhrase({ id, lang, target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ' '), pronunciation_chunks: phrase.rom, english: phrase.en, chinese_tc: '', notes: '', query: 'Sentence Builder', createdAt: Date.now() });
             }} />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}

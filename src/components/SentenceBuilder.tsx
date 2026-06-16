@@ -15,7 +15,7 @@ interface Pattern {
   build: (vocab: Vocab) => { jp: string; rom: string; en: string };
 }
 
-type SlotType = 'noun' | 'place' | 'food' | 'drink' | 'quantity' | 'action';
+type SlotType = 'noun' | 'place' | 'food' | 'drink' | 'quantity' | 'action' | 'time';
 
 interface Vocab {
   jp: string;
@@ -83,6 +83,33 @@ const PATTERNS: Pattern[] = [
     id: 'count', group: 'request', template: '○○を△△お願いします', templateRom: '○○ wo △△ o·ne·gai·shi·ma·su',
     meaning: '△△ of ○○ please', slotType: 'food', slotLabel: 'What do you want?',
     build: (v) => ({ jp: `${v.jp}をお願いします`, rom: `${v.rom} wo o·ne·gai·shi·ma·su`, en: `${v.en} please` }),
+  },
+  // Negative forms
+  {
+    id: 'iranai', group: 'request', template: '○○はいりません', templateRom: '○○ wa i·ri·ma·sen',
+    meaning: "I don't need ○○", slotType: 'noun', slotLabel: "What don't you need?",
+    build: (v) => ({ jp: `${v.jp}はいりません`, rom: `${v.rom} wa i·ri·ma·sen`, en: `I don't need ${v.en.toLowerCase()}` }),
+  },
+  {
+    id: 'dekinai', group: 'question', template: '○○できませんか？', templateRom: '○○ de·ki·ma·sen ka',
+    meaning: "Can't I ○○?", slotType: 'action', slotLabel: 'What can\'t you do?',
+    build: (v) => ({ jp: `${v.jp}できませんか？`, rom: `${v.rom} de·ki·ma·sen ka`, en: `Can't I ${v.en.toLowerCase()}?` }),
+  },
+  {
+    id: 'tabenai', group: 'want', template: '○○は食べられません', templateRom: '○○ wa ta·be·ra·re·ma·sen',
+    meaning: "I can't eat ○○", slotType: 'food', slotLabel: "What can't you eat?",
+    build: (v) => ({ jp: `${v.jp}は食べられません`, rom: `${v.rom} wa ta·be·ra·re·ma·sen`, en: `I can't eat ${v.en.toLowerCase()}` }),
+  },
+  // Time-based
+  {
+    id: 'nanji', group: 'question', template: '○○は何時ですか？', templateRom: '○○ wa nan·ji de·su ka',
+    meaning: 'What time is ○○?', slotType: 'time', slotLabel: 'What event/thing?',
+    build: (v) => ({ jp: `${v.jp}は何時ですか？`, rom: `${v.rom} wa nan·ji de·su ka`, en: `What time is ${v.en.toLowerCase()}?` }),
+  },
+  {
+    id: 'ni-ikitai', group: 'want', template: '○○に○○に行きたいです', templateRom: '○○ ni ○○ ni i·ki·tai de·su',
+    meaning: 'I want to go to ○○ at [time]', slotType: 'place', slotLabel: 'Where do you want to go?',
+    build: (v) => ({ jp: `${v.jp}に行きたいです`, rom: `${v.rom} ni i·ki·tai de·su`, en: `I want to go to ${v.en.toLowerCase()}` }),
   },
 ];
 
@@ -174,6 +201,18 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: 'Wi-Fiを使って', rom: 'wai·fai wo tsu·kat·te', en: 'Use Wi-Fi' },
     { jp: '充電', rom: 'juu·den', en: 'Charge (phone)' },
   ],
+  time: [
+    { jp: 'チェックイン', rom: 'chek·ku·in', en: 'Check-in' },
+    { jp: 'チェックアウト', rom: 'chek·ku·au·to', en: 'Check-out' },
+    { jp: '朝ごはん', rom: 'a·sa·go·han', en: 'Breakfast' },
+    { jp: '最終電車', rom: 'sai·shuu·den·sha', en: 'Last train' },
+    { jp: '始発', rom: 'shi·ha·tsu', en: 'First train' },
+    { jp: '次のバス', rom: 'tsu·gi no ba·su', en: 'Next bus' },
+    { jp: '閉店', rom: 'hei·ten', en: 'Closing time' },
+    { jp: '開店', rom: 'kai·ten', en: 'Opening time' },
+    { jp: '予約', rom: 'yo·ya·ku', en: 'Reservation' },
+    { jp: 'ラストオーダー', rom: 'ra·su·to oo·daa', en: 'Last order' },
+  ],
 };
 
 // Slot type labels for the chip category headers
@@ -184,9 +223,10 @@ const SLOT_LABELS: Record<SlotType, string> = {
   drink: '🍵 Drinks',
   quantity: '🔢 Quantities',
   action: '🎯 Actions',
+  time: '🕐 Time & Events',
 };
 
-export function SentenceBuilder({ onAskMore }: { onAskMore?: (phrase: { jp: string; rom: string; en: string }) => void }) {
+export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { jp: string; rom: string; en: string }) => void; onSave?: (phrase: { jp: string; rom: string; en: string }) => void }) {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [result, setResult] = useState<{ jp: string; rom: string; en: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -296,6 +336,7 @@ export function SentenceBuilder({ onAskMore }: { onAskMore?: (phrase: { jp: stri
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <button onClick={() => speak(result.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                {onSave && <button onClick={() => onSave(result)} className="p-1 rounded-lg active:bg-slate-600 text-lg">⭐</button>}
                 <button onClick={handleCopy} className="p-1 rounded-lg active:bg-slate-600 text-base">
                   {copied ? '✓' : '📋'}
                 </button>
