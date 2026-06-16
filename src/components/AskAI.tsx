@@ -403,15 +403,15 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     <div className="scroll-area h-full flex flex-col items-center justify-center px-6 text-center">
       <p className="text-4xl mb-4">🤖</p>
       <p className="text-lg font-semibold text-slate-200">AI not configured</p>
-      <p className="text-base text-slate-400 mt-2">Add your Azure OpenAI API key in <code className="text-sakura-300">.env.local</code> to enable &quot;How do I say...?&quot; feature.</p>
+      <p className="text-base text-slate-400 mt-2">Add your Azure OpenAI API key in <code className="text-sakura-300">.env.local</code> to enable the AI tutor.</p>
     </div>
   );
 
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">🤖 How do I say...?</h2>
-        <p className="text-base text-slate-400">Ask in English or 中文, get {currentLang.name} translation</p>
+        <h2 className="text-lg font-bold">🤖 AI Language Tutor</h2>
+        <p className="text-base text-slate-400">Translate, ask follow-ups, and learn {currentLang.name} naturally</p>
       </div>
       <div className="p-4 space-y-4">
         <div className="flex gap-2">
@@ -454,12 +454,12 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
             <div className="space-y-1.5">
               {history.map((h, i) => (
                 <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 flex items-center gap-2 active:bg-slate-700/50 transition cursor-pointer" onClick={() => openFollowUp(h)}>
-                  <button onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }} className="text-base shrink-0">🔊</button>
                   <div className="flex-1 min-w-0">
                     <p className="text-base text-slate-200 truncate">{h.target}</p>
                     <p className="text-base text-sakura-300 truncate">{h.pronunciation}</p>
                     <p className="text-base text-slate-500 truncate">{h.english}</p>
                   </div>
+                  <button onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
                 </div>
               ))}
             </div>
