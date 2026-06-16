@@ -236,6 +236,7 @@ const FOLLOW_UP_CHIPS = [
 ];
 
 const HISTORY_KEY = 'ai_history';
+const GRAMMAR_HISTORY_KEY = 'ai_grammar_history';
 const THREADS_KEY = 'ai_threads';
 const MAX_HISTORY = 10;
 const MAX_THREADS = 5;
@@ -282,6 +283,16 @@ function saveHistory(history: AIPhrase[]) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
 }
 
+type GrammarHistoryItem = { question: string; answer: string; example?: AIPhrase };
+
+function loadGrammarHistory(): GrammarHistoryItem[] {
+  try { return JSON.parse(localStorage.getItem(GRAMMAR_HISTORY_KEY) || '[]'); } catch { return []; }
+}
+
+function saveGrammarHistory(history: GrammarHistoryItem[]) {
+  localStorage.setItem(GRAMMAR_HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
+}
+
 function loadThread(threadKey: string, legacyTarget?: string): FollowUpResult[] {
   try {
     const threads = JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
@@ -322,6 +333,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   const [error, setError] = useState<string | null>(null);
   const [showBig, setShowBig] = useState<string | null>(null);
   const [history, setHistory] = useState<AIPhrase[]>(loadHistory);
+  const [grammarHistory, setGrammarHistory] = useState<GrammarHistoryItem[]>(loadGrammarHistory);
   const [followUpOpen, setFollowUpOpen] = useState(false);
   const [followUpPhrase, setFollowUpPhrase] = useState<AIPhrase | null>(null);
   const [followUpQuery, setFollowUpQuery] = useState('');
@@ -368,6 +380,11 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       if (aiMode === 'grammar') {
         const resp = await askGrammarQuestion(q, lang, aiExplainLang);
         setGrammarResult({ question: q, answer: resp.answer, example: resp.example });
+        setGrammarHistory(prev => {
+          const next = [{ question: q, answer: resp.answer, example: resp.example }, ...prev.filter(h => h.question !== q).slice(0, MAX_HISTORY - 1)];
+          saveGrammarHistory(next);
+          return next;
+        });
       } else {
         const phrase = await askHowToSay(q, lang, aiExplainLang);
         setResult(phrase);
@@ -480,18 +497,21 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
           <button onClick={handleAsk} disabled={loading || !query.trim()} className="bg-sakura-500/80 text-white px-4 py-3 rounded-xl text-base font-medium disabled:opacity-30 active:bg-sakura-600 transition shrink-0">{loading ? '...' : 'Ask'}</button>
         </div>
 
-        {!result && !loading && history.length === 0 && (
+        {!result && !grammarResult && !loading && ((aiMode === 'translate' && history.length === 0) || (aiMode === 'grammar' && grammarHistory.length === 0)) && (
           <div>
             <p className="text-base text-slate-500 mb-2">Try asking:</p>
             <div className="flex flex-wrap gap-1.5">
-              {['I want to split the bill', 'Is this seat taken?', 'Can I have the vegetarian option?', 'Where is the nearest ATM?', "I'm allergic to peanuts", 'Can you take a photo of us?'].map(s => (
+              {(aiMode === 'grammar'
+                ? ['How to use は?', 'Why に not で?', 'What does か do?', 'は vs が difference', 'When to use を?', 'What is ます form?']
+                : ['I want to split the bill', 'Is this seat taken?', 'Can I have the vegetarian option?', 'Where is the nearest ATM?', "I'm allergic to peanuts", 'Can you take a photo of us?']
+              ).map(s => (
                 <button key={s} onClick={() => setQuery(s)} className="text-base bg-slate-800 text-slate-400 px-2.5 py-1.5 rounded-lg active:bg-slate-700 transition">{s}</button>
               ))}
             </div>
           </div>
         )}
 
-        {loading && <div className="flex items-center justify-center py-8"><div className="animate-pulse text-slate-400 text-base">Translating...</div></div>}
+        {loading && <div className="flex items-center justify-center py-8"><div className="animate-pulse text-slate-400 text-base">{aiMode === 'grammar' ? 'Thinking...' : 'Translating...'}</div></div>}
         {error && <div className="bg-red-900/30 border border-red-700/40 rounded-xl p-3"><p className="text-base text-red-300">{error}</p></div>}
 
         {result && (
@@ -519,9 +539,9 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
           </div>
         )}
 
-        {history.length > 0 && (
+        {aiMode === 'translate' && history.length > 0 && (
           <div>
-            <h3 className="text-base text-slate-500 mb-2">Recent translations</h3>
+            <h3 className="text-base text-slate-500 mb-2">History</h3>
             <div className="space-y-1.5">
               {history.map((h, i) => (
                 <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 flex items-center gap-2 active:bg-slate-700/50 transition cursor-pointer" onClick={() => openFollowUp(h)}>
@@ -531,6 +551,20 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     <p className="text-base text-slate-500 truncate">{h.english}</p>
                   </div>
                   <button onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {aiMode === 'grammar' && grammarHistory.length > 0 && (
+          <div>
+            <h3 className="text-base text-slate-500 mb-2">History</h3>
+            <div className="space-y-1.5">
+              {grammarHistory.map((h, i) => (
+                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 cursor-pointer active:bg-slate-700/50 transition" onClick={() => setGrammarResult(h)}>
+                  <p className="text-base text-slate-200 truncate">{h.question}</p>
+                  <p className="text-base text-slate-500 truncate">{h.answer.slice(0, 60)}...</p>
                 </div>
               ))}
             </div>
