@@ -770,7 +770,7 @@ interface RbProps {
   onAskMore?: (item: { jp: string; hep: string; en: string }) => void;
 }
 
-function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, refBookmarkedIds, onToggleRefBookmark, learnedIds, onToggleLearned, onAskMore }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void; section?: string; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void; learnedIds?: Set<string>; onToggleLearned?: (id: string) => void; onAskMore?: (item: { jp: string; hep: string; en: string }) => void }) {
+function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, refBookmarkedIds, onToggleRefBookmark, learnedIds, onToggleLearned, onAskMore, note }: { id: string; jp: string; rom: string; meaning: string; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void; section?: string; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void; learnedIds?: Set<string>; onToggleLearned?: (id: string) => void; onAskMore?: (item: { jp: string; hep: string; en: string }) => void; note?: string }) {
   const isOpen = openSet.has(id);
   return (
     <div className={`bg-slate-700/40 rounded-xl overflow-hidden ${isOpen ? 'ring-1 ring-sakura-400/30' : ''}`}>
@@ -785,6 +785,11 @@ function AccordionRow({ id, jp, rom, meaning, items, openSet, toggle, section, r
       </div>
       {isOpen && (
         <div className="px-1.5 pb-1.5 space-y-1.5">
+          {note && (
+            <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg p-2 mx-1.5">
+              <p className="text-sm text-slate-300 leading-relaxed">{note}</p>
+            </div>
+          )}
           {items.map((ex, i) => {
             const bmId = `ref_${ex.jp}`;
             const isBm = refBookmarkedIds?.has(bmId);
@@ -859,19 +864,25 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           </div>
         </div>
         <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Sets the topic of the sentence. Use は when introducing what you're talking about. Also used for contrast: Aは…だが、Bは… (A is… but B is…). Not the same as the subject!"
+          items={[
             { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
             { jp: '私はアンソニーです', hep: 'wa·ta·shi wa an·so·nii de·su', en: 'I am Anthony' },
             { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
           ]} />
         <AccordionRow id="が" jp="が" rom="ga" meaning="Subject marker — marks who/what does the action"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Marks the subject doing the action. Also used with ほしい (want), できる (can), 好き (like). Has an exclusive nuance: 私が = it's ME, not someone else. Use が for new/unknown info."
+          items={[
             { jp: '水がほしいです', hep: 'mi·zu ga ho·shii de·su', en: 'I want water' },
             { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
             { jp: 'これが一番おいしいです', hep: 'ko·re ga i·chi·ban o·i·shii de·su', en: 'This is the most delicious' },
           ]} />
         <AccordionRow id="を" jp="を" rom="wo" meaning="Object marker — marks what receives the action"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Marks the object of an action. Also marks: starting point (家を出る = leave home), passing through (廊下を走る = run down the corridor). Cannot use を twice in one sentence."
+          items={[
             { jp: 'ラーメンを二つお願いします', hep: 'raa·men wo fu·ta·tsu o·ne·gai·shi·ma·su', en: 'Two ramen please' },
             { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
             { jp: '家を出る', hep: 'ie wo de·ru', en: 'Leave the house (starting point)' },
@@ -904,21 +915,24 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           </div>
         </div>
         <AccordionRow id="に" jp="に" rom="ni" meaning="Target point — to, at, in, on (destination/time/existence)"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="10 uses! Main ones for travel: ① destination (東京に行く), ② specific time (6時に), ③ existence (あそこにある), ④ target of action (友達に買う), ⑤ purpose (財布を取りに帰る). Not used with 今日/毎日 — only specific times." items={[
             { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock (time)' },
             { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo (destination)' },
             { jp: 'あそこに机がある', hep: 'a·so·ko ni tsu·kue ga a·ru', en: 'There\'s a desk over there (existence)' },
             { jp: 'ホテルに荷物を送ります', hep: 'ho·te·ru ni ni·mo·tsu wo o·ku·ri·ma·su', en: 'Send luggage to the hotel (target)' },
           ]} />
         <AccordionRow id="で" jp="で" rom="de" meaning="Action location / means — at, by, with, using"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="7 uses: ① where action happens (学校で勉強する), ② means/tool (ペンで書く), ③ method (電車で行く), ④ cause (雪で遅れる), ⑤ state (みんなで遊ぶ), ⑥ limit (5個で500円). ⚠️ Cannot use with movement verbs (行く/来る)." items={[
             { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here (location of action)' },
             { jp: 'Suicaで払います', hep: 'sui·ka de ha·rai·ma·su', en: 'I pay with Suica (means)' },
             { jp: '電車で行きます', hep: 'den·sha de i·ki·ma·su', en: 'I go by train (method)' },
             { jp: '雪で電車が遅れる', hep: 'yu·ki de den·sha ga o·ku·re·ru', en: 'Train delayed due to snow (cause)' },
           ]} />
         <AccordionRow id="へ" jp="へ" rom="e" meaning="Towards — direction of movement (focus on journey)"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Written へ but pronounced 'e'. Focuses on movement toward the target, not arrival. Interchangeable with に for direction but に focuses on the goal. Used in letters: お父さんへ (Dear Dad) — cannot use に here." items={[
             { jp: '東京へ行きます', hep: 'tou·kyou e i·ki·ma·su', en: 'I\'m heading to Tokyo (movement)' },
             { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
             { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'Heading to the exit' },
@@ -936,19 +950,22 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           </div>
         </div>
         <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Connects two nouns: AのB = A's B or B of A. Very versatile — 日本語のメニュー (Japanese menu), ホテルの電話 (hotel's phone). Think of it like English 'of' in reverse order." items={[
             { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
             { jp: '日本語のメニュー', hep: 'ni·hon·go no me·nyuu', en: 'Japanese menu' },
             { jp: 'ホテルの電話番号', hep: 'ho·te·ru no den·wa ban·gou', en: 'Hotel\'s phone number' },
           ]} />
         <AccordionRow id="と" jp="と" rom="to" meaning="And, with (listing/companion)"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Lists items exhaustively (AとB = A and B, nothing else) or indicates a companion (友達と行く = go with a friend). Unlike や which is non-exhaustive (AやB = A, B, and others)." items={[
             { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
             { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
             { jp: '朝と夜、二食付きです', hep: 'a·sa to yo·ru ni·sho·ku tsu·ki de·su', en: 'Breakfast and dinner included' },
           ]} />
         <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Replaces は or が to add 'also/too'. 私も = me too. これも = this one too. Can stack: 何もない = nothing at all. Useful for ordering: 同じものをお願いします (same for me please)." items={[
             { jp: 'これもお願いします', hep: 'ko·re mo o·ne·gai·shi·ma·su', en: 'This one too please' },
             { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
             { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
@@ -969,19 +986,22 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           </div>
         </div>
         <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Add か to the end of any statement to make it a question. いいです (it's good) → いいですか？ (is it good?). No need to change word order like in English!" items={[
             { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
             { jp: 'クレジットカードは使えますか？', hep: 'ku·re·jit·to kaa·do wa tsu·ka·e·ma·su ka', en: 'Can I use credit card?' },
             { jp: 'これはなんですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
           ]} />
         <AccordionRow id="から" jp="から" rom="ka·ra" meaning="From (place/time)"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Marks the starting point of movement or time. Often paired with まで: から…まで = from…to/until. Also means 'because' when after a verb: 雨が降るから = because it rains." items={[
             { jp: '名古屋から東京まで', hep: 'na·go·ya ka·ra tou·kyou ma·de', en: 'From Nagoya to Tokyo' },
             { jp: '7時から朝食です', hep: 'shi·chi·ji ka·ra chou·sho·ku de·su', en: 'Breakfast from 7 o\'clock' },
             { jp: 'ここから駅まで歩けますか？', hep: 'ko·ko ka·ra e·ki ma·de a·ru·ke·ma·su ka', en: 'Can I walk from here to the station?' },
           ]} />
         <AccordionRow id="まで" jp="まで" rom="ma·de" meaning="Until, to (endpoint)"
-          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore} items={[
+          openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
+          note="Marks the endpoint in time or space. Pair with から for ranges. Also means 'as far as' or 'even': 子供まで知っている = even children know it." items={[
             { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
             { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
             { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
