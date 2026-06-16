@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
@@ -467,16 +468,17 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         )}
       </div>
 
-      {showBig && (
+      {showBig && createPortal(
         <div onClick={() => setShowBig(null)} className="fixed inset-0 z-[90] bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer">
           <p className="text-4xl font-bold text-white text-center leading-relaxed">{showBig}</p>
           <p className="text-lg text-sakura-300 mt-4 text-center">{result?.pronunciation_chunks || result?.pronunciation}</p>
           <button onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }} className="mt-6 text-4xl active:scale-110 transition-transform">🔊</button>
           <p className="text-base text-slate-600 mt-8">Tap anywhere to close</p>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {followUpOpen && followUpPhrase && (
+      {followUpOpen && followUpPhrase && createPortal(
         <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={() => setFollowUpOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: '100dvh', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
@@ -567,7 +569,8 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
