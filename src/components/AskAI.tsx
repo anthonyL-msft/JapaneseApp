@@ -217,6 +217,7 @@ function BreakdownSection({ blocks, lang, onSave, onSpeak, savedAIPhrases }: {
 const FOLLOW_UP_CHIPS = [
   { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', mode: 'single' as const },
   { label: 'As a question', prompt: 'How do I turn this into a question?', mode: 'single' as const },
+  { label: 'When to use?', prompt: 'When and where would I use this phrase? Is it polite enough for strangers? Any situations where I should NOT use it?', mode: 'explain' as const },
   { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects, contexts, or similar expressions.', mode: 'multi' as const },
   { label: 'Break it down', prompt: '', mode: 'breakdown' as const },
 ];
@@ -237,12 +238,17 @@ function isExplanationQuestion(q: string): boolean {
     return false;
   }
 
-  return /why|difference|grammar|particle|what\s+does|part\s+of\s+speech|word class|usage|meaning/.test(normalized)
+  return /why|difference|grammar|particle|what\s+does|what\s+is|part\s+of\s+speech|word class|usage|meaning/.test(normalized)
     || /\bcan\s+i\s+use\b/.test(normalized)
     || /\b(is|does)\s+(this|it|that)\b/.test(normalized)
-    || /\bwhen\s+(do|can|should)\s+i\s+use\b/.test(normalized)
+    || /\bwhen\s+(do|can|should|would)\s+i\s+use\b/.test(normalized)
+    || /\bwhere\s+(do|can|should|would)\s+i\s+use\b/.test(normalized)
     || /\bdo\s+i\s+(need|have)\s+to\b/.test(normalized)
+    || /\bwhat\s+about\b/.test(normalized)
+    || /\bwhat\s+if\b/.test(normalized)
+    || /\bis\s+(this|it)\s+(rude|polite|formal|casual|natural|correct|wrong|ok|okay)\b/.test(normalized)
     || /\buse\s+(this|it|that)\s+for\b/.test(normalized)
+    || /\bso\s+(i|we|you)\s+(just|can|should|need)\b/.test(normalized)
     || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|用法|可以用在|能用在|什麼時候用|適合用在/.test(q);
 }
 
@@ -367,7 +373,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     setFollowUpOpen(true);
   };
 
-  const handleFollowUp = async (promptText?: string, mode: 'single' | 'multi' | 'breakdown' = 'single') => {
+  const handleFollowUp = async (promptText?: string, mode: 'single' | 'multi' | 'breakdown' | 'explain' = 'single') => {
     const q = promptText || followUpQuery.trim();
     const isFromChip = !!promptText; // chips pass promptText; textbox does not
     if ((!q && mode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
@@ -380,6 +386,11 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       } else if (mode === 'multi') {
         const responses = await askFollowUpMulti(followUpPhrase, q, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
+      } else if (mode === 'explain') {
+        // Explicit explanation mode (from chip or forced)
+        const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
+        setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer }]);
+        setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: explanation.answer }]);
       } else {
         // Chips always generate phrases; textbox uses intent detection
         const shouldExplain = !isFromChip && isExplanationQuestion(q);
