@@ -340,14 +340,10 @@ type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; 
 const TAG_DEFINITIONS = [
   { tag: '@grammar', desc: 'Grammar/usage explanation', mode: 'explain' as const },
   { tag: '@translate', desc: 'Translate to Japanese', mode: 'single' as const },
-  { tag: '@examples', desc: 'Show 3-5 example sentences', mode: 'multi' as const },
-  { tag: '@breakdown', desc: 'Break down the pattern', mode: 'breakdown' as const },
   { tag: '@clarify', desc: 'Compare or clarify differences', mode: 'explain' as const },
-  { tag: '@question', desc: 'Turn into a question', mode: 'single' as const },
   { tag: '@formal', desc: 'More polite/formal version', mode: 'single' as const },
   { tag: '@casual', desc: 'Casual/friendly version', mode: 'single' as const },
-  { tag: '@kanji', desc: 'Kanji meaning bridge (for Chinese speakers)', mode: 'explain' as const },
-  { tag: '@respond', desc: 'How to reply to this', mode: 'single' as const },
+  { tag: '@kanji', desc: 'Kanji meaning bridge', mode: 'explain' as const },
 ];
 
 function parseTag(input: string): { tag: string | null; cleanQuery: string; mode: 'single' | 'multi' | 'breakdown' | 'explain' | null } {
@@ -918,6 +914,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: 'More examples', prompt: 'Give me 3-5 practical travel example sentences that use this grammar point. Format each as: Japanese sentence (romaji) = English meaning. One per line. Do NOT explain, just list the examples.' },
+                  { label: 'When NOT?', prompt: 'When should I NOT use this? Give me common mistakes or situations to avoid.' },
                 ].map(chip => (
                   <button key={chip.label} onClick={() => handleGrammarFollowUp(chip.prompt)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
                 ))}
