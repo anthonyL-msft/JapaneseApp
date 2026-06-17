@@ -760,7 +760,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: 'More examples', prompt: 'Give me 3-5 practical travel example sentences that use this grammar point. Format each as: Japanese sentence (romaji) = English meaning. One per line. Do NOT explain, just list the examples.' },
-                  { label: 'Compare with が', prompt: 'Compare with が' },
+                  { label: 'Similar grammar?', prompt: 'What similar grammar points or particles could be confused with this one? Briefly compare them with 1 example each.' },
                   { label: 'When NOT to use?', prompt: 'When NOT to use?' },
                 ].map(chip => (
                   <button key={chip.label} onClick={() => handleGrammarFollowUp(chip.prompt)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
