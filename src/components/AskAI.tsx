@@ -111,7 +111,7 @@ function toHepburnFromKana(term: string): string | null {
 
 function ExplanationBubble({ text, example, onSpeak, onSave, isSaved }: { text: string; example?: AIPhrase; onSpeak?: (text: string) => void; onSave?: (phrase: AIPhrase) => void; isSaved?: boolean }) {
   const [activeTerm, setActiveTerm] = useState<string | null>(null);
-  const parts = text.split(/(「[^」]+」|『[^』]+』|“[^”]+”|"[^"]+")/g).filter(Boolean);
+
 
   const parseQuoted = (part: string): { inner: string; raw: string } | null => {
     let m = part.match(/^「([^」]+)」$/);
@@ -125,11 +125,30 @@ function ExplanationBubble({ text, example, onSpeak, onSave, isSaved }: { text: 
     return null;
   };
 
+  // Split text into lines to detect example sentence patterns
+  const lines = text.split('\n');
+  const exampleLineRegex = /^(.+?)\s*[\(（]([^)）]+)[\)）]\s*[=＝]\s*(.+)$/;
+
+  // Separate explanation lines from example lines
+  const explanationLines: string[] = [];
+  const inlineExamples: { jp: string; reading: string; meaning: string }[] = [];
+  for (const line of lines) {
+    const m = line.trim().match(exampleLineRegex);
+    if (m) {
+      inlineExamples.push({ jp: m[1].trim(), reading: m[2].trim(), meaning: m[3].trim() });
+    } else {
+      explanationLines.push(line);
+    }
+  }
+  const explanationText = explanationLines.join('\n').trim();
+  const explParts = explanationText.split(/(「[^」]+」|『[^』]+』|"[^"]+"|"[^"]+")/g).filter(Boolean);
+
   return (
     <div className="space-y-2">
-      <div className="px-1 py-1">
-        <p className="text-base text-slate-300 whitespace-pre-wrap leading-relaxed">
-          {parts.map((part, i) => {
+      {explanationText && (
+        <div className="px-1 py-1">
+          <p className="text-base text-slate-300 whitespace-pre-wrap leading-relaxed">
+            {explParts.map((part, i) => {
             const quoted = parseQuoted(part);
             if (!quoted) return <span key={i}>{part}</span>;
             const inner = quoted.inner;
@@ -151,10 +170,27 @@ function ExplanationBubble({ text, example, onSpeak, onSave, isSaved }: { text: 
           })}
         </p>
       </div>
+      )}
       {activeTerm && (
         <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg px-2.5 py-1.5">
           <p className="text-xs text-slate-500">Hepburn</p>
           <p className="text-sm text-indigo-200 font-mono">{toHepburnFromKana(activeTerm)}</p>
+        </div>
+      )}
+      {inlineExamples.length > 0 && (
+        <div className="space-y-1.5">
+          {inlineExamples.map((ex, i) => (
+            <div key={i} className="bg-slate-800/80 rounded-xl p-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-medium text-slate-100">{ex.jp}</p>
+                  <p className="text-sm text-sakura-300">{ex.reading}</p>
+                  <p className="text-sm text-slate-400">{ex.meaning}</p>
+                </div>
+                {onSpeak && <button onClick={() => onSpeak(ex.jp)} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>}
+              </div>
+            </div>
+          ))}
         </div>
       )}
       {example && (
