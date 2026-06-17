@@ -75,8 +75,8 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   if (phrase.pronunciation_chunks) {
     const chunkCount = phrase.pronunciation_chunks.split('·').length;
     const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
-    // If chunk count is reasonable (fewer chunks than kana), use chunk boundaries
-    if (chunkCount < kanaCount * 0.8) {
+    // If chunk count is reasonable (significantly fewer chunks than kana), use chunk boundaries
+    if (chunkCount < kanaCount * 0.5) {
       units = markChunkBoundaries(units, phrase.pronunciation_chunks);
     }
     // Otherwise skip chunk marking — just use word spaces from pronunciation_chunks
