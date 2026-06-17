@@ -70,26 +70,32 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
-  // Use pronunciation_chunks for chunk boundaries — but only if chunks are word-level
-  // AI often returns per-syllable chunks (su·mi·ma·se·n) vs static data per-sound chunks (su·mi·ma·sen)
-  if (phrase.pronunciation_chunks) {
-    const chunkCount = phrase.pronunciation_chunks.split('·').length;
-    const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
-    // If chunk count is reasonable (significantly fewer chunks than kana), use chunk boundaries
+  const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
+
+  // Determine if we have word-level data (few groups) vs per-syllable data (many groups)
+  // Static phrase data: pronunciation_chunks like "su·mi·ma·sen" (fewer chunks than kana)
+  // AI data: pronunciation_chunks like "su·mi·ma·se·n" (same count as kana = per-syllable)
+  const chunks = phrase.pronunciation_chunks;
+  const pron = phrase.pronunciation;
+
+  if (chunks) {
+    const chunkCount = chunks.split(/[· ]+/).length;
+    const wordCount = chunks.includes(' ') ? chunks.split(/\s+/).length : 1;
     if (chunkCount < kanaCount * 0.5) {
-      units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+      // Good chunk data (like static phrases) — use full chunk boundaries
+      units = markChunkBoundaries(units, chunks);
+    } else if (wordCount > 1 && wordCount < kanaCount * 0.5) {
+      // Per-syllable chunks but has real word spaces — use word boundaries only
+      units = markWordBoundaries(units, chunks.replace(/·/g, ''));
     }
-    // Otherwise skip chunk marking — just use word spaces from pronunciation_chunks
-    else if (phrase.pronunciation_chunks.includes(' ')) {
-      units = markWordBoundaries(units, phrase.pronunciation_chunks.replace(/·/g, ''));
-    }
-  } else if (phrase.pronunciation) {
-    const words = phrase.pronunciation.trim().split(/\s+/);
-    const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
-    if (words.length < kanaCount * 0.6) {
-      units = markWordBoundaries(units, phrase.pronunciation);
+    // Otherwise: per-syllable everything — skip all boundaries, just use lengtheners
+  } else if (pron) {
+    const wordCount = pron.trim().split(/\s+/).length;
+    if (wordCount > 1 && wordCount < kanaCount * 0.5) {
+      units = markWordBoundaries(units, pron);
     }
   }
+
   units = markLengtheners(units);
   const visible = units.filter(u => !u.isSpace);
   if (visible.length === 0) return null;
