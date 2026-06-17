@@ -46,7 +46,6 @@ interface Props {
   onClearAskMore?: () => void;
   aiExplainLang?: string;
   aiTutorMode?: string;
-  onGoBack?: () => void;
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
@@ -326,7 +325,7 @@ function clearThread(threadKey: string, legacyTarget?: string) {
   } catch { /* ignore */ }
 }
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher', onGoBack }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher' }: Props) {
   const [query, setQuery] = useState('');
   const [aiMode, setAiMode] = useState<'translate' | 'grammar'>('translate');
   const [result, setResult] = useState<AIPhrase | null>(null);
@@ -444,9 +443,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
 
   const closeFollowUpDrawer = useCallback(() => {
     setFollowUpOpen(false);
-    // Delay tab switch so drawer disappears before tab changes (no flicker)
-    if (onGoBack) setTimeout(() => onGoBack(), 50);
-  }, [onGoBack]);
+  }, []);
 
   const openFollowUp = (phrase: AIPhrase) => {
     const threadKey = getThreadKey(phrase);
