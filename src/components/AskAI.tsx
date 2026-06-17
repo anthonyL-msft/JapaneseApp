@@ -285,7 +285,7 @@ function saveHistory(history: AIPhrase[]) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)));
 }
 
-type GrammarHistoryItem = { question: string; answer: string; example?: AIPhrase };
+type GrammarHistoryItem = { question: string; answer: string; example?: AIPhrase; thread?: { question: string; answer: string; example?: AIPhrase }[] };
 
 function loadGrammarHistory(): GrammarHistoryItem[] {
   try { return JSON.parse(localStorage.getItem(GRAMMAR_HISTORY_KEY) || '[]'); } catch { return []; }
@@ -415,9 +415,18 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     if (!q || grammarFollowUpLoading || !grammarResult) return;
     setGrammarFollowUpLoading(true); setGrammarFollowUpQuery('');
     try {
-      const resp = await askGrammarQuestion(q, lang, aiExplainLang);
+      const contextQ = `Context: the user originally asked "${grammarResult.question}". Follow-up: ${q}`;
+      const resp = await askGrammarQuestion(contextQ, lang, aiExplainLang);
       const item = { question: q, answer: resp.answer, example: resp.example };
-      setGrammarThread(prev => [...prev, item]);
+      setGrammarThread(prev => {
+        const next = [...prev, item];
+        setGrammarHistory(h => {
+          const updated = h.map(hi => hi.question === grammarResult.question ? { ...hi, thread: next } : hi);
+          saveGrammarHistory(updated);
+          return updated;
+        });
+        return next;
+      });
     } catch { /* ignore */ }
     finally { setGrammarFollowUpLoading(false); }
   };
@@ -576,7 +585,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
             <h3 className="text-base text-slate-500 mb-2">History</h3>
             <div className="space-y-1.5">
               {grammarHistory.map((h, i) => (
-                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 cursor-pointer active:bg-slate-700/50 transition" onClick={() => { setGrammarResult(h); setGrammarThread([]); setGrammarFollowUpQuery(''); setGrammarDrawerOpen(true); }}>
+                <div key={i} className="bg-slate-800/50 rounded-xl p-2.5 cursor-pointer active:bg-slate-700/50 transition" onClick={() => { setGrammarResult(h); setGrammarThread(h.thread || []); setGrammarFollowUpQuery(''); setGrammarDrawerOpen(true); }}>
                   <p className="text-base text-slate-200 truncate">{h.question}</p>
                   <p className="text-base text-slate-500 truncate">{h.answer.slice(0, 60)}...</p>
                 </div>

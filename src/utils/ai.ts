@@ -340,7 +340,7 @@ export async function askGrammarQuestion(
 
   const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
 
-  const systemPrompt = `You are a travel language tutor for ${langName}. The user asks a grammar, structure, or usage question. They may ask in English, Chinese, or ${langName}.
+  const systemPrompt = `You are a travel language tutor for ${langName}. The user asks a grammar, structure, or usage question. They may ask in English, Chinese, or ${langName}. If the question includes "Context:", use that context to give a relevant follow-up answer about the same grammar topic.
 
 Return a valid JSON object:
 {
@@ -351,7 +351,8 @@ Return a valid JSON object:
 Rules:
 - "answer" must directly answer the question. Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'}.
 - Keep it concise and practical for a beginner traveler.
-- "example" is OPTIONAL — include when a practical example illustrates the answer.
+- "example" is OPTIONAL — only include when the user explicitly asks for an example or when a practical travel example directly illustrates the grammar point. Do NOT include example for meta questions like "how to memorize" or "what is the best way to learn".
+- If the user asks for "more examples", return 2-3 example sentences in the "answer" field as formatted text, each on its own line with the format: phrase (romaji) = English meaning.
 - For Japanese: "romanization" = hiragana reading, "pronunciation" = romaji with spaces between words.
 - Start with a direct answer. Then explain why in 1-2 sentences. End with the example if helpful.`;
 
