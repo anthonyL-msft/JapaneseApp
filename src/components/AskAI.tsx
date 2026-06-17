@@ -325,8 +325,6 @@ function BreakdownSection({ blocks, lang, onSave, onSpeak, savedAIPhrases }: {
 
 const FOLLOW_UP_CHIPS = [
   { label: 'Simpler?', prompt: 'Can you give me a simpler/shorter version of this phrase?', mode: 'single' as const },
-  { label: 'As a question', prompt: 'How do I turn this into a question?', mode: 'single' as const },
-  { label: 'When to use?', prompt: 'When and where would I use this phrase? Is it polite enough for strangers? Any situations where I should NOT use it?', mode: 'explain' as const },
   { label: 'More examples', prompt: 'Show me 3-5 more examples using the same sentence pattern but with different objects, contexts, or similar expressions.', mode: 'multi' as const },
   { label: 'Break it down', prompt: '', mode: 'breakdown' as const },
 ];
@@ -345,6 +343,11 @@ const TAG_DEFINITIONS = [
   { tag: '@examples', desc: 'Show 3-5 example sentences', mode: 'multi' as const },
   { tag: '@breakdown', desc: 'Break down the pattern', mode: 'breakdown' as const },
   { tag: '@clarify', desc: 'Compare or clarify differences', mode: 'explain' as const },
+  { tag: '@question', desc: 'Turn into a question', mode: 'single' as const },
+  { tag: '@formal', desc: 'More polite/formal version', mode: 'single' as const },
+  { tag: '@casual', desc: 'Casual/friendly version', mode: 'single' as const },
+  { tag: '@kanji', desc: 'Kanji meaning bridge (for Chinese speakers)', mode: 'explain' as const },
+  { tag: '@respond', desc: 'How to reply to this', mode: 'single' as const },
 ];
 
 function parseTag(input: string): { tag: string | null; cleanQuery: string; mode: 'single' | 'multi' | 'breakdown' | 'explain' | null } {
@@ -530,11 +533,22 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     const q = parsed.cleanQuery || rawQ;
     if (!q || grammarFollowUpLoading || !grammarResult) return;
     setGrammarFollowUpLoading(true); setGrammarFollowUpQuery('');
-    const grammarAiQuery = parsed.tag === '@clarify' ? `Compare and clarify the difference: ${q}. Explain when to use each, with a short example for each.` : q;
+    const grammarTagPrompts: Record<string, string> = {
+      '@clarify': `Compare and clarify the difference: ${q}. Explain when to use each, with a short example for each.`,
+      '@kanji': `Break down the kanji: ${q}. For each kanji, explain its meaning and how it's used.`,
+    };
+    const grammarAiQuery = parsed.tag && grammarTagPrompts[parsed.tag] ? grammarTagPrompts[parsed.tag] : q;
     try {
-      // If user types @translate in grammar drawer, translate it
+      // If user types @translate/@formal/@casual/@respond/@question in grammar drawer
       if (parsed.mode === 'single') {
-        const phrase = await askHowToSay(q, lang, aiExplainLang);
+        const singlePrompts: Record<string, string> = {
+          '@formal': `Give me a formal/polite version: ${q}`,
+          '@casual': `Give me a casual/friendly version: ${q}`,
+          '@respond': `How to respond to: ${q}`,
+          '@question': `Turn this into a question: ${q}`,
+        };
+        const singleQuery = parsed.tag && singlePrompts[parsed.tag] ? singlePrompts[parsed.tag] : q;
+        const phrase = await askHowToSay(singleQuery, lang, aiExplainLang);
         const item = { question: parsed.tag ? `${parsed.tag} ${q}` : q, answer: `${phrase.target} (${phrase.pronunciation}) = ${phrase.english}`, example: phrase };
         setGrammarThread(prev => {
           const next = [...prev, item];
@@ -586,8 +600,16 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     const parsed = !isFromChip ? parseTag(rawQ) : { tag: null, cleanQuery: rawQ, mode: null };
     const q = parsed.cleanQuery || rawQ;
     const effectiveMode = parsed.mode || mode;
-    // For @clarify, prefix the query so AI focuses on comparison
-    const aiQuery = parsed.tag === '@clarify' ? `Compare and clarify the difference: ${q}. Explain when to use each, with a short example for each.` : q;
+    // Tag-specific prompt prefixes
+    const tagPrompts: Record<string, string> = {
+      '@clarify': `Compare and clarify the difference: ${q}. Explain when to use each, with a short example for each.`,
+      '@question': `How do I turn this into a question form? ${q}`,
+      '@formal': `Give me a more polite/formal version of this phrase suitable for speaking to a hotel manager or elderly person. ${q}`,
+      '@casual': `Give me the casual/friendly version of this phrase, as if talking to a friend. Drop ます form if applicable. ${q}`,
+      '@kanji': `Break down the kanji in this phrase. For each kanji, explain: the character, its meaning in Chinese, and how it's used here. ${q}`,
+      '@respond': `How should I respond or reply if someone says this to me? Give me 2-3 common responses with their meanings. ${q}`,
+    };
+    const aiQuery = parsed.tag && tagPrompts[parsed.tag] ? tagPrompts[parsed.tag] : q;
     if ((!q && effectiveMode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
     setFollowUpLoading(true); setFollowUpQuery('');
     const displayQuery = effectiveMode === 'breakdown' ? 'Break it down' : (parsed.tag ? `${parsed.tag} ${q}` : q);
@@ -896,8 +918,6 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: 'More examples', prompt: 'Give me 3-5 practical travel example sentences that use this grammar point. Format each as: Japanese sentence (romaji) = English meaning. One per line. Do NOT explain, just list the examples.' },
-                  { label: 'Similar grammar?', prompt: 'What similar grammar points or particles could be confused with this one? Briefly compare them with 1 example each.' },
-                  { label: 'When NOT to use?', prompt: 'When NOT to use?' },
                 ].map(chip => (
                   <button key={chip.label} onClick={() => handleGrammarFollowUp(chip.prompt)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
                 ))}
