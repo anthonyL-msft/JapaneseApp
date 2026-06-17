@@ -243,14 +243,22 @@ Teaching style requirements:
 
 Return a valid JSON object:
 {
-  "answer": "direct answer to the question",
+  "answer": "structured answer",
   "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "English translation" }
 }
 
-Rules:
-- "answer" must directly answer the user question. Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'}.
-- Keep it concise and practical for a beginner traveler.
-- "example" is OPTIONAL — include it only when a practical example sentence would help illustrate the answer. Omit "example" entirely if the answer is self-explanatory.
+Rules for "answer" — structure it like a mini-lesson:
+1. Start with a direct answer (1-2 sentences). For yes/no questions, start with Yes or No.
+2. When explaining a word or usage, include common patterns or combinations if helpful.
+3. If asked for "more examples", give 3-5 example sentences, each on its own line: phrase (romaji) = meaning.
+4. Keep it concise — no more than 6-8 lines total.
+
+Rules for "example":
+- OPTIONAL — only include when a single practical travel example directly illustrates the point.
+- Omit if the answer already contains examples or is self-explanatory.
+
+General:
+- Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'} for the answer.
 - For ${langName === 'Japanese' ? '"romanization" must be the hiragana reading. "pronunciation" must be romaji with spaces between words.' : '"pronunciation" must be phonetic guide.'}
 ${teacherRules}`;
 
@@ -344,17 +352,25 @@ export async function askGrammarQuestion(
 
 Return a valid JSON object:
 {
-  "answer": "direct answer explaining the grammar point",
+  "answer": "structured answer",
   "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "English translation" }
 }
 
-Rules:
-- "answer" must directly answer the question. Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'}.
-- Keep it concise and practical for a beginner traveler.
-- "example" is OPTIONAL — only include when the user explicitly asks for an example or when a practical travel example directly illustrates the grammar point. Do NOT include example for meta questions like "how to memorize" or "what is the best way to learn".
-- If the user asks for "more examples", return 2-3 example sentences in the "answer" field as formatted text, each on its own line with the format: phrase (romaji) = English meaning.
-- For Japanese: "romanization" = hiragana reading, "pronunciation" = romaji with spaces between words.
-- Start with a direct answer. Then explain why in 1-2 sentences. End with the example if helpful.`;
+Rules for "answer" — structure it like a mini-lesson:
+1. Start with a direct answer (1-2 sentences). For yes/no questions, start with Yes or No.
+2. If explaining a word or grammar point, include:
+   - Common patterns of use (e.g. 暑い〜, 〜は暑い)
+   - 2-3 common word combinations (e.g. 暑い夏 = hot summer, 暑い日 = hot day)
+3. If the user asks for "more examples", give 3-5 example sentences, each on its own line: phrase (romaji) = meaning.
+4. Keep it concise — no more than 6-8 lines total.
+
+Rules for "example":
+- OPTIONAL — only include when a single practical travel example directly illustrates the point.
+- Do NOT include for meta questions ("how to memorize", "best way to learn") or when examples are already in the answer text.
+
+General rules:
+- Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'} for the answer.
+- For Japanese: "romanization" = hiragana reading, "pronunciation" = romaji with spaces between words.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },

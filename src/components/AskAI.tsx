@@ -444,7 +444,8 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
 
   const closeFollowUpDrawer = useCallback(() => {
     setFollowUpOpen(false);
-    if (onGoBack) onGoBack();
+    // Delay tab switch so drawer disappears before tab changes (no flicker)
+    if (onGoBack) setTimeout(() => onGoBack(), 50);
   }, [onGoBack]);
 
   const openFollowUp = (phrase: AIPhrase) => {
