@@ -264,6 +264,22 @@ const MAX_THREADS = 5;
 
 type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; blocks?: BreakdownBlock[]; explanation?: string; explanationExample?: AIPhrase; error?: string };
 
+const TAG_DEFINITIONS = [
+  { tag: '@grammar', desc: 'Grammar/usage explanation', mode: 'explain' as const },
+  { tag: '@translate', desc: 'Translate to Japanese', mode: 'single' as const },
+  { tag: '@examples', desc: 'Show 3-5 example sentences', mode: 'multi' as const },
+  { tag: '@breakdown', desc: 'Break down the pattern', mode: 'breakdown' as const },
+];
+
+function parseTag(input: string): { tag: string | null; cleanQuery: string; mode: 'single' | 'multi' | 'breakdown' | 'explain' | null } {
+  for (const def of TAG_DEFINITIONS) {
+    if (input.toLowerCase().startsWith(def.tag)) {
+      return { tag: def.tag, cleanQuery: input.slice(def.tag.length).trim(), mode: def.mode };
+    }
+  }
+  return { tag: null, cleanQuery: input, mode: null };
+}
+
 function isExplanationQuestion(q: string): boolean {
   const text = q.toLowerCase();
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -431,22 +447,32 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   const handleSpeak = (text: string) => speak(text, currentLang.ttsLang);
 
   const handleGrammarFollowUp = async (promptText?: string) => {
-    const q = promptText || grammarFollowUpQuery.trim();
+    const rawQ = promptText || grammarFollowUpQuery.trim();
+    const isFromChip = !!promptText;
+    const parsed = !isFromChip ? parseTag(rawQ) : { tag: null, cleanQuery: rawQ, mode: null };
+    const q = parsed.cleanQuery || rawQ;
     if (!q || grammarFollowUpLoading || !grammarResult) return;
     setGrammarFollowUpLoading(true); setGrammarFollowUpQuery('');
     try {
-      const contextQ = `Context: the user originally asked "${grammarResult.question}". Follow-up: ${q}`;
-      const resp = await askGrammarQuestion(contextQ, lang, aiExplainLang);
-      const item = { question: q, answer: resp.answer, example: resp.example };
-      setGrammarThread(prev => {
-        const next = [...prev, item];
-        setGrammarHistory(h => {
-          const updated = h.map(hi => hi.question === grammarResult.question ? { ...hi, thread: next } : hi);
-          saveGrammarHistory(updated);
-          return updated;
+      // If user types @translate in grammar drawer, translate it
+      if (parsed.mode === 'single') {
+        const phrase = await askHowToSay(q, lang, aiExplainLang);
+        const item = { question: parsed.tag ? `${parsed.tag} ${q}` : q, answer: `${phrase.target} (${phrase.pronunciation}) = ${phrase.english}`, example: phrase };
+        setGrammarThread(prev => {
+          const next = [...prev, item];
+          setGrammarHistory(h => { const updated = h.map(hi => hi.question === grammarResult.question ? { ...hi, thread: next } : hi); saveGrammarHistory(updated); return updated; });
+          return next;
         });
-        return next;
-      });
+      } else {
+        const contextQ = `Context: the user originally asked "${grammarResult.question}". Follow-up: ${q}`;
+        const resp = await askGrammarQuestion(contextQ, lang, aiExplainLang);
+        const item = { question: parsed.tag ? `${parsed.tag} ${q}` : q, answer: resp.answer, example: resp.example };
+        setGrammarThread(prev => {
+          const next = [...prev, item];
+          setGrammarHistory(h => { const updated = h.map(hi => hi.question === grammarResult.question ? { ...hi, thread: next } : hi); saveGrammarHistory(updated); return updated; });
+          return next;
+        });
+      }
     } catch { /* ignore */ }
     finally { setGrammarFollowUpLoading(false); }
   };
@@ -476,25 +502,28 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   };
 
   const handleFollowUp = async (promptText?: string, mode: 'single' | 'multi' | 'breakdown' | 'explain' = 'single') => {
-    const q = promptText || followUpQuery.trim();
-    const isFromChip = !!promptText; // chips pass promptText; textbox does not
-    if ((!q && mode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
+    const rawQ = promptText || followUpQuery.trim();
+    const isFromChip = !!promptText;
+    // Parse @tags from textbox input
+    const parsed = !isFromChip ? parseTag(rawQ) : { tag: null, cleanQuery: rawQ, mode: null };
+    const q = parsed.cleanQuery || rawQ;
+    const effectiveMode = parsed.mode || mode;
+    if ((!q && effectiveMode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
     setFollowUpLoading(true); setFollowUpQuery('');
-    const displayQuery = mode === 'breakdown' ? 'Break it down' : q;
+    const displayQuery = effectiveMode === 'breakdown' ? 'Break it down' : (parsed.tag ? `${parsed.tag} ${q}` : q);
     try {
-      if (mode === 'breakdown') {
+      if (effectiveMode === 'breakdown') {
         const blocks = await askBreakdown(followUpPhrase, lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, blocks }]);
-      } else if (mode === 'multi') {
-        const responses = await askFollowUpMulti(followUpPhrase, q, lang, aiExplainLang);
+      } else if (effectiveMode === 'multi') {
+        const responses = await askFollowUpMulti(followUpPhrase, q || 'Show me more examples using the same pattern', lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
-      } else if (mode === 'explain') {
-        // Explicit explanation mode (from chip or forced)
+      } else if (effectiveMode === 'explain') {
         const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
         setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer, explanationExample: explanation.example }]);
         setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: explanation.answer }]);
       } else {
-        // Chips always generate phrases; textbox uses intent detection
+        // No tag: chips generate phrases; textbox uses intent detection
         const shouldExplain = !isFromChip && isExplanationQuestion(q);
         if (shouldExplain) {
           const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
@@ -704,9 +733,16 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
             </div>
             <div className="shrink-0 px-4 pt-3 pb-2 border-t border-slate-700/50 space-y-2">
               <div className="flex gap-2">
-                <textarea value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }} placeholder="Ask a follow-up..." rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={followUpLoading} />
+                <textarea value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }} placeholder="Ask a follow-up... (try @grammar, @examples)" rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={followUpLoading} />
                 <button onClick={() => handleFollowUp()} disabled={followUpLoading || !followUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
               </div>
+              {followUpQuery.startsWith('@') && !followUpQuery.includes(' ') && (
+                <div className="flex flex-wrap gap-1.5">
+                  {TAG_DEFINITIONS.filter(t => t.tag.startsWith(followUpQuery.toLowerCase())).map(t => (
+                    <button key={t.tag} onClick={() => setFollowUpQuery(t.tag + ' ')} className="text-xs bg-indigo-900/40 text-indigo-300 px-2 py-1 rounded-md">{t.tag} <span className="text-slate-500">{t.desc}</span></button>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-wrap gap-1.5">
                 {FOLLOW_UP_CHIPS.map(chip => (
                   <button key={chip.label} onClick={() => handleFollowUp(chip.prompt || undefined, chip.mode)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
@@ -757,9 +793,16 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
             </div>
             <div className="shrink-0 px-4 pt-3 pb-2 border-t border-slate-700/50 space-y-2">
               <div className="flex gap-2">
-                <textarea value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up..." rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={grammarFollowUpLoading} />
+                <textarea value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up... (try @translate, @examples)" rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={grammarFollowUpLoading} />
                 <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
               </div>
+              {grammarFollowUpQuery.startsWith('@') && !grammarFollowUpQuery.includes(' ') && (
+                <div className="flex flex-wrap gap-1.5">
+                  {TAG_DEFINITIONS.filter(t => t.tag.startsWith(grammarFollowUpQuery.toLowerCase())).map(t => (
+                    <button key={t.tag} onClick={() => setGrammarFollowUpQuery(t.tag + ' ')} className="text-xs bg-indigo-900/40 text-indigo-300 px-2 py-1 rounded-md">{t.tag} <span className="text-slate-500">{t.desc}</span></button>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: 'More examples', prompt: 'Give me 3-5 practical travel example sentences that use this grammar point. Format each as: Japanese sentence (romaji) = English meaning. One per line. Do NOT explain, just list the examples.' },
