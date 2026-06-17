@@ -732,17 +732,22 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               )}
             </div>
             <div className="shrink-0 px-4 pt-3 pb-2 border-t border-slate-700/50 space-y-2">
-              <div className="flex gap-2">
-                <textarea value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }} placeholder="Ask a follow-up... (try @grammar, @examples)" rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={followUpLoading} />
-                <button onClick={() => handleFollowUp()} disabled={followUpLoading || !followUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
-              </div>
-              {followUpQuery.startsWith('@') && !followUpQuery.includes(' ') && (
-                <div className="flex flex-wrap gap-1.5">
-                  {TAG_DEFINITIONS.filter(t => t.tag.startsWith(followUpQuery.toLowerCase())).map(t => (
-                    <button key={t.tag} onClick={() => setFollowUpQuery(t.tag + ' ')} className="text-xs bg-indigo-900/40 text-indigo-300 px-2 py-1 rounded-md">{t.tag} <span className="text-slate-500">{t.desc}</span></button>
-                  ))}
+              <div className="relative">
+                {followUpQuery.startsWith('@') && !followUpQuery.includes(' ') && (
+                  <div className="absolute bottom-full left-0 right-0 mb-1 bg-slate-800 border border-slate-700/50 rounded-xl shadow-lg overflow-hidden z-10">
+                    {TAG_DEFINITIONS.filter(t => t.tag.startsWith(followUpQuery.toLowerCase())).map(t => (
+                      <button key={t.tag} onClick={() => setFollowUpQuery(t.tag + ' ')} className="w-full px-3 py-2 text-left text-sm active:bg-slate-700 transition flex items-center gap-2">
+                        <span className="text-indigo-300 font-mono">{t.tag}</span>
+                        <span className="text-slate-500">{t.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <textarea value={followUpQuery} onChange={e => setFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }} placeholder="Ask a follow-up... (try @)" rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={followUpLoading} />
+                  <button onClick={() => handleFollowUp()} disabled={followUpLoading || !followUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
                 </div>
-              )}
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {FOLLOW_UP_CHIPS.map(chip => (
                   <button key={chip.label} onClick={() => handleFollowUp(chip.prompt || undefined, chip.mode)} disabled={followUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
@@ -792,17 +797,22 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               )}
             </div>
             <div className="shrink-0 px-4 pt-3 pb-2 border-t border-slate-700/50 space-y-2">
-              <div className="flex gap-2">
-                <textarea value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up... (try @translate, @examples)" rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={grammarFollowUpLoading} />
-                <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
-              </div>
-              {grammarFollowUpQuery.startsWith('@') && !grammarFollowUpQuery.includes(' ') && (
-                <div className="flex flex-wrap gap-1.5">
-                  {TAG_DEFINITIONS.filter(t => t.tag.startsWith(grammarFollowUpQuery.toLowerCase())).map(t => (
-                    <button key={t.tag} onClick={() => setGrammarFollowUpQuery(t.tag + ' ')} className="text-xs bg-indigo-900/40 text-indigo-300 px-2 py-1 rounded-md">{t.tag} <span className="text-slate-500">{t.desc}</span></button>
-                  ))}
+              <div className="relative">
+                {grammarFollowUpQuery.startsWith('@') && !grammarFollowUpQuery.includes(' ') && (
+                  <div className="absolute bottom-full left-0 right-0 mb-1 bg-slate-800 border border-slate-700/50 rounded-xl shadow-lg overflow-hidden z-10">
+                    {TAG_DEFINITIONS.filter(t => t.tag.startsWith(grammarFollowUpQuery.toLowerCase())).map(t => (
+                      <button key={t.tag} onClick={() => setGrammarFollowUpQuery(t.tag + ' ')} className="w-full px-3 py-2 text-left text-sm active:bg-slate-700 transition flex items-center gap-2">
+                        <span className="text-indigo-300 font-mono">{t.tag}</span>
+                        <span className="text-slate-500">{t.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <textarea value={grammarFollowUpQuery} onChange={e => setGrammarFollowUpQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGrammarFollowUp(); } }} placeholder="Ask a follow-up... (try @)" rows={2} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-indigo-400/50 transition resize-none" disabled={grammarFollowUpLoading} />
+                  <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
                 </div>
-              )}
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: 'More examples', prompt: 'Give me 3-5 practical travel example sentences that use this grammar point. Format each as: Japanese sentence (romaji) = English meaning. One per line. Do NOT explain, just list the examples.' },
