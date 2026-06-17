@@ -72,27 +72,37 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   let units = breakdownKana(reading);
   const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
 
-  // Determine if we have word-level data (few groups) vs per-syllable data (many groups)
-  // Static phrase data: pronunciation_chunks like "su·mi·ma·sen" (fewer chunks than kana)
-  // AI data: pronunciation_chunks like "su·mi·ma·se·n" (same count as kana = per-syllable)
+  // Strategy: use pronunciation_chunks with markChunkBoundaries if the data
+  // has real chunk grouping (fewer chunks than kana). Otherwise fall back to
+  // pronunciation for word-level boundaries. Skip if everything is per-syllable.
   const chunks = phrase.pronunciation_chunks;
   const pron = phrase.pronunciation;
 
+  let applied = false;
   if (chunks) {
     const chunkCount = chunks.split(/[· ]+/).length;
-    const wordCount = chunks.includes(' ') ? chunks.split(/\s+/).length : 1;
-    if (chunkCount < kanaCount * 0.5) {
-      // Good chunk data (like static phrases) — use full chunk boundaries
+    if (chunkCount < kanaCount * 0.7) {
+      // Good chunk data — use it
       units = markChunkBoundaries(units, chunks);
-    } else if (wordCount > 1 && wordCount < kanaCount * 0.5) {
-      // Per-syllable chunks but has real word spaces — use word boundaries only
-      units = markWordBoundaries(units, chunks.replace(/·/g, ''));
+      applied = true;
     }
-    // Otherwise: per-syllable everything — skip all boundaries, just use lengtheners
-  } else if (pron) {
-    const wordCount = pron.trim().split(/\s+/).length;
-    if (wordCount > 1 && wordCount < kanaCount * 0.5) {
-      units = markWordBoundaries(units, pron);
+  }
+  if (!applied && pron) {
+    // Use pronunciation for word boundaries
+    // Count "real" words — consecutive romaji without spaces
+    const words = pron.trim().split(/\s+/);
+    // Merge very short tokens (single letters like 'o', 'n', 'a') with neighbors
+    // to avoid treating particles as separate words for spacing
+    const realWords = words.reduce((acc: string[], w) => {
+      if (w.length <= 1 && acc.length > 0) {
+        acc[acc.length - 1] += w;
+      } else {
+        acc.push(w);
+      }
+      return acc;
+    }, []);
+    if (realWords.length > 1 && realWords.length < kanaCount * 0.7) {
+      units = markWordBoundaries(units, realWords.join(' '));
     }
   }
 
