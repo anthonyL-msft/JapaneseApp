@@ -183,12 +183,12 @@ function ExplanationBubble({ text, example, onSpeak, onSave, isSaved, isSavedChe
             const exPhrase: AIPhrase = { target: ex.jp, pronunciation: ex.reading, pronunciation_chunks: '', english: ex.meaning, chinese_tc: '', notes: '' };
             const exSaved = isSavedCheck ? isSavedCheck(ex.jp) : false;
             return (
-              <div key={i} className="bg-slate-800/80 rounded-xl p-2.5">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-base font-medium text-slate-100">{ex.jp}</p>
-                    <p className="text-sm text-sakura-300">{ex.reading}</p>
-                    <p className="text-sm text-slate-400">{ex.meaning}</p>
+            <div key={i} className="bg-slate-800/80 rounded-xl p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-lg font-medium text-slate-50">{ex.jp}</p>
+                  <p className="text-base text-sakura-300">{ex.reading}</p>
+                  <p className="text-base text-slate-400">{ex.meaning}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {onSpeak && <button onClick={() => onSpeak(ex.jp)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>}
@@ -204,9 +204,9 @@ function ExplanationBubble({ text, example, onSpeak, onSave, isSaved, isSavedChe
         <div className="bg-slate-800/80 rounded-xl p-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <p className="text-base font-medium text-slate-100">{example.target}</p>
-              <p className="text-sm text-sakura-300">{example.pronunciation}</p>
-              <p className="text-sm text-slate-400">{example.english}</p>
+              <p className="text-lg font-medium text-slate-50">{example.target}</p>
+              <p className="text-base text-sakura-300">{example.pronunciation}</p>
+              <p className="text-base text-slate-400">{example.english}</p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
               {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>}

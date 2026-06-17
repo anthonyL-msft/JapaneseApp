@@ -380,14 +380,14 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
             <p className="text-sm text-slate-500 mb-2">✨ More examples using this pattern</p>
             <div className="space-y-1.5">
               {moreExamples.map((ex, i) => (
-                <div key={i} className="bg-slate-800/80 rounded-xl p-2.5 active:bg-slate-700/50 transition">
+                <div key={i} className="bg-slate-800/80 rounded-xl p-3 active:bg-slate-700/50 transition">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-base font-medium text-slate-100">{ex.target}</p>
-                      <p className="text-sm text-sakura-300">{ex.pronunciation}</p>
-                      <p className="text-sm text-slate-400">{ex.english}</p>
+                      <p className="text-lg font-medium text-slate-50">{ex.target}</p>
+                      <p className="text-base text-sakura-300">{ex.pronunciation}</p>
+                      <p className="text-base text-slate-400">{ex.english}</p>
                     </div>
-                    <button onClick={() => speak(ex.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-base shrink-0">🔊</button>
+                    <button onClick={() => speak(ex.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
                   </div>
                 </div>
               ))}
