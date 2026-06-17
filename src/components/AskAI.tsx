@@ -70,9 +70,19 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
-  // Use same logic as PhraseCard: pronunciation_chunks first, then pronunciation
+  // Use pronunciation_chunks for chunk boundaries — but only if chunks are word-level
+  // AI often returns per-syllable chunks (su·mi·ma·se·n) vs static data per-sound chunks (su·mi·ma·sen)
   if (phrase.pronunciation_chunks) {
-    units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+    const chunkCount = phrase.pronunciation_chunks.split('·').length;
+    const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
+    // If chunk count is reasonable (fewer chunks than kana), use chunk boundaries
+    if (chunkCount < kanaCount * 0.8) {
+      units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+    }
+    // Otherwise skip chunk marking — just use word spaces from pronunciation_chunks
+    else if (phrase.pronunciation_chunks.includes(' ')) {
+      units = markWordBoundaries(units, phrase.pronunciation_chunks.replace(/·/g, ''));
+    }
   } else if (phrase.pronunciation) {
     const words = phrase.pronunciation.trim().split(/\s+/);
     const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
