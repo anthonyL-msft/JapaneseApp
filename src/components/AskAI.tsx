@@ -5,7 +5,7 @@ import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
 import { LANGUAGES } from '../data/types';
-import { breakdownKana, markLengtheners, type KanaUnit } from '../utils/kana';
+import { breakdownKana, markChunkBoundaries, markLengtheners, type KanaUnit } from '../utils/kana';
 
 /** Track visual viewport height for keyboard-aware drawers (iOS Safari fix) */
 function useVisualViewportHeight() {
@@ -70,13 +70,12 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   const reading = phrase.romanization;
   if (!reading) return null;
   let units = breakdownKana(reading);
-  // Use pronunciation field (has word spaces) to mark word boundaries
-  // But only if it has real word-level spaces (not per-syllable)
-  if (phrase.pronunciation) {
+  // Use same logic as PhraseCard: pronunciation_chunks first, then pronunciation
+  if (phrase.pronunciation_chunks) {
+    units = markChunkBoundaries(units, phrase.pronunciation_chunks);
+  } else if (phrase.pronunciation) {
     const words = phrase.pronunciation.trim().split(/\s+/);
     const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
-    // If words count is much less than kana count, it's word-level spacing — use it
-    // If words count is close to kana count, it's per-syllable — skip word boundaries
     if (words.length < kanaCount * 0.6) {
       units = markWordBoundaries(units, phrase.pronunciation);
     }
