@@ -460,6 +460,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     if (!query.trim() || loading) return;
     setLoading(true); setError(null); setResult(null); setGrammarResult(null); setGrammarThread([]);
     const q = query.trim();
+    setQuery('');
     try {
       // Use toggle mode: grammar mode always explains, translate mode always translates
       if (aiMode === 'grammar') {
