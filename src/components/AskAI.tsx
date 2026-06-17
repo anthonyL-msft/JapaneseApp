@@ -109,7 +109,7 @@ function toHepburnFromKana(term: string): string | null {
   return parts.join(' ');
 }
 
-function ExplanationBubble({ text, example, onSpeak }: { text: string; example?: AIPhrase; onSpeak?: (text: string) => void }) {
+function ExplanationBubble({ text, example, onSpeak, onSave, isSaved }: { text: string; example?: AIPhrase; onSpeak?: (text: string) => void; onSave?: (phrase: AIPhrase) => void; isSaved?: boolean }) {
   const [activeTerm, setActiveTerm] = useState<string | null>(null);
   const parts = text.split(/(「[^」]+」|『[^』]+』|“[^”]+”|"[^"]+")/g).filter(Boolean);
 
@@ -165,7 +165,10 @@ function ExplanationBubble({ text, example, onSpeak }: { text: string; example?:
               <p className="text-sm text-sakura-300">{example.pronunciation}</p>
               <p className="text-sm text-slate-400">{example.english}</p>
             </div>
-            {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>}
+            <div className="flex items-center gap-1 shrink-0">
+              {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>}
+              {onSave && <button onClick={() => onSave(example)} className="p-1 rounded-lg active:bg-slate-600 text-lg">{isSaved ? '⭐' : '☆'}</button>}
+            </div>
           </div>
         </div>
       )}
@@ -671,7 +674,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                   ) : r.blocks ? (
                     <BreakdownSection blocks={r.blocks} lang={lang} onSave={handleSave} onSpeak={handleSpeak} savedAIPhrases={savedAIPhrases} />
                   ) : r.explanation ? (
-                    <ExplanationBubble text={r.explanation} example={r.explanationExample} onSpeak={handleSpeak} />
+                    <ExplanationBubble text={r.explanation} example={r.explanationExample} onSpeak={handleSpeak} onSave={r.explanationExample ? (p) => handleSave(p, r.query) : undefined} isSaved={r.explanationExample ? savedAIPhrases.some(s => s.target === r.explanationExample!.target) : false} />
                   ) : r.phrases ? (
                     <div className="space-y-1.5">
                       {r.phrases.map((p, pi) => (
@@ -731,7 +734,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              <ExplanationBubble text={grammarResult.answer} example={grammarResult.example} onSpeak={handleSpeak} />
+              <ExplanationBubble text={grammarResult.answer} example={grammarResult.example} onSpeak={handleSpeak} onSave={grammarResult.example ? (p) => handleSave(p, grammarResult.question) : undefined} isSaved={grammarResult.example ? savedAIPhrases.some(s => s.target === grammarResult.example!.target) : false} />
 
               {grammarThread.map((t, i) => (
                 <div key={i} className="space-y-2">
@@ -740,7 +743,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                       <p className="text-base text-slate-200">{t.question}</p>
                     </div>
                   </div>
-                  <ExplanationBubble text={t.answer} example={t.example} onSpeak={handleSpeak} />
+                  <ExplanationBubble text={t.answer} example={t.example} onSpeak={handleSpeak} onSave={t.example ? (p) => handleSave(p, t.question) : undefined} isSaved={t.example ? savedAIPhrases.some(s => s.target === t.example!.target) : false} />
                 </div>
               ))}
 
