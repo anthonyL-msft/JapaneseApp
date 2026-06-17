@@ -344,6 +344,7 @@ const TAG_DEFINITIONS = [
   { tag: '@translate', desc: 'Translate to Japanese', mode: 'single' as const },
   { tag: '@examples', desc: 'Show 3-5 example sentences', mode: 'multi' as const },
   { tag: '@breakdown', desc: 'Break down the pattern', mode: 'breakdown' as const },
+  { tag: '@clarify', desc: 'Compare or clarify differences', mode: 'explain' as const },
 ];
 
 function parseTag(input: string): { tag: string | null; cleanQuery: string; mode: 'single' | 'multi' | 'breakdown' | 'explain' | null } {
@@ -377,7 +378,7 @@ function isExplanationQuestion(q: string): boolean {
     || /\buse\s+(this|it|that)\s+for\b/.test(normalized)
     || /\bso\s+(i|we|you)\s+(just|can|should|need)\b/.test(normalized)
     || /怎麼用|如何使用|用法|什麼時候用/.test(q)
-    || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|可以用在|能用在|適合用在/.test(q);
+    || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|可以用在|能用在|適合用在|一樣嗎|不同/.test(q);
 }
 
 function getThreadKey(phrase: AIPhrase): string {
@@ -529,6 +530,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     const q = parsed.cleanQuery || rawQ;
     if (!q || grammarFollowUpLoading || !grammarResult) return;
     setGrammarFollowUpLoading(true); setGrammarFollowUpQuery('');
+    const grammarAiQuery = parsed.tag === '@clarify' ? `Compare and clarify the difference: ${q}. Explain when to use each, with a short example for each.` : q;
     try {
       // If user types @translate in grammar drawer, translate it
       if (parsed.mode === 'single') {
@@ -540,7 +542,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
           return next;
         });
       } else {
-        const contextQ = `Context: the user originally asked "${grammarResult.question}". Follow-up: ${q}`;
+        const contextQ = `Context: the user originally asked "${grammarResult.question}". Follow-up: ${grammarAiQuery}`;
         const resp = await askGrammarQuestion(contextQ, lang, aiExplainLang);
         const item = { question: parsed.tag ? `${parsed.tag} ${q}` : q, answer: resp.answer, example: resp.example };
         setGrammarThread(prev => {
@@ -584,6 +586,8 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     const parsed = !isFromChip ? parseTag(rawQ) : { tag: null, cleanQuery: rawQ, mode: null };
     const q = parsed.cleanQuery || rawQ;
     const effectiveMode = parsed.mode || mode;
+    // For @clarify, prefix the query so AI focuses on comparison
+    const aiQuery = parsed.tag === '@clarify' ? `Compare and clarify the difference: ${q}. Explain when to use each, with a short example for each.` : q;
     if ((!q && effectiveMode !== 'breakdown') || !followUpPhrase || followUpLoading) return;
     setFollowUpLoading(true); setFollowUpQuery('');
     const displayQuery = effectiveMode === 'breakdown' ? 'Break it down' : (parsed.tag ? `${parsed.tag} ${q}` : q);
@@ -595,7 +599,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         const responses = await askFollowUpMulti(followUpPhrase, q || 'Show me more examples using the same pattern', lang, aiExplainLang);
         setFollowUpResults(prev => [...prev, { query: displayQuery, phrases: responses }]);
       } else if (effectiveMode === 'explain') {
-        const explanation = await askFollowUpExplain(followUpPhrase, q, lang, aiExplainLang, aiTutorMode);
+        const explanation = await askFollowUpExplain(followUpPhrase, aiQuery, lang, aiExplainLang, aiTutorMode);
         setFollowUpResults(prev => [...prev, { query: displayQuery, explanation: explanation.answer, explanationExample: explanation.example }]);
         setFollowUpHistory(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: explanation.answer }]);
       } else {
