@@ -669,7 +669,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         {loading && <div className="flex items-center justify-center py-8"><div className="animate-pulse text-slate-400 text-base">{aiMode === 'grammar' ? 'Thinking...' : 'Translating...'}</div></div>}
         {error && <div className="bg-red-900/30 border border-red-700/40 rounded-xl p-3"><p className="text-base text-red-300">{error}</p></div>}
 
-        {result && (
+        {aiMode === 'translate' && result && (
           <div className="space-y-2">
             <AIResultCard
               phrase={result}
