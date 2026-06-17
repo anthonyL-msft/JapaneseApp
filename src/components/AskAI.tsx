@@ -7,6 +7,23 @@ import { speak } from '../utils/tts';
 import { LANGUAGES } from '../data/types';
 import { breakdownKana, markLengtheners, type KanaUnit } from '../utils/kana';
 
+/** Track visual viewport height for keyboard-aware drawers (iOS Safari fix) */
+function useVisualViewportHeight() {
+  const [height, setHeight] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setHeight(vv.height);
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
+  return height;
+}
+
 /** Mark word boundaries in kana units using the pronunciation field (which has word spaces) */
 function markWordBoundaries(units: KanaUnit[], pronunciation: string): KanaUnit[] {
   // Split pronunciation into words by spaces
@@ -348,6 +365,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   const followUpScrollRef = useRef<HTMLDivElement>(null);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const configured = isAIConfigured();
+  const vvHeight = useVisualViewportHeight();
 
   // Auto-open follow-up drawer when askMorePhrase is passed from PhraseCard
   useEffect(() => {
@@ -606,7 +624,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       {followUpOpen && followUpPhrase && createPortal(
         <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={closeFollowUpDrawer}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up h-full" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
+          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: vvHeight ? `${vvHeight}px` : '100%', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
               <div className="px-4 pt-3 pb-3 border-b border-slate-700/50">
                 <div className="flex items-center justify-between">
@@ -700,7 +718,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       {grammarDrawerOpen && grammarResult && createPortal(
         <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={() => setGrammarDrawerOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up h-full" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
+          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: vvHeight ? `${vvHeight}px` : '100%', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0">
               <div className="px-4 pt-3 pb-3 border-b border-slate-700/50">
                 <div className="flex items-center justify-between">
