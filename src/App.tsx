@@ -158,7 +158,7 @@ function App() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        {tab === 'phrases' && (
+        <div style={{ display: tab === 'phrases' ? 'contents' : 'none' }}>
           <PhraseBook
             phrases={filteredPhrases}
             bookmarkedIds={bookmarkedIds}
@@ -174,7 +174,7 @@ function App() {
               setTab('ai');
             }}
           />
-        )}
+        </div>
         {tab === 'cards' && (
           <Flashcards phrases={langPhrases} learnedIds={new Set(learnedItems.map(l => l.id))} refBookmarks={refBookmarks} />
         )}
@@ -195,7 +195,9 @@ function App() {
             search={search}
           />
         )}
-        {tab === 'reference' && <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); setPreviousTab(tab); setTab('ai'); }} />}
+        <div style={{ display: tab === 'reference' ? 'contents' : 'none' }}>
+          <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); setPreviousTab(tab); setTab('ai'); }} />
+        </div>
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         {tab === 'ai' && <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} onGoBack={previousTab ? () => { setTab(previousTab); setPreviousTab(null); } : undefined} />}
         {tab === 'builder' && <SentenceBuilder onAskMore={(phrase) => {
