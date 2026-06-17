@@ -758,8 +758,12 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                 <button onClick={() => handleGrammarFollowUp()} disabled={grammarFollowUpLoading || !grammarFollowUpQuery.trim()} className="bg-indigo-600 text-white px-4 rounded-xl text-base font-medium disabled:opacity-30 active:bg-indigo-700 transition shrink-0 self-end py-2.5">Ask</button>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {['More examples', 'Compare with が', 'When NOT to use?'].map(chip => (
-                  <button key={chip} onClick={() => handleGrammarFollowUp(chip)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip}</button>
+                {[
+                  { label: 'More examples', prompt: 'Give me 3-5 practical travel example sentences that use this grammar point. Format each as: Japanese sentence (romaji) = English meaning. One per line. Do NOT explain, just list the examples.' },
+                  { label: 'Compare with が', prompt: 'Compare with が' },
+                  { label: 'When NOT to use?', prompt: 'When NOT to use?' },
+                ].map(chip => (
+                  <button key={chip.label} onClick={() => handleGrammarFollowUp(chip.prompt)} disabled={grammarFollowUpLoading} className="text-sm bg-indigo-900/30 text-indigo-300 px-2.5 py-1 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">{chip.label}</button>
                 ))}
               </div>
             </div>
