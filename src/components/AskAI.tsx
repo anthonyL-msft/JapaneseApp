@@ -71,8 +71,15 @@ function AISounds({ phrase }: { phrase: AIPhrase }) {
   if (!reading) return null;
   let units = breakdownKana(reading);
   // Use pronunciation field (has word spaces) to mark word boundaries
+  // But only if it has real word-level spaces (not per-syllable)
   if (phrase.pronunciation) {
-    units = markWordBoundaries(units, phrase.pronunciation);
+    const words = phrase.pronunciation.trim().split(/\s+/);
+    const kanaCount = units.filter(u => !u.isSpace && u.romaji).length;
+    // If words count is much less than kana count, it's word-level spacing — use it
+    // If words count is close to kana count, it's per-syllable — skip word boundaries
+    if (words.length < kanaCount * 0.6) {
+      units = markWordBoundaries(units, phrase.pronunciation);
+    }
   }
   units = markLengtheners(units);
   const visible = units.filter(u => !u.isSpace);
