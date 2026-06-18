@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Phrase, SRSCard, RefBookmark, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 import { getSRSCards, saveSRSCard } from '../db';
 import { createNewCard, reviewCard, isDueForReview } from '../utils/srs';
 import { useSlidePanel } from '../utils/useSlidePanel';
-import { HIRAGANA_CARDS, KATAKANA_CARDS, KANA_VOCAB } from '../data/kana-data';
+import { HIRAGANA_CARDS, KATAKANA_CARDS } from '../data/kana-data';
 import type { KanaCard } from '../data/kana-data';
 
 interface Props {

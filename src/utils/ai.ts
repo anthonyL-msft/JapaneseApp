@@ -608,7 +608,6 @@ export async function askSentenceExpansion(
   currentSentence: string,
   currentEnglish: string,
   history: string[],
-  explainLang: string = 'en',
 ): Promise<SentenceExpansion[]> {
   if (!isAIConfigured()) throw new Error('AI not configured.');
 
