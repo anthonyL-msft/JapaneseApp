@@ -10,6 +10,7 @@ import { Reference, NumberConverter } from './components/Reference';
 import { Scenarios } from './components/Scenarios';
 import { AskAI } from './components/AskAI';
 import { SentenceBuilder } from './components/SentenceBuilder';
+import { SentenceGrow } from './components/SentenceGrow';
 import { QuickNote } from './components/QuickNote';
 import { Progress } from './components/Progress';
 import { Settings } from './components/Settings';
@@ -150,6 +151,7 @@ function App() {
         onOpenCards={() => setTab('cards')}
         onOpenConverter={() => setTab('converter')}
         onOpenBuilder={() => setTab('builder')}
+        onOpenGrow={() => setTab('grow')}
         onOpenNotes={() => setTab('notes')}
         onOpenProgress={() => setTab('progress')}
         onOpenSettings={() => setTab('settings')}
@@ -204,6 +206,10 @@ function App() {
             }} onSave={(phrase) => {
               const id = `ai_${Date.now()}`;
               handleSaveAIPhrase({ id, lang, target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ' '), pronunciation_chunks: phrase.rom, english: phrase.en, chinese_tc: '', notes: '', query: 'Sentence Builder', createdAt: Date.now() });
+            }} />}
+        {tab === 'grow' && <SentenceGrow onSave={(phrase) => {
+              const id = `ai_${Date.now()}`;
+              handleSaveAIPhrase({ id, lang, target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ' '), pronunciation_chunks: phrase.rom, english: phrase.en, chinese_tc: '', notes: '', query: 'Sentence Grow', createdAt: Date.now() });
             }} />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}

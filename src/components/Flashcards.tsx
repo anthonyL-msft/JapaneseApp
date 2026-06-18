@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Phrase, SRSCard, RefBookmark, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 import { getSRSCards, saveSRSCard } from '../db';
 import { createNewCard, reviewCard, isDueForReview } from '../utils/srs';
 import { useSlidePanel } from '../utils/useSlidePanel';
+import { HIRAGANA_CARDS, KATAKANA_CARDS, KANA_VOCAB } from '../data/kana-data';
+import type { KanaCard } from '../data/kana-data';
 
 interface Props {
   phrases: Phrase[];
@@ -29,7 +31,17 @@ function refToPseudoPhrase(rb: RefBookmark): Phrase {
   };
 }
 
-type DeckMode = 'all' | Category | 'ref';
+type DeckMode = 'all' | Category | 'ref' | 'hiragana' | 'katakana';
+
+// Shuffle array (Fisher-Yates)
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
   const [cards, setCards] = useState<SRSCard[]>([]);
@@ -100,11 +112,19 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
   const handlePrev = () => { setShowAnswer(false); setCurrentIndex(prev => Math.max(0, prev - 1)); };
 
   const startDeck = (mode: DeckMode) => {
+    if (mode === 'hiragana' || mode === 'katakana') {
+      setKanaCards(shuffle(mode === 'hiragana' ? HIRAGANA_CARDS : KATAKANA_CARDS));
+    }
     deck.open(mode);
     setCurrentIndex(0);
     setShowAnswer(false);
     setReviewMode('all');
   };
+
+  // Kana deck state
+  const [kanaCards, setKanaCards] = useState<KanaCard[]>([]);
+  const isKanaDeck = deck.value === 'hiragana' || deck.value === 'katakana';
+  const currentKana = isKanaDeck && kanaCards.length > 0 ? kanaCards[currentIndex % kanaCards.length] : null;
 
   if (!loaded) {
     return <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>;
@@ -116,55 +136,78 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
           <h2 className="text-lg font-bold">🃏 Flashcards</h2>
-          <p className="text-base text-slate-400">{totalLearned} learned items ready to practice</p>
+          <p className="text-base text-slate-400">Practice kana recognition &amp; learned phrases</p>
         </div>
 
-        {totalLearned === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 px-6 text-center">
-            <p className="text-4xl mb-4">📝</p>
-            <p className="text-lg font-semibold text-slate-200">No learned items yet</p>
-            <p className="text-base text-slate-400 mt-2">Mark phrases or reference examples as "Learned ✓" to add them to your flashcard deck</p>
+        <div className="p-4 space-y-4">
+          {/* Kana Recognition Section */}
+          <div>
+            <p className="text-sm text-slate-500 mb-2">Kana Recognition</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => startDeck('hiragana')}
+                className="bg-indigo-900/30 border border-indigo-700/30 rounded-xl p-3 text-left active:bg-indigo-800/40 transition flex flex-col gap-1"
+              >
+                <span className="text-2xl">あ</span>
+                <span className="text-base font-semibold text-slate-100">Hiragana</span>
+                <span className="text-sm text-slate-500">{HIRAGANA_CARDS.length} characters</span>
+              </button>
+              <button
+                onClick={() => startDeck('katakana')}
+                className="bg-indigo-900/30 border border-indigo-700/30 rounded-xl p-3 text-left active:bg-indigo-800/40 transition flex flex-col gap-1"
+              >
+                <span className="text-2xl">ア</span>
+                <span className="text-base font-semibold text-slate-100">Katakana</span>
+                <span className="text-sm text-slate-500">{KATAKANA_CARDS.length} characters</span>
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="p-4 grid grid-cols-2 gap-2">
-            {/* All Learned */}
-            <button
-              onClick={() => startDeck('all')}
-              className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
-            >
-              <span className="text-2xl">🎲</span>
-              <span className="text-base font-semibold text-slate-100">All Learned</span>
-              <span className="text-sm text-slate-500">{totalLearned} cards</span>
-            </button>
 
-            {/* Per-category */}
-            {(Object.entries(CATEGORY_INFO) as [Category, { label: string; emoji: string; labelTC: string }][])
-              .filter(([cat]) => categoryCounts.has(cat))
-              .map(([cat, info]) => (
+          {/* Learned Phrases Section */}
+          {totalLearned > 0 && (
+            <div>
+              <p className="text-sm text-slate-500 mb-2">Learned Phrases ({totalLearned})</p>
+              <div className="grid grid-cols-2 gap-2">
+                {/* All Learned */}
                 <button
-                  key={cat}
-                  onClick={() => startDeck(cat)}
+                  onClick={() => startDeck('all')}
                   className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
                 >
-                  <span className="text-2xl">{info.emoji}</span>
-                  <span className="text-base font-semibold text-slate-100">{info.label}</span>
-                  <span className="text-sm text-slate-500">{categoryCounts.get(cat)} cards</span>
+                  <span className="text-2xl">🎲</span>
+                  <span className="text-base font-semibold text-slate-100">All Learned</span>
+                  <span className="text-sm text-slate-500">{totalLearned} cards</span>
                 </button>
-              ))}
 
-            {/* Reference Examples */}
-            {learnedRefPhrases.length > 0 && (
-              <button
-                onClick={() => startDeck('ref')}
-                className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
-              >
-                <span className="text-2xl">📚</span>
-                <span className="text-base font-semibold text-slate-100">Reference</span>
-                <span className="text-sm text-slate-500">{learnedRefPhrases.length} cards</span>
-              </button>
-            )}
-          </div>
-        )}
+                {/* Per-category */}
+                {(Object.entries(CATEGORY_INFO) as [Category, { label: string; emoji: string; labelTC: string }][])
+                  .filter(([cat]) => categoryCounts.has(cat))
+                  .map(([cat, info]) => (
+                    <button
+                      key={cat}
+                      onClick={() => startDeck(cat)}
+                      className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
+                    >
+                      <span className="text-2xl">{info.emoji}</span>
+                      <span className="text-base font-semibold text-slate-100">{info.label}</span>
+                      <span className="text-sm text-slate-500">{categoryCounts.get(cat)} cards</span>
+                    </button>
+                  ))}
+
+                {/* Reference Examples */}
+                {learnedRefPhrases.length > 0 && (
+                  <button
+                    onClick={() => startDeck('ref')}
+                    className="bg-slate-800/60 rounded-xl p-3 text-left active:bg-slate-700/50 transition flex flex-col gap-1"
+                  >
+                    <span className="text-2xl">📚</span>
+                    <span className="text-base font-semibold text-slate-100">Reference</span>
+                    <span className="text-sm text-slate-500">{learnedRefPhrases.length} cards</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Step 2: Flashcard game (slide-in) */}
@@ -176,25 +219,95 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
               <button onClick={() => deck.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
                 ←
               </button>
-              <p className="text-base text-slate-400">
-                {reviewMode === 'review'
-                  ? `${displayPhrases.length} due for review`
-                  : `${displayPhrases.length} cards`}
-              </p>
+              {isKanaDeck ? (
+                <p className="text-base text-slate-400">
+                  {deck.value === 'hiragana' ? 'ひらがな' : 'カタカナ'} · {(currentIndex % kanaCards.length) + 1} / {kanaCards.length}
+                </p>
+              ) : (
+                <p className="text-base text-slate-400">
+                  {reviewMode === 'review'
+                    ? `${displayPhrases.length} due for review`
+                    : `${displayPhrases.length} cards`}
+                </p>
+              )}
             </div>
-            <div className="flex gap-2">
+            {!isKanaDeck && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setReviewMode('review'); setCurrentIndex(0); setShowAnswer(false); }}
+                  className={`text-sm px-3 py-1.5 rounded-lg ${reviewMode === 'review' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
+                >Due</button>
+                <button
+                  onClick={() => { setReviewMode('all'); setCurrentIndex(0); setShowAnswer(false); }}
+                  className={`text-sm px-3 py-1.5 rounded-lg ${reviewMode === 'all' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
+                >All</button>
+              </div>
+            )}
+            {isKanaDeck && (
               <button
-                onClick={() => { setReviewMode('review'); setCurrentIndex(0); setShowAnswer(false); }}
-                className={`text-sm px-3 py-1.5 rounded-lg ${reviewMode === 'review' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
-              >Due</button>
-              <button
-                onClick={() => { setReviewMode('all'); setCurrentIndex(0); setShowAnswer(false); }}
-                className={`text-sm px-3 py-1.5 rounded-lg ${reviewMode === 'all' ? 'bg-sakura-500/80 text-white' : 'bg-slate-800 text-slate-400'}`}
-              >All</button>
-            </div>
+                onClick={() => { setKanaCards(shuffle(kanaCards)); setCurrentIndex(0); setShowAnswer(false); }}
+                className="text-sm px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700"
+              >🔀 Shuffle</button>
+            )}
           </div>
 
-          {displayPhrases.length === 0 ? (
+          {/* Kana Card Game */}
+          {isKanaDeck && currentKana ? (
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <div
+                onClick={() => setShowAnswer(!showAnswer)}
+                className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer active:bg-slate-700/80 transition min-h-[320px] flex flex-col items-center justify-center"
+              >
+                {!showAnswer ? (
+                  <>
+                    <p className="text-7xl font-bold text-slate-50 mb-4">{currentKana.char}</p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); speak(currentKana.char, 'ja-JP'); }}
+                      className="text-2xl mb-4 active:scale-110 transition-transform"
+                    >🔊</button>
+                    <p className="text-base text-slate-500">What sound is this? Tap to reveal</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-5xl font-bold text-slate-50 mb-2">{currentKana.char}</p>
+                    <p className="text-2xl text-indigo-300 font-semibold mb-1">{currentKana.rom}</p>
+                    {currentKana.altChar && (
+                      <p className="text-base text-slate-400 mb-3">
+                        {deck.value === 'hiragana' ? 'Katakana' : 'Hiragana'}: <span className="text-slate-200 text-lg">{currentKana.altChar}</span>
+                      </p>
+                    )}
+                    {currentKana.vocab.length > 0 && (
+                      <>
+                        <div className="border-t border-slate-700 w-full my-3" />
+                        <p className="text-sm text-slate-500 mb-2">Words with 「{currentKana.rom}」</p>
+                        <div className="space-y-1.5 w-full">
+                          {currentKana.vocab.slice(0, 3).map((v, i) => (
+                            <button
+                              key={i}
+                              onClick={(e) => { e.stopPropagation(); speak(v.jp, 'ja-JP'); }}
+                              className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-700/40 active:bg-slate-600/50 transition text-left"
+                            >
+                              <span className="text-base text-slate-100">{v.jp}</span>
+                              <span className="text-sm text-slate-400">{v.en}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); speak(currentKana.char, 'ja-JP'); }}
+                      className="text-xl mt-3 active:scale-110 transition-transform"
+                    >🔊</button>
+                  </>
+                )}
+              </div>
+
+              <div className="flex gap-4 mt-4">
+                <button onClick={handlePrev} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-base" disabled={currentIndex === 0}>← Prev</button>
+                <button onClick={handleNext} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-base">Next →</button>
+              </div>
+            </div>
+          ) : !isKanaDeck && displayPhrases.length === 0 ? (
             <div className="flex flex-col items-center justify-center flex-1 px-6 text-center">
               <p className="text-4xl mb-4">🎉</p>
               <p className="text-lg font-semibold text-slate-200">No cards due!</p>

@@ -8,12 +8,13 @@ interface Props {
   onOpenCards: () => void;
   onOpenConverter: () => void;
   onOpenBuilder: () => void;
+  onOpenGrow: () => void;
   onOpenNotes: () => void;
   onOpenProgress: () => void;
   onOpenSettings: () => void;
 }
 
-export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenNotes, onOpenProgress, onOpenSettings }: Props) {
+export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
@@ -141,6 +142,16 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <div>
                     <p className="text-base text-slate-200">Sentence Builder</p>
                     <p className="text-sm text-slate-500">Pick a pattern, fill the blank</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenGrow(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🌱</span>
+                  <div>
+                    <p className="text-base text-slate-200">Sentence Grow</p>
+                    <p className="text-sm text-slate-500">Expand sentences step by step</p>
                   </div>
                 </button>
                 <button

@@ -590,3 +590,96 @@ Respond ONLY with a valid JSON array. No markdown wrapping.`;
     };
   });
 }
+
+// ============================================================
+// Sentence Expansion — grow a sentence step by step
+// ============================================================
+
+export interface SentenceExpansion {
+  label: string;       // e.g. "+Where" or "+Who"
+  target: string;      // full expanded sentence
+  pronunciation: string;
+  pronunciation_chunks: string;
+  english: string;
+  added: string;       // the new part that was added (for highlighting)
+}
+
+export async function askSentenceExpansion(
+  currentSentence: string,
+  currentEnglish: string,
+  history: string[],
+  explainLang: string = 'en',
+): Promise<SentenceExpansion[]> {
+  if (!isAIConfigured()) throw new Error('AI not configured.');
+
+  const historyNote = history.length > 0
+    ? `\nPrevious expansions already added: ${history.join(', ')}. Do NOT suggest the same categories again.`
+    : '';
+
+  const systemPrompt = `You are a Japanese sentence building tutor for beginners. Given a Japanese sentence, suggest 2-3 ways to expand it by adding ONE grammar element.
+
+Each suggestion should add a different type of element:
+- +Where (destination/location): に, で, へ
+- +Who (companion): と
+- +When (time): に, 朝/昼/夜, 曜日
+- +What (object): を
+- +How (manner/transport): で
+- +Why (reason): から, ので
+- +How much/many (quantity): 数量
+${historyNote}
+
+Return a JSON array of 2-3 expansion objects. Each object:
+{
+  "label": "+Category (e.g. +Where, +Who, +When)",
+  "target": "full expanded Japanese sentence",
+  "pronunciation": "romaji with spaces between words",
+  "pronunciation_chunks": "syllable·broken with · separators and spaces between words",
+  "english": "English translation",
+  "added": "just the new Japanese words/phrase that was added"
+}
+
+Keep sentences natural, travel-relevant, and in casual polite form (ます/です).
+Each expansion should produce a natural sentence a traveler might actually say.
+Respond ONLY with a valid JSON array.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Expand this sentence: ${currentSentence} = "${currentEnglish}"` },
+  ];
+
+  const url = `${ENDPOINT}/openai/deployments/${DEPLOYMENT}/chat/completions?api-version=${API_VERSION}`;
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
+    body: JSON.stringify({ messages, temperature: 0.7, max_tokens: 600 }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`AI request failed: ${resp.status} ${errText}`);
+  }
+
+  const resData = await resp.json();
+  const resContent = resData.choices?.[0]?.message?.content?.trim();
+  if (!resContent) throw new Error('Empty response from AI');
+
+  const jsonStr = resContent.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed;
+  try { parsed = JSON.parse(jsonStr); } catch {
+    const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
+    if (arrMatch) {
+      try { parsed = JSON.parse(arrMatch[0]); } catch { throw new Error('Could not parse AI response.'); }
+    } else { throw new Error('AI returned non-JSON response.'); }
+  }
+  if (!Array.isArray(parsed)) parsed = [parsed];
+
+  return parsed.map((e: Record<string, unknown>): SentenceExpansion => ({
+    label: safeStr(e.label),
+    target: safeStr(e.target),
+    pronunciation: safeStr(e.pronunciation),
+    pronunciation_chunks: safeStr(e.pronunciation_chunks),
+    english: safeStr(e.english),
+    added: safeStr(e.added),
+  }));
+}
