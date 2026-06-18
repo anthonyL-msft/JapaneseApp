@@ -960,7 +960,7 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} onAskMore={onAskMore}
           note="Lists items exhaustively (AとB = A and B, nothing else) or indicates a companion (友達と行く = go with a friend). Unlike や which is non-exhaustive (AやB = A, B, and others)." items={[
             { jp: 'ビールと枝豆をお願いします', hep: 'bii·ru to e·da·ma·me wo o·ne·gai·shi·ma·su', en: 'Beer and edamame please' },
-            { jp: 'ふたりで旅行しています', hep: 'fu·ta·ri de ryo·kou shi·te i·ma·su', en: 'Traveling as two people' },
+            { jp: '友達と一緒に来ました', hep: 'to·mo·da·chi to i·ssho ni ki·ma·shi·ta', en: 'I came together with a friend' },
             { jp: '朝と夜、二食付きです', hep: 'a·sa to yo·ru ni·sho·ku tsu·ki de·su', en: 'Breakfast and dinner included' },
           ]} />
         <AccordionRow id="も" jp="も" rom="mo" meaning="Also, too"

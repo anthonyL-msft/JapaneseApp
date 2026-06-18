@@ -4,18 +4,6 @@ import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
 import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';
 
-function useVisualViewportHeight() {
-  const [height, setHeight] = useState<number | undefined>(undefined);
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => setHeight(vv.height);
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    return () => { vv.removeEventListener('resize', update); vv.removeEventListener('scroll', update); };
-  }, []);
-  return height;
-}
 import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 
@@ -32,7 +20,6 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const autoPlayRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const vvHeight = useVisualViewportHeight();
 
   const allLangScenarios = scenarios.filter(s => s.lang === lang);
 
@@ -263,7 +250,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
       {conversationPanel.visible && selectedScenario && createPortal(
         <div className="fixed inset-0 z-[80] flex flex-col justify-end" onClick={handleBack}>
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up" style={{ height: vvHeight ? `${vvHeight}px` : '100%', paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
+          <div className="relative bg-slate-950 rounded-t-2xl flex flex-col animate-slide-up h-full" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }} onClick={e => e.stopPropagation()}>
             <div className="shrink-0 px-4 pt-3 pb-3 border-b border-slate-700/50">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
