@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Phrase, SRSCard, RefBookmark, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 import { getSRSCards, saveSRSCard } from '../db';
 import { createNewCard, reviewCard, isDueForReview } from '../utils/srs';
 import { useSlidePanel } from '../utils/useSlidePanel';
-import { HIRAGANA_CARDS, KATAKANA_CARDS } from '../data/kana-data';
-import type { KanaCard } from '../data/kana-data';
+import { HIRAGANA_CARDS, KATAKANA_CARDS, HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
+import type { KanaCard, KanaVocabCard } from '../data/kana-data';
 
 interface Props {
   phrases: Phrase[];
@@ -31,7 +31,10 @@ function refToPseudoPhrase(rb: RefBookmark): Phrase {
   };
 }
 
-type DeckMode = 'all' | Category | 'ref' | 'hiragana' | 'katakana';
+type DeckMode = 'all' | Category | 'ref' | 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k';
+
+const GAME_TIME = 10; // seconds per question
+const GAME_ROUNDS = 20; // questions per game session
 
 // Shuffle array (Fisher-Yates)
 function shuffle<T>(arr: T[]): T[] {
@@ -114,7 +117,11 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
   const startDeck = (mode: DeckMode) => {
     if (mode === 'hiragana' || mode === 'katakana') {
       setKanaCards(shuffle(mode === 'hiragana' ? HIRAGANA_CARDS : KATAKANA_CARDS));
+    } else if (mode === 'vocab-h' || mode === 'vocab-k') {
+      setVocabCards(shuffle(mode === 'vocab-h' ? HIRAGANA_VOCAB_CARDS : KATAKANA_VOCAB_CARDS));
     }
+    setGameMode(false);
+    setGameFinished(false);
     deck.open(mode);
     setCurrentIndex(0);
     setShowAnswer(false);
@@ -125,6 +132,125 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
   const [kanaCards, setKanaCards] = useState<KanaCard[]>([]);
   const isKanaDeck = deck.value === 'hiragana' || deck.value === 'katakana';
   const currentKana = isKanaDeck && kanaCards.length > 0 ? kanaCards[currentIndex % kanaCards.length] : null;
+
+  // Vocab deck state
+  const [vocabCards, setVocabCards] = useState<KanaVocabCard[]>([]);
+  const isVocabDeck = deck.value === 'vocab-h' || deck.value === 'vocab-k';
+  const currentVocab = isVocabDeck && vocabCards.length > 0 ? vocabCards[currentIndex % vocabCards.length] : null;
+
+  // Game mode state
+  const [gameMode, setGameMode] = useState(false);
+  const [gameScore, setGameScore] = useState({ correct: 0, total: 0 });
+  const [timeLeft, setTimeLeft] = useState(GAME_TIME);
+  const [choices, setChoices] = useState<string[]>([]);
+  const [answered, setAnswered] = useState<string | null>(null);
+  const [correctAnswer, setCorrectAnswer] = useState('');
+  const [gameFinished, setGameFinished] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Generate multiple choice options
+  const generateChoices = useCallback((idx: number) => {
+    if (isKanaDeck && kanaCards.length > 0) {
+      const card = kanaCards[idx % kanaCards.length];
+      const correct = card.rom;
+      const pool = kanaCards.map(c => c.rom).filter(r => r !== correct);
+      const wrong = shuffle(pool).slice(0, 3);
+      setCorrectAnswer(correct);
+      setChoices(shuffle([correct, ...wrong]));
+    } else if (isVocabDeck && vocabCards.length > 0) {
+      const card = vocabCards[idx % vocabCards.length];
+      const correct = card.en;
+      const pool = vocabCards.map(c => c.en).filter(e => e !== correct);
+      const wrong = shuffle(pool).slice(0, 3);
+      setCorrectAnswer(correct);
+      setChoices(shuffle([correct, ...wrong]));
+    }
+  }, [isKanaDeck, isVocabDeck, kanaCards, vocabCards]);
+
+  // Start/reset timer for a question
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setTimeLeft(GAME_TIME);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          // Time's up — mark as wrong
+          setAnswered('__timeout__');
+          setGameScore(s => ({ correct: s.correct, total: s.total + 1 }));
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  // Handle game answer selection
+  const handleGameAnswer = useCallback((choice: string) => {
+    if (answered) return; // already answered
+    if (timerRef.current) clearInterval(timerRef.current);
+    setAnswered(choice);
+    const isCorrect = choice === correctAnswer;
+    setGameScore(s => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
+  }, [answered, correctAnswer]);
+
+  // Auto-advance after answering
+  useEffect(() => {
+    if (!answered || !gameMode) return;
+    const timeout = setTimeout(() => {
+      // Speak correct answer
+      if (isKanaDeck && kanaCards.length > 0) {
+        speak(kanaCards[currentIndex % kanaCards.length].char, 'ja-JP');
+      } else if (isVocabDeck && vocabCards.length > 0) {
+        speak(vocabCards[currentIndex % vocabCards.length].jp, 'ja-JP');
+      }
+    }, 300);
+    const advance = setTimeout(() => {
+      const nextIdx = currentIndex + 1;
+      if (gameScore.total >= GAME_ROUNDS) {
+        setGameFinished(true);
+      } else {
+        setCurrentIndex(nextIdx);
+        setAnswered(null);
+        generateChoices(nextIdx);
+        startTimer();
+      }
+    }, 1500);
+    return () => { clearTimeout(timeout); clearTimeout(advance); };
+  }, [answered, gameMode]);
+
+  // Cleanup timer on unmount/deck close
+  useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  const startGameMode = () => {
+    setGameMode(true);
+    setGameScore({ correct: 0, total: 0 });
+    setGameFinished(false);
+    setCurrentIndex(0);
+    setAnswered(null);
+    // Re-shuffle cards
+    if (isKanaDeck) {
+      const shuffled = shuffle(kanaCards);
+      setKanaCards(shuffled);
+    } else if (isVocabDeck) {
+      const shuffled = shuffle(vocabCards);
+      setVocabCards(shuffled);
+    }
+    setTimeout(() => {
+      generateChoices(0);
+      startTimer();
+    }, 50);
+  };
+
+  const exitGameMode = () => {
+    setGameMode(false);
+    setGameFinished(false);
+    if (timerRef.current) clearInterval(timerRef.current);
+    setCurrentIndex(0);
+    setShowAnswer(false);
+  };
 
   if (!loaded) {
     return <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>;
@@ -159,6 +285,29 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                 <span className="text-2xl">ア</span>
                 <span className="text-base font-semibold text-slate-100">Katakana</span>
                 <span className="text-sm text-slate-500">{KATAKANA_CARDS.length} characters</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Kana Vocab Section */}
+          <div>
+            <p className="text-sm text-slate-500 mb-2">Kana Vocab Practice</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => startDeck('vocab-h')}
+                className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-3 text-left active:bg-purple-800/40 transition flex flex-col gap-1"
+              >
+                <span className="text-2xl">🏷️</span>
+                <span className="text-base font-semibold text-slate-100">Vocab (ひらがな)</span>
+                <span className="text-sm text-slate-500">{HIRAGANA_VOCAB_CARDS.length} words</span>
+              </button>
+              <button
+                onClick={() => startDeck('vocab-k')}
+                className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-3 text-left active:bg-purple-800/40 transition flex flex-col gap-1"
+              >
+                <span className="text-2xl">🏷️</span>
+                <span className="text-base font-semibold text-slate-100">Vocab (カタカナ)</span>
+                <span className="text-sm text-slate-500">{KATAKANA_VOCAB_CARDS.length} words</span>
               </button>
             </div>
           </div>
@@ -216,22 +365,26 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
           {/* Header */}
           <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
             <div>
-              <button onClick={() => deck.close()} className="text-base text-slate-400 active:text-slate-200 p-1">
+              <button onClick={() => { deck.close(); exitGameMode(); }} className="text-base text-slate-400 active:text-slate-200 p-1">
                 ←
               </button>
-              {isKanaDeck ? (
+              {(isKanaDeck || isVocabDeck) && !gameMode ? (
                 <p className="text-base text-slate-400">
-                  {deck.value === 'hiragana' ? 'ひらがな' : 'カタカナ'} · {(currentIndex % kanaCards.length) + 1} / {kanaCards.length}
+                  {deck.value === 'hiragana' ? 'ひらがな' : deck.value === 'katakana' ? 'カタカナ' : deck.value === 'vocab-h' ? 'Vocab ひらがな' : 'Vocab カタカナ'} · {(currentIndex % (isKanaDeck ? kanaCards.length : vocabCards.length || 1)) + 1} / {isKanaDeck ? kanaCards.length : vocabCards.length}
                 </p>
-              ) : (
+              ) : gameMode && !gameFinished ? (
+                <p className="text-base text-slate-400">
+                  🎮 Game · {gameScore.total + 1} / {GAME_ROUNDS}
+                </p>
+              ) : !gameMode && !isKanaDeck && !isVocabDeck ? (
                 <p className="text-base text-slate-400">
                   {reviewMode === 'review'
                     ? `${displayPhrases.length} due for review`
                     : `${displayPhrases.length} cards`}
                 </p>
-              )}
+              ) : null}
             </div>
-            {!isKanaDeck && (
+            {!isKanaDeck && !isVocabDeck && !gameMode && (
               <div className="flex gap-2">
                 <button
                   onClick={() => { setReviewMode('review'); setCurrentIndex(0); setShowAnswer(false); }}
@@ -243,16 +396,149 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                 >All</button>
               </div>
             )}
-            {isKanaDeck && (
+            {(isKanaDeck || isVocabDeck) && !gameMode && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (isKanaDeck) setKanaCards(shuffle(kanaCards));
+                    else setVocabCards(shuffle(vocabCards));
+                    setCurrentIndex(0); setShowAnswer(false);
+                  }}
+                  className="text-sm px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700"
+                >🔀</button>
+                <button
+                  onClick={startGameMode}
+                  className="text-sm px-3 py-1.5 rounded-lg bg-amber-900/50 text-amber-300 active:bg-amber-800/60"
+                >🎮 Quiz</button>
+              </div>
+            )}
+            {gameMode && !gameFinished && (
               <button
-                onClick={() => { setKanaCards(shuffle(kanaCards)); setCurrentIndex(0); setShowAnswer(false); }}
+                onClick={exitGameMode}
                 className="text-sm px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700"
-              >🔀 Shuffle</button>
+              >✕ Exit</button>
             )}
           </div>
 
-          {/* Kana Card Game */}
-          {isKanaDeck && currentKana ? (
+          {/* Game Mode UI */}
+          {gameMode && !gameFinished && (isKanaDeck || isVocabDeck) ? (
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              {/* Timer bar */}
+              <div className="w-full max-w-sm mb-4">
+                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-1000 ${timeLeft <= 3 ? 'bg-red-500' : 'bg-emerald-500'}`}
+                    style={{ width: `${(timeLeft / GAME_TIME) * 100}%` }}
+                  />
+                </div>
+                <p className="text-sm text-slate-500 text-right mt-1">{timeLeft}s</p>
+              </div>
+
+              {/* Score */}
+              <p className="text-base text-slate-400 mb-3">✓ {gameScore.correct} / {gameScore.total}</p>
+
+              {/* Question */}
+              <div className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center mb-4 min-h-[120px] flex flex-col items-center justify-center">
+                {isKanaDeck && currentKana && (
+                  <>
+                    <p className="text-6xl font-bold text-slate-50 mb-2">{currentKana.char}</p>
+                    <p className="text-base text-slate-500">What sound is this?</p>
+                  </>
+                )}
+                {isVocabDeck && currentVocab && (
+                  <>
+                    <p className="text-3xl font-bold text-slate-50 mb-1">{currentVocab.jp}</p>
+                    <p className="text-base text-sakura-300">{currentVocab.hep}</p>
+                    <p className="text-base text-slate-500 mt-1">What does this mean?</p>
+                  </>
+                )}
+              </div>
+
+              {/* 4 Choices */}
+              <div className="w-full max-w-sm grid grid-cols-1 gap-2">
+                {choices.map((choice, i) => {
+                  let btnClass = 'bg-slate-800 text-slate-200 active:bg-slate-700';
+                  if (answered) {
+                    if (choice === correctAnswer) btnClass = 'bg-emerald-600/60 text-emerald-100';
+                    else if (choice === answered) btnClass = 'bg-red-600/60 text-red-100';
+                    else btnClass = 'bg-slate-800/50 text-slate-500';
+                  }
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => handleGameAnswer(choice)}
+                      disabled={!!answered}
+                      className={`w-full py-3 px-4 rounded-xl text-base text-left transition ${btnClass}`}
+                    >
+                      {choice}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : gameMode && gameFinished ? (
+            /* Game End Screen */
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+              <p className="text-5xl mb-4">{gameScore.correct >= GAME_ROUNDS * 0.8 ? '🎉' : gameScore.correct >= GAME_ROUNDS * 0.5 ? '👍' : '💪'}</p>
+              <p className="text-2xl font-bold text-slate-100 mb-2">
+                {gameScore.correct} / {gameScore.total}
+              </p>
+              <p className="text-lg text-slate-400 mb-1">
+                {Math.round((gameScore.correct / gameScore.total) * 100)}% correct
+              </p>
+              <p className="text-base text-slate-500 mb-6">
+                {gameScore.correct >= GAME_ROUNDS * 0.8 ? 'Excellent!' : gameScore.correct >= GAME_ROUNDS * 0.5 ? 'Good effort!' : 'Keep practicing!'}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={startGameMode}
+                  className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base"
+                >🔄 Play Again</button>
+                <button
+                  onClick={exitGameMode}
+                  className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base"
+                >📖 Free Study</button>
+              </div>
+            </div>
+          ) : isVocabDeck && currentVocab ? (
+            /* Vocab Flashcard (free study) */
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <div
+                onClick={() => setShowAnswer(!showAnswer)}
+                className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer active:bg-slate-700/80 transition min-h-[300px] flex flex-col items-center justify-center"
+              >
+                {!showAnswer ? (
+                  <>
+                    <p className="text-3xl font-bold text-slate-50 mb-3">{currentVocab.jp}</p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, 'ja-JP'); }}
+                      className="text-2xl mb-4 active:scale-110 transition-transform"
+                    >🔊</button>
+                    <p className="text-base text-slate-500">What does this word mean? Tap to reveal</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold text-slate-50 mb-2">{currentVocab.jp}</p>
+                    <p className="text-lg text-sakura-300 mb-1">{currentVocab.hep}</p>
+                    <div className="border-t border-slate-700 w-full my-3" />
+                    <p className="text-lg text-slate-200 mb-2">{currentVocab.en}</p>
+                    <p className="text-sm text-indigo-300 bg-indigo-900/30 px-3 py-1 rounded-full">
+                      Kana: {currentVocab.kanaKey}
+                    </p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, 'ja-JP'); }}
+                      className="text-xl mt-3 active:scale-110 transition-transform"
+                    >🔊</button>
+                  </>
+                )}
+              </div>
+
+              <div className="flex gap-4 mt-4">
+                <button onClick={handlePrev} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-base" disabled={currentIndex === 0}>← Prev</button>
+                <button onClick={handleNext} className="text-slate-400 px-4 py-2 rounded-xl bg-slate-800 active:bg-slate-700 text-base">Next →</button>
+              </div>
+            </div>
+          ) : isKanaDeck && currentKana ? (
             <div className="flex-1 flex flex-col items-center justify-center px-6">
               <div
                 onClick={() => setShowAnswer(!showAnswer)}

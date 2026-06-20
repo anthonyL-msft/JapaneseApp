@@ -146,3 +146,35 @@ function buildCards(chart: string[][], altChart: string[][]): KanaCard[] {
 
 export const HIRAGANA_CARDS = buildCards(HIRAGANA_CHART, KATAKANA_CHART);
 export const KATAKANA_CARDS = buildCards(KATAKANA_CHART, HIRAGANA_CHART);
+
+// Vocab cards for contextual kana practice — each word tagged with its kana key
+export interface KanaVocabCard {
+  jp: string;
+  hep: string;
+  en: string;
+  kanaKey: string; // which kana sound this word practices
+}
+
+function isKatakana(ch: string): boolean {
+  const code = ch.charCodeAt(0);
+  return code >= 0x30A0 && code <= 0x30FF;
+}
+
+function buildVocabCards(katakanaMode: boolean): KanaVocabCard[] {
+  const cards: KanaVocabCard[] = [];
+  for (const [key, items] of Object.entries(KANA_VOCAB)) {
+    for (const item of items) {
+      // Skip placeholder entries
+      if (item.en.includes('Rarely used')) continue;
+      const firstChar = item.jp[0];
+      const isKata = isKatakana(firstChar);
+      if (katakanaMode === isKata) {
+        cards.push({ jp: item.jp, hep: item.hep, en: item.en, kanaKey: key });
+      }
+    }
+  }
+  return cards;
+}
+
+export const HIRAGANA_VOCAB_CARDS = buildVocabCards(false);
+export const KATAKANA_VOCAB_CARDS = buildVocabCards(true);
