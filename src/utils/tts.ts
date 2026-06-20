@@ -14,9 +14,17 @@ export function setTtsRate(rate: number): void {
 export function speak(text: string, lang = 'ja-JP'): void {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
+
+  // For single kana characters, extend with vowel mark for clarity
+  let speakText = text;
+  if (text.length === 1 && lang === 'ja-JP') {
+    speakText = text + 'ー'; // makes "あ" → "あー" (longer, clearer)
+  }
+
+  const utterance = new SpeechSynthesisUtterance(speakText);
   utterance.lang = lang;
-  utterance.rate = getTtsRate();
+  // Use normal rate for single characters (slow rate warps short sounds)
+  utterance.rate = text.length <= 2 ? Math.max(getTtsRate(), 0.85) : getTtsRate();
   utterance.pitch = 1;
 
   // Try to find a matching voice

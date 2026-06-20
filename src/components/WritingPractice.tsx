@@ -179,6 +179,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [started, setStarted] = useState(false);
   const [results, setResults] = useState<{ char: string; rom: string; correct: boolean }[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const clearRef = useRef<(() => void) | null>(null);
@@ -201,16 +202,21 @@ function DictationPage({ onBack }: { onBack: () => void }) {
     }, 1000);
   }, []);
 
-  // Play sound for current character
+  // Play sound for current character (only after started)
   useEffect(() => {
-    if (!finished && currentChar) {
-      setRevealed(false);
-      clearRef.current?.();
-      startTimer();
-      setTimeout(() => speak(currentChar.char, 'ja-JP'), 200);
-    }
+    if (!started || finished || !currentChar) return;
+    setRevealed(false);
+    clearRef.current?.();
+    startTimer();
+    setTimeout(() => speak(currentChar.char, 'ja-JP'), 200);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [currentIdx, finished]);
+  }, [currentIdx, started, finished]);
+
+  const handleStart = () => {
+    // User tap unlocks TTS on iOS
+    speak(currentChar.char, 'ja-JP');
+    setStarted(true);
+  };
 
   const handleGrade = (correct: boolean) => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -260,6 +266,26 @@ function DictationPage({ onBack }: { onBack: () => void }) {
             <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base">🔄 Again</button>
             <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base">← Back</button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!started) {
+    return (
+      <div className="h-full scroll-area">
+        <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+          <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+          <h2 className="text-lg font-bold">👂 Dictation</h2>
+        </div>
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <p className="text-5xl mb-4">👂</p>
+          <p className="text-lg text-slate-200 mb-2">Ready?</p>
+          <p className="text-base text-slate-400 mb-6">Listen to each sound and draw the character.<br/>{DICTATION_TIME}s per character × {DICTATION_ROUNDS} rounds.</p>
+          <button
+            onClick={handleStart}
+            className="px-8 py-3 rounded-xl bg-indigo-500/80 text-white text-lg active:bg-indigo-600 transition"
+          >🔊 Start</button>
         </div>
       </div>
     );
@@ -345,13 +371,15 @@ function SprintPage({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [started, setStarted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const clearRef = useRef<(() => void) | null>(null);
 
   const currentChar = queue[currentIdx % queue.length];
 
-  // Start global timer
-  useEffect(() => {
+  const beginSprint = () => {
+    speak(currentChar.char, 'ja-JP');
+    setStarted(true);
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -362,17 +390,20 @@ function SprintPage({ onBack }: { onBack: () => void }) {
         return prev - 1;
       });
     }, 1000);
+  };
+
+  // Play sound on new character (after started)
+  useEffect(() => {
+    if (!started || finished) return;
+    setRevealed(false);
+    clearRef.current?.();
+    setTimeout(() => speak(currentChar.char, 'ja-JP'), 100);
+  }, [currentIdx, started, finished]);
+
+  // Cleanup
+  useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
-
-  // Play sound on new character
-  useEffect(() => {
-    if (!finished) {
-      setRevealed(false);
-      clearRef.current?.();
-      setTimeout(() => speak(currentChar.char, 'ja-JP'), 100);
-    }
-  }, [currentIdx, finished]);
 
   const handleGrade = (correct: boolean) => {
     if (correct) setScore(s => s + 1);
@@ -418,6 +449,26 @@ function SprintPage({ onBack }: { onBack: () => void }) {
             <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base">🔄 Again</button>
             <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base">← Back</button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!started) {
+    return (
+      <div className="h-full scroll-area">
+        <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+          <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+          <h2 className="text-lg font-bold">⚡ Sprint</h2>
+        </div>
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <p className="text-5xl mb-4">⚡</p>
+          <p className="text-lg text-slate-200 mb-2">Ready?</p>
+          <p className="text-base text-slate-400 mb-6">{SPRINT_TIME} seconds — draw as many characters as you can!</p>
+          <button
+            onClick={beginSprint}
+            className="px-8 py-3 rounded-xl bg-amber-500/80 text-white text-lg active:bg-amber-600 transition"
+          >🔊 Go!</button>
         </div>
       </div>
     );
