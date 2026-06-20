@@ -53,7 +53,9 @@ function saveStreak(state: StreakState) {
 }
 
 function isYesterday(dateStr: string): boolean {
+  if (!dateStr) return false;
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return false;
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   return d.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0];
