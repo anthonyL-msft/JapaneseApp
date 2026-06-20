@@ -166,6 +166,12 @@ export function Quiz() {
         </div>
 
         <div className="p-4 space-y-4">
+          {/* Info */}
+          <div className="bg-slate-800/40 rounded-xl p-3">
+            <p className="text-sm text-slate-400">⏱️ {GAME_TIME}s per question · {GAME_ROUNDS} questions per round</p>
+            <p className="text-sm text-slate-500 mt-1">Pick the correct answer from 4 choices before time runs out!</p>
+          </div>
+
           {/* Kana Characters */}
           <div>
             <p className="text-sm text-slate-500 mb-2">Kana Characters</p>
@@ -222,12 +228,6 @@ export function Quiz() {
                 )}
               </button>
             </div>
-          </div>
-
-          {/* Info */}
-          <div className="bg-slate-800/40 rounded-xl p-3">
-            <p className="text-sm text-slate-400">⏱️ {GAME_TIME}s per question · {GAME_ROUNDS} questions per round</p>
-            <p className="text-sm text-slate-500 mt-1">Pick the correct answer from 4 choices before time runs out!</p>
           </div>
         </div>
       </div>
