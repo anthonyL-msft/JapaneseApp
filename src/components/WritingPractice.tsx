@@ -2,195 +2,54 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { speak } from '../utils/tts';
 import { HIRAGANA_STROKES } from '../data/hiragana-strokes';
 
-type Mode = 'learn' | 'trace' | 'dictation';
+type Page = 'menu' | 'learn' | 'dictation';
 
-const CANVAS_SIZE = 280;
-const SCALE = CANVAS_SIZE / 100;
+const CANVAS_SIZE = 260;
+const DICTATION_TIME = 10; // seconds per word
+const DICTATION_ROUNDS = 10;
 
-function drawGrid(ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath();
-  ctx.moveTo(CANVAS_SIZE / 2, 0);
-  ctx.lineTo(CANVAS_SIZE / 2, CANVAS_SIZE);
-  ctx.moveTo(0, CANVAS_SIZE / 2);
-  ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE / 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-function drawSmoothStroke(ctx: CanvasRenderingContext2D, points: number[][], color: string, width: number, progress = 1) {
-  if (points.length < 2) return;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-
-  const totalPoints = points.length;
-  const drawUpTo = Math.ceil(totalPoints * progress);
-
-  ctx.moveTo(points[0][0] * SCALE, points[0][1] * SCALE);
-  for (let i = 1; i < drawUpTo; i++) {
-    if (i < totalPoints - 1) {
-      const xc = ((points[i][0] + points[i + 1][0]) / 2) * SCALE;
-      const yc = ((points[i][1] + points[i + 1][1]) / 2) * SCALE;
-      ctx.quadraticCurveTo(points[i][0] * SCALE, points[i][1] * SCALE, xc, yc);
-    } else {
-      ctx.lineTo(points[i][0] * SCALE, points[i][1] * SCALE);
-    }
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  ctx.stroke();
+  return a;
 }
 
-export function WritingPractice() {
-  const [charIndex, setCharIndex] = useState(0);
-  const [mode, setMode] = useState<Mode>('learn');
-  const [showGrid, setShowGrid] = useState(true);
-  const [animating, setAnimating] = useState(false);
-  const [revealed, setRevealed] = useState(false);
-
-  const animCanvasRef = useRef<HTMLCanvasElement>(null);
-  const drawCanvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>(0);
+function DrawCanvas({ size, onClear }: { size: number; onClear?: (clearFn: () => void) => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDrawingRef = useRef(false);
   const lastPointRef = useRef<[number, number] | null>(null);
 
-  const currentChar = HIRAGANA_STROKES[charIndex];
-  const totalChars = HIRAGANA_STROKES.length;
+  const clear = useCallback(() => {
+    const ctx = canvasRef.current?.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, size, size);
+  }, [size]);
 
-  // Animate stroke order overlay
-  const animateStrokes = useCallback(() => {
-    const canvas = animCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+  useEffect(() => { onClear?.(clear); }, [clear, onClear]);
 
-    setAnimating(true);
-    const strokes = currentChar.strokes;
-    let strokeIdx = 0;
-    let progress = 0;
-    const speed = 0.035;
-
-    const draw = () => {
-      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-      if (showGrid) drawGrid(ctx);
-
-      // Draw completed strokes (with numbers)
-      for (let i = 0; i < strokeIdx; i++) {
-        drawSmoothStroke(ctx, strokes[i], 'rgba(244, 114, 182, 0.7)', 5);
-        const start = strokes[i][0];
-        ctx.fillStyle = '#f43f5e';
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillText(`${i + 1}`, start[0] * SCALE - 10, start[1] * SCALE - 10);
-      }
-
-      // Draw current stroke with progress
-      if (strokeIdx < strokes.length) {
-        drawSmoothStroke(ctx, strokes[strokeIdx], '#f472b6', 6, progress);
-        const start = strokes[strokeIdx][0];
-        ctx.fillStyle = '#f43f5e';
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillText(`${strokeIdx + 1}`, start[0] * SCALE - 10, start[1] * SCALE - 10);
-
-        // Draw direction arrow at current tip
-        const tipIdx = Math.min(Math.floor(progress * strokes[strokeIdx].length), strokes[strokeIdx].length - 1);
-        const tip = strokes[strokeIdx][tipIdx];
-        ctx.beginPath();
-        ctx.arc(tip[0] * SCALE, tip[1] * SCALE, 6, 0, Math.PI * 2);
-        ctx.fillStyle = '#f43f5e';
-        ctx.fill();
-
-        progress += speed;
-        if (progress >= 1) {
-          strokeIdx++;
-          progress = 0;
-          if (strokeIdx >= strokes.length) {
-            setAnimating(false);
-            // Show all stroke numbers at end
-            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-            if (showGrid) drawGrid(ctx);
-            for (let i = 0; i < strokes.length; i++) {
-              drawSmoothStroke(ctx, strokes[i], 'rgba(244, 114, 182, 0.5)', 4);
-              const s = strokes[i][0];
-              ctx.fillStyle = '#f43f5e';
-              ctx.font = 'bold 16px sans-serif';
-              ctx.fillText(`${i + 1}`, s[0] * SCALE - 10, s[1] * SCALE - 10);
-            }
-            return;
-          }
-        }
-        animFrameRef.current = requestAnimationFrame(draw);
-      }
-    };
-    animFrameRef.current = requestAnimationFrame(draw);
-  }, [currentChar, showGrid]);
-
-  // Clear drawing canvas
-  const clearDrawing = useCallback(() => {
-    const canvas = drawCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-  }, []);
-
-  // Clear animation canvas
-  const clearAnim = useCallback(() => {
-    const canvas = animCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    if (showGrid) drawGrid(ctx);
-  }, [showGrid]);
-
-  // Setup for mode/character changes
-  useEffect(() => {
-    cancelAnimationFrame(animFrameRef.current);
-    setAnimating(false);
-    setRevealed(false);
-    clearDrawing();
-
-    if (mode === 'learn') {
-      setTimeout(() => animateStrokes(), 100);
-    } else if (mode === 'trace') {
-      clearAnim();
-    } else {
-      // Dictation: play sound
-      clearAnim();
-      setTimeout(() => speak(currentChar.char, 'ja-JP'), 300);
-    }
-  }, [mode, charIndex]);
-
-  // Touch drawing handlers
-  const getCanvasPoint = (e: React.TouchEvent | React.MouseEvent): [number, number] | null => {
-    const canvas = drawCanvasRef.current;
+  const getPoint = (e: React.TouchEvent | React.MouseEvent): [number, number] | null => {
+    const canvas = canvasRef.current;
     if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
     const touch = 'touches' in e ? e.touches[0] || e.changedTouches[0] : e;
     return [touch.clientX - rect.left, touch.clientY - rect.top];
   };
 
-  const startDraw = (e: React.TouchEvent | React.MouseEvent) => {
-    if (mode === 'learn') return;
+  const start = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     isDrawingRef.current = true;
-    const pt = getCanvasPoint(e);
-    if (pt) lastPointRef.current = pt;
+    lastPointRef.current = getPoint(e);
   };
 
-  const moveDraw = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDrawingRef.current || mode === 'learn') return;
+  const move = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDrawingRef.current) return;
     e.preventDefault();
-    const canvas = drawCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
-    const pt = getCanvasPoint(e);
+    const pt = getPoint(e);
     if (!pt || !lastPointRef.current) return;
-
     ctx.strokeStyle = '#f472b6';
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
@@ -202,123 +61,94 @@ export function WritingPractice() {
     lastPointRef.current = pt;
   };
 
-  const endDraw = () => {
-    isDrawingRef.current = false;
-    lastPointRef.current = null;
-  };
+  const end = () => { isDrawingRef.current = false; lastPointRef.current = null; };
 
-  const handleReveal = () => {
-    setRevealed(true);
-  };
+  return (
+    <canvas
+      ref={canvasRef}
+      width={size}
+      height={size}
+      className="absolute inset-0 z-[2]"
+      onTouchStart={start}
+      onTouchMove={move}
+      onTouchEnd={end}
+      onMouseDown={start}
+      onMouseMove={move}
+      onMouseUp={end}
+      onMouseLeave={end}
+      style={{ touchAction: 'none' }}
+    />
+  );
+}
+
+// ========================
+// Learning Page
+// ========================
+function LearningPage({ onBack }: { onBack: () => void }) {
+  const [charIndex, setCharIndex] = useState(0);
+  const [showGuide, setShowGuide] = useState(true);
+  const clearRef = useRef<(() => void) | null>(null);
+
+  const currentChar = HIRAGANA_STROKES[charIndex];
+  const totalChars = HIRAGANA_STROKES.length;
 
   const goTo = (idx: number) => {
     setCharIndex(((idx % totalChars) + totalChars) % totalChars);
+    clearRef.current?.();
   };
-
-  // Should we show the large text character as guide?
-  const showCharGuide = mode === 'trace' || (mode === 'learn') || (mode === 'dictation' && revealed);
 
   return (
     <div className="h-full scroll-area">
-      <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">✍️ Writing Practice</h2>
-        <p className="text-base text-slate-400">Learn stroke order, trace, and draw from memory</p>
+      <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+        <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+        <div>
+          <h2 className="text-lg font-bold">📖 Learning</h2>
+          <p className="text-sm text-slate-400">Study stroke order & practice tracing</p>
+        </div>
       </div>
 
       <div className="p-4 space-y-3">
-        {/* Mode tabs */}
-        <div className="flex gap-1 bg-slate-800/50 rounded-xl p-1">
-          {([['learn', '📺 Learn'], ['trace', '✏️ Trace'], ['dictation', '👂 Dictation']] as [Mode, string][]).map(([m, label]) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={`flex-1 py-2 rounded-lg text-sm transition ${mode === m ? 'bg-sakura-500/60 text-white' : 'text-slate-400'}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Character info */}
+        {/* Character info + navigation */}
         <div className="flex items-center justify-between">
-          <button onClick={() => goTo(charIndex - 1)} className="px-3 py-2 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700 text-base">←</button>
+          <button onClick={() => goTo(charIndex - 1)} className="px-3 py-2 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700">←</button>
           <div className="text-center">
-            <p className="text-3xl font-bold text-slate-100">{mode === 'dictation' && !revealed ? '?' : currentChar.char}</p>
-            <p className="text-base text-sakura-300">{mode === 'dictation' && !revealed ? '???' : currentChar.rom}</p>
-            <p className="text-xs text-slate-500">{charIndex + 1} / {totalChars} · {currentChar.strokes.length} strokes</p>
+            <p className="text-4xl font-bold text-slate-100">{currentChar.char}</p>
+            <p className="text-lg text-sakura-300">{currentChar.rom}</p>
+            <p className="text-xs text-slate-500">{charIndex + 1}/{totalChars} · {currentChar.strokes.length} strokes</p>
           </div>
-          <button onClick={() => goTo(charIndex + 1)} className="px-3 py-2 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700 text-base">→</button>
+          <button onClick={() => goTo(charIndex + 1)} className="px-3 py-2 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700">→</button>
         </div>
 
-        {/* Canvas area */}
+        {/* Canvas with guide */}
         <div className="relative mx-auto rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden" style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}>
-          {/* Text character as guide (system font = perfect shape) */}
-          {showCharGuide && (
-            <div
-              className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
-              style={{ opacity: mode === 'learn' ? 0.15 : 0.2 }}
-            >
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.75}px`, lineHeight: 1, color: '#94a3b8' }}>
+          {/* Grid lines */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute left-1/2 top-0 bottom-0 w-px border-l border-dashed border-slate-700/40" />
+            <div className="absolute top-1/2 left-0 right-0 h-px border-t border-dashed border-slate-700/40" />
+          </div>
+          {/* Character guide */}
+          {showGuide && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.2 }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#94a3b8' }}>
                 {currentChar.char}
               </span>
             </div>
           )}
-          {/* Animation/guide overlay canvas */}
-          <canvas
-            ref={animCanvasRef}
-            width={CANVAS_SIZE}
-            height={CANVAS_SIZE}
-            className="absolute inset-0 z-[1]"
-          />
-          {/* Drawing canvas (user input) */}
-          <canvas
-            ref={drawCanvasRef}
-            width={CANVAS_SIZE}
-            height={CANVAS_SIZE}
-            className="absolute inset-0 z-[2]"
-            onTouchStart={startDraw}
-            onTouchMove={moveDraw}
-            onTouchEnd={endDraw}
-            onMouseDown={startDraw}
-            onMouseMove={moveDraw}
-            onMouseUp={endDraw}
-            onMouseLeave={endDraw}
-            style={{ touchAction: 'none' }}
-          />
+          {/* Drawing canvas */}
+          <DrawCanvas size={CANVAS_SIZE} onClear={(fn) => { clearRef.current = fn; }} />
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          {mode === 'learn' && (
-            <>
-              <button
-                onClick={() => { cancelAnimationFrame(animFrameRef.current); animateStrokes(); }}
-                disabled={animating}
-                className="px-4 py-2 rounded-lg bg-sakura-500/80 text-white text-sm active:bg-sakura-600 transition"
-              >▶ Replay</button>
-              <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">🔊</button>
-            </>
-          )}
-          {mode === 'trace' && (
-            <>
-              <button onClick={clearDrawing} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">Clear</button>
-              <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">🔊</button>
-            </>
-          )}
-          {mode === 'dictation' && (
-            <>
-              <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm active:bg-indigo-600">🔊 Play</button>
-              <button onClick={clearDrawing} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">Clear</button>
-              <button onClick={handleReveal} className={`px-4 py-2 rounded-lg text-sm ${revealed ? 'bg-emerald-600/80 text-white' : 'bg-amber-600/80 text-white active:bg-amber-700'}`}>{revealed ? '✓ Shown' : 'Reveal'}</button>
-            </>
-          )}
+        <div className="flex items-center justify-center gap-2">
+          <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">Clear</button>
+          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">🔊</button>
           <button
-            onClick={() => setShowGrid(g => !g)}
-            className={`px-3 py-2 rounded-lg text-sm ${showGrid ? 'bg-slate-600 text-slate-200' : 'bg-slate-800 text-slate-500'}`}
-          >⊞</button>
+            onClick={() => setShowGuide(g => !g)}
+            className={`px-4 py-2 rounded-lg text-sm ${showGuide ? 'bg-indigo-500/60 text-white' : 'bg-slate-800 text-slate-500'}`}
+          >{showGuide ? 'Guide On' : 'Guide Off'}</button>
         </div>
 
-        {/* Character grid picker */}
+        {/* Character grid */}
         <details className="bg-slate-800/40 rounded-xl">
           <summary className="px-4 py-2 text-sm text-slate-400 cursor-pointer">All Characters</summary>
           <div className="grid grid-cols-10 gap-1 p-3">
@@ -333,6 +163,210 @@ export function WritingPractice() {
             ))}
           </div>
         </details>
+      </div>
+    </div>
+  );
+}
+
+// ========================
+// Dictation Game Page
+// ========================
+function DictationPage({ onBack }: { onBack: () => void }) {
+  const [queue, setQueue] = useState(() => shuffle(HIRAGANA_STROKES).slice(0, DICTATION_ROUNDS));
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(DICTATION_TIME);
+  const [revealed, setRevealed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const [results, setResults] = useState<{ char: string; rom: string; correct: boolean }[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const clearRef = useRef<(() => void) | null>(null);
+
+  const currentChar = queue[currentIdx];
+
+  // Start timer
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setTimeLeft(DICTATION_TIME);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          setRevealed(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  // Play sound for current character
+  useEffect(() => {
+    if (!finished && currentChar) {
+      setRevealed(false);
+      clearRef.current?.();
+      startTimer();
+      setTimeout(() => speak(currentChar.char, 'ja-JP'), 200);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [currentIdx, finished]);
+
+  const handleGrade = (correct: boolean) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setResults(prev => [...prev, { char: currentChar.char, rom: currentChar.rom, correct }]);
+    if (correct) setScore(s => s + 1);
+
+    if (currentIdx + 1 >= DICTATION_ROUNDS) {
+      setFinished(true);
+    } else {
+      setCurrentIdx(prev => prev + 1);
+    }
+  };
+
+  const restart = () => {
+    setQueue(shuffle(HIRAGANA_STROKES).slice(0, DICTATION_ROUNDS));
+    setCurrentIdx(0);
+    setScore(0);
+    setFinished(false);
+    setResults([]);
+    setRevealed(false);
+  };
+
+  if (finished) {
+    return (
+      <div className="h-full scroll-area">
+        <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+          <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+          <h2 className="text-lg font-bold">👂 Results</h2>
+        </div>
+        <div className="p-4 flex flex-col items-center text-center">
+          <p className="text-5xl mb-3">{score >= 8 ? '🎉' : score >= 5 ? '👍' : '💪'}</p>
+          <p className="text-3xl font-bold text-slate-100">{score} / {DICTATION_ROUNDS}</p>
+          <p className="text-base text-slate-400 mb-4">{score >= 8 ? 'Excellent!' : score >= 5 ? 'Good effort!' : 'Keep practicing!'}</p>
+
+          {/* Results grid */}
+          <div className="grid grid-cols-5 gap-2 w-full max-w-sm mb-4">
+            {results.map((r, i) => (
+              <div key={i} className={`rounded-lg p-2 text-center ${r.correct ? 'bg-emerald-900/30' : 'bg-red-900/30'}`}>
+                <p className="text-xl">{r.char}</p>
+                <p className="text-xs text-slate-400">{r.rom}</p>
+                <p className="text-xs">{r.correct ? '✓' : '✗'}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-3">
+            <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base">🔄 Again</button>
+            <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base">← Back</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full scroll-area">
+      <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+          <p className="text-base text-slate-400">Q{currentIdx + 1}/{DICTATION_ROUNDS}</p>
+        </div>
+        <p className="text-base text-emerald-400">✓ {score}</p>
+      </div>
+
+      <div className="p-4 space-y-3">
+        {/* Timer bar */}
+        <div className="w-full">
+          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-1000 ${timeLeft <= 3 ? 'bg-red-500' : 'bg-emerald-500'}`}
+              style={{ width: `${(timeLeft / DICTATION_TIME) * 100}%` }}
+            />
+          </div>
+          <p className="text-sm text-slate-500 text-right mt-1">{timeLeft}s</p>
+        </div>
+
+        {/* Prompt */}
+        <div className="text-center">
+          <p className="text-base text-slate-400 mb-1">Listen and draw:</p>
+          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="text-3xl active:scale-110 transition-transform">🔊</button>
+        </div>
+
+        {/* Canvas */}
+        <div className="relative mx-auto rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden" style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}>
+          {/* Grid */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute left-1/2 top-0 bottom-0 w-px border-l border-dashed border-slate-700/40" />
+            <div className="absolute top-1/2 left-0 right-0 h-px border-t border-dashed border-slate-700/40" />
+          </div>
+          {/* Reveal answer overlay */}
+          {revealed && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.35 }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399' }}>
+                {currentChar.char}
+              </span>
+            </div>
+          )}
+          {/* Drawing canvas */}
+          <DrawCanvas size={CANVAS_SIZE} onClear={(fn) => { clearRef.current = fn; }} />
+        </div>
+
+        {/* Controls */}
+        {!revealed ? (
+          <div className="flex items-center justify-center gap-2">
+            <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm">Clear</button>
+            <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm">🔊 Again</button>
+            <button onClick={() => { if (timerRef.current) clearInterval(timerRef.current); setRevealed(true); }} className="px-4 py-2 rounded-lg bg-amber-600/80 text-white text-sm">Check</button>
+          </div>
+        ) : (
+          <div className="text-center space-y-2">
+            <p className="text-2xl font-bold text-slate-100">{currentChar.char} <span className="text-lg text-sakura-300">({currentChar.rom})</span></p>
+            <p className="text-base text-slate-400">Did you get it right?</p>
+            <div className="flex justify-center gap-3">
+              <button onClick={() => handleGrade(true)} className="px-6 py-2.5 rounded-xl bg-emerald-600/80 text-white text-base active:bg-emerald-700">✓ Got it</button>
+              <button onClick={() => handleGrade(false)} className="px-6 py-2.5 rounded-xl bg-red-600/60 text-red-100 text-base active:bg-red-700">✗ Missed</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ========================
+// Main Component (Menu)
+// ========================
+export function WritingPractice() {
+  const [page, setPage] = useState<Page>('menu');
+
+  if (page === 'learn') return <LearningPage onBack={() => setPage('menu')} />;
+  if (page === 'dictation') return <DictationPage onBack={() => setPage('menu')} />;
+
+  return (
+    <div className="h-full scroll-area">
+      <div className="px-4 py-3 border-b border-slate-800">
+        <h2 className="text-lg font-bold">✍️ Writing Practice</h2>
+        <p className="text-base text-slate-400">Learn to write hiragana by hand</p>
+      </div>
+
+      <div className="p-4 space-y-3">
+        <button
+          onClick={() => setPage('learn')}
+          className="w-full bg-indigo-900/30 border border-indigo-700/30 rounded-xl p-5 text-left active:bg-indigo-800/40 transition"
+        >
+          <p className="text-2xl mb-1">📖</p>
+          <p className="text-lg font-semibold text-slate-100">Learning</p>
+          <p className="text-sm text-slate-400">Study each character with guide overlay. Trace to build muscle memory.</p>
+        </button>
+
+        <button
+          onClick={() => setPage('dictation')}
+          className="w-full bg-purple-900/30 border border-purple-700/30 rounded-xl p-5 text-left active:bg-purple-800/40 transition"
+        >
+          <p className="text-2xl mb-1">👂</p>
+          <p className="text-lg font-semibold text-slate-100">Dictation</p>
+          <p className="text-sm text-slate-400">Hear the sound, draw from memory. 10 seconds × 10 random characters.</p>
+        </button>
       </div>
     </div>
   );
