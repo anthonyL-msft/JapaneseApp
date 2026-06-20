@@ -15,6 +15,7 @@ import { QuickNote } from './components/QuickNote';
 import { Progress } from './components/Progress';
 import { Settings } from './components/Settings';
 import { SearchBar } from './components/SearchBar';
+import { Quiz } from './components/Quiz';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'phrases', label: 'Learn', icon: '📖' },
@@ -149,6 +150,7 @@ function App() {
         onChange={setSearch}
         lang={lang}
         onOpenCards={() => setTab('cards')}
+        onOpenQuiz={() => setTab('quiz')}
         onOpenConverter={() => setTab('converter')}
         onOpenBuilder={() => setTab('builder')}
         onOpenGrow={() => setTab('grow')}
@@ -213,6 +215,7 @@ function App() {
             }} />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
+        {tab === 'quiz' && <Quiz />}
         {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} aiTutorMode={aiTutorMode} onAiTutorModeChange={handleAiTutorModeChange} />}
         {tab === 'converter' && (
           <div className="scroll-area h-full">

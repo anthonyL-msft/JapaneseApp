@@ -12,9 +12,10 @@ interface Props {
   onOpenNotes: () => void;
   onOpenProgress: () => void;
   onOpenSettings: () => void;
+  onOpenQuiz: () => void;
 }
 
-export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings }: Props) {
+export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings, onOpenQuiz }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
@@ -122,6 +123,16 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <div>
                     <p className="text-base text-slate-200">Flashcards</p>
                     <p className="text-sm text-slate-500">Practice learned items</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenQuiz(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🎮</span>
+                  <div>
+                    <p className="text-base text-slate-200">Quiz</p>
+                    <p className="text-sm text-slate-500">Timed multiple choice game</p>
                   </div>
                 </button>
                 <button
