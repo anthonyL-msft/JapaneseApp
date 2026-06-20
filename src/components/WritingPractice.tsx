@@ -130,7 +130,7 @@ function LearningPage({ onBack }: { onBack: () => void }) {
           {/* Character guide */}
           {showGuide && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.2 }}>
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#94a3b8' }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#94a3b8', fontFamily: '"Zen Kurenaido", serif' }}>
                 {currentChar.char}
               </span>
             </div>
@@ -334,7 +334,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
           {/* Reveal answer overlay */}
           {revealed && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.35 }}>
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399' }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399', fontFamily: '"Zen Kurenaido", serif' }}>
                 {currentChar.char}
               </span>
             </div>
@@ -519,7 +519,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
           </div>
           {revealed && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.35 }}>
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399' }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399', fontFamily: '"Zen Kurenaido", serif' }}>
                 {currentChar.char}
               </span>
             </div>
