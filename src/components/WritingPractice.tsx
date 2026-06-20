@@ -8,6 +8,19 @@ type Mode = 'learn' | 'trace' | 'dictation';
 const CANVAS_SIZE = 280;
 const SCALE = CANVAS_SIZE / 100;
 
+function drawGrid(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_SIZE / 2, 0);
+  ctx.lineTo(CANVAS_SIZE / 2, CANVAS_SIZE);
+  ctx.moveTo(0, CANVAS_SIZE / 2);
+  ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE / 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
 function drawSmoothStroke(ctx: CanvasRenderingContext2D, points: number[][], color: string, width: number, progress = 1) {
   if (points.length < 2) return;
   ctx.strokeStyle = color;
@@ -20,7 +33,6 @@ function drawSmoothStroke(ctx: CanvasRenderingContext2D, points: number[][], col
   const drawUpTo = Math.ceil(totalPoints * progress);
 
   ctx.moveTo(points[0][0] * SCALE, points[0][1] * SCALE);
-
   for (let i = 1; i < drawUpTo; i++) {
     if (i < totalPoints - 1) {
       const xc = ((points[i][0] + points[i + 1][0]) / 2) * SCALE;
@@ -33,20 +45,15 @@ function drawSmoothStroke(ctx: CanvasRenderingContext2D, points: number[][], col
   ctx.stroke();
 }
 
-function drawFullCharacter(ctx: CanvasRenderingContext2D, char: StrokeChar, color: string, width: number) {
-  for (const stroke of char.strokes) {
-    drawSmoothStroke(ctx, stroke, color, width);
-  }
-}
-
 export function WritingPractice() {
   const [charIndex, setCharIndex] = useState(0);
   const [mode, setMode] = useState<Mode>('learn');
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
   const [animating, setAnimating] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const [animStroke, setAnimStroke] = useState(-1); // which stroke is currently highlighted
 
-  const guideCanvasRef = useRef<HTMLCanvasElement>(null);
+  const animCanvasRef = useRef<HTMLCanvasElement>(null);
   const drawCanvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
   const isDrawingRef = useRef(false);
@@ -55,95 +62,72 @@ export function WritingPractice() {
   const currentChar = HIRAGANA_STROKES[charIndex];
   const totalChars = HIRAGANA_STROKES.length;
 
-  // Draw guide character (faded) on guide canvas
-  const drawGuide = useCallback((char: StrokeChar, opacity: number) => {
-    const canvas = guideCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-
-    // Grid
-    if (showGrid) {
-      ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(CANVAS_SIZE / 2, 0);
-      ctx.lineTo(CANVAS_SIZE / 2, CANVAS_SIZE);
-      ctx.moveTo(0, CANVAS_SIZE / 2);
-      ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE / 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // Character strokes
-    const color = `rgba(148, 163, 184, ${opacity})`;
-    drawFullCharacter(ctx, char, color, 4);
-  }, [showGrid]);
-
-  // Animate stroke-by-stroke
+  // Animate stroke order overlay
   const animateStrokes = useCallback(() => {
-    const canvas = guideCanvasRef.current;
+    const canvas = animCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     setAnimating(true);
+    setAnimStroke(0);
     const strokes = currentChar.strokes;
     let strokeIdx = 0;
     let progress = 0;
-    const speed = 0.04; // progress per frame
+    const speed = 0.035;
 
     const draw = () => {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      if (showGrid) drawGrid(ctx);
 
-      // Grid
-      if (showGrid) {
-        ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(CANVAS_SIZE / 2, 0);
-        ctx.lineTo(CANVAS_SIZE / 2, CANVAS_SIZE);
-        ctx.moveTo(0, CANVAS_SIZE / 2);
-        ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE / 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      // Draw completed strokes
+      // Draw completed strokes (with numbers)
       for (let i = 0; i < strokeIdx; i++) {
-        drawSmoothStroke(ctx, strokes[i], '#e2e8f0', 4);
-        // Stroke number
+        drawSmoothStroke(ctx, strokes[i], 'rgba(244, 114, 182, 0.7)', 5);
         const start = strokes[i][0];
         ctx.fillStyle = '#f43f5e';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText(`${i + 1}`, start[0] * SCALE - 8, start[1] * SCALE - 8);
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillText(`${i + 1}`, start[0] * SCALE - 10, start[1] * SCALE - 10);
       }
 
       // Draw current stroke with progress
       if (strokeIdx < strokes.length) {
-        drawSmoothStroke(ctx, strokes[strokeIdx], '#f472b6', 5, progress);
-        // Stroke number for current
+        drawSmoothStroke(ctx, strokes[strokeIdx], '#f472b6', 6, progress);
         const start = strokes[strokeIdx][0];
         ctx.fillStyle = '#f43f5e';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText(`${strokeIdx + 1}`, start[0] * SCALE - 8, start[1] * SCALE - 8);
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillText(`${strokeIdx + 1}`, start[0] * SCALE - 10, start[1] * SCALE - 10);
+
+        // Draw direction arrow at current tip
+        const tipIdx = Math.min(Math.floor(progress * strokes[strokeIdx].length), strokes[strokeIdx].length - 1);
+        const tip = strokes[strokeIdx][tipIdx];
+        ctx.beginPath();
+        ctx.arc(tip[0] * SCALE, tip[1] * SCALE, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#f43f5e';
+        ctx.fill();
 
         progress += speed;
         if (progress >= 1) {
           strokeIdx++;
           progress = 0;
+          setAnimStroke(strokeIdx);
           if (strokeIdx >= strokes.length) {
             setAnimating(false);
+            // Show all stroke numbers at end
+            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            if (showGrid) drawGrid(ctx);
+            for (let i = 0; i < strokes.length; i++) {
+              drawSmoothStroke(ctx, strokes[i], 'rgba(244, 114, 182, 0.5)', 4);
+              const s = strokes[i][0];
+              ctx.fillStyle = '#f43f5e';
+              ctx.font = 'bold 16px sans-serif';
+              ctx.fillText(`${i + 1}`, s[0] * SCALE - 10, s[1] * SCALE - 10);
+            }
             return;
           }
         }
         animFrameRef.current = requestAnimationFrame(draw);
       }
     };
-
     animFrameRef.current = requestAnimationFrame(draw);
   }, [currentChar, showGrid]);
 
@@ -156,38 +140,31 @@ export function WritingPractice() {
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   }, []);
 
-  // Setup for mode changes
+  // Clear animation canvas
+  const clearAnim = useCallback(() => {
+    const canvas = animCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    if (showGrid) drawGrid(ctx);
+  }, [showGrid]);
+
+  // Setup for mode/character changes
   useEffect(() => {
     cancelAnimationFrame(animFrameRef.current);
     setAnimating(false);
     setRevealed(false);
+    setAnimStroke(-1);
     clearDrawing();
 
     if (mode === 'learn') {
-      animateStrokes();
+      setTimeout(() => animateStrokes(), 100);
     } else if (mode === 'trace') {
-      drawGuide(currentChar, 0.3);
+      clearAnim();
     } else {
-      // Dictation: blank canvas, play sound
-      const canvas = guideCanvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-          if (showGrid) {
-            ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(CANVAS_SIZE / 2, 0);
-            ctx.lineTo(CANVAS_SIZE / 2, CANVAS_SIZE);
-            ctx.moveTo(0, CANVAS_SIZE / 2);
-            ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE / 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          }
-        }
-      }
+      // Dictation: play sound
+      clearAnim();
       setTimeout(() => speak(currentChar.char, 'ja-JP'), 300);
     }
   }, [mode, charIndex]);
@@ -237,12 +214,14 @@ export function WritingPractice() {
 
   const handleReveal = () => {
     setRevealed(true);
-    drawGuide(currentChar, 0.5);
   };
 
   const goTo = (idx: number) => {
     setCharIndex(((idx % totalChars) + totalChars) % totalChars);
   };
+
+  // Should we show the large text character as guide?
+  const showCharGuide = mode === 'trace' || (mode === 'learn') || (mode === 'dictation' && revealed);
 
   return (
     <div className="h-full scroll-area">
@@ -278,19 +257,30 @@ export function WritingPractice() {
 
         {/* Canvas area */}
         <div className="relative mx-auto rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden" style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}>
-          {/* Guide layer */}
+          {/* Text character as guide (system font = perfect shape) */}
+          {showCharGuide && (
+            <div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+              style={{ opacity: mode === 'learn' ? 0.15 : 0.2 }}
+            >
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.75}px`, lineHeight: 1, color: '#94a3b8' }}>
+                {currentChar.char}
+              </span>
+            </div>
+          )}
+          {/* Animation/guide overlay canvas */}
           <canvas
-            ref={guideCanvasRef}
+            ref={animCanvasRef}
             width={CANVAS_SIZE}
             height={CANVAS_SIZE}
-            className="absolute inset-0"
+            className="absolute inset-0 z-[1]"
           />
-          {/* Drawing layer */}
+          {/* Drawing canvas (user input) */}
           <canvas
             ref={drawCanvasRef}
             width={CANVAS_SIZE}
             height={CANVAS_SIZE}
-            className="absolute inset-0 z-10"
+            className="absolute inset-0 z-[2]"
             onTouchStart={startDraw}
             onTouchMove={moveDraw}
             onTouchEnd={endDraw}
@@ -303,13 +293,16 @@ export function WritingPractice() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           {mode === 'learn' && (
-            <button
-              onClick={() => { cancelAnimationFrame(animFrameRef.current); animateStrokes(); }}
-              disabled={animating}
-              className="px-4 py-2 rounded-lg bg-sakura-500/80 text-white text-sm active:bg-sakura-600 transition"
-            >▶ Replay</button>
+            <>
+              <button
+                onClick={() => { cancelAnimationFrame(animFrameRef.current); animateStrokes(); }}
+                disabled={animating}
+                className="px-4 py-2 rounded-lg bg-sakura-500/80 text-white text-sm active:bg-sakura-600 transition"
+              >▶ Replay</button>
+              <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">🔊</button>
+            </>
           )}
           {mode === 'trace' && (
             <>
@@ -319,9 +312,9 @@ export function WritingPractice() {
           )}
           {mode === 'dictation' && (
             <>
-              <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm active:bg-indigo-600">🔊 Play Again</button>
+              <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm active:bg-indigo-600">🔊 Play</button>
               <button onClick={clearDrawing} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">Clear</button>
-              <button onClick={handleReveal} className="px-4 py-2 rounded-lg bg-amber-600/80 text-white text-sm active:bg-amber-700">{revealed ? '✓ Shown' : 'Reveal'}</button>
+              <button onClick={handleReveal} className={`px-4 py-2 rounded-lg text-sm ${revealed ? 'bg-emerald-600/80 text-white' : 'bg-amber-600/80 text-white active:bg-amber-700'}`}>{revealed ? '✓ Shown' : 'Reveal'}</button>
             </>
           )}
           <button
