@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { speak } from '../utils/tts';
 import { HIRAGANA_STROKES } from '../data/hiragana-strokes';
 
-type Page = 'menu' | 'learn' | 'dictation';
+type Page = 'menu' | 'learn' | 'dictation' | 'sprint';
 
 const CANVAS_SIZE = 260;
 const DICTATION_TIME = 10; // seconds per word
 const DICTATION_ROUNDS = 10;
+const SPRINT_TIME = 60; // total seconds for sprint
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -334,6 +335,159 @@ function DictationPage({ onBack }: { onBack: () => void }) {
 }
 
 // ========================
+// Sprint Game Page (60s, as many as possible)
+// ========================
+function SprintPage({ onBack }: { onBack: () => void }) {
+  const [queue, setQueue] = useState(() => shuffle(HIRAGANA_STROKES));
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(SPRINT_TIME);
+  const [revealed, setRevealed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const clearRef = useRef<(() => void) | null>(null);
+
+  const currentChar = queue[currentIdx % queue.length];
+
+  // Start global timer
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          setFinished(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  // Play sound on new character
+  useEffect(() => {
+    if (!finished) {
+      setRevealed(false);
+      clearRef.current?.();
+      setTimeout(() => speak(currentChar.char, 'ja-JP'), 100);
+    }
+  }, [currentIdx, finished]);
+
+  const handleGrade = (correct: boolean) => {
+    if (correct) setScore(s => s + 1);
+    setTotal(t => t + 1);
+    setCurrentIdx(prev => prev + 1);
+  };
+
+  const handleCheck = () => setRevealed(true);
+
+  const restart = () => {
+    setQueue(shuffle(HIRAGANA_STROKES));
+    setCurrentIdx(0);
+    setScore(0);
+    setTotal(0);
+    setFinished(false);
+    setTimeLeft(SPRINT_TIME);
+    setRevealed(false);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          setFinished(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  if (finished) {
+    return (
+      <div className="h-full scroll-area">
+        <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+          <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+          <h2 className="text-lg font-bold">⚡ Sprint Results</h2>
+        </div>
+        <div className="p-4 flex flex-col items-center text-center">
+          <p className="text-5xl mb-3">⚡</p>
+          <p className="text-3xl font-bold text-slate-100">{score} / {total}</p>
+          <p className="text-lg text-slate-400 mb-1">{total} characters attempted in {SPRINT_TIME}s</p>
+          <p className="text-base text-slate-500 mb-4">{score >= total * 0.8 ? 'Excellent speed!' : score >= total * 0.5 ? 'Good pace!' : 'Keep practicing!'}</p>
+          <div className="flex gap-3">
+            <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base">🔄 Again</button>
+            <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base">← Back</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full scroll-area">
+      <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
+          <p className="text-base text-slate-400">#{total + 1}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <p className="text-base text-emerald-400">✓ {score}</p>
+          <p className={`text-base font-mono ${timeLeft <= 10 ? 'text-red-400' : 'text-slate-400'}`}>{timeLeft}s</p>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-3">
+        {/* Timer bar */}
+        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-1000 ${timeLeft <= 10 ? 'bg-red-500' : 'bg-amber-500'}`}
+            style={{ width: `${(timeLeft / SPRINT_TIME) * 100}%` }}
+          />
+        </div>
+
+        {/* Prompt */}
+        <div className="text-center">
+          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="text-3xl active:scale-110 transition-transform">🔊</button>
+        </div>
+
+        {/* Canvas */}
+        <div className="relative mx-auto rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden" style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}>
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute left-1/2 top-0 bottom-0 w-px border-l border-dashed border-slate-700/40" />
+            <div className="absolute top-1/2 left-0 right-0 h-px border-t border-dashed border-slate-700/40" />
+          </div>
+          {revealed && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.35 }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399' }}>
+                {currentChar.char}
+              </span>
+            </div>
+          )}
+          <DrawCanvas size={CANVAS_SIZE} onClear={(fn) => { clearRef.current = fn; }} />
+        </div>
+
+        {/* Controls */}
+        {!revealed ? (
+          <div className="flex items-center justify-center gap-2">
+            <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm">Clear</button>
+            <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm">🔊</button>
+            <button onClick={handleCheck} className="px-4 py-2 rounded-lg bg-amber-600/80 text-white text-sm">Check</button>
+          </div>
+        ) : (
+          <div className="text-center space-y-2">
+            <p className="text-2xl font-bold text-slate-100">{currentChar.char} <span className="text-lg text-sakura-300">({currentChar.rom})</span></p>
+            <div className="flex justify-center gap-3">
+              <button onClick={() => handleGrade(true)} className="px-6 py-2.5 rounded-xl bg-emerald-600/80 text-white text-base active:bg-emerald-700">✓</button>
+              <button onClick={() => handleGrade(false)} className="px-6 py-2.5 rounded-xl bg-red-600/60 text-red-100 text-base active:bg-red-700">✗</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ========================
 // Main Component (Menu)
 // ========================
 export function WritingPractice() {
@@ -341,6 +495,7 @@ export function WritingPractice() {
 
   if (page === 'learn') return <LearningPage onBack={() => setPage('menu')} />;
   if (page === 'dictation') return <DictationPage onBack={() => setPage('menu')} />;
+  if (page === 'sprint') return <SprintPage onBack={() => setPage('menu')} />;
 
   return (
     <div className="h-full scroll-area">
@@ -366,6 +521,15 @@ export function WritingPractice() {
           <p className="text-2xl mb-1">👂</p>
           <p className="text-lg font-semibold text-slate-100">Dictation</p>
           <p className="text-sm text-slate-400">Hear the sound, draw from memory. 10 seconds × 10 random characters.</p>
+        </button>
+
+        <button
+          onClick={() => setPage('sprint')}
+          className="w-full bg-amber-900/30 border border-amber-700/30 rounded-xl p-5 text-left active:bg-amber-800/40 transition"
+        >
+          <p className="text-2xl mb-1">⚡</p>
+          <p className="text-lg font-semibold text-slate-100">Sprint</p>
+          <p className="text-sm text-slate-400">60 seconds — draw as many characters as you can! No time limit per word.</p>
         </button>
       </div>
     </div>
