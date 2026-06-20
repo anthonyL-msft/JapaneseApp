@@ -13,7 +13,12 @@ export function setTtsRate(rate: number): void {
 
 export function speak(text: string, lang = 'ja-JP'): void {
   if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
+
+  // iOS fix: cancel can leave synth in a broken state, resume first
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  // iOS requires a resume after cancel to unstick the queue
+  synth.resume();
 
   // For single kana characters, extend with vowel mark for clarity
   let speakText = text;
@@ -28,12 +33,15 @@ export function speak(text: string, lang = 'ja-JP'): void {
   utterance.pitch = 1;
 
   // Try to find a matching voice
-  const voices = window.speechSynthesis.getVoices();
+  const voices = synth.getVoices();
   const langPrefix = lang.split('-')[0];
   const voice = voices.find(v => v.lang.startsWith(langPrefix));
   if (voice) utterance.voice = voice;
 
-  window.speechSynthesis.speak(utterance);
+  // iOS workaround: small delay before speaking after cancel
+  setTimeout(() => {
+    synth.speak(utterance);
+  }, 10);
 }
 
 /** Get TTS language code from phrase lang code */

@@ -202,13 +202,18 @@ function DictationPage({ onBack }: { onBack: () => void }) {
     }, 1000);
   }, []);
 
-  // Play sound for current character (only after started)
+  // Play sound for current character (only after started, skip first since handleStart already plays)
+  const hasPlayedFirstRef = useRef(false);
   useEffect(() => {
     if (!started || finished || !currentChar) return;
     setRevealed(false);
     clearRef.current?.();
     startTimer();
-    setTimeout(() => speak(currentChar.char, 'ja-JP'), 200);
+    if (hasPlayedFirstRef.current) {
+      setTimeout(() => speak(currentChar.char, 'ja-JP'), 300);
+    } else {
+      hasPlayedFirstRef.current = true;
+    }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [currentIdx, started, finished]);
 
@@ -392,12 +397,17 @@ function SprintPage({ onBack }: { onBack: () => void }) {
     }, 1000);
   };
 
-  // Play sound on new character (after started)
+  // Play sound on new character (after started, skip first since beginSprint already plays)
+  const hasPlayedFirstSprintRef = useRef(false);
   useEffect(() => {
     if (!started || finished) return;
     setRevealed(false);
     clearRef.current?.();
-    setTimeout(() => speak(currentChar.char, 'ja-JP'), 100);
+    if (hasPlayedFirstSprintRef.current) {
+      setTimeout(() => speak(currentChar.char, 'ja-JP'), 200);
+    } else {
+      hasPlayedFirstSprintRef.current = true;
+    }
   }, [currentIdx, started, finished]);
 
   // Cleanup
