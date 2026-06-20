@@ -82,16 +82,33 @@ function DrawCanvas({ size, onClear }: { size: number; onClear?: (clearFn: () =>
   );
 }
 
+const WRITING_FONTS = [
+  { id: 'klee', name: 'Textbook', family: '"Klee One", cursive' },
+  { id: 'yuji', name: 'Brush', family: '"Yuji Syuku", serif' },
+];
+
+function getStoredFont(): string {
+  return localStorage.getItem('writing-font') || 'klee';
+}
+
 // ========================
 // Learning Page
 // ========================
 function LearningPage({ onBack }: { onBack: () => void }) {
   const [charIndex, setCharIndex] = useState(0);
   const [showGuide, setShowGuide] = useState(true);
+  const [fontId, setFontId] = useState(getStoredFont);
   const clearRef = useRef<(() => void) | null>(null);
 
   const currentChar = HIRAGANA_STROKES[charIndex];
   const totalChars = HIRAGANA_STROKES.length;
+  const fontFamily = WRITING_FONTS.find(f => f.id === fontId)?.family || WRITING_FONTS[0].family;
+
+  const toggleFont = () => {
+    const next = fontId === 'klee' ? 'yuji' : 'klee';
+    setFontId(next);
+    localStorage.setItem('writing-font', next);
+  };
 
   const goTo = (idx: number) => {
     setCharIndex(((idx % totalChars) + totalChars) % totalChars);
@@ -130,7 +147,7 @@ function LearningPage({ onBack }: { onBack: () => void }) {
           {/* Character guide */}
           {showGuide && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.2 }}>
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#94a3b8', fontFamily: '"Zen Kurenaido", serif' }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#94a3b8', fontFamily }}>
                 {currentChar.char}
               </span>
             </div>
@@ -140,13 +157,17 @@ function LearningPage({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">Clear</button>
           <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">🔊</button>
           <button
             onClick={() => setShowGuide(g => !g)}
             className={`px-4 py-2 rounded-lg text-sm ${showGuide ? 'bg-indigo-500/60 text-white' : 'bg-slate-800 text-slate-500'}`}
-          >{showGuide ? 'Guide On' : 'Guide Off'}</button>
+          >{showGuide ? 'Guide' : 'Hide'}</button>
+          <button
+            onClick={toggleFont}
+            className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600"
+          >{fontId === 'klee' ? '✏️ Textbook' : '🖌️ Brush'}</button>
         </div>
 
         {/* Character grid */}
@@ -183,6 +204,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
   const [results, setResults] = useState<{ char: string; rom: string; correct: boolean }[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const clearRef = useRef<(() => void) | null>(null);
+  const fontFamily = WRITING_FONTS.find(f => f.id === getStoredFont())?.family || WRITING_FONTS[0].family;
 
   const currentChar = queue[currentIdx];
 
@@ -334,7 +356,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
           {/* Reveal answer overlay */}
           {revealed && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.35 }}>
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399', fontFamily: '"Zen Kurenaido", serif' }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399', fontFamily }}>
                 {currentChar.char}
               </span>
             </div>
@@ -374,6 +396,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
   const [timeLeft, setTimeLeft] = useState(SPRINT_TIME);
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
+  const fontFamily = WRITING_FONTS.find(f => f.id === getStoredFont())?.family || WRITING_FONTS[0].family;
   const [total, setTotal] = useState(0);
   const [finished, setFinished] = useState(false);
   const [started, setStarted] = useState(false);
@@ -519,7 +542,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
           </div>
           {revealed && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.35 }}>
-              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399', fontFamily: '"Zen Kurenaido", serif' }}>
+              <span style={{ fontSize: `${CANVAS_SIZE * 0.78}px`, lineHeight: 1, color: '#34d399', fontFamily }}>
                 {currentChar.char}
               </span>
             </div>
