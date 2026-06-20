@@ -20,7 +20,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Tap any kana → bottom drawer with travel vocab examples
 - Accordion examples with Open All/Close All in header
 - Interactive number converter with currency rates (HKD/CAD)
-- Tools: Counters, Sentence Patterns, Common Signs
+- Tools: Sentence Patterns, Counters, Common Signs, What You'll Hear (29 staff phrases)
 
 ### 🎭 Conversations
 - 46 real-world dialogue scenarios across 10 groups
@@ -33,8 +33,32 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 ### 🃏 Flashcards
 - SRS (Spaced Repetition System) with SM-2 algorithm
 - Category picker: study by topic or review all learned items
+- Kana Recognition decks (Hiragana + Katakana character cards)
+- Kana Vocab decks (ひらがな ~130 words, カタカナ ~50 words)
 - Includes both phrases and reference examples
 - 4-level rating: Again / Hard / Good / Easy
+
+### 🎮 Quiz (Timed Multiple Choice)
+- 4 categories: Hiragana, Katakana, Vocab ひらがな, Vocab カタカナ
+- 10-second countdown timer per question
+- 4 answer choices (1 correct + 3 distractors)
+- 20 questions per round
+- Green/red feedback with TTS on correct answer
+- High score persisted per category
+
+### 🃏 Match Game
+- Pair Japanese ↔ English by tapping (6 pairs × 3 rounds)
+- Decks: Vocab ひらがな, Vocab カタカナ, Mixed
+- Timer counts up — speed is the challenge
+- Best time saved per deck
+- Correct matches disappear with TTS pronunciation
+
+### 🎯 Daily Challenge
+- Learn 3 new phrases + review 5 learned ones
+- Progress bars per task
+- 🔥 Streak counter (consecutive days)
+- Review mode: see English → recall Japanese → check
+- Completion tracked daily with streak persistence
 
 ### 🔧 Sentence Builder
 - Pick a pattern template → fill with vocab chips → get complete sentence
@@ -67,9 +91,13 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 
 ### ☰ Menu (Left Drawer)
 - 📊 My Progress — learned count, category bars, streak, recent activity
-- 🃏 Flashcards
+- 🃏 Flashcards — kana recognition, vocab, learned phrases (SRS)
+- 🎮 Quiz — timed multiple choice game
+- 🃏 Match Game — pair Japanese ↔ English speed challenge
+- 🎯 Daily Challenge — learn 3 + review 5 with streak
 - 🔄 Number Converter
 - 🔧 Sentence Builder
+- 🌱 Sentence Grow
 - 📝 Quick Note
 - ⚙️ Settings — light/dark mode, language, speech speed, AI explanation language, AI follow-up style
 
