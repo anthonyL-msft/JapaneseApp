@@ -104,27 +104,17 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
 
             {/* Menu items */}
             <div className="flex-1 overflow-y-auto">
-              {/* Tools */}
+              {/* Practice & Games */}
               <div className="px-4 py-3 border-b border-slate-800/50">
-                <p className="text-sm text-slate-500 mb-2">Tools</p>
+                <p className="text-sm text-slate-500 mb-2">Practice & Games</p>
                 <button
-                  onClick={() => { closeDrawer(); onOpenProgress(); }}
+                  onClick={() => { closeDrawer(); onOpenDaily(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">📊</span>
+                  <span className="text-lg">🎯</span>
                   <div>
-                    <p className="text-base text-slate-200">My Progress</p>
-                    <p className="text-sm text-slate-500">Track your learning</p>
-                  </div>
-                </button>
-                <button
-                  onClick={() => { closeDrawer(); onOpenCards(); }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
-                >
-                  <span className="text-lg">🃏</span>
-                  <div>
-                    <p className="text-base text-slate-200">Flashcards</p>
-                    <p className="text-sm text-slate-500">Practice learned items</p>
+                    <p className="text-base text-slate-200">Daily Challenge</p>
+                    <p className="text-sm text-slate-500">Learn 3 + review 5 daily</p>
                   </div>
                 </button>
                 <button
@@ -134,7 +124,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <span className="text-lg">🎮</span>
                   <div>
                     <p className="text-base text-slate-200">Quiz</p>
-                    <p className="text-sm text-slate-500">Timed multiple choice game</p>
+                    <p className="text-sm text-slate-500">Timed multiple choice</p>
                   </div>
                 </button>
                 <button
@@ -148,25 +138,20 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   </div>
                 </button>
                 <button
-                  onClick={() => { closeDrawer(); onOpenDaily(); }}
+                  onClick={() => { closeDrawer(); onOpenCards(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🎯</span>
+                  <span className="text-lg">📇</span>
                   <div>
-                    <p className="text-base text-slate-200">Daily Challenge</p>
-                    <p className="text-sm text-slate-500">Learn 3 + review 5 daily</p>
+                    <p className="text-base text-slate-200">Flashcards</p>
+                    <p className="text-sm text-slate-500">SRS review learned items</p>
                   </div>
                 </button>
-                <button
-                  onClick={() => { closeDrawer(); onOpenConverter(); }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
-                >
-                  <span className="text-lg">🔄</span>
-                  <div>
-                    <p className="text-base text-slate-200">Number Converter</p>
-                    <p className="text-sm text-slate-500">Number → kanji + reading</p>
-                  </div>
-                </button>
+              </div>
+
+              {/* Build & Tools */}
+              <div className="px-4 py-3 border-b border-slate-800/50">
+                <p className="text-sm text-slate-500 mb-2">Build & Tools</p>
                 <button
                   onClick={() => { closeDrawer(); onOpenBuilder(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
@@ -185,6 +170,31 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <div>
                     <p className="text-base text-slate-200">Sentence Grow</p>
                     <p className="text-sm text-slate-500">Expand sentences step by step</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenConverter(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🔄</span>
+                  <div>
+                    <p className="text-base text-slate-200">Number Converter</p>
+                    <p className="text-sm text-slate-500">Number → kanji + reading</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Track */}
+              <div className="px-4 py-3 border-b border-slate-800/50">
+                <p className="text-sm text-slate-500 mb-2">Track</p>
+                <button
+                  onClick={() => { closeDrawer(); onOpenProgress(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">📊</span>
+                  <div>
+                    <p className="text-base text-slate-200">My Progress</p>
+                    <p className="text-sm text-slate-500">Track your learning</p>
                   </div>
                 </button>
                 <button
