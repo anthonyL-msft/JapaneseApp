@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { speak } from '../utils/tts';
 import { HIRAGANA_STROKES } from '../data/hiragana-strokes';
-import type { StrokeChar } from '../data/hiragana-strokes';
 
 type Mode = 'learn' | 'trace' | 'dictation';
 
@@ -51,7 +50,6 @@ export function WritingPractice() {
   const [showGrid, setShowGrid] = useState(true);
   const [animating, setAnimating] = useState(false);
   const [revealed, setRevealed] = useState(false);
-  const [animStroke, setAnimStroke] = useState(-1); // which stroke is currently highlighted
 
   const animCanvasRef = useRef<HTMLCanvasElement>(null);
   const drawCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -70,7 +68,6 @@ export function WritingPractice() {
     if (!ctx) return;
 
     setAnimating(true);
-    setAnimStroke(0);
     const strokes = currentChar.strokes;
     let strokeIdx = 0;
     let progress = 0;
@@ -109,7 +106,6 @@ export function WritingPractice() {
         if (progress >= 1) {
           strokeIdx++;
           progress = 0;
-          setAnimStroke(strokeIdx);
           if (strokeIdx >= strokes.length) {
             setAnimating(false);
             // Show all stroke numbers at end
@@ -155,7 +151,6 @@ export function WritingPractice() {
     cancelAnimationFrame(animFrameRef.current);
     setAnimating(false);
     setRevealed(false);
-    setAnimStroke(-1);
     clearDrawing();
 
     if (mode === 'learn') {
