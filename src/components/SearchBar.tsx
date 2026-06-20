@@ -13,9 +13,11 @@ interface Props {
   onOpenProgress: () => void;
   onOpenSettings: () => void;
   onOpenQuiz: () => void;
+  onOpenMatch: () => void;
+  onOpenDaily: () => void;
 }
 
-export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings, onOpenQuiz }: Props) {
+export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings, onOpenQuiz, onOpenMatch, onOpenDaily }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
@@ -133,6 +135,26 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <div>
                     <p className="text-base text-slate-200">Quiz</p>
                     <p className="text-sm text-slate-500">Timed multiple choice game</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenMatch(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🃏</span>
+                  <div>
+                    <p className="text-base text-slate-200">Match Game</p>
+                    <p className="text-sm text-slate-500">Pair Japanese ↔ English</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenDaily(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🎯</span>
+                  <div>
+                    <p className="text-base text-slate-200">Daily Challenge</p>
+                    <p className="text-sm text-slate-500">Learn 3 + review 5 daily</p>
                   </div>
                 </button>
                 <button
