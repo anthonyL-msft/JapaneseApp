@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Phrase } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 
@@ -82,25 +82,33 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
 
   // Build queues on mount
   useEffect(() => {
-    // Learn queue: phrases NOT yet learned, shuffled, pick some
+    // Learn queue: phrases NOT yet learned, shuffled, pick extra for skipping
     const unlearned = phrases.filter(p => !learnedIds.has(p.id) && !daily.learnedToday.includes(p.id));
     const shuffled = [...unlearned].sort(() => Math.random() - 0.5);
-    setLearnQueue(shuffled.slice(0, LEARN_TARGET - learnProgress));
+    setLearnQueue(shuffled.slice(0, Math.max(LEARN_TARGET * 3, 9)));
 
-    // Review queue: phrases already learned, shuffled
+    // Review queue: phrases already learned, shuffled, pick extra for skipping
     const learned = phrases.filter(p => learnedIds.has(p.id) && !daily.reviewedToday.includes(p.id));
     const shuffledReview = [...learned].sort(() => Math.random() - 0.5);
-    setReviewQueue(shuffledReview.slice(0, REVIEW_TARGET - reviewProgress));
+    setReviewQueue(shuffledReview.slice(0, Math.max(REVIEW_TARGET * 3, 15)));
   }, []);
 
   const markLearnComplete = useCallback(() => {
     const current = learnQueue[currentIndex];
     if (!current) return;
+    if (daily.learnedToday.includes(current.id)) {
+      // Already learned this one, just move on
+      if (currentIndex + 1 < learnQueue.length) {
+        setCurrentIndex(prev => prev + 1);
+        setShowAnswer(false);
+      }
+      return;
+    }
     onToggleLearned(current.id);
     const newDaily = { ...daily, learnedToday: [...daily.learnedToday, current.id] };
 
-    if (currentIndex + 1 >= learnQueue.length || newDaily.learnedToday.length >= LEARN_TARGET) {
-      // Learning phase complete
+    if (newDaily.learnedToday.length >= LEARN_TARGET) {
+      // Learning target met
       setDaily(newDaily);
       saveDaily(newDaily);
       setPhase('overview');
@@ -109,7 +117,10 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
     } else {
       setDaily(newDaily);
       saveDaily(newDaily);
-      setCurrentIndex(prev => prev + 1);
+      // Move to next card
+      if (currentIndex + 1 < learnQueue.length) {
+        setCurrentIndex(prev => prev + 1);
+      }
       setShowAnswer(false);
     }
   }, [currentIndex, learnQueue, daily, onToggleLearned]);
@@ -117,9 +128,17 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
   const markReviewComplete = useCallback(() => {
     const current = reviewQueue[currentIndex];
     if (!current) return;
+    if (daily.reviewedToday.includes(current.id)) {
+      // Already reviewed, just move on
+      if (currentIndex + 1 < reviewQueue.length) {
+        setCurrentIndex(prev => prev + 1);
+        setShowAnswer(false);
+      }
+      return;
+    }
     const newDaily = { ...daily, reviewedToday: [...daily.reviewedToday, current.id] };
 
-    if (currentIndex + 1 >= reviewQueue.length || newDaily.reviewedToday.length >= REVIEW_TARGET) {
+    if (newDaily.reviewedToday.length >= REVIEW_TARGET) {
       setDaily(newDaily);
       saveDaily(newDaily);
       setPhase('overview');
@@ -128,7 +147,9 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
     } else {
       setDaily(newDaily);
       saveDaily(newDaily);
-      setCurrentIndex(prev => prev + 1);
+      if (currentIndex + 1 < reviewQueue.length) {
+        setCurrentIndex(prev => prev + 1);
+      }
       setShowAnswer(false);
     }
   }, [currentIndex, reviewQueue, daily]);
@@ -159,6 +180,67 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
       completeChallenge();
     }
   }, [learnDone, reviewDone, allDone]);
+
+  // Swipe gesture handling
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipeTransition, setSwipeTransition] = useState(false);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    setSwipeTransition(false);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart.current) return;
+    const dx = e.touches[0].clientX - touchStart.current.x;
+    const dy = e.touches[0].clientY - touchStart.current.y;
+    // Only track horizontal swipes
+    if (Math.abs(dx) > Math.abs(dy)) {
+      setSwipeOffset(dx);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (Math.abs(swipeOffset) > 80) {
+      // Swipe threshold met — skip card
+      const direction = swipeOffset > 0 ? -1 : 1; // swipe right = go back, swipe left = go forward
+      const queue = phase === 'learn' ? learnQueue : reviewQueue;
+      const newIndex = currentIndex + direction;
+      if (newIndex >= 0 && newIndex < queue.length) {
+        setSwipeTransition(true);
+        setSwipeOffset(direction > 0 ? -300 : 300);
+        setTimeout(() => {
+          setCurrentIndex(newIndex);
+          setShowAnswer(false);
+          setSwipeOffset(0);
+          setSwipeTransition(false);
+        }, 200);
+      } else {
+        setSwipeTransition(true);
+        setSwipeOffset(0);
+      }
+    } else {
+      setSwipeTransition(true);
+      setSwipeOffset(0);
+    }
+    touchStart.current = null;
+  };
+
+  const skipCard = (direction: 1 | -1) => {
+    const queue = phase === 'learn' ? learnQueue : reviewQueue;
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < queue.length) {
+      setSwipeTransition(true);
+      setSwipeOffset(direction > 0 ? -300 : 300);
+      setTimeout(() => {
+        setCurrentIndex(newIndex);
+        setShowAnswer(false);
+        setSwipeOffset(0);
+        setSwipeTransition(false);
+      }, 200);
+    }
+  };
 
   const currentLearn = learnQueue[currentIndex];
   const currentReview = reviewQueue[currentIndex];
@@ -244,10 +326,24 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
             <button onClick={() => setPhase('overview')} className="text-base text-slate-400 p-1">← Back</button>
             <p className="text-base text-slate-400">{currentIndex + 1} / {learnQueue.length}</p>
           </div>
-          <div className="flex-1 flex flex-col items-center justify-center px-6">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-hidden">
+            {/* Dots indicator */}
+            <div className="flex gap-1.5 mb-4">
+              {learnQueue.map((_, i) => (
+                <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? 'bg-sakura-400 scale-125' : daily.learnedToday.includes(learnQueue[i]?.id) ? 'bg-emerald-500' : 'bg-slate-600'}`} />
+              ))}
+            </div>
             <div
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
               onClick={() => setShowAnswer(!showAnswer)}
-              className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer active:bg-slate-700/80 transition min-h-[280px] flex flex-col items-center justify-center"
+              className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer active:bg-slate-700/80 min-h-[280px] flex flex-col items-center justify-center"
+              style={{
+                transform: `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.03}deg)`,
+                transition: swipeTransition ? 'transform 0.2s ease-out' : 'none',
+                opacity: Math.max(0.5, 1 - Math.abs(swipeOffset) / 400),
+              }}
             >
               {!showAnswer ? (
                 <>
@@ -268,12 +364,28 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                 </>
               )}
             </div>
-            {showAnswer && (
+            {/* Skip arrows + action buttons */}
+            <div className="flex items-center gap-4 mt-4">
               <button
-                onClick={markLearnComplete}
-                className="mt-4 px-6 py-3 rounded-xl bg-emerald-600/80 text-white text-base active:bg-emerald-700 transition"
-              >✓ Got it — Mark Learned</button>
-            )}
+                onClick={() => skipCard(-1)}
+                disabled={currentIndex === 0}
+                className="p-2 rounded-full text-slate-400 active:text-white disabled:opacity-30 transition text-xl"
+              >◀</button>
+              {showAnswer && (
+                <button
+                  onClick={markLearnComplete}
+                  className="px-6 py-3 rounded-xl bg-emerald-600/80 text-white text-base active:bg-emerald-700 transition"
+                >✓ Got it — Mark Learned</button>
+              )}
+              {!showAnswer && (
+                <p className="text-sm text-slate-500">← swipe to skip →</p>
+              )}
+              <button
+                onClick={() => skipCard(1)}
+                disabled={currentIndex >= learnQueue.length - 1}
+                className="p-2 rounded-full text-slate-400 active:text-white disabled:opacity-30 transition text-xl"
+              >▶</button>
+            </div>
           </div>
         </div>
       )}
@@ -285,10 +397,24 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
             <button onClick={() => setPhase('overview')} className="text-base text-slate-400 p-1">← Back</button>
             <p className="text-base text-slate-400">{currentIndex + 1} / {reviewQueue.length}</p>
           </div>
-          <div className="flex-1 flex flex-col items-center justify-center px-6">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-hidden">
+            {/* Dots indicator */}
+            <div className="flex gap-1.5 mb-4">
+              {reviewQueue.map((_, i) => (
+                <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? 'bg-indigo-400 scale-125' : daily.reviewedToday.includes(reviewQueue[i]?.id) ? 'bg-emerald-500' : 'bg-slate-600'}`} />
+              ))}
+            </div>
             <div
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
               onClick={() => setShowAnswer(!showAnswer)}
-              className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer active:bg-slate-700/80 transition min-h-[280px] flex flex-col items-center justify-center"
+              className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer active:bg-slate-700/80 min-h-[280px] flex flex-col items-center justify-center"
+              style={{
+                transform: `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.03}deg)`,
+                transition: swipeTransition ? 'transform 0.2s ease-out' : 'none',
+                opacity: Math.max(0.5, 1 - Math.abs(swipeOffset) / 400),
+              }}
             >
               {!showAnswer ? (
                 <>
@@ -306,18 +432,33 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                 </>
               )}
             </div>
-            {showAnswer && (
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={markReviewComplete}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600/80 text-white text-base active:bg-emerald-700 transition"
-                >✓ Remembered</button>
-                <button
-                  onClick={() => { setShowAnswer(false); }}
-                  className="px-5 py-2.5 rounded-xl bg-slate-700 text-slate-300 text-base active:bg-slate-600 transition"
-                >Try Again</button>
-              </div>
-            )}
+            {/* Skip arrows + action buttons */}
+            <div className="flex items-center gap-3 mt-4">
+              <button
+                onClick={() => skipCard(-1)}
+                disabled={currentIndex === 0}
+                className="p-2 rounded-full text-slate-400 active:text-white disabled:opacity-30 transition text-xl"
+              >◀</button>
+              {showAnswer ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={markReviewComplete}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600/80 text-white text-base active:bg-emerald-700 transition"
+                  >✓ Remembered</button>
+                  <button
+                    onClick={() => { setShowAnswer(false); }}
+                    className="px-4 py-2.5 rounded-xl bg-slate-700 text-slate-300 text-base active:bg-slate-600 transition"
+                  >Retry</button>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500">← swipe to skip →</p>
+              )}
+              <button
+                onClick={() => skipCard(1)}
+                disabled={currentIndex >= reviewQueue.length - 1}
+                className="p-2 rounded-full text-slate-400 active:text-white disabled:opacity-30 transition text-xl"
+              >▶</button>
+            </div>
           </div>
         </div>
       )}
