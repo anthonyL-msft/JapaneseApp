@@ -232,7 +232,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
             {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
-            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} explainLang={explainLang} />}
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
@@ -757,11 +757,31 @@ const GRAMMAR_TERMS: Record<string, GrammarTerm> = {
   'place': {
     title: { en: 'Place', tc: '地點' },
     what: { en: 'A location or named place.', tc: '地點或場所名稱。' },
-    how: { en: ['Use the place name as-is before は'], tc: ['直接在 は 前面放地名'] },
+    how: { en: ['Use the place name as-is'], tc: ['直接使用地名'] },
     examples: [
       { jp: 'トイレ', reading: 'toi·re', en: 'toilet', tc: '廁所' },
       { jp: '駅', reading: 'e·ki', en: 'station', tc: '車站' },
       { jp: 'コンビニ', reading: 'kon·bi·ni', en: 'convenience store', tc: '便利商店' },
+    ],
+  },
+  'object': {
+    title: { en: 'Object (thing being acted on)', tc: '受詞（被動作的對象）' },
+    what: { en: 'The thing you\'re doing something to — what you eat, buy, take, etc.', tc: '你對它做動作的東西 — 你吃的、買的、拿的東西。' },
+    how: { en: ['Use a noun — the thing receiving the action'], tc: ['用名詞 — 接受動作的對象'] },
+    examples: [
+      { jp: 'ラーメン', reading: 'raa·men', en: 'ramen', tc: '拉麵' },
+      { jp: '切符', reading: 'kip·pu', en: 'ticket', tc: '車票' },
+      { jp: '写真', reading: 'sha·shin', en: 'photo', tc: '照片' },
+    ],
+  },
+  'subject': {
+    title: { en: 'Subject (who/what does it)', tc: '主語（誰/什麼做的）' },
+    what: { en: 'Who or what performs the action — usually dropped in Japanese when it\'s "I".', tc: '執行動作的人或物 — 日語中如果是「我」通常省略。' },
+    how: { en: ['Only needed when it\'s NOT "I" — a bus, a friend, a shop, etc.'], tc: ['只有不是「我」時才需要 — 巴士、朋友、店家等'] },
+    examples: [
+      { jp: 'このバス', reading: 'ko·no ba·su', en: 'this bus', tc: '這台巴士' },
+      { jp: '友達', reading: 'to·mo·da·chi', en: 'friend', tc: '朋友' },
+      { jp: 'お店', reading: 'o·mi·se', en: 'the shop', tc: '店家' },
     ],
   },
   'verb stem': {
@@ -1636,9 +1656,11 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
 // ============================================================
 // Sentence Structure (Step 2)
 // ============================================================
-function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, explainLang = 'en' }: RbProps) {
   const { openSet, toggle } = useAccordion(['O を V ます','V ます','S は O を V ます','Place で V ます','Place に V ます','S は ... です'], toggleSignal);
+  const [activeTerm, setActiveTerm] = useState<string | null>(null);
   return (
+    <TermTapContext.Provider value={setActiveTerm}>
     <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-3">Japanese word order is Subject → Object → Verb (verb goes LAST, opposite of English)</p>
 
@@ -1657,36 +1679,42 @@ function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSign
 
 
       <AccordionRow id="O を V ます" jp="O を V ます" rom="O wo V ma·su" meaning="Most common: Object + Verb (subject dropped)"
+        structure={['Say: [object] を [verb] {ます}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'ラーメンを食べます', hep: 'raa·men wo ta·be·ma·su', en: 'I eat ramen' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
           { jp: '写真を撮ります', hep: 'sha·shin wo to·ri·ma·su', en: 'I take a photo' },
         ]} />
       <AccordionRow id="V ます" jp="V ます" rom="V ma·su" meaning="Simplest: just the verb"
+        structure={['Say: [verb] {ます}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
           { jp: '食べます', hep: 'ta·be·ma·su', en: 'I eat' },
           { jp: 'わかりました', hep: 'wa·ka·ri·ma·shi·ta', en: 'I understood / Got it' },
         ]} />
       <AccordionRow id="S は O を V ます" jp="S は O を V ます" rom="S wa O wo V ma·su" meaning="Full sentence with subject (when it's not 'I')"
+        structure={['Say: [subject] は [object] を [verb] {ます}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'このバスは東京駅を通ります', hep: 'ko·no ba·su wa tou·kyou·e·ki wo too·ri·ma·su', en: 'This bus passes Tokyo Station' },
           { jp: 'お店は朝食を出します', hep: 'o·mi·se wa chou·sho·ku wo da·shi·ma·su', en: 'The restaurant serves breakfast' },
           { jp: '友達はお土産を買います', hep: 'to·mo·da·chi wa o·mi·ya·ge wo kai·ma·su', en: 'My friend buys souvenirs' },
         ]} />
       <AccordionRow id="Place で V ます" jp="Place で V ます" rom="Place de V ma·su" meaning="Where: do something AT a place"
+        structure={['Say: [place] で [object] を [verb] {ます}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'ここで食べます', hep: 'ko·ko de ta·be·ma·su', en: 'I eat here' },
           { jp: 'コンビニでコーヒーを買います', hep: 'kon·bi·ni de koo·hii wo kai·ma·su', en: 'I buy coffee at the convenience store' },
           { jp: 'ホテルで休みます', hep: 'ho·te·ru de ya·su·mi·ma·su', en: 'I rest at the hotel' },
         ]} />
       <AccordionRow id="Place に V ます" jp="Place に V ます" rom="Place ni V ma·su" meaning="Direction: go TO a place"
+        structure={['Say: [place] に [verb] {ます}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '東京に行きます', hep: 'tou·kyou ni i·ki·ma·su', en: 'I go to Tokyo' },
           { jp: 'ホテルに帰ります', hep: 'ho·te·ru ni ka·e·ri·ma·su', en: 'I return to the hotel' },
           { jp: '駅に着きました', hep: 'e·ki ni tsu·ki·ma·shi·ta', en: 'I arrived at the station' },
         ]} />
-      <AccordionRow id="S は ... です" jp="S は ... です" rom="S wa ... de·su" meaning="When you DO need to name the subject"
+      <AccordionRow id="S は ... です" jp="S は ... です" rom="S wa ... de·su" meaning="Describing something: Subject is ..."
+        structure={['Say: [subject] は [clause] {です}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '電車が来ます', hep: 'den·sha ga ki·ma·su', en: 'The train comes (it, not me)' },
           { jp: '友達が待っています', hep: 'to·mo·da·chi ga mat·te i·ma·su', en: 'My friend is waiting (they, not me)' },
@@ -1703,7 +1731,9 @@ function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSign
           <p className="text-base text-slate-300">✅ ラーメンを食べます <span className="text-slate-500">(natural!)</span></p>
         </div>
       </div>
+      <GrammarTermDrawer term={activeTerm} onClose={() => setActiveTerm(null)} lang={explainLang} />
     </div>
+    </TermTapContext.Provider>
   );
 }
 
