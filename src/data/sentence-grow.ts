@@ -2,7 +2,7 @@
 
 export interface SeedSentence {
   id: string;
-  group: 'travel' | 'food' | 'shopping' | 'activity';
+  group: 'travel' | 'food' | 'shopping' | 'activity' | 'hotel' | 'transport' | 'social' | 'emergency';
   target: string;
   pronunciation: string;
   pronunciation_chunks: string;
@@ -31,6 +31,18 @@ export const SEED_SENTENCES: SeedSentence[] = [
   // Activity
   { id: 's7', group: 'activity', target: '見ました', pronunciation: 'mimashita', pronunciation_chunks: 'mi·ma·shi·ta', english: 'I saw / watched' },
   { id: 's8', group: 'activity', target: '飲みました', pronunciation: 'nomimashita', pronunciation_chunks: 'no·mi·ma·shi·ta', english: 'I drank' },
+  // Hotel
+  { id: 's9', group: 'hotel', target: '泊まりました', pronunciation: 'tomarimashita', pronunciation_chunks: 'to·ma·ri·ma·shi·ta', english: 'I stayed' },
+  { id: 's10', group: 'hotel', target: '予約しました', pronunciation: 'yoyaku shimashita', pronunciation_chunks: 'yo·ya·ku shi·ma·shi·ta', english: 'I reserved' },
+  // Transportation
+  { id: 's11', group: 'transport', target: '乗りました', pronunciation: 'norimashita', pronunciation_chunks: 'no·ri·ma·shi·ta', english: 'I rode' },
+  { id: 's12', group: 'transport', target: '降ります', pronunciation: 'orimasu', pronunciation_chunks: 'o·ri·ma·su', english: "I'll get off" },
+  // Social
+  { id: 's13', group: 'social', target: '住んでいます', pronunciation: 'sunde imasu', pronunciation_chunks: 'sun·de i·ma·su', english: 'I live in' },
+  { id: 's14', group: 'social', target: '好きです', pronunciation: 'suki desu', pronunciation_chunks: 'su·ki de·su', english: 'I like' },
+  // Emergency
+  { id: 's15', group: 'emergency', target: '困っています', pronunciation: 'komatte imasu', pronunciation_chunks: 'ko·mat·te i·ma·su', english: "I'm in trouble" },
+  { id: 's16', group: 'emergency', target: 'なくしました', pronunciation: 'nakushimashita', pronunciation_chunks: 'na·ku·shi·ma·shi·ta', english: 'I lost' },
 ];
 
 // Pre-built expansion chains (offline fallback) — keyed by seed id
@@ -91,6 +103,62 @@ export const FALLBACK_CHAINS: Record<string, ExpansionStep[][]> = {
       { label: '+Who', target: '友達と飲みました', pronunciation: 'tomodachi to nomimashita', pronunciation_chunks: 'to·mo·da·chi to no·mi·ma·shi·ta', english: 'I drank with a friend', added: '友達と' },
     ],
   ],
+  s9: [
+    [
+      { label: '+Where', target: '渋谷に泊まりました', pronunciation: 'shibuya ni tomarimashita', pronunciation_chunks: 'shi·bu·ya ni to·ma·ri·ma·shi·ta', english: 'I stayed in Shibuya', added: '渋谷に' },
+      { label: '+When', target: '昨日泊まりました', pronunciation: 'kinou tomarimashita', pronunciation_chunks: 'ki·nou to·ma·ri·ma·shi·ta', english: 'I stayed yesterday', added: '昨日' },
+      { label: '+How long', target: '二泊泊まりました', pronunciation: 'nihaku tomarimashita', pronunciation_chunks: 'ni·ha·ku to·ma·ri·ma·shi·ta', english: 'I stayed two nights', added: '二泊' },
+    ],
+  ],
+  s10: [
+    [
+      { label: '+What', target: 'ホテルを予約しました', pronunciation: 'hoteru wo yoyaku shimashita', pronunciation_chunks: 'ho·te·ru wo yo·ya·ku shi·ma·shi·ta', english: 'I reserved a hotel', added: 'ホテルを' },
+      { label: '+When', target: '昨日予約しました', pronunciation: 'kinou yoyaku shimashita', pronunciation_chunks: 'ki·nou yo·ya·ku shi·ma·shi·ta', english: 'I reserved yesterday', added: '昨日' },
+      { label: '+How many', target: '二人分予約しました', pronunciation: 'futaribun yoyaku shimashita', pronunciation_chunks: 'fu·ta·ri·bun yo·ya·ku shi·ma·shi·ta', english: 'I reserved for two people', added: '二人分' },
+    ],
+  ],
+  s11: [
+    [
+      { label: '+What', target: '新幹線に乗りました', pronunciation: 'shinkansen ni norimashita', pronunciation_chunks: 'shin·kan·sen ni no·ri·ma·shi·ta', english: 'I rode the Shinkansen', added: '新幹線に' },
+      { label: '+Where', target: '東京から乗りました', pronunciation: 'toukyou kara norimashita', pronunciation_chunks: 'tou·kyou ka·ra no·ri·ma·shi·ta', english: 'I rode from Tokyo', added: '東京から' },
+      { label: '+When', target: '今朝乗りました', pronunciation: 'kesa norimashita', pronunciation_chunks: 'ke·sa no·ri·ma·shi·ta', english: 'I rode this morning', added: '今朝' },
+    ],
+  ],
+  s12: [
+    [
+      { label: '+Where', target: '次の駅で降ります', pronunciation: 'tsugi no eki de orimasu', pronunciation_chunks: 'tsu·gi no e·ki de o·ri·ma·su', english: "I'll get off at the next station", added: '次の駅で' },
+      { label: '+Reason', target: 'ここで降ります', pronunciation: 'koko de orimasu', pronunciation_chunks: 'ko·ko de o·ri·ma·su', english: "I'll get off here", added: 'ここで' },
+      { label: '+Who', target: '友達と降ります', pronunciation: 'tomodachi to orimasu', pronunciation_chunks: 'to·mo·da·chi to o·ri·ma·su', english: "I'll get off with my friend", added: '友達と' },
+    ],
+  ],
+  s13: [
+    [
+      { label: '+Where', target: '東京に住んでいます', pronunciation: 'toukyou ni sunde imasu', pronunciation_chunks: 'tou·kyou ni sun·de i·ma·su', english: 'I live in Tokyo', added: '東京に' },
+      { label: '+How long', target: '三年住んでいます', pronunciation: 'sannen sunde imasu', pronunciation_chunks: 'san·nen sun·de i·ma·su', english: 'I have lived here for 3 years', added: '三年' },
+      { label: '+Who', target: '家族と住んでいます', pronunciation: 'kazoku to sunde imasu', pronunciation_chunks: 'ka·zo·ku to sun·de i·ma·su', english: 'I live with my family', added: '家族と' },
+    ],
+  ],
+  s14: [
+    [
+      { label: '+What', target: '日本が好きです', pronunciation: 'nihon ga suki desu', pronunciation_chunks: 'ni·hon ga su·ki de·su', english: 'I like Japan', added: '日本が' },
+      { label: '+What', target: 'ラーメンが好きです', pronunciation: 'raamen ga suki desu', pronunciation_chunks: 'raa·men ga su·ki de·su', english: 'I like ramen', added: 'ラーメンが' },
+      { label: '+How much', target: 'とても好きです', pronunciation: 'totemo suki desu', pronunciation_chunks: 'to·te·mo su·ki de·su', english: 'I like it very much', added: 'とても' },
+    ],
+  ],
+  s15: [
+    [
+      { label: '+What', target: '道に困っています', pronunciation: 'michi ni komatte imasu', pronunciation_chunks: 'mi·chi ni ko·mat·te i·ma·su', english: "I'm lost (having trouble with directions)", added: '道に' },
+      { label: '+What', target: '電車に困っています', pronunciation: 'densha ni komatte imasu', pronunciation_chunks: 'den·sha ni ko·mat·te i·ma·su', english: "I'm having trouble with the train", added: '電車に' },
+      { label: '+Intensity', target: 'とても困っています', pronunciation: 'totemo komatte imasu', pronunciation_chunks: 'to·te·mo ko·mat·te i·ma·su', english: "I'm really in trouble", added: 'とても' },
+    ],
+  ],
+  s16: [
+    [
+      { label: '+What', target: '財布をなくしました', pronunciation: 'saifu wo nakushimashita', pronunciation_chunks: 'sai·fu wo na·ku·shi·ma·shi·ta', english: 'I lost my wallet', added: '財布を' },
+      { label: '+Where', target: '電車でなくしました', pronunciation: 'densha de nakushimashita', pronunciation_chunks: 'den·sha de na·ku·shi·ma·shi·ta', english: 'I lost it on the train', added: '電車で' },
+      { label: '+What', target: 'パスポートをなくしました', pronunciation: 'pasupooto wo nakushimashita', pronunciation_chunks: 'pa·su·poo·to wo na·ku·shi·ma·shi·ta', english: 'I lost my passport', added: 'パスポートを' },
+    ],
+  ],
 };
 
 export const SEED_GROUPS: { id: string; label: string; emoji: string }[] = [
@@ -98,4 +166,8 @@ export const SEED_GROUPS: { id: string; label: string; emoji: string }[] = [
   { id: 'food', label: 'Food', emoji: '🍜' },
   { id: 'shopping', label: 'Shopping', emoji: '🛍️' },
   { id: 'activity', label: 'Activity', emoji: '🎯' },
+  { id: 'hotel', label: 'Hotel', emoji: '🏨' },
+  { id: 'transport', label: 'Transportation', emoji: '🚃' },
+  { id: 'social', label: 'Social', emoji: '💬' },
+  { id: 'emergency', label: 'Emergency', emoji: '🚨' },
 ];

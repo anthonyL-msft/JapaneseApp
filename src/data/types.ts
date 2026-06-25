@@ -1,3 +1,5 @@
+export type Level = 'basic' | 'intermediate' | 'advanced';
+
 export interface Phrase {
   id: string;
   lang: string;
@@ -10,6 +12,7 @@ export interface Phrase {
   category: Category;
   situation: string;
   difficulty: 1 | 2 | 3;
+  level?: Level;               // basic | intermediate | advanced — for scaffolded learning
   notes: string;
   native_hint?: string;        // kanji bridge for JP, cognate hints for ES/FR
 }
@@ -43,7 +46,8 @@ export type Category =
   | 'culture'
   | 'local'
   | 'emergency'
-  | 'vocab';
+  | 'vocab'
+  | 'power';
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; labelTC: string }> = {
   greetings:  { label: 'Greetings',              emoji: '👋', labelTC: '問候用語' },
@@ -60,6 +64,7 @@ export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; lab
   local:      { label: 'Local Specials',          emoji: '📍', labelTC: '當地特色' },
   emergency:  { label: 'Emergency & Health',      emoji: '🚑', labelTC: '緊急與醫療' },
   vocab:      { label: 'Vocabulary',              emoji: '🔤', labelTC: '基本單字' },
+  power:      { label: 'Power Phrases',            emoji: '⚡', labelTC: '實用短句' },
 };
 
 export interface UserNote {

@@ -15,7 +15,7 @@ interface Pattern {
   build: (vocab: Vocab) => { jp: string; rom: string; en: string };
 }
 
-type SlotType = 'noun' | 'place' | 'food' | 'drink' | 'quantity' | 'action' | 'time';
+type SlotType = 'noun' | 'place' | 'food' | 'drink' | 'quantity' | 'action' | 'time' | 'adjective';
 
 interface Vocab {
   jp: string;
@@ -121,6 +121,17 @@ const PATTERNS: Pattern[] = [
     meaning: 'Until what time is ○○?', slotType: 'time', slotLabel: 'What closes/ends?',
     build: (v) => ({ jp: `${v.jp}は何時までですか？`, rom: `${v.rom} wa nan·ji ma·de de·su ka`, en: `Until what time is ${v.en.toLowerCase()}?` }),
   },
+  // Adjective-based
+  {
+    id: 'adj_desu', group: 'question', template: '○○です', templateRom: '○○ de·su',
+    meaning: 'It is ○○ (describing)', slotType: 'adjective', slotLabel: 'How is it?',
+    build: (v) => ({ jp: `${v.jp}です`, rom: `${v.rom} de·su`, en: `It is ${v.en.toLowerCase()}` }),
+  },
+  {
+    id: 'motto', group: 'question', template: 'もっと○○のはありますか？', templateRom: 'mot·to ○○ no wa a·ri·ma·su ka',
+    meaning: 'Do you have something more ○○?', slotType: 'adjective', slotLabel: 'What quality?',
+    build: (v) => ({ jp: `もっと${v.jp}のはありますか？`, rom: `mot·to ${v.rom} no wa a·ri·ma·su ka`, en: `Do you have something more ${v.en.toLowerCase()}?` }),
+  },
 ];
 
 // === Vocab Banks ===
@@ -141,6 +152,15 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: 'タオル', rom: 'ta·o·ru', en: 'Towel' },
     { jp: '毛布', rom: 'mou·fu', en: 'Blanket' },
     { jp: 'ICカード', rom: 'ai·shii kaa·do', en: 'IC card' },
+    { jp: '電話', rom: 'den·wa', en: 'Phone' },
+    { jp: '鍵', rom: 'ka·gi', en: 'Key' },
+    { jp: 'スリッパ', rom: 'su·rip·pa', en: 'Slippers' },
+    { jp: '枕', rom: 'ma·ku·ra', en: 'Pillow' },
+    { jp: 'ハンガー', rom: 'han·gaa', en: 'Hanger' },
+    { jp: 'ドライヤー', rom: 'do·rai·yaa', en: 'Hair dryer' },
+    { jp: 'コンセント', rom: 'kon·sen·to', en: 'Power outlet' },
+    { jp: '石鹸', rom: 'sek·ken', en: 'Soap' },
+    { jp: 'シャンプー', rom: 'shan·puu', en: 'Shampoo' },
   ],
   place: [
     { jp: 'トイレ', rom: 'toi·re', en: 'Toilet' },
@@ -158,6 +178,14 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: 'レストラン', rom: 're·su·to·ran', en: 'Restaurant' },
     { jp: '病院', rom: 'byou·in', en: 'Hospital' },
     { jp: '交番', rom: 'kou·ban', en: 'Police box' },
+    { jp: '公園', rom: 'kou·en', en: 'Park' },
+    { jp: '神社', rom: 'jin·ja', en: 'Shrine' },
+    { jp: 'お寺', rom: 'o·te·ra', en: 'Temple' },
+    { jp: '美術館', rom: 'bi·ju·tsu·kan', en: 'Art museum' },
+    { jp: 'デパート', rom: 'de·paa·to', en: 'Department store' },
+    { jp: '搭乗口', rom: 'tou·jou·gu·chi', en: 'Boarding gate' },
+    { jp: '両替所', rom: 'ryou·ga·e·jo', en: 'Currency exchange' },
+    { jp: '観光案内所', rom: 'kan·kou·an·nai·jo', en: 'Tourist info center' },
   ],
   food: [
     { jp: 'ラーメン', rom: 'raa·men', en: 'Ramen' },
@@ -173,6 +201,11 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: '刺身', rom: 'sa·shi·mi', en: 'Sashimi' },
     { jp: '味噌カツ', rom: 'mi·so·ka·tsu', en: 'Miso pork cutlet' },
     { jp: 'ひつまぶし', rom: 'hi·tsu·ma·bu·shi', en: 'Grilled eel on rice' },
+    { jp: '焼き鳥', rom: 'ya·ki·to·ri', en: 'Yakitori' },
+    { jp: 'お好み焼き', rom: 'o·ko·no·mi·ya·ki', en: 'Okonomiyaki' },
+    { jp: '餃子', rom: 'gyou·za', en: 'Gyoza' },
+    { jp: '抹茶アイス', rom: 'mat·cha ai·su', en: 'Matcha ice cream' },
+    { jp: 'メロンパン', rom: 'me·ron·pan', en: 'Melon bread' },
   ],
   drink: [
     { jp: '水', rom: 'mi·zu', en: 'Water' },
@@ -187,6 +220,10 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: '抹茶ラテ', rom: 'mat·cha ra·te', en: 'Matcha latte' },
     { jp: 'コーラ', rom: 'koo·ra', en: 'Cola' },
     { jp: '紅茶', rom: 'kou·cha', en: 'Black tea' },
+    { jp: 'レモンサワー', rom: 're·mon·sa·waa', en: 'Lemon sour' },
+    { jp: 'ハイボール', rom: 'hai·boo·ru', en: 'Highball' },
+    { jp: 'カルピス', rom: 'ka·ru·pi·su', en: 'Calpis' },
+    { jp: '甘酒', rom: 'a·ma·za·ke', en: 'Sweet sake' },
   ],
   quantity: [
     { jp: 'ひとつ', rom: 'hi·to·tsu', en: 'One' },
@@ -210,6 +247,13 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: '返品', rom: 'hen·pin', en: 'Return (item)' },
     { jp: 'Wi-Fiを使って', rom: 'wai·fai wo tsu·kat·te', en: 'Use Wi-Fi' },
     { jp: '充電', rom: 'juu·den', en: 'Charge (phone)' },
+    { jp: '両替', rom: 'ryou·ga·e', en: 'Exchange currency' },
+    { jp: 'チェックイン', rom: 'chek·ku·in', en: 'Check in' },
+    { jp: '延長', rom: 'en·chou', en: 'Extend' },
+    { jp: '借りて', rom: 'ka·ri·te', en: 'Borrow' },
+    { jp: '洗濯', rom: 'sen·ta·ku', en: 'Do laundry' },
+    { jp: '送って', rom: 'o·kut·te', en: 'Send' },
+    { jp: '案内', rom: 'an·nai', en: 'Guide / show around' },
   ],
   time: [
     { jp: 'チェックイン', rom: 'chek·ku·in', en: 'Check-in' },
@@ -223,6 +267,20 @@ const VOCAB: Record<SlotType, Vocab[]> = {
     { jp: '予約', rom: 'yo·ya·ku', en: 'Reservation' },
     { jp: 'ラストオーダー', rom: 'ra·su·to oo·daa', en: 'Last order' },
   ],
+  adjective: [
+    { jp: '大きい', rom: 'oo·kii', en: 'Big' },
+    { jp: '小さい', rom: 'chii·sai', en: 'Small' },
+    { jp: '暑い', rom: 'a·tsu·i', en: 'Hot (weather)' },
+    { jp: '寒い', rom: 'sa·mu·i', en: 'Cold (weather)' },
+    { jp: '安い', rom: 'ya·su·i', en: 'Cheap' },
+    { jp: '高い', rom: 'ta·kai', en: 'Expensive' },
+    { jp: 'おいしい', rom: 'o·i·shii', en: 'Delicious' },
+    { jp: '近い', rom: 'chi·kai', en: 'Near' },
+    { jp: '遠い', rom: 'too·i', en: 'Far' },
+    { jp: '新しい', rom: 'a·ta·ra·shii', en: 'New' },
+    { jp: '静かな', rom: 'shi·zu·ka·na', en: 'Quiet' },
+    { jp: 'きれいな', rom: 'ki·rei·na', en: 'Beautiful / Clean' },
+  ],
 };
 
 // Slot type labels for the chip category headers
@@ -234,6 +292,7 @@ const SLOT_LABELS: Record<SlotType, string> = {
   quantity: '🔢 Quantities',
   action: '🎯 Actions',
   time: '🕐 Time & Events',
+  adjective: '✨ Adjectives',
 };
 
 export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { jp: string; rom: string; en: string }) => void; onSave?: (phrase: { jp: string; rom: string; en: string }) => void }) {

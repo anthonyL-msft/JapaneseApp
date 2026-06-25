@@ -966,15 +966,33 @@ function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
 }
 
 function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
-  const { openSet, toggle } = useAccordion(['○○をお願いします','○○はありますか','○○はどこですか','○○してもいいですか','○○てください','○○がわかりません','○○たいです'], toggleSignal);
-  return (
-    <div className="mt-2 space-y-1.5">
+  const [patternLevel, setPatternLevel] = useState<'all' | 'basic' | 'intermediate' | 'advanced'>('all');
+
+  const basicKeys = ['○○をお願いします','○○てください','○○はありますか','○○はどこですか','○○してもいいですか','○○たいです','○○がわかりません'];
+  const intermediateKeys = ['〜てもらえますか','〜ほうがいい','〜と思います','〜かもしれません','〜たことがあります','〜なければなりません','AもBも'];
+  const advancedKeys = ['〜ことにしました','〜ようにしています','〜わけではない','〜ば〜ほど','〜にとって'];
+
+  const activeKeys = patternLevel === 'all' ? [...basicKeys, ...intermediateKeys, ...advancedKeys]
+    : patternLevel === 'basic' ? basicKeys
+    : patternLevel === 'intermediate' ? intermediateKeys
+    : advancedKeys;
+
+  const { openSet, toggle } = useAccordion(activeKeys, toggleSignal);
+
+  const renderBasic = () => (
+    <>
       <AccordionRow id="○○をお願いします" jp="○○をお願いします" rom="○○ wo o·ne·gai·shi·ma·su" meaning="○○ please — works for anything!"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '水をお願いします', hep: 'mi·zu wo o·ne·gai·shi·ma·su', en: 'Water please' },
           { jp: 'メニューをお願いします', hep: 'me·nyuu wo o·ne·gai·shi·ma·su', en: 'Menu please' },
           { jp: 'お会計をお願いします', hep: 'o·kai·kei wo o·ne·gai·shi·ma·su', en: 'Check please' },
           { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
+        ]} />
+      <AccordionRow id="○○てください" jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
+          { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
+          { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
         ]} />
       <AccordionRow id="○○はありますか" jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -994,11 +1012,11 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
-      <AccordionRow id="○○てください" jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
+      <AccordionRow id="○○たいです" jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
-          { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
-          { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
-          { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
+          { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
+          { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
+          { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
         ]} />
       <AccordionRow id="○○がわかりません" jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1006,12 +1024,132 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
           { jp: '道がわかりません', hep: 'mi·chi ga wa·ka·ri·ma·sen', en: "I don't know the way" },
         ]} />
-      <AccordionRow id="○○たいです" jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
+    </>
+  );
+
+  const renderIntermediate = () => (
+    <>
+      <AccordionRow id="〜てもらえますか" jp="〜てもらえますか" rom="te mo·ra·e·ma·su ka" meaning="Could you ○○ for me? (polite request)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
-          { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
-          { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
-          { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
+          { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Could you take a photo for me?' },
+          { jp: 'ここまで連れて行ってもらえますか？', hep: 'ko·ko ma·de tsu·re·te it·te mo·ra·e·ma·su ka', en: 'Could you take me here?' },
+          { jp: '説明してもらえますか？', hep: 'se·tsu·mei shi·te mo·ra·e·ma·su ka', en: 'Could you explain it?' },
         ]} />
+      <AccordionRow id="〜ほうがいい" jp="〜ほうがいい" rom="hou ga ii" meaning="Should ○○ / It's better to ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '早く行ったほうがいいです', hep: 'ha·ya·ku it·ta hou ga ii de·su', en: "It's better to go early" },
+          { jp: '予約したほうがいいですか？', hep: 'yo·ya·ku shi·ta hou ga ii de·su ka', en: 'Should I make a reservation?' },
+          { jp: '現金を持ったほうがいいです', hep: 'gen·kin wo mot·ta hou ga ii de·su', en: "It's better to carry cash" },
+        ]} />
+      <AccordionRow id="〜と思います" jp="〜と思います" rom="to o·mo·i·ma·su" meaning="I think ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'おいしいと思います', hep: 'o·i·shii to o·mo·i·ma·su', en: 'I think it\'s delicious' },
+          { jp: '電車のほうが早いと思います', hep: 'den·sha no hou ga ha·yai to o·mo·i·ma·su', en: 'I think the train is faster' },
+          { jp: '大丈夫だと思います', hep: 'dai·jou·bu da to o·mo·i·ma·su', en: 'I think it\'s fine' },
+        ]} />
+      <AccordionRow id="〜かもしれません" jp="〜かもしれません" rom="ka·mo shi·re·ma·sen" meaning="Maybe ○○ / It might ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '遅れるかもしれません', hep: 'o·ku·re·ru ka·mo shi·re·ma·sen', en: 'I might be late' },
+          { jp: '雨が降るかもしれません', hep: 'a·me ga fu·ru ka·mo shi·re·ma·sen', en: 'It might rain' },
+          { jp: '売り切れかもしれません', hep: 'u·ri·ki·re ka·mo shi·re·ma·sen', en: 'It might be sold out' },
+        ]} />
+      <AccordionRow id="〜たことがあります" jp="〜たことがあります" rom="ta ko·to ga a·ri·ma·su" meaning="I have experienced ○○ (past experience)"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '日本に来たことがあります', hep: 'ni·hon ni ki·ta ko·to ga a·ri·ma·su', en: 'I have been to Japan before' },
+          { jp: 'すしを食べたことがあります', hep: 'su·shi wo ta·be·ta ko·to ga a·ri·ma·su', en: 'I have eaten sushi before' },
+          { jp: '新幹線に乗ったことがあります', hep: 'shin·kan·sen ni not·ta ko·to ga a·ri·ma·su', en: 'I have ridden the Shinkansen' },
+        ]} />
+      <AccordionRow id="〜なければなりません" jp="〜なければなりません" rom="na·ke·re·ba na·ri·ma·sen" meaning="Must ○○ / Have to ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '予約しなければなりません', hep: 'yo·ya·ku shi·na·ke·re·ba na·ri·ma·sen', en: 'I must make a reservation' },
+          { jp: 'パスポートを見せなければなりません', hep: 'pa·su·poo·to wo mi·se·na·ke·re·ba na·ri·ma·sen', en: 'I have to show my passport' },
+          { jp: '靴を脱がなければなりません', hep: 'ku·tsu wo nu·ga·na·ke·re·ba na·ri·ma·sen', en: 'I have to take off my shoes' },
+        ]} />
+      <AccordionRow id="AもBも" jp="AもBも" rom="A mo B mo" meaning="Both A and B / I want A and B"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'ラーメンもぎょうざもください', hep: 'raa·men mo gyou·za mo ku·da·sai', en: 'I\'ll have both ramen and gyoza' },
+          { jp: '日本語も英語も話します', hep: 'ni·hon·go mo ei·go mo ha·na·shi·ma·su', en: 'I speak both Japanese and English' },
+          { jp: 'これもそれもお願いします', hep: 'ko·re mo so·re mo o·ne·gai·shi·ma·su', en: 'I\'ll take both this and that' },
+          { jp: '東京も京都も行きたいです', hep: 'tou·kyou mo kyou·to mo i·ki·tai de·su', en: 'I want to go to both Tokyo and Kyoto' },
+        ]} />
+    </>
+  );
+
+  const renderAdvanced = () => (
+    <>
+      <AccordionRow id="〜ことにしました" jp="〜ことにしました" rom="ko·to ni shi·ma·shi·ta" meaning="I decided to ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '京都に行くことにしました', hep: 'kyou·to ni i·ku ko·to ni shi·ma·shi·ta', en: 'I decided to go to Kyoto' },
+          { jp: '新幹線に乗ることにしました', hep: 'shin·kan·sen ni no·ru ko·to ni shi·ma·shi·ta', en: 'I decided to take the Shinkansen' },
+          { jp: 'もう一泊することにしました', hep: 'mou ip·pa·ku su·ru ko·to ni shi·ma·shi·ta', en: 'I decided to stay one more night' },
+        ]} />
+      <AccordionRow id="〜ようにしています" jp="〜ようにしています" rom="you ni shi·te i·ma·su" meaning="I make a point to ○○ (habitual effort)"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '毎日日本語を練習するようにしています', hep: 'mai·ni·chi ni·hon·go wo ren·shuu su·ru you ni shi·te i·ma·su', en: 'I make a point to practice Japanese every day' },
+          { jp: 'なるべく現金を使うようにしています', hep: 'na·ru·be·ku gen·kin wo tsu·ka·u you ni shi·te i·ma·su', en: 'I try to use cash as much as possible' },
+          { jp: '早く寝るようにしています', hep: 'ha·ya·ku ne·ru you ni shi·te i·ma·su', en: 'I try to go to bed early' },
+        ]} />
+      <AccordionRow id="〜わけではない" jp="〜わけではない" rom="wa·ke de wa nai" meaning="It's not that ○○ (clarifying nuance)"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '日本語がわからないわけではないです', hep: 'ni·hon·go ga wa·ka·ra·nai wa·ke de wa nai de·su', en: "It's not that I don't understand Japanese (a little)" },
+          { jp: '嫌いなわけではないです', hep: 'ki·rai na wa·ke de wa nai de·su', en: "It's not that I dislike it" },
+          { jp: '高いわけではないです', hep: 'ta·kai wa·ke de wa nai de·su', en: "It's not that it's expensive" },
+        ]} />
+      <AccordionRow id="〜ば〜ほど" jp="〜ば〜ほど" rom="ba ... ho·do" meaning="The more ○○, the more ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '食べれば食べるほどおいしい', hep: 'ta·be·re·ba ta·be·ru ho·do o·i·shii', en: 'The more you eat, the more delicious it is' },
+          { jp: '日本語を勉強すればするほど面白い', hep: 'ni·hon·go wo ben·kyou su·re·ba su·ru ho·do o·mo·shi·roi', en: 'The more I study Japanese, the more interesting it is' },
+          { jp: '練習すればするほど上手になります', hep: 'ren·shuu su·re·ba su·ru ho·do jou·zu ni na·ri·ma·su', en: 'The more you practice, the better you get' },
+        ]} />
+      <AccordionRow id="〜にとって" jp="〜にとって" rom="ni tot·te" meaning="For ○○ / From ○○'s perspective"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '外国人にとって漢字は難しいです', hep: 'gai·ko·ku·jin ni tot·te kan·ji wa mu·zu·ka·shii de·su', en: 'For foreigners, kanji is difficult' },
+          { jp: '私にとって日本は特別な場所です', hep: 'wa·ta·shi ni tot·te ni·hon wa to·ku·be·tsu na ba·sho de·su', en: 'For me, Japan is a special place' },
+          { jp: '旅行者にとってICカードは便利です', hep: 'ryo·kou·sha ni tot·te ai·shii kaa·do wa ben·ri de·su', en: 'For travelers, IC cards are convenient' },
+        ]} />
+    </>
+  );
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      {/* Level tabs */}
+      <div className="flex gap-2 mb-3">
+        {(['all', 'basic', 'intermediate', 'advanced'] as const).map(level => {
+          const label = level === 'all' ? 'All' : level === 'intermediate' ? 'Intermediate' : level.charAt(0).toUpperCase() + level.slice(1);
+          return (
+            <button
+              key={level}
+              onClick={() => setPatternLevel(level)}
+              className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+                patternLevel === level
+                  ? 'bg-sakura-500/60 text-white'
+                  : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {(patternLevel === 'all' || patternLevel === 'basic') && (
+        <>
+          {patternLevel === 'all' && <p className="text-sm text-slate-500 font-medium mt-2 mb-1">Basic</p>}
+          {renderBasic()}
+        </>
+      )}
+      {(patternLevel === 'all' || patternLevel === 'intermediate') && (
+        <>
+          {patternLevel === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Intermediate</p>}
+          {renderIntermediate()}
+        </>
+      )}
+      {(patternLevel === 'all' || patternLevel === 'advanced') && (
+        <>
+          {patternLevel === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Advanced</p>}
+          {renderAdvanced()}
+        </>
+      )}
     </div>
   );
 }

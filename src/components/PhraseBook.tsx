@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Phrase, UserNote, Category } from '../data/types';
+import type { Phrase, UserNote, Category, Level } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { PhraseCard } from './PhraseCard';
 import { useSlidePanel } from '../utils/useSlidePanel';
@@ -22,6 +22,17 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   const [expandedPhrase, setExpandedPhrase] = useState<string | null>(null);
   const [openSituations, setOpenSituations] = useState<Set<string>>(new Set());
   const [initializedCategory, setInitializedCategory] = useState<string | null>(null);
+  const [levelFilter, setLevelFilter] = useState<'all' | Level>('all');
+  const [vocabTab, setVocabTab] = useState<string>('words');
+
+  // Vocab topic grouping
+  const VOCAB_TABS: { id: string; label: string; situations: string[] }[] = [
+    { id: 'words', label: 'Words', situations: ['Basic nouns', 'Pointing words', 'Colors'] },
+    { id: 'actions', label: 'Actions', situations: ['Basic verbs', 'Daily actions'] },
+    { id: 'time', label: 'Time', situations: ['Numbers', 'Time', 'Meals', 'Days of the week'] },
+    { id: 'world', label: 'World', situations: ['Basic places', 'Directions'] },
+    { id: 'people', label: 'People', situations: ['People & Family', 'Body & Health', 'Basic adjectives'] },
+  ];
 
   const toggleSituation = (situation: string) => {
     setOpenSituations(prev => {
@@ -36,9 +47,30 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   const categoryPhrases = panel.value ? phrases.filter(p => p.category === panel.value) : [];
   const info = panel.value ? CATEGORY_INFO[panel.value] : null;
 
+  // Level counts for tabs
+  const levelCounts = {
+    all: categoryPhrases.length,
+    basic: categoryPhrases.filter(p => (p.level || 'basic') === 'basic').length,
+    intermediate: categoryPhrases.filter(p => p.level === 'intermediate').length,
+    advanced: categoryPhrases.filter(p => p.level === 'advanced').length,
+  };
+
+  // Filter by level
+  const filteredPhrases = levelFilter === 'all'
+    ? categoryPhrases
+    : categoryPhrases.filter(p => (p.level || 'basic') === levelFilter);
+
+  // Filter by vocab tab when in Vocabulary category
+  const activeVocabSituations = panel.value === 'vocab'
+    ? VOCAB_TABS.find(t => t.id === vocabTab)?.situations ?? []
+    : null;
+  const displayPhrases = activeVocabSituations
+    ? filteredPhrases.filter(p => activeVocabSituations.includes(p.situation))
+    : filteredPhrases;
+
   // Group by situation
   const situations = new Map<string, Phrase[]>();
-  categoryPhrases.forEach(p => {
+  displayPhrases.forEach(p => {
     const list = situations.get(p.situation) || [];
     list.push(p);
     situations.set(p.situation, list);
@@ -83,10 +115,11 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
         </div>
         {/* Grouped category grid */}
         {[
-          { title: 'Getting Started', cats: ['greetings', 'basics', 'smalltalk', 'vocab'] },
-          { title: 'Travel', cats: ['airport', 'directions', 'hotel'] },
-          { title: 'Food & Shopping', cats: ['restaurant', 'food', 'drinks', 'shopping'] },
-          { title: 'Culture & Safety', cats: ['culture', 'local', 'emergency'] },
+          { title: 'Foundation', cats: ['greetings', 'basics', 'power', 'vocab'] },
+          { title: 'Travel & Stay', cats: ['airport', 'directions', 'hotel'] },
+          { title: 'Food & Drinks', cats: ['restaurant', 'food', 'drinks'] },
+          { title: 'Shopping & Daily', cats: ['shopping', 'smalltalk', 'emergency'] },
+          { title: 'Culture & Local', cats: ['culture', 'local'] },
         ].map(group => (
           <div key={group.title} className="mb-4">
             <h3 className="text-sm text-slate-500 font-medium mb-1.5 px-1">{group.title}</h3>
@@ -99,7 +132,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                 return (
                   <button
                     key={key}
-                    onClick={() => { panel.open(key as Category); setOpenSituations(new Set()); setExpandedPhrase(null); }}
+                    onClick={() => { panel.open(key as Category); setOpenSituations(new Set()); setExpandedPhrase(null); setLevelFilter('all'); setVocabTab('words'); }}
                     className="bg-slate-800/80 rounded-xl p-4 text-left active:bg-slate-700 transition-colors"
                   >
                     <span className="text-2xl">{catInfo.emoji}</span>
@@ -132,6 +165,57 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
               {allOpen ? '▲ Close All' : '▼ Open All'}
             </button>
           </div>
+
+          {/* Level filter tabs */}
+          {(levelCounts.intermediate > 0 || levelCounts.advanced > 0) && (
+            <div className="flex gap-1 overflow-x-auto px-4 py-2 border-b border-slate-800 shrink-0">
+              {(['all', 'basic', 'intermediate', 'advanced'] as const).map(level => {
+                const count = levelCounts[level];
+                if (level !== 'all' && count === 0) return null;
+                const label = level === 'all' ? 'All' : level === 'intermediate' ? 'Intermediate' : level.charAt(0).toUpperCase() + level.slice(1);
+                return (
+                  <button
+                    key={level}
+                    onClick={() => setLevelFilter(level)}
+                    className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+                      levelFilter === level
+                        ? 'bg-sakura-500/60 text-white'
+                        : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Vocab topic tabs */}
+          {panel.value === 'vocab' && (
+            <div className="flex gap-1 overflow-x-auto px-4 py-2 border-b border-slate-800 shrink-0">
+              {VOCAB_TABS.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => { 
+                    setVocabTab(tab.id); 
+                    // Auto-open all situations in this tab
+                    const tabSituations = tab.situations;
+                    const matchingSituations = filteredPhrases
+                      .filter(p => tabSituations.includes(p.situation))
+                      .map(p => p.situation);
+                    setOpenSituations(new Set(matchingSituations));
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+                    vocabTab === tab.id
+                      ? 'bg-sakura-500/60 text-white'
+                      : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="scroll-area flex-1 px-2 py-2 space-y-1.5">
             {Array.from(situations.entries())
