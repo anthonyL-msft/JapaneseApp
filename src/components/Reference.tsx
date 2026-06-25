@@ -1089,7 +1089,7 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '現金を持ったほうがいいです', hep: 'gen·kin wo mot·ta hou ga ii de·su', en: "It's better to carry cash" },
         ]} />
       <AccordionRow id="〜たことがあります" jp="〜たことがあります" rom="ta ko·to ga a·ri·ma·su" meaning="I have experienced ○○ (past experience)"
-        structure={['Say: [verb past た] [ことがあります]', 'Ask: [verb past た] [ことがあります] か？']}
+        structure={['Say: [verb た-form] {ことがあります}', 'Ask: [verb た-form] {ことがありますか}？']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '日本に来たことがあります', hep: 'ni·hon ni ki·ta ko·to ga a·ri·ma·su', en: 'I have been to Japan before' },
           { jp: 'すしを食べたことがあります', hep: 'su·shi wo ta·be·ta ko·to ga a·ri·ma·su', en: 'I have eaten sushi before' },
