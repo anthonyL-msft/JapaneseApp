@@ -37,9 +37,14 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
   useEffect(() => {
     if (data) {
       document.body.style.overflow = 'hidden';
+      const scrollAreas = document.querySelectorAll('.scroll-area');
+      scrollAreas.forEach(el => (el as HTMLElement).style.overflow = 'hidden');
       setClosing(false);
+      return () => {
+        document.body.style.overflow = '';
+        scrollAreas.forEach(el => (el as HTMLElement).style.overflow = '');
+      };
     }
-    return () => { document.body.style.overflow = ''; };
   }, [data]);
   const handleClose = useCallback(() => {
     setClosing(true);
@@ -50,11 +55,12 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
   }, [onClose]);
   if (!data) return null;
   return (
-    <div className={`fixed inset-0 z-50 flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose}>
+    <div className={`fixed inset-0 z-50 flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose} onTouchMove={e => e.preventDefault()}>
       <div className="absolute inset-0 bg-black/50" />
       <div
         className={`relative bg-slate-800 rounded-t-2xl max-h-[80vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
+        onTouchMove={e => e.stopPropagation()}
       >
         <div className="flex justify-center pt-2 pb-1">
           <div className="w-10 h-1 rounded-full bg-slate-600" />
@@ -1001,9 +1007,15 @@ function GrammarTermDrawer({ term, onClose, lang = 'en' }: { term: string | null
   useEffect(() => {
     if (term) {
       document.body.style.overflow = 'hidden';
+      // Prevent scroll on all scroll-area containers behind the drawer
+      const scrollAreas = document.querySelectorAll('.scroll-area');
+      scrollAreas.forEach(el => (el as HTMLElement).style.overflow = 'hidden');
       setClosing(false);
+      return () => {
+        document.body.style.overflow = '';
+        scrollAreas.forEach(el => (el as HTMLElement).style.overflow = '');
+      };
     }
-    return () => { document.body.style.overflow = ''; };
   }, [term]);
   const handleClose = useCallback(() => {
     setClosing(true);
@@ -1011,9 +1023,9 @@ function GrammarTermDrawer({ term, onClose, lang = 'en' }: { term: string | null
   }, [onClose]);
   if (!data) return null;
   return (
-    <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose}>
+    <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose} onTouchMove={e => e.preventDefault()}>
       <div className="absolute inset-0 bg-black/50" />
-      <div className={`relative bg-slate-800 rounded-t-2xl max-h-[85vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`} onClick={e => e.stopPropagation()}>
+      <div className={`relative bg-slate-800 rounded-t-2xl max-h-[85vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`} onClick={e => e.stopPropagation()} onTouchMove={e => e.stopPropagation()}>
         <div className="flex justify-center pt-2 pb-1">
           <div className="w-10 h-1 rounded-full bg-slate-600" />
         </div>
