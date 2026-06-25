@@ -1075,7 +1075,7 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '大丈夫だと思います', hep: 'dai·jou·bu da to o·mo·i·ma·su', en: 'I think it\'s fine' },
         ]} />
       <AccordionRow id="〜かもしれません" jp="〜かもしれません" rom="ka·mo shi·re·ma·sen" meaning="Maybe ○○ / It might ○○"
-        structure={['[plain form verb/adj] + かもしれません', '過れる → 過れるかもしれません']}
+        structure={['Say: [plain form] {かもしれません}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '遅れるかもしれません', hep: 'o·ku·re·ru ka·mo shi·re·ma·sen', en: 'I might be late' },
           { jp: '雨が降るかもしれません', hep: 'a·me ga fu·ru ka·mo shi·re·ma·sen', en: 'It might rain' },
