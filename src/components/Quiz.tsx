@@ -6,6 +6,7 @@ import type { KanaCard, KanaVocabCard } from '../data/kana-data';
 import { phrases } from '../data/phrases';
 
 type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food';
+type QuizMode = 'easy' | 'reverse' | 'hard';
 
 // Build phrase vocab cards from phrases.ts by situation groups
 const buildPhraseCards = (situations: string[]): KanaVocabCard[] => phrases
@@ -58,6 +59,8 @@ function setHighScore(cat: QuizCategory, score: number) {
 
 export function Quiz() {
   const panel = useSlidePanel<QuizCategory>();
+  const [startPage, setStartPage] = useState<'hiragana' | 'katakana' | null>(null);
+  const [quizMode, setQuizMode] = useState<QuizMode>('easy');
 
   // Game state
   const [kanaCards, setKanaCards] = useState<KanaCard[]>([]);
@@ -69,7 +72,9 @@ export function Quiz() {
   const [answered, setAnswered] = useState<string | null>(null);
   const [correctAnswer, setCorrectAnswer] = useState('');
   const [gameFinished, setGameFinished] = useState(false);
+  const [typedAnswer, setTypedAnswer] = useState('');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const isKana = panel.value === 'hiragana' || panel.value === 'katakana';
   const isVocab = panel.value === 'vocab-h' || panel.value === 'vocab-k' || panel.value === 'phrases';
@@ -78,14 +83,28 @@ export function Quiz() {
   const currentVocab = isVocab && vocabCards.length > 0 ? vocabCards[currentIndex % vocabCards.length] : null;
 
   // Generate 4 choices
-  const generateChoices = useCallback((idx: number, kCards: KanaCard[], vCards: KanaVocabCard[], isKanaMode: boolean) => {
+  const generateChoices = useCallback((idx: number, kCards: KanaCard[], vCards: KanaVocabCard[], isKanaMode: boolean, mode: QuizMode = 'easy') => {
     if (isKanaMode && kCards.length > 0) {
       const card = kCards[idx % kCards.length];
-      const correct = card.rom;
-      const pool = kCards.map(c => c.rom).filter(r => r !== correct);
-      const wrong = shuffle(pool).slice(0, 3);
-      setCorrectAnswer(correct);
-      setChoices(shuffle([correct, ...wrong]));
+      if (mode === 'reverse') {
+        // Show romaji, pick character
+        const correct = card.char;
+        const pool = kCards.map(c => c.char).filter(c => c !== correct);
+        const wrong = shuffle(pool).slice(0, 3);
+        setCorrectAnswer(correct);
+        setChoices(shuffle([correct, ...wrong]));
+      } else if (mode === 'hard') {
+        // Type mode — no choices needed
+        setCorrectAnswer(card.rom);
+        setChoices([]);
+      } else {
+        // Easy — show character, pick romaji
+        const correct = card.rom;
+        const pool = kCards.map(c => c.rom).filter(r => r !== correct);
+        const wrong = shuffle(pool).slice(0, 3);
+        setCorrectAnswer(correct);
+        setChoices(shuffle([correct, ...wrong]));
+      }
     } else if (!isKanaMode && vCards.length > 0) {
       const card = vCards[idx % vCards.length];
       const correct = card.en;
@@ -137,8 +156,10 @@ export function Quiz() {
         const nextIdx = currentIndex + 1;
         setCurrentIndex(nextIdx);
         setAnswered(null);
-        generateChoices(nextIdx, kanaCards, vocabCards, isKana);
+        setTypedAnswer('');
+        generateChoices(nextIdx, kanaCards, vocabCards, isKana, quizMode);
         startTimer();
+        if (quizMode === 'hard' && inputRef.current) setTimeout(() => inputRef.current?.focus(), 100);
       }
     }, 1500);
     return () => { clearTimeout(speakTimeout); clearTimeout(advanceTimeout); };
@@ -149,10 +170,12 @@ export function Quiz() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
-  const startGame = (cat: QuizCategory) => {
+  const startGame = (cat: QuizCategory, mode: QuizMode = 'easy') => {
     let kCards: KanaCard[] = [];
     let vCards: KanaVocabCard[] = [];
     const isKanaMode = cat === 'hiragana' || cat === 'katakana';
+    setQuizMode(mode);
+    setTypedAnswer('');
 
     if (isKanaMode) {
       kCards = shuffle(cat === 'hiragana' ? HIRAGANA_CARDS : KATAKANA_CARDS);
@@ -179,11 +202,13 @@ export function Quiz() {
     setGameScore({ correct: 0, total: 0 });
     setGameFinished(false);
     setAnswered(null);
+    setStartPage(null);
     panel.open(cat);
 
     setTimeout(() => {
-      generateChoices(0, kCards, vCards, isKanaMode);
+      generateChoices(0, kCards, vCards, isKanaMode, mode);
       startTimer();
+      if (mode === 'hard' && inputRef.current) inputRef.current.focus();
     }, 50);
   };
 
@@ -217,7 +242,7 @@ export function Quiz() {
             <p className="text-sm text-slate-500 mb-2">Kana Characters</p>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => startGame('hiragana')}
+                onClick={() => setStartPage('hiragana')}
                 className="bg-indigo-900/30 border border-indigo-700/30 rounded-xl p-4 text-left active:bg-indigo-800/40 transition flex flex-col gap-1"
               >
                 <span className="text-3xl">あ</span>
@@ -228,7 +253,7 @@ export function Quiz() {
                 )}
               </button>
               <button
-                onClick={() => startGame('katakana')}
+                onClick={() => setStartPage('katakana')}
                 className="bg-indigo-900/30 border border-indigo-700/30 rounded-xl p-4 text-left active:bg-indigo-800/40 transition flex flex-col gap-1"
               >
                 <span className="text-3xl">ア</span>
@@ -305,6 +330,55 @@ export function Quiz() {
         </div>
       </div>
 
+      {/* Start Page — Kana difficulty picker */}
+      {startPage && !panel.visible && (
+        <div className="absolute inset-0 bg-slate-950 animate-slide-in-right flex flex-col z-40">
+          <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
+            <button onClick={() => setStartPage(null)} className="text-lg text-slate-400 active:text-slate-200 p-1">←</button>
+            <h2 className="text-lg font-bold">{startPage === 'hiragana' ? 'あ' : 'ア'} {startPage === 'hiragana' ? 'Hiragana' : 'Katakana'}</h2>
+          </div>
+          <div className="flex-1 flex flex-col justify-center px-4 space-y-3">
+            <p className="text-base text-slate-400 text-center mb-2">Choose your challenge</p>
+            <button
+              onClick={() => startGame(startPage, 'easy')}
+              className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🟢</span>
+                <div>
+                  <p className="text-base font-semibold text-slate-100">Easy — Pick the sound</p>
+                  <p className="text-sm text-slate-500">See character → pick from 4 romaji</p>
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={() => startGame(startPage, 'reverse')}
+              className="bg-amber-900/30 border border-amber-700/30 rounded-xl p-4 text-left active:bg-amber-800/40 transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🟡</span>
+                <div>
+                  <p className="text-base font-semibold text-slate-100">Reverse — Pick the character</p>
+                  <p className="text-sm text-slate-500">See romaji → pick the correct character</p>
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={() => startGame(startPage, 'hard')}
+              className="bg-red-900/30 border border-red-700/30 rounded-xl p-4 text-left active:bg-red-800/40 transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🔴</span>
+                <div>
+                  <p className="text-base font-semibold text-slate-100">Hard — Type the answer</p>
+                  <p className="text-sm text-slate-500">See character → type the romaji yourself</p>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Game Panel (slide-in) */}
       {panel.visible && (
         <div className={`absolute inset-0 bg-slate-950 ${panel.animClass} flex flex-col z-40`}>
@@ -314,7 +388,7 @@ export function Quiz() {
               <button onClick={exitGame} className="text-base text-slate-400 active:text-slate-200 p-1">←</button>
               {!gameFinished && (
                 <p className="text-base text-slate-400">
-                  {panel.value === 'hiragana' ? 'ひらがな' : panel.value === 'katakana' ? 'カタカナ' : panel.value === 'vocab-h' ? 'Vocab ひらがな' : 'Vocab カタカナ'} · Q{gameScore.total + 1}/{GAME_ROUNDS}
+                  {panel.value === 'hiragana' ? 'ひらがな' : panel.value === 'katakana' ? 'カタカナ' : panel.value?.replace('vocab-', '').replace('phrases-', '')} · {quizMode === 'reverse' ? 'Reverse' : quizMode === 'hard' ? 'Hard' : ''} Q{gameScore.total + 1}/{GAME_ROUNDS}
                 </p>
               )}
             </div>
@@ -342,10 +416,22 @@ export function Quiz() {
 
               {/* Question */}
               <div className="w-full max-w-sm bg-slate-800/80 rounded-2xl p-6 text-center mb-4 min-h-[120px] flex flex-col items-center justify-center">
-                {isKana && currentKana && (
+                {isKana && currentKana && quizMode === 'easy' && (
                   <>
                     <p className="text-6xl font-bold text-slate-50 mb-2">{currentKana.char}</p>
                     <p className="text-base text-slate-500">What sound is this?</p>
+                  </>
+                )}
+                {isKana && currentKana && quizMode === 'reverse' && (
+                  <>
+                    <p className="text-4xl font-bold text-sakura-300 mb-2">{currentKana.rom}</p>
+                    <p className="text-base text-slate-500">Which character is this?</p>
+                  </>
+                )}
+                {isKana && currentKana && quizMode === 'hard' && (
+                  <>
+                    <p className="text-6xl font-bold text-slate-50 mb-2">{currentKana.char}</p>
+                    <p className="text-base text-slate-500">Type the romaji</p>
                   </>
                 )}
                 {isVocab && currentVocab && (
@@ -357,27 +443,68 @@ export function Quiz() {
                 )}
               </div>
 
-              {/* 4 Choices */}
-              <div className="w-full max-w-sm grid grid-cols-1 gap-2">
-                {choices.map((choice, i) => {
-                  let btnClass = 'bg-slate-800 text-slate-200 active:bg-slate-700';
-                  if (answered) {
-                    if (choice === correctAnswer) btnClass = 'bg-emerald-600/60 text-emerald-100';
-                    else if (choice === answered) btnClass = 'bg-red-600/60 text-red-100';
-                    else btnClass = 'bg-slate-800/50 text-slate-500';
-                  }
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleAnswer(choice)}
+              {/* Choices (Easy & Reverse) or Text Input (Hard) */}
+              {quizMode === 'hard' && isKana ? (
+                <div className="w-full max-w-sm">
+                  <div className="flex gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={typedAnswer}
+                      onChange={e => setTypedAnswer(e.target.value.toLowerCase())}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && typedAnswer && !answered) {
+                          const isCorrect = typedAnswer.trim() === correctAnswer;
+                          handleAnswer(isCorrect ? correctAnswer : typedAnswer.trim());
+                        }
+                      }}
                       disabled={!!answered}
-                      className={`w-full py-3 px-4 rounded-xl text-base text-left transition ${btnClass}`}
-                    >
-                      {choice}
-                    </button>
-                  );
-                })}
-              </div>
+                      placeholder="Type romaji..."
+                      autoComplete="off"
+                      className={`flex-1 px-4 py-3 rounded-xl text-lg text-center outline-none transition ${
+                        answered
+                          ? typedAnswer.trim() === correctAnswer ? 'bg-emerald-600/40 text-emerald-100' : 'bg-red-600/40 text-red-100'
+                          : 'bg-slate-800 text-slate-100 focus:ring-1 focus:ring-sakura-400/50'
+                      }`}
+                    />
+                    {!answered && (
+                      <button
+                        onClick={() => {
+                          if (typedAnswer && !answered) {
+                            const isCorrect = typedAnswer.trim() === correctAnswer;
+                            handleAnswer(isCorrect ? correctAnswer : typedAnswer.trim());
+                          }
+                        }}
+                        className="px-4 py-3 rounded-xl bg-sakura-500/60 text-white active:bg-sakura-600 transition"
+                      >→</button>
+                    )}
+                  </div>
+                  {answered && typedAnswer.trim() !== correctAnswer && (
+                    <p className="text-base text-emerald-400 text-center mt-2">Correct: {correctAnswer}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="w-full max-w-sm grid grid-cols-1 gap-2">
+                  {choices.map((choice, i) => {
+                    let btnClass = 'bg-slate-800 text-slate-200 active:bg-slate-700';
+                    if (answered) {
+                      if (choice === correctAnswer) btnClass = 'bg-emerald-600/60 text-emerald-100';
+                      else if (choice === answered) btnClass = 'bg-red-600/60 text-red-100';
+                      else btnClass = 'bg-slate-800/50 text-slate-500';
+                    }
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => handleAnswer(choice)}
+                        disabled={!!answered}
+                        className={`w-full py-3 px-4 rounded-xl ${quizMode === 'reverse' && isKana ? 'text-2xl text-center' : 'text-base text-left'} transition ${btnClass}`}
+                      >
+                        {choice}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             /* End Screen */
