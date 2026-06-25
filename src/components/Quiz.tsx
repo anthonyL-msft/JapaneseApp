@@ -77,7 +77,7 @@ export function Quiz() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isKana = panel.value === 'hiragana' || panel.value === 'katakana';
-  const isVocab = panel.value === 'vocab-h' || panel.value === 'vocab-k' || panel.value === 'phrases';
+  const isVocab = !isKana && !!panel.value;
 
   const currentKana = isKana && kanaCards.length > 0 ? kanaCards[currentIndex % kanaCards.length] : null;
   const currentVocab = isVocab && vocabCards.length > 0 ? vocabCards[currentIndex % vocabCards.length] : null;
