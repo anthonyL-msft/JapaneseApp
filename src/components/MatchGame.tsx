@@ -5,14 +5,28 @@ import { HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
 import type { KanaVocabCard } from '../data/kana-data';
 import { phrases } from '../data/phrases';
 
-type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed' | 'phrases';
+type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food';
 
 const PAIR_COUNT = 6; // 6 pairs per round
 
-// Build phrase vocab cards from phrases.ts vocabulary
-const PHRASE_VOCAB_CARDS: KanaVocabCard[] = phrases
-  .filter(p => p.lang === 'ja' && p.category === 'vocab')
+// Build phrase vocab cards by situation groups
+const buildPhraseCards = (situations: string[]): KanaVocabCard[] => phrases
+  .filter(p => p.lang === 'ja' && p.category === 'vocab' && situations.includes(p.situation))
   .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
+
+const buildCategoryCards = (categories: string[]): KanaVocabCard[] => phrases
+  .filter(p => p.lang === 'ja' && categories.includes(p.category))
+  .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
+
+const VOCAB_WORDS_CARDS = buildPhraseCards(['Basic nouns', 'Pointing words', 'Colors']);
+const VOCAB_ACTIONS_CARDS = buildPhraseCards(['Basic verbs', 'Daily actions']);
+const VOCAB_TIME_CARDS = buildPhraseCards(['Numbers', 'Time', 'Meals', 'Days of the week']);
+const VOCAB_WORLD_CARDS = buildPhraseCards(['Basic places', 'Directions']);
+const VOCAB_PEOPLE_CARDS = buildPhraseCards(['People & Family', 'Body & Health', 'Basic adjectives']);
+const PHRASES_POWER_CARDS = buildCategoryCards(['power']);
+const PHRASES_TRAVEL_CARDS = buildCategoryCards(['airport', 'directions', 'hotel']);
+const PHRASES_FOOD_CARDS = buildCategoryCards(['restaurant', 'food', 'drinks']);
+const PHRASE_VOCAB_CARDS = buildCategoryCards(['vocab']);
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -70,10 +84,21 @@ export function MatchGame() {
   const startRound = (cat?: MatchCategory) => {
     const category = cat || panel.value;
     let pool: KanaVocabCard[];
-    if (category === 'vocab-h') pool = HIRAGANA_VOCAB_CARDS;
-    else if (category === 'vocab-k') pool = KATAKANA_VOCAB_CARDS;
-    else if (category === 'phrases') pool = PHRASE_VOCAB_CARDS;
-    else pool = [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS];
+    const poolMap: Record<string, KanaVocabCard[]> = {
+      'vocab-h': HIRAGANA_VOCAB_CARDS,
+      'vocab-k': KATAKANA_VOCAB_CARDS,
+      'mixed': [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS],
+      'phrases': PHRASE_VOCAB_CARDS,
+      'vocab-words': VOCAB_WORDS_CARDS,
+      'vocab-actions': VOCAB_ACTIONS_CARDS,
+      'vocab-time': VOCAB_TIME_CARDS,
+      'vocab-world': VOCAB_WORLD_CARDS,
+      'vocab-people': VOCAB_PEOPLE_CARDS,
+      'phrases-power': PHRASES_POWER_CARDS,
+      'phrases-travel': PHRASES_TRAVEL_CARDS,
+      'phrases-food': PHRASES_FOOD_CARDS,
+    };
+    pool = poolMap[category || 'mixed'] || [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS];
 
     const selected = shuffle(pool).slice(0, PAIR_COUNT);
     const newPairs = selected.map((v, i) => ({ id: i, jp: v.jp, en: v.en, hep: v.hep }));
@@ -172,59 +197,77 @@ export function MatchGame() {
           </div>
 
           <div>
-            <p className="text-sm text-slate-500 mb-2">Pick a deck</p>
+            <p className="text-sm text-slate-500 mb-2">Vocabulary</p>
             <div className="grid grid-cols-1 gap-2">
-              <button
-                onClick={() => startGame('vocab-h')}
-                className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3"
-              >
-                <span className="text-2xl">🏷️</span>
+              <button onClick={() => startGame('vocab-words')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">📦</span>
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Vocab ひらがな</p>
-                  <p className="text-sm text-slate-500">{HIRAGANA_VOCAB_CARDS.length} words</p>
+                  <p className="text-base font-semibold text-slate-100">Words</p>
+                  <p className="text-sm text-slate-500">{VOCAB_WORDS_CARDS.length} words</p>
                 </div>
-                {getBestTime('vocab-h') && (
-                  <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-h')!)}</span>
-                )}
+                {getBestTime('vocab-words') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-words')!)}</span>}
               </button>
-              <button
-                onClick={() => startGame('vocab-k')}
-                className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3"
-              >
-                <span className="text-2xl">🏷️</span>
+              <button onClick={() => startGame('vocab-actions')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">🎯</span>
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Vocab カタカナ</p>
-                  <p className="text-sm text-slate-500">{KATAKANA_VOCAB_CARDS.length} words</p>
+                  <p className="text-base font-semibold text-slate-100">Actions</p>
+                  <p className="text-sm text-slate-500">{VOCAB_ACTIONS_CARDS.length} words</p>
                 </div>
-                {getBestTime('vocab-k') && (
-                  <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-k')!)}</span>
-                )}
+                {getBestTime('vocab-actions') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-actions')!)}</span>}
               </button>
-              <button
-                onClick={() => startGame('mixed')}
-                className="bg-indigo-900/30 border border-indigo-700/30 rounded-xl p-4 text-left active:bg-indigo-800/40 transition flex items-center gap-3"
-              >
-                <span className="text-2xl">🎲</span>
+              <button onClick={() => startGame('vocab-time')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">🕐</span>
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Mixed (All Vocab)</p>
-                  <p className="text-sm text-slate-500">{HIRAGANA_VOCAB_CARDS.length + KATAKANA_VOCAB_CARDS.length} words</p>
+                  <p className="text-base font-semibold text-slate-100">Time</p>
+                  <p className="text-sm text-slate-500">{VOCAB_TIME_CARDS.length} words</p>
                 </div>
-                {getBestTime('mixed') && (
-                  <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('mixed')!)}</span>
-                )}
+                {getBestTime('vocab-time') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-time')!)}</span>}
               </button>
-              <button
-                onClick={() => startGame('phrases')}
-                className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3"
-              >
-                <span className="text-2xl">📚</span>
+              <button onClick={() => startGame('vocab-world')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">🌍</span>
                 <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Phrase Vocabulary</p>
-                  <p className="text-sm text-slate-500">{PHRASE_VOCAB_CARDS.length} words</p>
+                  <p className="text-base font-semibold text-slate-100">World</p>
+                  <p className="text-sm text-slate-500">{VOCAB_WORLD_CARDS.length} words</p>
                 </div>
-                {getBestTime('phrases') && (
-                  <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases')!)}</span>
-                )}
+                {getBestTime('vocab-world') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-world')!)}</span>}
+              </button>
+              <button onClick={() => startGame('vocab-people')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">👥</span>
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-slate-100">People</p>
+                  <p className="text-sm text-slate-500">{VOCAB_PEOPLE_CARDS.length} words</p>
+                </div>
+                {getBestTime('vocab-people') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-people')!)}</span>}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-slate-500 mb-2">Phrases</p>
+            <div className="grid grid-cols-1 gap-2">
+              <button onClick={() => startGame('phrases-power')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">⚡</span>
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-slate-100">Power Phrases</p>
+                  <p className="text-sm text-slate-500">{PHRASES_POWER_CARDS.length} phrases</p>
+                </div>
+                {getBestTime('phrases-power') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-power')!)}</span>}
+              </button>
+              <button onClick={() => startGame('phrases-travel')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">✈️</span>
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-slate-100">Travel Phrases</p>
+                  <p className="text-sm text-slate-500">{PHRASES_TRAVEL_CARDS.length} phrases</p>
+                </div>
+                {getBestTime('phrases-travel') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-travel')!)}</span>}
+              </button>
+              <button onClick={() => startGame('phrases-food')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3">
+                <span className="text-2xl">🍜</span>
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-slate-100">Food Phrases</p>
+                  <p className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</p>
+                </div>
+                {getBestTime('phrases-food') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-food')!)}</span>}
               </button>
             </div>
           </div>
