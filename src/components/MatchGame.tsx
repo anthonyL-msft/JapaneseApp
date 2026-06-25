@@ -198,45 +198,35 @@ export function MatchGame() {
 
           <div>
             <p className="text-sm text-slate-500 mb-2">Vocabulary</p>
-            <div className="grid grid-cols-1 gap-2">
-              <button onClick={() => startGame('vocab-words')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => startGame('vocab-words')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">📦</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Words</p>
-                  <p className="text-sm text-slate-500">{VOCAB_WORDS_CARDS.length} words</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">Words</span>
+                <span className="text-sm text-slate-500">{VOCAB_WORDS_CARDS.length} words</span>
                 {getBestTime('vocab-words') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-words')!)}</span>}
               </button>
-              <button onClick={() => startGame('vocab-actions')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+              <button onClick={() => startGame('vocab-actions')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🎯</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Actions</p>
-                  <p className="text-sm text-slate-500">{VOCAB_ACTIONS_CARDS.length} words</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">Actions</span>
+                <span className="text-sm text-slate-500">{VOCAB_ACTIONS_CARDS.length} words</span>
                 {getBestTime('vocab-actions') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-actions')!)}</span>}
               </button>
-              <button onClick={() => startGame('vocab-time')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+              <button onClick={() => startGame('vocab-time')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🕐</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Time</p>
-                  <p className="text-sm text-slate-500">{VOCAB_TIME_CARDS.length} words</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">Time</span>
+                <span className="text-sm text-slate-500">{VOCAB_TIME_CARDS.length} words</span>
                 {getBestTime('vocab-time') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-time')!)}</span>}
               </button>
-              <button onClick={() => startGame('vocab-world')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+              <button onClick={() => startGame('vocab-world')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🌍</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">World</p>
-                  <p className="text-sm text-slate-500">{VOCAB_WORLD_CARDS.length} words</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">World</span>
+                <span className="text-sm text-slate-500">{VOCAB_WORLD_CARDS.length} words</span>
                 {getBestTime('vocab-world') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-world')!)}</span>}
               </button>
-              <button onClick={() => startGame('vocab-people')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex items-center gap-3">
+              <button onClick={() => startGame('vocab-people')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">👥</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">People</p>
-                  <p className="text-sm text-slate-500">{VOCAB_PEOPLE_CARDS.length} words</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">People</span>
+                <span className="text-sm text-slate-500">{VOCAB_PEOPLE_CARDS.length} words</span>
                 {getBestTime('vocab-people') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-people')!)}</span>}
               </button>
             </div>
@@ -244,29 +234,23 @@ export function MatchGame() {
 
           <div>
             <p className="text-sm text-slate-500 mb-2">Phrases</p>
-            <div className="grid grid-cols-1 gap-2">
-              <button onClick={() => startGame('phrases-power')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => startGame('phrases-power')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">⚡</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Power Phrases</p>
-                  <p className="text-sm text-slate-500">{PHRASES_POWER_CARDS.length} phrases</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">Power</span>
+                <span className="text-sm text-slate-500">{PHRASES_POWER_CARDS.length} phrases</span>
                 {getBestTime('phrases-power') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-power')!)}</span>}
               </button>
-              <button onClick={() => startGame('phrases-travel')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3">
+              <button onClick={() => startGame('phrases-travel')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">✈️</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Travel Phrases</p>
-                  <p className="text-sm text-slate-500">{PHRASES_TRAVEL_CARDS.length} phrases</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">Travel</span>
+                <span className="text-sm text-slate-500">{PHRASES_TRAVEL_CARDS.length} phrases</span>
                 {getBestTime('phrases-travel') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-travel')!)}</span>}
               </button>
-              <button onClick={() => startGame('phrases-food')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3">
+              <button onClick={() => startGame('phrases-food')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🍜</span>
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-slate-100">Food Phrases</p>
-                  <p className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</p>
-                </div>
+                <span className="text-base font-semibold text-slate-100">Food</span>
+                <span className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</span>
                 {getBestTime('phrases-food') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-food')!)}</span>}
               </button>
             </div>
