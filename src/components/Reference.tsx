@@ -753,9 +753,12 @@ function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle,
                 return (
                   <div key={i} className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-xs text-slate-500 shrink-0 w-8">{isQuestion ? 'Ask' : 'Say'}</span>
-                    {cleanLine.split(/(\[[^\]]+\])/g).filter(Boolean).map((part, j) => {
+                    {cleanLine.split(/(\[[^\]]+\]|\{[^}]+\})/g).filter(Boolean).map((part, j) => {
                       if (part.startsWith('[') && part.endsWith(']')) {
                         return <span key={j} className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-sm border border-purple-500/30">{part.slice(1, -1)}</span>;
+                      }
+                      if (part.startsWith('{') && part.endsWith('}')) {
+                        return <span key={j} className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-sm border border-emerald-500/30">{part.slice(1, -1)}</span>;
                       }
                       const trimmed = part.trim();
                       if (!trimmed) return null;
