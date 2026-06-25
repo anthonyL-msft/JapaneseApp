@@ -968,9 +968,9 @@ function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
 function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
   const [patternLevel, setPatternLevel] = useState<'all' | 'basic' | 'intermediate' | 'advanced'>('all');
 
-  const basicKeys = ['○○をお願いします','○○てください','○○はありますか','○○はどこですか','○○してもいいですか','○○たいです','○○がわかりません'];
-  const intermediateKeys = ['〜てもらえますか','〜ほうがいい','〜と思います','〜かもしれません','〜たことがあります','〜なければなりません','AもBも'];
-  const advancedKeys = ['〜ことにしました','〜ようにしています','〜わけではない','〜ば〜ほど','〜にとって'];
+  const basicKeys = ['○○をお願いします','○○はありますか','○○はどこですか','○○たいです','○○てください','○○がわかりません','○○してもいいですか'];
+  const intermediateKeys = ['〜てもらえますか','〜と思います','〜かもしれません','〜ほうがいい','〜たことがあります','AもBも','〜なければなりません'];
+  const advancedKeys = ['〜ことにしました','〜わけではない','〜ようにしています','〜ば〜ほど','〜にとって'];
 
   const activeKeys = patternLevel === 'all' ? [...basicKeys, ...intermediateKeys, ...advancedKeys]
     : patternLevel === 'basic' ? basicKeys
@@ -988,12 +988,6 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: 'お会計をお願いします', hep: 'o·kai·kei wo o·ne·gai·shi·ma·su', en: 'Check please' },
           { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
         ]} />
-      <AccordionRow id="○○てください" jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
-          { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
-          { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
-          { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
-        ]} />
       <AccordionRow id="○○はありますか" jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
@@ -1006,23 +1000,29 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
           { jp: 'ATMはどこですか？', hep: 'ee·tii·e·mu wa do·ko de·su ka', en: 'Where is an ATM?' },
         ]} />
-      <AccordionRow id="○○してもいいですか" jp="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
-          { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
-          { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
-          { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
-        ]} />
       <AccordionRow id="○○たいです" jp="○○たいです" rom="○○ tai de·su" meaning="I want to ○○ (desire)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
           { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
           { jp: '荷物を送りたいです', hep: 'ni·mo·tsu wo o·ku·ri·tai de·su', en: 'I want to send luggage' },
         ]} />
+      <AccordionRow id="○○てください" jp="○○てください" rom="○○ te ku·da·sai" meaning="Please do ○○ (polite request)"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
+          { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
+          { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
+        ]} />
       <AccordionRow id="○○がわかりません" jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '日本語がわかりません', hep: 'ni·hon·go ga wa·ka·ri·ma·sen', en: "I don't understand Japanese" },
           { jp: '使い方がわかりません', hep: 'tsu·kai·ka·ta ga wa·ka·ri·ma·sen', en: "I don't know how to use it" },
           { jp: '道がわかりません', hep: 'mi·chi ga wa·ka·ri·ma·sen', en: "I don't know the way" },
+        ]} />
+      <AccordionRow id="○○してもいいですか" jp="○○してもいいですか" rom="○○ shi·te mo ii de·su ka" meaning="May I ○○? (asking permission)"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
+          { jp: 'ここで食べてもいいですか？', hep: 'ko·ko de ta·be·te mo ii de·su ka', en: 'May I eat here?' },
+          { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
     </>
   );
@@ -1034,12 +1034,6 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Could you take a photo for me?' },
           { jp: 'ここまで連れて行ってもらえますか？', hep: 'ko·ko ma·de tsu·re·te it·te mo·ra·e·ma·su ka', en: 'Could you take me here?' },
           { jp: '説明してもらえますか？', hep: 'se·tsu·mei shi·te mo·ra·e·ma·su ka', en: 'Could you explain it?' },
-        ]} />
-      <AccordionRow id="〜ほうがいい" jp="〜ほうがいい" rom="hou ga ii" meaning="Should ○○ / It's better to ○○"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
-          { jp: '早く行ったほうがいいです', hep: 'ha·ya·ku it·ta hou ga ii de·su', en: "It's better to go early" },
-          { jp: '予約したほうがいいですか？', hep: 'yo·ya·ku shi·ta hou ga ii de·su ka', en: 'Should I make a reservation?' },
-          { jp: '現金を持ったほうがいいです', hep: 'gen·kin wo mot·ta hou ga ii de·su', en: "It's better to carry cash" },
         ]} />
       <AccordionRow id="〜と思います" jp="〜と思います" rom="to o·mo·i·ma·su" meaning="I think ○○"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1053,17 +1047,17 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '雨が降るかもしれません', hep: 'a·me ga fu·ru ka·mo shi·re·ma·sen', en: 'It might rain' },
           { jp: '売り切れかもしれません', hep: 'u·ri·ki·re ka·mo shi·re·ma·sen', en: 'It might be sold out' },
         ]} />
+      <AccordionRow id="〜ほうがいい" jp="〜ほうがいい" rom="hou ga ii" meaning="Should ○○ / It's better to ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '早く行ったほうがいいです', hep: 'ha·ya·ku it·ta hou ga ii de·su', en: "It's better to go early" },
+          { jp: '予約したほうがいいですか？', hep: 'yo·ya·ku shi·ta hou ga ii de·su ka', en: 'Should I make a reservation?' },
+          { jp: '現金を持ったほうがいいです', hep: 'gen·kin wo mot·ta hou ga ii de·su', en: "It's better to carry cash" },
+        ]} />
       <AccordionRow id="〜たことがあります" jp="〜たことがあります" rom="ta ko·to ga a·ri·ma·su" meaning="I have experienced ○○ (past experience)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '日本に来たことがあります', hep: 'ni·hon ni ki·ta ko·to ga a·ri·ma·su', en: 'I have been to Japan before' },
           { jp: 'すしを食べたことがあります', hep: 'su·shi wo ta·be·ta ko·to ga a·ri·ma·su', en: 'I have eaten sushi before' },
           { jp: '新幹線に乗ったことがあります', hep: 'shin·kan·sen ni not·ta ko·to ga a·ri·ma·su', en: 'I have ridden the Shinkansen' },
-        ]} />
-      <AccordionRow id="〜なければなりません" jp="〜なければなりません" rom="na·ke·re·ba na·ri·ma·sen" meaning="Must ○○ / Have to ○○"
-        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
-          { jp: '予約しなければなりません', hep: 'yo·ya·ku shi·na·ke·re·ba na·ri·ma·sen', en: 'I must make a reservation' },
-          { jp: 'パスポートを見せなければなりません', hep: 'pa·su·poo·to wo mi·se·na·ke·re·ba na·ri·ma·sen', en: 'I have to show my passport' },
-          { jp: '靴を脱がなければなりません', hep: 'ku·tsu wo nu·ga·na·ke·re·ba na·ri·ma·sen', en: 'I have to take off my shoes' },
         ]} />
       <AccordionRow id="AもBも" jp="AもBも" rom="A mo B mo" meaning="Both A and B / I want A and B"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1071,6 +1065,12 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '日本語も英語も話します', hep: 'ni·hon·go mo ei·go mo ha·na·shi·ma·su', en: 'I speak both Japanese and English' },
           { jp: 'これもそれもお願いします', hep: 'ko·re mo so·re mo o·ne·gai·shi·ma·su', en: 'I\'ll take both this and that' },
           { jp: '東京も京都も行きたいです', hep: 'tou·kyou mo kyou·to mo i·ki·tai de·su', en: 'I want to go to both Tokyo and Kyoto' },
+        ]} />
+      <AccordionRow id="〜なければなりません" jp="〜なければなりません" rom="na·ke·re·ba na·ri·ma·sen" meaning="Must ○○ / Have to ○○"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '予約しなければなりません', hep: 'yo·ya·ku shi·na·ke·re·ba na·ri·ma·sen', en: 'I must make a reservation' },
+          { jp: 'パスポートを見せなければなりません', hep: 'pa·su·poo·to wo mi·se·na·ke·re·ba na·ri·ma·sen', en: 'I have to show my passport' },
+          { jp: '靴を脱がなければなりません', hep: 'ku·tsu wo nu·ga·na·ke·re·ba na·ri·ma·sen', en: 'I have to take off my shoes' },
         ]} />
     </>
   );
