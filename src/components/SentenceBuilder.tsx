@@ -6,7 +6,7 @@ import type { AIPhrase } from '../utils/ai';
 // === Pattern Templates ===
 interface Pattern {
   id: string;
-  group: 'request' | 'question' | 'want';
+  group: 'request' | 'question' | 'want' | 'describe';
   template: string;
   templateRom: string;
   meaning: string;
@@ -96,17 +96,17 @@ const PATTERNS: Pattern[] = [
   },
   // Negative forms
   {
-    id: 'iranai', group: 'request', template: '○○はいりません', templateRom: '○○ wa i·ri·ma·sen',
+    id: 'iranai', group: 'describe', template: '○○はいりません', templateRom: '○○ wa i·ri·ma·sen',
     meaning: "I don't need ○○", slotType: 'noun', slotLabel: "What don't you need?",
     build: (v) => ({ jp: `${v.jp}はいりません`, rom: `${v.rom} wa i·ri·ma·sen`, en: `I don't need ${v.en.toLowerCase()}` }),
   },
   {
-    id: 'dekinai', group: 'question', template: '○○できませんか？', templateRom: '○○ de·ki·ma·sen ka',
+    id: 'dekinai', group: 'describe', template: '○○できませんか？', templateRom: '○○ de·ki·ma·sen ka',
     meaning: "Can't I ○○?", slotType: 'action', slotLabel: 'What can\'t you do?',
     build: (v) => ({ jp: `${v.jp}できませんか？`, rom: `${v.rom} de·ki·ma·sen ka`, en: `Can't I ${v.en.toLowerCase()}?` }),
   },
   {
-    id: 'tabenai', group: 'want', template: '○○は食べられません', templateRom: '○○ wa ta·be·ra·re·ma·sen',
+    id: 'tabenai', group: 'describe', template: '○○は食べられません', templateRom: '○○ wa ta·be·ra·re·ma·sen',
     meaning: "I can't eat ○○", slotType: 'food', slotLabel: "What can't you eat?",
     build: (v) => ({ jp: `${v.jp}は食べられません`, rom: `${v.rom} wa ta·be·ra·re·ma·sen`, en: `I can't eat ${v.en.toLowerCase()}` }),
   },
@@ -123,12 +123,12 @@ const PATTERNS: Pattern[] = [
   },
   // Adjective-based
   {
-    id: 'adj_desu', group: 'question', template: '○○です', templateRom: '○○ de·su',
+    id: 'adj_desu', group: 'describe', template: '○○です', templateRom: '○○ de·su',
     meaning: 'It is ○○ (describing)', slotType: 'adjective', slotLabel: 'How is it?',
     build: (v) => ({ jp: `${v.jp}です`, rom: `${v.rom} de·su`, en: `It is ${v.en.toLowerCase()}` }),
   },
   {
-    id: 'motto', group: 'question', template: 'もっと○○のはありますか？', templateRom: 'mot·to ○○ no wa a·ri·ma·su ka',
+    id: 'motto', group: 'describe', template: 'もっと○○のはありますか？', templateRom: 'mot·to ○○ no wa a·ri·ma·su ka',
     meaning: 'Do you have something more ○○?', slotType: 'adjective', slotLabel: 'What quality?',
     build: (v) => ({ jp: `もっと${v.jp}のはありますか？`, rom: `mot·to ${v.rom} no wa a·ri·ma·su ka`, en: `Do you have something more ${v.en.toLowerCase()}?` }),
   },
@@ -299,7 +299,7 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [result, setResult] = useState<{ jp: string; rom: string; en: string } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [tab, setTab] = useState<'request' | 'question' | 'want'>('request');
+  const [tab, setTab] = useState<'request' | 'question' | 'want' | 'describe'>('request');
   const [moreExamples, setMoreExamples] = useState<AIPhrase[] | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -346,13 +346,16 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
         <div className="px-4 pt-3">
           <div className="flex gap-2 mb-3">
             <button onClick={() => setTab('request')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'request' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
-              🙏 Requests
+              Requests
             </button>
             <button onClick={() => setTab('question')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'question' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
-              ❓ Questions
+              Questions
             </button>
             <button onClick={() => setTab('want')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'want' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
-              💭 I want...
+              I want...
+            </button>
+            <button onClick={() => setTab('describe')} className={`flex-1 py-2 rounded-lg text-base transition ${tab === 'describe' ? 'bg-sakura-500/60 text-white' : 'bg-slate-700/50 text-slate-400'}`}>
+              Describe
             </button>
           </div>
         </div>
