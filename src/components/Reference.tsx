@@ -759,20 +759,7 @@ function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle,
                       }
                       const trimmed = part.trim();
                       if (!trimmed) return null;
-                      // Split by + to render separately
-                      return trimmed.split(/\s*\+\s*/).map((seg, k) => {
-                        const s = seg.trim();
-                        if (!s) return null;
-                        // Particles (single kana like を は が に で も の)
-                        if (/^[をはがにでもの]$/.test(s)) {
-                          return <span key={`${j}-${k}`} className="text-amber-300 text-sm font-medium">{s}</span>;
-                        }
-                        // Grammar endings
-                        if (['です', 'ですか？', 'ません', 'ました', 'ください', 'ありますか？', 'もいいですか？', 'もらえますか？', 'たいです', 'たいですか？', 'わかりません', 'お願いします', 'かもしれません', 'と思います', 'と思いますか？', 'ほうがいいです', 'ほうがいいですか？', 'ことがあります', 'ことがありますか？', 'なければなりません', 'ことにしました', 'ようにしています', 'わけではない（です）', 'けれはなりません'].some(g => s.includes(g) || g.includes(s))) {
-                          return <span key={`${j}-${k}`} className="bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded text-sm">{s}</span>;
-                        }
-                        return <span key={`${j}-${k}`} className="text-slate-300 text-sm">{s}</span>;
-                      });
+                      return <span key={j} className="text-slate-400 text-sm">{trimmed}</span>;
                     })}
                   </div>
                 );
