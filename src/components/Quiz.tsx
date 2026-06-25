@@ -5,7 +5,7 @@ import { HIRAGANA_CARDS, KATAKANA_CARDS, HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CA
 import type { KanaCard, KanaVocabCard } from '../data/kana-data';
 import { phrases } from '../data/phrases';
 
-type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food' | 'patterns';
+type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food' | 'patterns' | 'counters' | 'signs' | 'particles';
 type QuizMode = 'easy' | 'reverse' | 'hard';
 
 // Build phrase vocab cards from phrases.ts by situation groups
@@ -50,6 +50,55 @@ const PATTERNS_CARDS: KanaVocabCard[] = [
   { jp: '〜わけではない', hep: 'wa·ke de wa nai', en: "It's not that ○○", kanaKey: 'wa' },
   { jp: '〜ば〜ほど', hep: 'ba ... ho·do', en: 'The more ○○, the more ○○', kanaKey: 'ba' },
   { jp: '〜にとって', hep: 'ni tot·te', en: "For ○○ / From ○○'s perspective", kanaKey: 'ni' },
+];
+
+// Counters
+const COUNTERS_CARDS: KanaVocabCard[] = [
+  { jp: '〜つ', hep: '-tsu', en: 'General counter (1-10)', kanaKey: 'ts' },
+  { jp: '〜人', hep: '-nin', en: 'People', kanaKey: 'ni' },
+  { jp: '〜枚', hep: '-mai', en: 'Flat objects (tickets, shirts)', kanaKey: 'ma' },
+  { jp: '〜本', hep: '-hon', en: 'Long objects (bottles, pens)', kanaKey: 'ho' },
+  { jp: '〜杯', hep: '-hai', en: 'Cups / glasses / bowls', kanaKey: 'ha' },
+  { jp: '〜個', hep: '-ko', en: 'Small round objects', kanaKey: 'ko' },
+  { jp: '〜台', hep: '-dai', en: 'Machines / vehicles', kanaKey: 'da' },
+  { jp: '〜泊', hep: '-haku', en: 'Nights (hotel stay)', kanaKey: 'ha' },
+  { jp: '〜名', hep: '-mei', en: 'People (formal)', kanaKey: 'me' },
+  { jp: '〜階', hep: '-kai', en: 'Floors / stories', kanaKey: 'ka' },
+];
+
+// Common Signs
+const SIGNS_CARDS: KanaVocabCard[] = [
+  { jp: '入口', hep: 'i·ri·gu·chi', en: 'Entrance', kanaKey: 'ir' },
+  { jp: '出口', hep: 'de·gu·chi', en: 'Exit', kanaKey: 'de' },
+  { jp: '禁煙', hep: 'kin·en', en: 'No smoking', kanaKey: 'ki' },
+  { jp: '営業中', hep: 'ei·gyou·chuu', en: 'Open (for business)', kanaKey: 'ei' },
+  { jp: '準備中', hep: 'jun·bi·chuu', en: 'Preparing / Closed', kanaKey: 'ju' },
+  { jp: 'お手洗い', hep: 'o·te·a·rai', en: 'Toilet / Restroom', kanaKey: 'ot' },
+  { jp: '非常口', hep: 'hi·jou·gu·chi', en: 'Emergency exit', kanaKey: 'hi' },
+  { jp: '立入禁止', hep: 'ta·chi·i·ri kin·shi', en: 'No entry', kanaKey: 'ta' },
+  { jp: '無料', hep: 'mu·ryou', en: 'Free (no charge)', kanaKey: 'mu' },
+  { jp: '有料', hep: 'yuu·ryou', en: 'Paid / Fee required', kanaKey: 'yu' },
+  { jp: '定休日', hep: 'tei·kyuu·bi', en: 'Regular holiday / Closed day', kanaKey: 'te' },
+  { jp: '割引', hep: 'wa·ri·bi·ki', en: 'Discount', kanaKey: 'wa' },
+  { jp: '売り切れ', hep: 'u·ri·ki·re', en: 'Sold out', kanaKey: 'ur' },
+  { jp: '使用中', hep: 'shi·you·chuu', en: 'In use / Occupied', kanaKey: 'sh' },
+  { jp: '空き', hep: 'a·ki', en: 'Vacant / Available', kanaKey: 'ak' },
+];
+
+// Particles
+const PARTICLES_CARDS: KanaVocabCard[] = [
+  { jp: 'は', hep: 'wa', en: 'Topic marker (about)', kanaKey: 'wa' },
+  { jp: 'が', hep: 'ga', en: 'Subject marker (who/what does it)', kanaKey: 'ga' },
+  { jp: 'を', hep: 'wo', en: 'Object marker (receives action)', kanaKey: 'wo' },
+  { jp: 'に', hep: 'ni', en: 'Direction / time (to, at)', kanaKey: 'ni' },
+  { jp: 'で', hep: 'de', en: 'Location of action / by means of', kanaKey: 'de' },
+  { jp: 'へ', hep: 'e', en: 'Towards (direction)', kanaKey: 'he' },
+  { jp: 'の', hep: 'no', en: "Possessive / connecting ('s, of)", kanaKey: 'no' },
+  { jp: 'と', hep: 'to', en: 'And, with (listing/companion)', kanaKey: 'to' },
+  { jp: 'も', hep: 'mo', en: 'Also, too', kanaKey: 'mo' },
+  { jp: 'か', hep: 'ka', en: 'Question marker', kanaKey: 'ka' },
+  { jp: 'から', hep: 'ka·ra', en: 'From (place/time)', kanaKey: 'ka' },
+  { jp: 'まで', hep: 'ma·de', en: 'Until, to (endpoint)', kanaKey: 'ma' },
 ];
 
 // Legacy (keep for backward compat with high scores)
@@ -217,6 +266,9 @@ export function Quiz() {
         'phrases-travel': PHRASES_TRAVEL_CARDS,
         'phrases-food': PHRASES_FOOD_CARDS,
         'patterns': PATTERNS_CARDS,
+        'counters': COUNTERS_CARDS,
+        'signs': SIGNS_CARDS,
+        'particles': PARTICLES_CARDS,
       };
       vCards = shuffle(vocabMap[cat] || PHRASE_VOCAB_CARDS);
       setVocabCards(vCards);
@@ -354,6 +406,24 @@ export function Quiz() {
                 <span className="text-base font-semibold text-slate-100">Patterns</span>
                 <span className="text-sm text-slate-500">{PATTERNS_CARDS.length} patterns</span>
                 {getHighScore('patterns') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('patterns')}/{GAME_ROUNDS}</span>}
+              </button>
+              <button onClick={() => startGame('counters')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
+                <span className="text-3xl">📏</span>
+                <span className="text-base font-semibold text-slate-100">Counters</span>
+                <span className="text-sm text-slate-500">{COUNTERS_CARDS.length} counters</span>
+                {getHighScore('counters') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('counters')}/{GAME_ROUNDS}</span>}
+              </button>
+              <button onClick={() => startGame('signs')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
+                <span className="text-3xl">🪧</span>
+                <span className="text-base font-semibold text-slate-100">Signs</span>
+                <span className="text-sm text-slate-500">{SIGNS_CARDS.length} signs</span>
+                {getHighScore('signs') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('signs')}/{GAME_ROUNDS}</span>}
+              </button>
+              <button onClick={() => startGame('particles')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
+                <span className="text-3xl">🔤</span>
+                <span className="text-base font-semibold text-slate-100">Particles</span>
+                <span className="text-sm text-slate-500">{PARTICLES_CARDS.length} particles</span>
+                {getHighScore('particles') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('particles')}/{GAME_ROUNDS}</span>}
               </button>
             </div>
           </div>
