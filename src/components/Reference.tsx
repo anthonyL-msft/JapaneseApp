@@ -1,6 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, createContext, useContext } from 'react';
 import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
+
+const TermTapContext = createContext<((term: string) => void) | null>(null);
 
 type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening';
 
@@ -115,6 +117,7 @@ interface RefProps {
   learnedIds?: Set<string>;
   onToggleLearned?: (id: string) => void;
   onAskMore?: (item: { jp: string; hep: string; en: string }) => void;
+  explainLang?: string;
 }
 
 // Exported for use in MyStuff
@@ -151,7 +154,7 @@ export function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onTogg
   );
 }
 
-export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, learnedIds = new Set(), onToggleLearned, onAskMore: _onAskMore }: RefProps) {
+export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, learnedIds = new Set(), onToggleLearned, onAskMore: _onAskMore, explainLang = 'en' }: RefProps) {
   const panel = useSlidePanel<Section>();
   const [drawer, setDrawer] = useState<DrawerData>(null);
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
@@ -233,7 +236,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
-            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} explainLang={explainLang} />}
             {panel.value === 'polite' && <PoliteRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
@@ -728,10 +731,347 @@ interface RbProps {
   learnedIds?: Set<string>;
   onToggleLearned?: (id: string) => void;
   toggleSignal?: number;
+  explainLang?: string;
 }
 
-function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle, section, refBookmarkedIds, onToggleRefBookmark, learnedIds, onToggleLearned }: { id: string; jp: string; rom: string; meaning: string; structure?: string[]; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void; section?: string; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void; learnedIds?: Set<string>; onToggleLearned?: (id: string) => void }) {
+// Grammar term explanations for purple chips — bilingual (en / zh-TW)
+type GrammarTerm = {
+  title: { en: string; tc: string };
+  what: { en: string; tc: string };
+  how: { en: string[]; tc: string[] };
+  table?: { headers: { en: string[]; tc: string[] }; rows: string[][] };
+  examples: { jp: string; reading: string; en: string; tc: string }[];
+};
+
+const GRAMMAR_TERMS: Record<string, GrammarTerm> = {
+  'noun': {
+    title: { en: 'Noun', tc: '名詞' },
+    what: { en: 'A thing, place, or concept — just a regular word.', tc: '事物、地點或概念 — 一般名詞，直接使用。' },
+    how: { en: ['Use it as-is', 'No conjugation needed'], tc: ['直接使用', '不需要變化'] },
+    examples: [
+      { jp: '水', reading: 'mi·zu', en: 'water', tc: '水' },
+      { jp: 'メニュー', reading: 'me·nyuu', en: 'menu', tc: '菜單' },
+      { jp: 'パスポート', reading: 'pa·su·poo·to', en: 'passport', tc: '護照' },
+    ],
+  },
+  'place': {
+    title: { en: 'Place', tc: '地點' },
+    what: { en: 'A location or named place.', tc: '地點或場所名稱。' },
+    how: { en: ['Use the place name as-is before は'], tc: ['直接在 は 前面放地名'] },
+    examples: [
+      { jp: 'トイレ', reading: 'toi·re', en: 'toilet', tc: '廁所' },
+      { jp: '駅', reading: 'e·ki', en: 'station', tc: '車站' },
+      { jp: 'コンビニ', reading: 'kon·bi·ni', en: 'convenience store', tc: '便利商店' },
+    ],
+  },
+  'verb stem': {
+    title: { en: 'Verb Stem (ます-stem)', tc: '動詞語幹（ます形去掉ます）' },
+    what: { en: 'The ます-form with ます removed. This is the "core" of the verb.', tc: '動詞的 ます 形去掉 ます 後的部分，是動詞的核心。' },
+    how: {
+      en: ['Take the ます-form and remove ます'],
+      tc: ['把 ます形 去掉 ます'],
+    },
+    table: {
+      headers: { en: ['ます-form', '→', 'Stem'], tc: ['ます形', '→', '語幹'] },
+      rows: [
+        ['食べます', '→', '食べ'],
+        ['行きます', '→', '行き'],
+        ['飲みます', '→', '飲み'],
+        ['話します', '→', '話し'],
+        ['します', '→', 'し'],
+      ],
+    },
+    examples: [
+      { jp: '食べ', reading: 'ta·be', en: 'eat (stem)', tc: '吃（語幹）' },
+      { jp: '行き', reading: 'i·ki', en: 'go (stem)', tc: '去（語幹）' },
+      { jp: '飲み', reading: 'no·mi', en: 'drink (stem)', tc: '喝（語幹）' },
+    ],
+  },
+  'verb て-form': {
+    title: { en: 'Verb て-form', tc: '動詞 て形' },
+    what: { en: 'The "connecting" form — used for requests, linking actions, and permissions.', tc: '動詞的「連接形」— 用於請求、連接動作、表達許可。' },
+    how: {
+      en: ['Change the verb ending based on its last character'],
+      tc: ['根據動詞字尾來變化'],
+    },
+    table: {
+      headers: { en: ['Ending', 'Change', 'Example'], tc: ['字尾', '變化', '例子'] },
+      rows: [
+        ['る-verb', '→ て', '食べる → 食べて'],
+        ['う/つ/る', '→ って', '買う → 買って'],
+        ['む/ぶ/ぬ', '→ んで', '飲む → 飲んで'],
+        ['く', '→ いて', '書く → 書いて'],
+        ['ぐ', '→ いで', '泳ぐ → 泳いで'],
+        ['す', '→ して', '話す → 話して'],
+      ],
+    },
+    examples: [
+      { jp: '食べて', reading: 'ta·be·te', en: 'eat (te-form)', tc: '吃（て形）' },
+      { jp: '書いて', reading: 'kai·te', en: 'write (te-form)', tc: '寫（て形）' },
+      { jp: '話して', reading: 'ha·na·shi·te', en: 'speak (te-form)', tc: '說（て形）' },
+    ],
+  },
+  'verb た-form': {
+    title: { en: 'Verb た-form (Past Plain)', tc: '動詞 た形（過去式）' },
+    what: { en: 'The casual past tense — same rules as て-form, but ends in た/だ instead of て/で.', tc: '動詞的常體過去式 — 變化規則跟 て形一樣，只是結尾換成 た/だ。' },
+    how: {
+      en: ['Same pattern as て-form, swap て→た and で→だ'],
+      tc: ['跟 て形 規則一樣，把 て→た, で→だ'],
+    },
+    table: {
+      headers: { en: ['Ending', 'Change', 'Example'], tc: ['字尾', '變化', '例子'] },
+      rows: [
+        ['る-verb', '→ た', '食べる → 食べた'],
+        ['う/つ/る', '→ った', '買う → 買った'],
+        ['む/ぶ/ぬ', '→ んだ', '飲む → 飲んだ'],
+        ['く', '→ いた', '書く → 書いた'],
+        ['す', '→ した', '話す → 話した'],
+      ],
+    },
+    examples: [
+      { jp: '食べた', reading: 'ta·be·ta', en: 'ate', tc: '吃了' },
+      { jp: '行った', reading: 'it·ta', en: 'went', tc: '去了' },
+      { jp: '飲んだ', reading: 'non·da', en: 'drank', tc: '喝了' },
+    ],
+  },
+  'verb dictionary': {
+    title: { en: 'Verb Dictionary Form', tc: '動詞辭書形' },
+    what: { en: 'The base form found in dictionaries — unconjugated, casual present/future.', tc: '字典裡查到的原形 — 未變化，表示現在或未來。' },
+    how: {
+      en: ['This IS the base form', 'Use the verb as-is, no change needed'],
+      tc: ['這就是動詞原形', '直接使用，不需要變化'],
+    },
+    examples: [
+      { jp: '食べる', reading: 'ta·be·ru', en: 'eat', tc: '吃' },
+      { jp: '行く', reading: 'i·ku', en: 'go', tc: '去' },
+      { jp: 'する', reading: 'su·ru', en: 'do', tc: '做' },
+    ],
+  },
+  'plain form': {
+    title: { en: 'Plain Form', tc: '常體（普通形）' },
+    what: { en: 'The casual form of any word — verb, adjective, or noun+だ. The "non-polite" version.', tc: '任何詞的非敬語形式 — 動詞、形容詞、名詞+だ 都可以。' },
+    how: {
+      en: ['Use the casual/dictionary form of any word type'],
+      tc: ['使用任何詞類的常體形式'],
+    },
+    table: {
+      headers: { en: ['Type', 'Form', 'Example'], tc: ['詞類', '形式', '例子'] },
+      rows: [
+        ['Verb', 'dictionary', '食べる'],
+        ['い-adj', 'as-is', '高い'],
+        ['な-adj', '+だ', '静かだ'],
+        ['Noun', '+だ', '雨だ'],
+      ],
+    },
+    examples: [
+      { jp: '遅れる', reading: 'o·ku·re·ru', en: 'will be late (verb)', tc: '會遲到（動詞）' },
+      { jp: '高い', reading: 'ta·kai', en: 'expensive (i-adj)', tc: '貴（い形容詞）' },
+      { jp: '雨だ', reading: 'a·me da', en: "it's rain (noun+da)", tc: '是雨（名詞+だ）' },
+    ],
+  },
+  'verb ない-stem': {
+    title: { en: 'Verb ない-stem', tc: '動詞 ない語幹' },
+    what: { en: 'The negative stem — the part before ない. Used to build "must do" patterns.', tc: '否定語幹 — ない 前面的部分。用來組成「必須做」的句型。' },
+    how: {
+      en: ['Change the verb ending to the あ-row sound'],
+      tc: ['把動詞字尾換成あ段音'],
+    },
+    table: {
+      headers: { en: ['Type', 'Rule', 'Example'], tc: ['類型', '規則', '例子'] },
+      rows: [
+        ['る-verb', 'drop る', '食べる → 食べ'],
+        ['う-verb', 'う → あ', '行く → 行か'],
+        ['する', '→ し', 'する → し'],
+        ['来る', '→ こ', '来る → こ'],
+      ],
+    },
+    examples: [
+      { jp: '食べ', reading: 'ta·be', en: 'eat (ない-stem)', tc: '吃（ない語幹）' },
+      { jp: '行か', reading: 'i·ka', en: 'go (ない-stem)', tc: '去（ない語幹）' },
+      { jp: 'し', reading: 'shi', en: 'do (ない-stem)', tc: '做（ない語幹）' },
+    ],
+  },
+  'verb ば-form': {
+    title: { en: 'Verb ば-form (Conditional)', tc: '動詞 ば形（條件形）' },
+    what: { en: 'The "if" conditional form — "if you do X".', tc: '條件形 —「如果做 X 的話」。' },
+    how: {
+      en: ['Change the last vowel to え-row + ば'],
+      tc: ['把字尾換成え段音 + ば'],
+    },
+    table: {
+      headers: { en: ['Type', 'Rule', 'Example'], tc: ['類型', '規則', '例子'] },
+      rows: [
+        ['る-verb', 'る → れば', '食べる → 食べれば'],
+        ['う-verb', 'う → えば', '行く → 行けば'],
+        ['する', '→ すれば', 'する → すれば'],
+        ['来る', '→ くれば', '来る → くれば'],
+      ],
+    },
+    examples: [
+      { jp: '食べれば', reading: 'ta·be·re·ba', en: 'if you eat', tc: '如果吃的話' },
+      { jp: '行けば', reading: 'i·ke·ba', en: 'if you go', tc: '如果去的話' },
+      { jp: 'すれば', reading: 'su·re·ba', en: 'if you do', tc: '如果做的話' },
+    ],
+  },
+  'verb': {
+    title: { en: 'Verb', tc: '動詞' },
+    what: { en: 'An action word — use ます-form for politeness in travel.', tc: '表示動作的詞 — 旅遊時用 ます形 比較禮貌。' },
+    how: { en: ['Use ます-form for polite speech'], tc: ['用 ます形 表示禮貌'] },
+    examples: [
+      { jp: '食べます', reading: 'ta·be·ma·su', en: 'eat', tc: '吃' },
+      { jp: '行きます', reading: 'i·ki·ma·su', en: 'go', tc: '去' },
+      { jp: '飲みます', reading: 'no·mi·ma·su', en: 'drink', tc: '喝' },
+    ],
+  },
+  'adj stem': {
+    title: { en: 'Adjective Stem', tc: '形容詞語幹' },
+    what: { en: 'An い-adjective with the final い removed.', tc: 'い形容詞去掉最後的 い。' },
+    how: { en: ['Drop the final い from い-adjectives'], tc: ['把 い形容詞 去掉最後的 い'] },
+    table: {
+      headers: { en: ['Adjective', '→', 'Stem'], tc: ['形容詞', '→', '語幹'] },
+      rows: [
+        ['高い (expensive)', '→', '高'],
+        ['辛い (spicy)', '→', '辛'],
+        ['遠い (far)', '→', '遠'],
+        ['大きい (big)', '→', '大き'],
+      ],
+    },
+    examples: [
+      { jp: '高', reading: 'ta·ka', en: 'expensive (stem)', tc: '貴（語幹）' },
+      { jp: '辛', reading: 'ka·ra', en: 'spicy (stem)', tc: '辣（語幹）' },
+      { jp: '遠', reading: 'too', en: 'far (stem)', tc: '遠（語幹）' },
+    ],
+  },
+  'clause': {
+    title: { en: 'Clause (your thought)', tc: '子句（你想說的內容）' },
+    what: { en: 'A thought, opinion, or observation you want to express — plug in any idea here.', tc: '你想表達的想法、意見或觀察 — 任何內容都可以放這裡。' },
+    how: { en: ['Any statement or description — use plain form for verbs/adjectives inside'], tc: ['任何陳述或描述 — 內部用常體'] },
+    examples: [
+      { jp: 'おいしい', reading: 'o·i·shii', en: "it's delicious", tc: '好吃' },
+      { jp: '電車のほうが早い', reading: 'den·sha no hou ga ha·yai', en: 'train is faster', tc: '電車比較快' },
+      { jp: '漢字は難しい', reading: 'kan·ji wa mu·zu·ka·shii', en: 'kanji is difficult', tc: '漢字很難' },
+      { jp: '便利だ', reading: 'ben·ri da', en: 'is convenient', tc: '很方便' },
+    ],
+  },
+  'result': {
+    title: { en: 'Result', tc: '結果' },
+    what: { en: 'The outcome — what happens as a consequence.', tc: '結果 — 產生什麼變化。' },
+    how: { en: ['Describe what changes or increases'], tc: ['描述什麼產生了變化'] },
+    examples: [
+      { jp: 'おいしい', reading: 'o·i·shii', en: 'more delicious', tc: '越好吃' },
+      { jp: '上手になります', reading: 'jou·zu ni na·ri·ma·su', en: 'get better', tc: '越來越好' },
+    ],
+  },
+  'person': {
+    title: { en: 'Person', tc: '人物' },
+    what: { en: 'Who the statement applies to — whose perspective.', tc: '這句話的對象 — 從誰的角度來看。' },
+    how: { en: ['Use a person or group noun'], tc: ['使用人物或群體名詞'] },
+    examples: [
+      { jp: '外国人', reading: 'gai·ko·ku·jin', en: 'foreigners', tc: '外國人' },
+      { jp: '私', reading: 'wa·ta·shi', en: 'me', tc: '我' },
+      { jp: '旅行者', reading: 'ryo·kou·sha', en: 'travelers', tc: '旅客' },
+    ],
+  },
+};
+
+function GrammarTermDrawer({ term, onClose, lang = 'en' }: { term: string | null; onClose: () => void; lang?: string }) {
+  const [closing, setClosing] = useState(false);
+  const data = term ? GRAMMAR_TERMS[term] : null;
+  const isTc = lang === 'zh-TW';
+  useEffect(() => {
+    if (term) {
+      document.body.style.overflow = 'hidden';
+      setClosing(false);
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [term]);
+  const handleClose = useCallback(() => {
+    setClosing(true);
+    setTimeout(() => { setClosing(false); onClose(); }, 200);
+  }, [onClose]);
+  if (!data) return null;
+  return (
+    <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`} onClick={handleClose}>
+      <div className="absolute inset-0 bg-black/50" />
+      <div className={`relative bg-slate-800 rounded-t-2xl max-h-[85vh] flex flex-col ${closing ? 'animate-slide-down' : 'animate-slide-up'}`} onClick={e => e.stopPropagation()}>
+        <div className="flex justify-center pt-2 pb-1">
+          <div className="w-10 h-1 rounded-full bg-slate-600" />
+        </div>
+        <div className="px-4 pb-3 border-b border-slate-700/50 shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-lg text-base font-medium border border-purple-500/30">{term}</span>
+              <h3 className="text-lg font-bold text-slate-100">{isTc ? data.title.tc : data.title.en}</h3>
+            </div>
+            <button onClick={handleClose} className="text-xl text-slate-400 p-2">✕</button>
+          </div>
+        </div>
+        <div className="overflow-y-auto flex-1 min-h-0 p-4 space-y-5">
+          {/* What is it */}
+          <div className="bg-slate-700/30 rounded-xl p-3.5">
+            <p className="text-xs font-semibold text-purple-300/80 uppercase tracking-wide mb-1.5">{isTc ? '這是什麼？' : 'What is it?'}</p>
+            <p className="text-base text-slate-200 leading-relaxed">{isTc ? data.what.tc : data.what.en}</p>
+          </div>
+
+          {/* How to form */}
+          <div className="bg-slate-700/30 rounded-xl p-3.5">
+            <p className="text-xs font-semibold text-emerald-300/80 uppercase tracking-wide mb-2">{isTc ? '怎麼變化？' : 'How to form'}</p>
+            <div className="space-y-1.5">
+              {(isTc ? data.how.tc : data.how.en).map((line, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="text-emerald-400/60 text-sm mt-0.5 shrink-0">{i === 0 ? '→' : '•'}</span>
+                  <p className="text-base text-slate-200">{line}</p>
+                </div>
+              ))}
+            </div>
+            {/* Conjugation table */}
+            {data.table && (
+              <table className="w-full mt-3 text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-600/50">
+                    {(isTc ? data.table.headers.tc : data.table.headers.en).map((h, i) => (
+                      <th key={i} className="text-left py-1.5 px-2 text-slate-400 font-medium">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.table.rows.map((row, i) => (
+                    <tr key={i} className="border-b border-slate-700/30 last:border-0">
+                      {row.map((cell, j) => (
+                        <td key={j} className={`py-1.5 px-2 ${j === 0 ? 'text-purple-300' : j === 1 ? 'text-emerald-300' : 'text-slate-200'}`}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Examples */}
+          <div>
+            <p className="text-xs font-semibold text-sakura-300/80 uppercase tracking-wide mb-2 px-1">{isTc ? '例子' : 'Examples'}</p>
+            <div className="space-y-2">
+              {data.examples.map((ex, i) => (
+                <div key={i} className="bg-slate-700/40 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
+                  <div className="flex items-baseline gap-2 min-w-0">
+                    <span className="text-lg font-medium text-slate-100 shrink-0">{ex.jp}</span>
+                    <span className="text-sm text-sakura-300">{ex.reading}</span>
+                  </div>
+                  <span className="text-sm text-slate-400 shrink-0">{isTc ? ex.tc : ex.en}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle, section, refBookmarkedIds, onToggleRefBookmark, learnedIds, onToggleLearned, onTermTap }: { id: string; jp: string; rom: string; meaning: string; structure?: string[]; items: { jp: string; hep: string; en: string }[]; openSet: Set<string>; toggle: (k: string) => void; section?: string; refBookmarkedIds?: Set<string>; onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void; learnedIds?: Set<string>; onToggleLearned?: (id: string) => void; onTermTap?: (term: string) => void }) {
   const isOpen = openSet.has(id);
+  const termTapCtx = useContext(TermTapContext);
+  const handleTermTap = onTermTap || termTapCtx;
   return (
     <div className={`bg-slate-700/40 rounded-xl overflow-hidden ${isOpen ? 'ring-1 ring-sakura-400/30' : ''}`}>
       <div className="flex items-start gap-2 p-3">
@@ -755,7 +1095,15 @@ function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle,
                     <span className="text-xs text-slate-500 shrink-0 w-8">{isQuestion ? 'Ask' : 'Say'}</span>
                     {cleanLine.split(/(\[[^\]]+\]|\{[^}]+\})/g).filter(Boolean).map((part, j) => {
                       if (part.startsWith('[') && part.endsWith(']')) {
-                        return <span key={j} className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-sm border border-purple-500/30">{part.slice(1, -1)}</span>;
+                        const term = part.slice(1, -1);
+                        const hasDef = term in GRAMMAR_TERMS;
+                        return hasDef && handleTermTap ? (
+                          <button key={j} onClick={() => handleTermTap(term)} className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-sm border border-purple-500/30 active:bg-purple-500/40 transition">
+                            {term}
+                          </button>
+                        ) : (
+                          <span key={j} className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-sm border border-purple-500/30">{term}</span>
+                        );
                       }
                       if (part.startsWith('{') && part.endsWith('}')) {
                         return <span key={j} className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-sm border border-emerald-500/30">{part.slice(1, -1)}</span>;
@@ -989,12 +1337,13 @@ function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
   );
 }
 
-function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, explainLang = 'en' }: RbProps) {
   const [patternLevel, setPatternLevel] = useState<'all' | 'basic' | 'intermediate' | 'advanced'>('all');
+  const [activeTerm, setActiveTerm] = useState<string | null>(null);
 
-  const basicKeys = ['○○をお願いします','○○はありますか','○○はどこですか','○○たいです','○○てください','○○がわかりません','○○してもいいですか'];
-  const intermediateKeys = ['〜てもらえますか','〜と思います','〜かもしれません','〜ほうがいい','〜たことがあります','AもBも','〜なければなりません'];
-  const advancedKeys = ['〜ことにしました','〜わけではない','〜ようにしています','〜ば〜ほど','〜にとって'];
+  const basicKeys = ['○○をお願いします','○○はありますか','○○はどこですか','○○たいです','○○てください','○○ないでください','○○がわかりません','○○してもいいですか'];
+  const intermediateKeys = ['〜てもらえますか','〜と思います','〜かもしれません','〜ほうがいい','〜すぎます','〜ことができますか','〜つもりです','〜たことがあります','AもBも','〜なければなりません'];
+  const advancedKeys = ['〜てしまいました','〜ことにしました','〜わけではない','〜ようにしています','〜ば〜ほど','〜にとって'];
 
   const activeKeys = patternLevel === 'all' ? [...basicKeys, ...intermediateKeys, ...advancedKeys]
     : patternLevel === 'basic' ? basicKeys
@@ -1014,14 +1363,14 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '二つをお願いします', hep: 'fu·ta·tsu wo o·ne·gai·shi·ma·su', en: 'Two of them please' },
         ]} />
       <AccordionRow id="○○はありますか" jp="○○はありますか" rom="○○ wa a·ri·ma·su ka" meaning="Is there ○○? / Do you have ○○?"
-        structure={['Say: [noun] は {ありますか}？']}
+        structure={['Ask: [noun] は {ありますか}？']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'Wi-Fiはありますか？', hep: 'wai·fai wa a·ri·ma·su ka', en: 'Is there Wi-Fi?' },
           { jp: '英語のメニューはありますか？', hep: 'ei·go no me·nyuu wa a·ri·ma·su ka', en: 'Do you have an English menu?' },
           { jp: '空いている席はありますか？', hep: 'ai·te i·ru se·ki wa a·ri·ma·su ka', en: 'Is there an empty seat?' },
         ]} />
       <AccordionRow id="○○はどこですか" jp="○○はどこですか" rom="○○ wa do·ko de·su ka" meaning="Where is ○○?"
-        structure={['Say: [place] は {どこですか}？']}
+        structure={['Ask: [place] は {どこですか}？']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'トイレはどこですか？', hep: 'toi·re wa do·ko de·su ka', en: 'Where is the toilet?' },
           { jp: '駅はどこですか？', hep: 'e·ki wa do·ko de·su ka', en: 'Where is the station?' },
@@ -1040,6 +1389,14 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '書いてください', hep: 'kai·te ku·da·sai', en: 'Please write it down' },
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
           { jp: '温めてください', hep: 'a·ta·ta·me·te ku·da·sai', en: 'Please heat it up' },
+        ]} />
+      <AccordionRow id="○○ないでください" jp="○○ないでください" rom="○○ nai·de ku·da·sai" meaning="Please don't ○○ (polite negative request)"
+        structure={['Say: [verb ない-stem] {ないでください}']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'わさびを入れないでください', hep: 'wa·sa·bi wo i·re·nai·de ku·da·sai', en: 'Please don\'t add wasabi' },
+          { jp: '袋はいりません、入れないでください', hep: 'fu·ku·ro wa i·ri·ma·sen, i·re·nai·de ku·da·sai', en: 'No bag needed, please don\'t put it in' },
+          { jp: '写真を撮らないでください', hep: 'sha·shin wo to·ra·nai·de ku·da·sai', en: 'Please don\'t take photos' },
+          { jp: '氷を入れないでください', hep: 'kou·ri wo i·re·nai·de ku·da·sai', en: 'No ice please' },
         ]} />
       <AccordionRow id="○○がわかりません" jp="○○がわかりません" rom="○○ ga wa·ka·ri·ma·sen" meaning="I don't understand ○○"
         structure={['Say: [noun] が {わかりません}']}
@@ -1068,7 +1425,7 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '説明してもらえますか？', hep: 'se·tsu·mei shi·te mo·ra·e·ma·su ka', en: 'Could you explain it?' },
         ]} />
       <AccordionRow id="〜と思います" jp="〜と思います" rom="to o·mo·i·ma·su" meaning="I think ○○"
-        structure={['Say: [sentence] {と思います}', 'Ask: [sentence] {と思いますか}？']}
+        structure={['Say: [clause] {と思います}', 'Ask: [clause] {と思いますか}？']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'おいしいと思います', hep: 'o·i·shii to o·mo·i·ma·su', en: 'I think it\'s delicious' },
           { jp: '電車のほうが早いと思います', hep: 'den·sha no hou ga ha·yai to o·mo·i·ma·su', en: 'I think the train is faster' },
@@ -1088,6 +1445,28 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '予約したほうがいいですか？', hep: 'yo·ya·ku shi·ta hou ga ii de·su ka', en: 'Should I make a reservation?' },
           { jp: '現金を持ったほうがいいです', hep: 'gen·kin wo mot·ta hou ga ii de·su', en: "It's better to carry cash" },
         ]} />
+      <AccordionRow id="〜すぎます" jp="〜すぎます" rom="su·gi·ma·su" meaning="Too ○○ (excessive)"
+        structure={['Say: [verb stem] {すぎます}', 'Say: [adj stem] {すぎます}']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '高すぎます', hep: 'ta·ka·su·gi·ma·su', en: 'Too expensive' },
+          { jp: '辛すぎます', hep: 'ka·ra·su·gi·ma·su', en: 'Too spicy' },
+          { jp: '遠すぎます', hep: 'too·su·gi·ma·su', en: 'Too far' },
+          { jp: '食べすぎました', hep: 'ta·be·su·gi·ma·shi·ta', en: 'I ate too much' },
+        ]} />
+      <AccordionRow id="〜ことができますか" jp="〜ことができますか" rom="ko·to ga de·ki·ma·su ka" meaning="Can I ○○? / Is it possible?"
+        structure={['Ask: [verb dictionary] {ことができますか}？']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'カードで払うことができますか？', hep: 'kaa·do de ha·ra·u ko·to ga de·ki·ma·su ka', en: 'Can I pay by card?' },
+          { jp: '英語を話すことができますか？', hep: 'ei·go wo ha·na·su ko·to ga de·ki·ma·su ka', en: 'Can you speak English?' },
+          { jp: '予約を変更することができますか？', hep: 'yo·ya·ku wo hen·kou su·ru ko·to ga de·ki·ma·su ka', en: 'Can I change my reservation?' },
+        ]} />
+      <AccordionRow id="〜つもりです" jp="〜つもりです" rom="tsu·mo·ri de·su" meaning="I plan to ○○"
+        structure={['Say: [verb dictionary] {つもりです}']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '明日京都に行くつもりです', hep: 'a·shi·ta kyou·to ni i·ku tsu·mo·ri de·su', en: 'I plan to go to Kyoto tomorrow' },
+          { jp: '三泊するつもりです', hep: 'san·pa·ku su·ru tsu·mo·ri de·su', en: 'I plan to stay three nights' },
+          { jp: '電車で行くつもりです', hep: 'den·sha de i·ku tsu·mo·ri de·su', en: 'I plan to go by train' },
+        ]} />
       <AccordionRow id="〜たことがあります" jp="〜たことがあります" rom="ta ko·to ga a·ri·ma·su" meaning="I have experienced ○○ (past experience)"
         structure={['Say: [verb た-form] {ことがあります}', 'Ask: [verb た-form] {ことがありますか}？']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
@@ -1095,13 +1474,13 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: 'すしを食べたことがあります', hep: 'su·shi wo ta·be·ta ko·to ga a·ri·ma·su', en: 'I have eaten sushi before' },
           { jp: '新幹線に乗ったことがあります', hep: 'shin·kan·sen ni not·ta ko·to ga a·ri·ma·su', en: 'I have ridden the Shinkansen' },
         ]} />
-      <AccordionRow id="AもBも" jp="AもBも" rom="A mo B mo" meaning="Both A and B / I want A and B"
-        structure={['Say: [noun] も [noun] も [verb] {ください}']}
+      <AccordionRow id="AもBも" jp="AもBも" rom="A mo B mo" meaning="Both A and B — listing multiple things"
+        structure={['Say: [noun] {も} [noun] {も} [verb]']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'ラーメンもぎょうざもください', hep: 'raa·men mo gyou·za mo ku·da·sai', en: 'I\'ll have both ramen and gyoza' },
           { jp: '日本語も英語も話します', hep: 'ni·hon·go mo ei·go mo ha·na·shi·ma·su', en: 'I speak both Japanese and English' },
-          { jp: 'これもそれもお願いします', hep: 'ko·re mo so·re mo o·ne·gai·shi·ma·su', en: 'I\'ll take both this and that' },
           { jp: '東京も京都も行きたいです', hep: 'tou·kyou mo kyou·to mo i·ki·tai de·su', en: 'I want to go to both Tokyo and Kyoto' },
+          { jp: 'これもそれもおいしいです', hep: 'ko·re mo so·re mo o·i·shii de·su', en: 'Both this and that are delicious' },
         ]} />
       <AccordionRow id="〜なければなりません" jp="〜なければなりません" rom="na·ke·re·ba na·ri·ma·sen" meaning="Must ○○ / Have to ○○"
         structure={['Say: [verb ない-stem] {なければなりません}']}
@@ -1115,15 +1494,23 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
 
   const renderAdvanced = () => (
     <>
+      <AccordionRow id="〜てしまいました" jp="〜てしまいました" rom="te shi·mai·ma·shi·ta" meaning="I accidentally / unfortunately did ○○"
+        structure={['Say: [verb て-form] {しまいました}']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '財布をなくしてしまいました', hep: 'sai·fu wo na·ku·shi·te shi·mai·ma·shi·ta', en: 'I lost my wallet' },
+          { jp: '電車に乗り過ごしてしまいました', hep: 'den·sha ni no·ri·su·go·shi·te shi·mai·ma·shi·ta', en: 'I missed my train stop' },
+          { jp: '携帯を壊してしまいました', hep: 'kei·tai wo ko·wa·shi·te shi·mai·ma·shi·ta', en: 'I broke my phone' },
+          { jp: 'パスポートを忘れてしまいました', hep: 'pa·su·poo·to wo wa·su·re·te shi·mai·ma·shi·ta', en: 'I forgot my passport' },
+        ]} />
       <AccordionRow id="〜ことにしました" jp="〜ことにしました" rom="ko·to ni shi·ma·shi·ta" meaning="I decided to ○○"
-        structure={['Say: [verb plain] {ことにしました}']}
+        structure={['Say: [verb dictionary] {ことにしました}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '京都に行くことにしました', hep: 'kyou·to ni i·ku ko·to ni shi·ma·shi·ta', en: 'I decided to go to Kyoto' },
           { jp: '新幹線に乗ることにしました', hep: 'shin·kan·sen ni no·ru ko·to ni shi·ma·shi·ta', en: 'I decided to take the Shinkansen' },
           { jp: 'もう一泊することにしました', hep: 'mou ip·pa·ku su·ru ko·to ni shi·ma·shi·ta', en: 'I decided to stay one more night' },
         ]} />
       <AccordionRow id="〜ようにしています" jp="〜ようにしています" rom="you ni shi·te i·ma·su" meaning="I make a point to ○○ (habitual effort)"
-        structure={['Say: [verb plain] {ようにしています}']}
+        structure={['Say: [verb dictionary] {ようにしています}']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '毎日日本語を練習するようにしています', hep: 'mai·ni·chi ni·hon·go wo ren·shuu su·ru you ni shi·te i·ma·su', en: 'I make a point to practice Japanese every day' },
           { jp: 'なるべく現金を使うようにしています', hep: 'na·ru·be·ku gen·kin wo tsu·ka·u you ni shi·te i·ma·su', en: 'I try to use cash as much as possible' },
@@ -1137,14 +1524,14 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           { jp: '高いわけではないです', hep: 'ta·kai wa·ke de wa nai de·su', en: "It's not that it's expensive" },
         ]} />
       <AccordionRow id="〜ば〜ほど" jp="〜ば〜ほど" rom="ba ... ho·do" meaning="The more ○○, the more ○○"
-        structure={['Say: [verb ば-form] [verb plain] ほど [result]']}
+        structure={['Say: [verb ば-form] [verb dictionary] ほど [result]']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '食べれば食べるほどおいしい', hep: 'ta·be·re·ba ta·be·ru ho·do o·i·shii', en: 'The more you eat, the more delicious it is' },
           { jp: '日本語を勉強すればするほど面白い', hep: 'ni·hon·go wo ben·kyou su·re·ba su·ru ho·do o·mo·shi·roi', en: 'The more I study Japanese, the more interesting it is' },
           { jp: '練習すればするほど上手になります', hep: 'ren·shuu su·re·ba su·ru ho·do jou·zu ni na·ri·ma·su', en: 'The more you practice, the better you get' },
         ]} />
       <AccordionRow id="〜にとって" jp="〜にとって" rom="ni tot·te" meaning="For ○○ / From ○○'s perspective"
-        structure={['Say: [person] {にとって} [statement]']}
+        structure={['Say: [person] {にとって} [clause]']}
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '外国人にとって漢字は難しいです', hep: 'gai·ko·ku·jin ni tot·te kan·ji wa mu·zu·ka·shii de·su', en: 'For foreigners, kanji is difficult' },
           { jp: '私にとって日本は特別な場所です', hep: 'wa·ta·shi ni tot·te ni·hon wa to·ku·be·tsu na ba·sho de·su', en: 'For me, Japan is a special place' },
@@ -1154,6 +1541,7 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
   );
 
   return (
+    <TermTapContext.Provider value={setActiveTerm}>
     <div className="mt-2 space-y-1.5">
       {/* Level tabs */}
       <div className="flex gap-2 mb-3">
@@ -1193,7 +1581,9 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           {renderAdvanced()}
         </>
       )}
+      <GrammarTermDrawer term={activeTerm} onClose={() => setActiveTerm(null)} lang={explainLang} />
     </div>
+    </TermTapContext.Provider>
   );
 }
 

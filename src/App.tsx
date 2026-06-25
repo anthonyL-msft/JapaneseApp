@@ -203,7 +203,7 @@ function App() {
           />
         )}
         <div style={{ display: tab === 'reference' ? 'contents' : 'none' }}>
-          <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); }} />
+          <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); }} explainLang={aiExplainLang} />
         </div>
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         <div style={{ display: tab === 'ai' ? 'contents' : 'none' }}>
