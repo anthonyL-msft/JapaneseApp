@@ -5,7 +5,7 @@ import { HIRAGANA_CARDS, KATAKANA_CARDS, HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CA
 import type { KanaCard, KanaVocabCard } from '../data/kana-data';
 import { phrases } from '../data/phrases';
 
-type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food';
+type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food' | 'patterns';
 type QuizMode = 'easy' | 'reverse' | 'hard';
 
 // Build phrase vocab cards from phrases.ts by situation groups
@@ -28,6 +28,29 @@ const VOCAB_PEOPLE_CARDS = buildPhraseCards(['People & Family', 'Body & Health',
 const PHRASES_POWER_CARDS = buildCategoryCards(['power']);
 const PHRASES_TRAVEL_CARDS = buildCategoryCards(['airport', 'directions', 'hotel']);
 const PHRASES_FOOD_CARDS = buildCategoryCards(['restaurant', 'food', 'drinks']);
+
+// Sentence patterns for quiz
+const PATTERNS_CARDS: KanaVocabCard[] = [
+  { jp: '○○をお願いします', hep: 'wo o·ne·gai·shi·ma·su', en: '○○ please', kanaKey: 'wo' },
+  { jp: '○○てください', hep: 'te ku·da·sai', en: 'Please do ○○', kanaKey: 'te' },
+  { jp: '○○はありますか', hep: 'wa a·ri·ma·su ka', en: 'Do you have ○○?', kanaKey: 'wa' },
+  { jp: '○○はどこですか', hep: 'wa do·ko de·su ka', en: 'Where is ○○?', kanaKey: 'wa' },
+  { jp: '○○してもいいですか', hep: 'shi·te mo ii de·su ka', en: 'May I ○○?', kanaKey: 'sh' },
+  { jp: '○○たいです', hep: 'tai de·su', en: 'I want to ○○', kanaKey: 'ta' },
+  { jp: '○○がわかりません', hep: 'ga wa·ka·ri·ma·sen', en: "I don't understand ○○", kanaKey: 'ga' },
+  { jp: '〜てもらえますか', hep: 'te mo·ra·e·ma·su ka', en: 'Could you ○○ for me?', kanaKey: 'te' },
+  { jp: '〜ほうがいい', hep: 'hou ga ii', en: 'Should / Better to ○○', kanaKey: 'ho' },
+  { jp: '〜と思います', hep: 'to o·mo·i·ma·su', en: 'I think ○○', kanaKey: 'to' },
+  { jp: '〜かもしれません', hep: 'ka·mo shi·re·ma·sen', en: 'Maybe / Might ○○', kanaKey: 'ka' },
+  { jp: '〜たことがあります', hep: 'ta ko·to ga a·ri·ma·su', en: 'I have experienced ○○', kanaKey: 'ta' },
+  { jp: '〜なければなりません', hep: 'na·ke·re·ba na·ri·ma·sen', en: 'Must / Have to ○○', kanaKey: 'na' },
+  { jp: 'AもBも', hep: 'A mo B mo', en: 'Both A and B', kanaKey: 'mo' },
+  { jp: '〜ことにしました', hep: 'ko·to ni shi·ma·shi·ta', en: 'I decided to ○○', kanaKey: 'ko' },
+  { jp: '〜ようにしています', hep: 'you ni shi·te i·ma·su', en: 'I make a point to ○○', kanaKey: 'yo' },
+  { jp: '〜わけではない', hep: 'wa·ke de wa nai', en: "It's not that ○○", kanaKey: 'wa' },
+  { jp: '〜ば〜ほど', hep: 'ba ... ho·do', en: 'The more ○○, the more ○○', kanaKey: 'ba' },
+  { jp: '〜にとって', hep: 'ni tot·te', en: "For ○○ / From ○○'s perspective", kanaKey: 'ni' },
+];
 
 // Legacy (keep for backward compat with high scores)
 const PHRASE_VOCAB_CARDS: KanaVocabCard[] = phrases
@@ -193,6 +216,7 @@ export function Quiz() {
         'phrases-power': PHRASES_POWER_CARDS,
         'phrases-travel': PHRASES_TRAVEL_CARDS,
         'phrases-food': PHRASES_FOOD_CARDS,
+        'patterns': PATTERNS_CARDS,
       };
       vCards = shuffle(vocabMap[cat] || PHRASE_VOCAB_CARDS);
       setVocabCards(vCards);
@@ -324,6 +348,12 @@ export function Quiz() {
                 <span className="text-base font-semibold text-slate-100">Food</span>
                 <span className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</span>
                 {getHighScore('phrases-food') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('phrases-food')}/{GAME_ROUNDS}</span>}
+              </button>
+              <button onClick={() => startGame('patterns')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
+                <span className="text-3xl">📐</span>
+                <span className="text-base font-semibold text-slate-100">Patterns</span>
+                <span className="text-sm text-slate-500">{PATTERNS_CARDS.length} patterns</span>
+                {getHighScore('patterns') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('patterns')}/{GAME_ROUNDS}</span>}
               </button>
             </div>
           </div>

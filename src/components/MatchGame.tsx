@@ -5,7 +5,7 @@ import { HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
 import type { KanaVocabCard } from '../data/kana-data';
 import { phrases } from '../data/phrases';
 
-type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food';
+type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed' | 'phrases' | 'vocab-words' | 'vocab-actions' | 'vocab-time' | 'vocab-world' | 'vocab-people' | 'phrases-power' | 'phrases-travel' | 'phrases-food' | 'patterns';
 
 const PAIR_COUNT = 6; // 6 pairs per round
 
@@ -27,6 +27,29 @@ const PHRASES_POWER_CARDS = buildCategoryCards(['power']);
 const PHRASES_TRAVEL_CARDS = buildCategoryCards(['airport', 'directions', 'hotel']);
 const PHRASES_FOOD_CARDS = buildCategoryCards(['restaurant', 'food', 'drinks']);
 const PHRASE_VOCAB_CARDS = buildCategoryCards(['vocab']);
+
+// Sentence patterns for match
+const PATTERNS_CARDS: KanaVocabCard[] = [
+  { jp: '○○をお願いします', hep: 'wo o·ne·gai·shi·ma·su', en: '○○ please', kanaKey: 'wo' },
+  { jp: '○○てください', hep: 'te ku·da·sai', en: 'Please do ○○', kanaKey: 'te' },
+  { jp: '○○はありますか', hep: 'wa a·ri·ma·su ka', en: 'Do you have ○○?', kanaKey: 'wa' },
+  { jp: '○○はどこですか', hep: 'wa do·ko de·su ka', en: 'Where is ○○?', kanaKey: 'wa' },
+  { jp: '○○してもいいですか', hep: 'shi·te mo ii de·su ka', en: 'May I ○○?', kanaKey: 'sh' },
+  { jp: '○○たいです', hep: 'tai de·su', en: 'I want to ○○', kanaKey: 'ta' },
+  { jp: '○○がわかりません', hep: 'ga wa·ka·ri·ma·sen', en: "I don't understand ○○", kanaKey: 'ga' },
+  { jp: '〜てもらえますか', hep: 'te mo·ra·e·ma·su ka', en: 'Could you ○○ for me?', kanaKey: 'te' },
+  { jp: '〜ほうがいい', hep: 'hou ga ii', en: 'Should / Better to ○○', kanaKey: 'ho' },
+  { jp: '〜と思います', hep: 'to o·mo·i·ma·su', en: 'I think ○○', kanaKey: 'to' },
+  { jp: '〜かもしれません', hep: 'ka·mo shi·re·ma·sen', en: 'Maybe / Might ○○', kanaKey: 'ka' },
+  { jp: '〜たことがあります', hep: 'ta ko·to ga a·ri·ma·su', en: 'I have experienced ○○', kanaKey: 'ta' },
+  { jp: '〜なければなりません', hep: 'na·ke·re·ba na·ri·ma·sen', en: 'Must / Have to ○○', kanaKey: 'na' },
+  { jp: 'AもBも', hep: 'A mo B mo', en: 'Both A and B', kanaKey: 'mo' },
+  { jp: '〜ことにしました', hep: 'ko·to ni shi·ma·shi·ta', en: 'I decided to ○○', kanaKey: 'ko' },
+  { jp: '〜ようにしています', hep: 'you ni shi·te i·ma·su', en: 'I make a point to ○○', kanaKey: 'yo' },
+  { jp: '〜わけではない', hep: 'wa·ke de wa nai', en: "It's not that ○○", kanaKey: 'wa' },
+  { jp: '〜ば〜ほど', hep: 'ba ... ho·do', en: 'The more ○○, the more ○○', kanaKey: 'ba' },
+  { jp: '〜にとって', hep: 'ni tot·te', en: "For ○○ / From ○○'s perspective", kanaKey: 'ni' },
+];
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -97,6 +120,7 @@ export function MatchGame() {
       'phrases-power': PHRASES_POWER_CARDS,
       'phrases-travel': PHRASES_TRAVEL_CARDS,
       'phrases-food': PHRASES_FOOD_CARDS,
+      'patterns': PATTERNS_CARDS,
     };
     pool = poolMap[category || 'mixed'] || [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS];
 
@@ -252,6 +276,12 @@ export function MatchGame() {
                 <span className="text-base font-semibold text-slate-100">Food</span>
                 <span className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</span>
                 {getBestTime('phrases-food') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-food')!)}</span>}
+              </button>
+              <button onClick={() => startGame('patterns')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
+                <span className="text-2xl">📐</span>
+                <span className="text-base font-semibold text-slate-100">Patterns</span>
+                <span className="text-sm text-slate-500">{PATTERNS_CARDS.length} patterns</span>
+                {getBestTime('patterns') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('patterns')!)}</span>}
               </button>
             </div>
           </div>
