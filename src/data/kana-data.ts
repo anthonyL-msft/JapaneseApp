@@ -68,7 +68,7 @@ export const KANA_VOCAB: Record<string, KanaVocab[]> = {
   do: [{ jp: 'どこ', hep: 'do·ko', en: 'Where?' }, { jp: 'どうぞ', hep: 'dou·zo', en: 'Please / Go ahead' }],
   ba: [{ jp: 'バス', hep: 'ba·su', en: 'Bus' }, { jp: '場所', hep: 'ba·sho', en: 'Place / location' }],
   bi: [{ jp: 'ビール', hep: 'bii·ru', en: 'Beer' }, { jp: '美術館', hep: 'bi·ju·tsu·kan', en: 'Art museum' }],
-  bu: [{ jp: '部屋', hep: 'bu? → he·ya', en: 'Note: 部屋 reads he·ya not bu·ya' }, { jp: 'ぶたにく', hep: 'bu·ta·ni·ku', en: 'Pork' }],
+  bu: [{ jp: 'ぶたにく', hep: 'bu·ta·ni·ku', en: 'Pork' }, { jp: '部分', hep: 'bu·bun', en: 'Part / portion' }],
   be: [{ jp: '弁当', hep: 'ben·tou', en: 'Bento / lunchbox' }, { jp: '便利', hep: 'ben·ri', en: 'Convenient' }],
   bo: [{ jp: '帽子', hep: 'bou·shi', en: 'Hat / cap' }],
   // Handakuten (p-sounds)

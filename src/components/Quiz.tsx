@@ -3,8 +3,14 @@ import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 import { HIRAGANA_CARDS, KATAKANA_CARDS, HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
 import type { KanaCard, KanaVocabCard } from '../data/kana-data';
+import { phrases } from '../data/phrases';
 
-type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k';
+type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases';
+
+// Build phrase vocab cards from phrases.ts vocabulary
+const PHRASE_VOCAB_CARDS: KanaVocabCard[] = phrases
+  .filter(p => p.lang === 'ja' && p.category === 'vocab')
+  .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
 const GAME_TIME = 10;
 const GAME_ROUNDS = 20;
@@ -45,7 +51,7 @@ export function Quiz() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isKana = panel.value === 'hiragana' || panel.value === 'katakana';
-  const isVocab = panel.value === 'vocab-h' || panel.value === 'vocab-k';
+  const isVocab = panel.value === 'vocab-h' || panel.value === 'vocab-k' || panel.value === 'phrases';
 
   const currentKana = isKana && kanaCards.length > 0 ? kanaCards[currentIndex % kanaCards.length] : null;
   const currentVocab = isVocab && vocabCards.length > 0 ? vocabCards[currentIndex % vocabCards.length] : null;
@@ -131,7 +137,7 @@ export function Quiz() {
       kCards = shuffle(cat === 'hiragana' ? HIRAGANA_CARDS : KATAKANA_CARDS);
       setKanaCards(kCards);
     } else {
-      vCards = shuffle(cat === 'vocab-h' ? HIRAGANA_VOCAB_CARDS : KATAKANA_VOCAB_CARDS);
+      vCards = shuffle(cat === 'phrases' ? PHRASE_VOCAB_CARDS : cat === 'vocab-h' ? HIRAGANA_VOCAB_CARDS : KATAKANA_VOCAB_CARDS);
       setVocabCards(vCards);
     }
 
@@ -203,7 +209,7 @@ export function Quiz() {
 
           {/* Kana Vocab */}
           <div>
-            <p className="text-sm text-slate-500 mb-2">Kana Vocab</p>
+            <p className="text-sm text-slate-500 mb-2">Vocabulary</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => startGame('vocab-h')}
@@ -225,6 +231,24 @@ export function Quiz() {
                 <span className="text-sm text-slate-500">{KATAKANA_VOCAB_CARDS.length} words</span>
                 {getHighScore('vocab-k') > 0 && (
                   <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('vocab-k')}/{GAME_ROUNDS}</span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Phrase Vocab */}
+          <div>
+            <p className="text-sm text-slate-500 mb-2">Phrase Book Vocab</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => startGame('phrases')}
+                className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1"
+              >
+                <span className="text-3xl">📚</span>
+                <span className="text-base font-semibold text-slate-100">Vocabulary</span>
+                <span className="text-sm text-slate-500">{PHRASE_VOCAB_CARDS.length} words</span>
+                {getHighScore('phrases') > 0 && (
+                  <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('phrases')}/{GAME_ROUNDS}</span>
                 )}
               </button>
             </div>

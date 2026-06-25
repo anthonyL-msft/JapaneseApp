@@ -3,10 +3,16 @@ import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 import { HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
 import type { KanaVocabCard } from '../data/kana-data';
+import { phrases } from '../data/phrases';
 
-type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed';
+type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed' | 'phrases';
 
 const PAIR_COUNT = 6; // 6 pairs per round
+
+// Build phrase vocab cards from phrases.ts vocabulary
+const PHRASE_VOCAB_CARDS: KanaVocabCard[] = phrases
+  .filter(p => p.lang === 'ja' && p.category === 'vocab')
+  .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -66,6 +72,7 @@ export function MatchGame() {
     let pool: KanaVocabCard[];
     if (category === 'vocab-h') pool = HIRAGANA_VOCAB_CARDS;
     else if (category === 'vocab-k') pool = KATAKANA_VOCAB_CARDS;
+    else if (category === 'phrases') pool = PHRASE_VOCAB_CARDS;
     else pool = [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS];
 
     const selected = shuffle(pool).slice(0, PAIR_COUNT);
@@ -204,6 +211,19 @@ export function MatchGame() {
                 </div>
                 {getBestTime('mixed') && (
                   <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('mixed')!)}</span>
+                )}
+              </button>
+              <button
+                onClick={() => startGame('phrases')}
+                className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex items-center gap-3"
+              >
+                <span className="text-2xl">📚</span>
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-slate-100">Phrase Vocabulary</p>
+                  <p className="text-sm text-slate-500">{PHRASE_VOCAB_CARDS.length} words</p>
+                </div>
+                {getBestTime('phrases') && (
+                  <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases')!)}</span>
                 )}
               </button>
             </div>
