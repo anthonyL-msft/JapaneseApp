@@ -237,7 +237,7 @@ export function MatchGame() {
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => startGame('phrases-power')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">⚡</span>
-                <span className="text-base font-semibold text-slate-100">Power</span>
+                <span className="text-base font-semibold text-slate-100">Power Phrases</span>
                 <span className="text-sm text-slate-500">{PHRASES_POWER_CARDS.length} phrases</span>
                 {getBestTime('phrases-power') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-power')!)}</span>}
               </button>
