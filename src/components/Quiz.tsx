@@ -151,7 +151,7 @@ export function Quiz() {
     const advanceTimeout = setTimeout(() => {
       if (gameScore.total >= GAME_ROUNDS) {
         setGameFinished(true);
-        if (panel.value) setHighScore(panel.value, gameScore.correct + (answered === correctAnswer ? 1 : 0));
+        if (panel.value) setHighScore(panel.value, gameScore.correct);
       } else {
         const nextIdx = currentIndex + 1;
         setCurrentIndex(nextIdx);
