@@ -1222,9 +1222,50 @@ function useAccordion(keys: string[], externalToggle?: number) {
 }
 
 function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
-  const { openSet, toggle } = useAccordion(['は','が','を','に','で','へ','の','と','も','か','から','まで'], toggleSignal);
+  const [group, setGroup] = useState<'all' | 'roles' | 'place' | 'connect' | 'range'>('all');
+
+  const rolesKeys = ['は','が','を'];
+  const placeKeys = ['に','で','へ'];
+  const connectKeys = ['の','と','も'];
+  const rangeKeys = ['から','まで','か'];
+
+  const activeKeys = group === 'all' ? [...rolesKeys, ...placeKeys, ...connectKeys, ...rangeKeys]
+    : group === 'roles' ? rolesKeys
+    : group === 'place' ? placeKeys
+    : group === 'connect' ? connectKeys
+    : rangeKeys;
+
+  const { openSet, toggle } = useAccordion(activeKeys, toggleSignal);
+
+  const tabs = [
+    { id: 'all' as const, label: 'All' },
+    { id: 'roles' as const, label: 'Roles' },
+    { id: 'place' as const, label: 'Place' },
+    { id: 'connect' as const, label: 'Connect' },
+    { id: 'range' as const, label: 'Range' },
+  ];
+
   return (
     <div className="mt-2 space-y-1.5">
+      <div className="flex gap-2 mb-3 overflow-x-auto">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setGroup(tab.id)}
+            className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+              group === tab.id
+                ? 'bg-sakura-500/60 text-white'
+                : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {(group === 'all' || group === 'roles') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-2 mb-1">Marking Roles</p>}
       <AccordionRow id="は" jp="は" rom="wa" meaning="Topic marker — marks what you're talking about"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'これは何ですか？', hep: 'ko·re wa nan de·su ka', en: 'What is this?' },
@@ -1243,6 +1284,12 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '写真を撮ってもらえますか？', hep: 'sha·shin wo tot·te mo·ra·e·ma·su ka', en: 'Can you take a photo?' },
           { jp: '切符を買います', hep: 'kip·pu wo kai·ma·su', en: 'I buy a ticket' },
         ]} />
+        </>
+      )}
+
+      {(group === 'all' || group === 'place') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Place & Direction</p>}
       <AccordionRow id="に" jp="に" rom="ni" meaning="Direction/time — to, at, in, on"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '6時に予約しました', hep: 'ro·ku·ji ni yo·ya·ku shi·ma·shi·ta', en: 'I reserved at 6 o\'clock' },
@@ -1261,6 +1308,12 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: 'こちらへどうぞ', hep: 'ko·chi·ra e dou·zo', en: 'This way please' },
           { jp: '出口へ向かいます', hep: 'de·gu·chi e mu·kai·ma·su', en: 'I\'m heading to the exit' },
         ]} />
+        </>
+      )}
+
+      {(group === 'all' || group === 'connect') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Connecting</p>}
       <AccordionRow id="の" jp="の" rom="no" meaning="Possessive / connecting — 's, of"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '名古屋の名物', hep: 'na·go·ya no mei·bu·tsu', en: 'Nagoya\'s specialty' },
@@ -1279,6 +1332,12 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '日本語もわかりません', hep: 'ni·hon·go mo wa·ka·ri·ma·sen', en: 'I don\'t understand Japanese either' },
           { jp: '私も同じものをお願いします', hep: 'wa·ta·shi mo o·na·ji mo·no wo o·ne·gai·shi·ma·su', en: 'Same thing for me too please' },
         ]} />
+        </>
+      )}
+
+      {(group === 'all' || group === 'range') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Range & Question</p>}
       <AccordionRow id="か" jp="か" rom="ka" meaning="Question marker (end of sentence)"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'いくらですか？', hep: 'i·ku·ra de·su ka', en: 'How much?' },
@@ -1297,6 +1356,8 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
           { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
         ]} />
+        </>
+      )}
     </div>
   );
 }
@@ -1620,9 +1681,44 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
 }
 
 function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
-  const { openSet, toggle } = useAccordion(['〜ます','〜ません','〜ました','〜です','〜てください','〜てもいいですか'], toggleSignal);
+  const [group, setGroup] = useState<'all' | 'statements' | 'requests'>('all');
+
+  const statementsKeys = ['〜ます','〜ません','〜ました','〜です'];
+  const requestsKeys = ['〜てください','〜てもいいですか'];
+
+  const activeKeys = group === 'all' ? [...statementsKeys, ...requestsKeys]
+    : group === 'statements' ? statementsKeys
+    : requestsKeys;
+
+  const { openSet, toggle } = useAccordion(activeKeys, toggleSignal);
+
+  const tabs = [
+    { id: 'all' as const, label: 'All' },
+    { id: 'statements' as const, label: 'Statements' },
+    { id: 'requests' as const, label: 'Requests' },
+  ];
+
   return (
     <div className="mt-2 space-y-1.5">
+      <div className="flex gap-2 mb-3">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setGroup(tab.id)}
+            className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+              group === tab.id
+                ? 'bg-sakura-500/60 text-white'
+                : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {(group === 'all' || group === 'statements') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-2 mb-1">Statements</p>}
       <AccordionRow id="〜ます" jp="〜ます" rom="ma·su" meaning="🕐 Default for ALL travel — ordering, asking, stating"
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: '行きます', hep: 'i·ki·ma·su', en: 'I go / I will go' },
@@ -1649,6 +1745,12 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
           { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
           { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
         ]} />
+        </>
+      )}
+
+      {(group === 'all' || group === 'requests') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Requests</p>}
       <AccordionRow id="〜てください" jp="〜てください" rom="te ku·da·sai" meaning='🕐 Asking someone to do something — "please do ○○"'
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'ゆっくり話してください', hep: 'yuk·ku·ri ha·na·shi·te ku·da·sai', en: 'Please speak slowly' },
@@ -1661,6 +1763,8 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
           { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
         ]} />
+        </>
+      )}
     </div>
   );
 }
