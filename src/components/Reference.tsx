@@ -746,9 +746,30 @@ function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle,
       {isOpen && (
         <div className="px-1.5 pb-1.5 space-y-1.5">
           {structure && structure.length > 0 && (
-            <div className="bg-slate-600/20 rounded-lg px-3 py-2 mx-1.5">
+            <div className="bg-slate-600/20 rounded-lg px-3 py-2.5 space-y-2">
               {structure.map((line, i) => (
-                <p key={i} className="text-sm text-slate-400 font-mono">{line}</p>
+                <div key={i} className="flex items-center gap-1 flex-wrap">
+                  {line.split(/(\[[^\]]+\]|[＋+→?？])/g).filter(Boolean).map((part, j) => {
+                    if (part.startsWith('[') && part.endsWith(']')) {
+                      // Slot — colored pill
+                      return <span key={j} className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-sm border border-purple-500/30">{part.slice(1, -1)}</span>;
+                    } else if (part === '→') {
+                      return <span key={j} className="text-slate-500 text-sm">→</span>;
+                    } else if (part === '?' || part === '？') {
+                      return <span key={j} className="text-amber-400 text-sm font-medium">?</span>;
+                    } else if (part === '+' || part === '＋') {
+                      return <span key={j} className="text-slate-500 text-sm">+</span>;
+                    } else {
+                      // Particles and grammar — green for grammar endings, plain for particles
+                      const trimmed = part.trim();
+                      if (!trimmed) return null;
+                      if (['です', 'ですか', 'ですか？', 'ません', 'ました'].some(g => trimmed.includes(g))) {
+                        return <span key={j} className="bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded text-sm">{trimmed}</span>;
+                      }
+                      return <span key={j} className="text-slate-300 text-sm">{trimmed}</span>;
+                    }
+                  })}
+                </div>
               ))}
             </div>
           )}
