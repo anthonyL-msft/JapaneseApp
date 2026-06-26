@@ -1345,18 +1345,20 @@ function useAccordion(keys: string[], externalToggle?: number) {
 }
 
 function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
-  const [group, setGroup] = useState<'all' | 'roles' | 'place' | 'connect' | 'range'>('all');
+  const [group, setGroup] = useState<'all' | 'roles' | 'place' | 'connect' | 'range' | 'tone'>('all');
 
   const rolesKeys = ['は','が','を'];
   const placeKeys = ['に','で','へ'];
   const connectKeys = ['の','と','も'];
   const rangeKeys = ['から','まで','か'];
+  const toneKeys = ['よ','ね','けど'];
 
-  const activeKeys = group === 'all' ? [...rolesKeys, ...placeKeys, ...connectKeys, ...rangeKeys]
+  const activeKeys = group === 'all' ? [...rolesKeys, ...placeKeys, ...connectKeys, ...rangeKeys, ...toneKeys]
     : group === 'roles' ? rolesKeys
     : group === 'place' ? placeKeys
     : group === 'connect' ? connectKeys
-    : rangeKeys;
+    : group === 'range' ? rangeKeys
+    : toneKeys;
 
   const { openSet, toggle } = useAccordion(activeKeys, toggleSignal);
 
@@ -1366,6 +1368,7 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
     { id: 'place' as const, label: 'Place' },
     { id: 'connect' as const, label: 'Connect' },
     { id: 'range' as const, label: 'Range' },
+    { id: 'tone' as const, label: 'Tone' },
   ];
 
   return (
@@ -1478,6 +1481,30 @@ function ParticlesRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: 'この住所までお願いします', hep: 'ko·no juu·sho ma·de o·ne·gai·shi·ma·su', en: 'To this address please' },
           { jp: '10時まで営業です', hep: 'juu·ji ma·de ei·gyou de·su', en: 'Open until 10 o\'clock' },
           { jp: '名古屋まで何時間ですか？', hep: 'na·go·ya ma·de nan·ji·kan de·su ka', en: 'How many hours to Nagoya?' },
+        ]} />
+        </>
+      )}
+
+      {(group === 'all' || group === 'tone') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Tone & Nuance</p>}
+      <AccordionRow id="よ" jp="よ" rom="yo" meaning="Emphasis / informing — telling someone something new"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'おいしいですよ', hep: 'o·i·shii de·su yo', en: 'It\'s delicious! (you should know)' },
+          { jp: 'もう閉まりますよ', hep: 'mou shi·ma·ri·ma·su yo', en: 'It\'s closing soon! (heads up)' },
+          { jp: 'ここですよ', hep: 'ko·ko de·su yo', en: 'It\'s right here! (informing)' },
+        ]} />
+      <AccordionRow id="ね" jp="ね" rom="ne" meaning="Agreement / confirmation — right?, isn't it?"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'おいしいですね', hep: 'o·i·shii de·su ne', en: 'It\'s delicious, isn\'t it?' },
+          { jp: 'いい天気ですね', hep: 'ii ten·ki de·su ne', en: 'Nice weather, right?' },
+          { jp: '便利ですね', hep: 'ben·ri de·su ne', en: 'That\'s convenient, isn\'t it?' },
+        ]} />
+      <AccordionRow id="けど" jp="けど" rom="ke·do" meaning="But / however — softening or contrasting"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '行きたいですけど、時間がありません', hep: 'i·ki·tai de·su ke·do, ji·kan ga a·ri·ma·sen', en: 'I want to go, but I don\'t have time' },
+          { jp: 'すみませんけど、もう一度お願いします', hep: 'su·mi·ma·sen ke·do, mou i·chi·do o·ne·gai·shi·ma·su', en: 'Sorry, but could you say that again?' },
+          { jp: 'おいしいですけど、辛いです', hep: 'o·i·shii de·su ke·do, ka·rai de·su', en: 'It\'s delicious, but spicy' },
         ]} />
         </>
       )}
@@ -1804,14 +1831,16 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
 }
 
 function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
-  const [group, setGroup] = useState<'all' | 'statements' | 'requests'>('all');
+  const [group, setGroup] = useState<'all' | 'statements' | 'requests' | 'responses'>('all');
 
-  const statementsKeys = ['〜ます','〜ません','〜ました','〜です'];
-  const requestsKeys = ['〜てください','〜てもいいですか'];
+  const statementsKeys = ['〜ます','〜ません','〜ました','〜ませんでした','〜です','〜ています','〜たいです'];
+  const requestsKeys = ['〜てください','〜てもいいですか','〜ないでください'];
+  const responsesKeys = ['〜ですね','ちょっと…'];
 
-  const activeKeys = group === 'all' ? [...statementsKeys, ...requestsKeys]
+  const activeKeys = group === 'all' ? [...statementsKeys, ...requestsKeys, ...responsesKeys]
     : group === 'statements' ? statementsKeys
-    : requestsKeys;
+    : group === 'requests' ? requestsKeys
+    : responsesKeys;
 
   const { openSet, toggle } = useAccordion(activeKeys, toggleSignal);
 
@@ -1819,6 +1848,7 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
     { id: 'all' as const, label: 'All' },
     { id: 'statements' as const, label: 'Statements' },
     { id: 'requests' as const, label: 'Requests' },
+    { id: 'responses' as const, label: 'Responses' },
   ];
 
   return (
@@ -1861,12 +1891,32 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
           { jp: 'もう払いました', hep: 'mou ha·rai·ma·shi·ta', en: 'I already paid' },
           { jp: '荷物をなくしました', hep: 'ni·mo·tsu wo na·ku·shi·ma·shi·ta', en: 'I lost my luggage' },
         ]} />
+      <AccordionRow id="〜ませんでした" jp="〜ませんでした" rom="ma·sen·de·shi·ta" meaning="🕐 Didn't / wasn't — past negative"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '届きませんでした', hep: 'to·do·ki·ma·sen·de·shi·ta', en: 'It didn\'t arrive' },
+          { jp: '知りませんでした', hep: 'shi·ri·ma·sen·de·shi·ta', en: 'I didn\'t know' },
+          { jp: '間に合いませんでした', hep: 'ma·ni·a·i·ma·sen·de·shi·ta', en: 'I didn\'t make it in time' },
+        ]} />
       <AccordionRow id="〜です" jp="〜です" rom="de·su" meaning='🕐 Stating what something IS — identity, quantities'
         openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'ふたりです', hep: 'fu·ta·ri de·su', en: 'Two people (party size)' },
           { jp: 'アレルギーです', hep: 'a·re·ru·gii de·su', en: "It's an allergy" },
           { jp: 'これです', hep: 'ko·re de·su', en: "It's this one" },
           { jp: '大丈夫です', hep: 'dai·jou·bu de·su', en: "It's fine / I'm okay" },
+        ]} />
+      <AccordionRow id="〜ています" jp="〜ています" rom="te i·ma·su" meaning="🕐 Currently doing / ongoing state — am ~ing"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '探しています', hep: 'sa·ga·shi·te i·ma·su', en: 'I\'m looking for (something)' },
+          { jp: 'ホテルに泊まっています', hep: 'ho·te·ru ni to·mat·te i·ma·su', en: 'I\'m staying at a hotel' },
+          { jp: '友達を待っています', hep: 'to·mo·da·chi wo mat·te i·ma·su', en: 'I\'m waiting for a friend' },
+          { jp: '旅行しています', hep: 'ryo·kou shi·te i·ma·su', en: 'I\'m traveling' },
+        ]} />
+      <AccordionRow id="〜たいです" jp="〜たいです" rom="tai de·su" meaning="🕐 Want to — expressing desire"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '食べたいです', hep: 'ta·be·tai de·su', en: 'I want to eat' },
+          { jp: '行きたいです', hep: 'i·ki·tai de·su', en: 'I want to go' },
+          { jp: '買いたいです', hep: 'kai·tai de·su', en: 'I want to buy' },
+          { jp: '温泉に入りたいです', hep: 'on·sen ni hai·ri·tai de·su', en: 'I want to go to an onsen' },
         ]} />
         </>
       )}
@@ -1885,6 +1935,32 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
           { jp: '写真を撮ってもいいですか？', hep: 'sha·shin wo tot·te mo ii de·su ka', en: 'May I take photos?' },
           { jp: 'ここに座ってもいいですか？', hep: 'ko·ko ni su·wat·te mo ii de·su ka', en: 'May I sit here?' },
           { jp: '試着してもいいですか？', hep: 'shi·cha·ku shi·te mo ii de·su ka', en: 'May I try it on?' },
+        ]} />
+      <AccordionRow id="〜ないでください" jp="〜ないでください" rom="nai·de ku·da·sai" meaning="🕐 Please don't — polite negative request"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'わさびを入れないでください', hep: 'wa·sa·bi wo i·re·nai·de ku·da·sai', en: 'Please don\'t add wasabi' },
+          { jp: '写真を撮らないでください', hep: 'sha·shin wo to·ra·nai·de ku·da·sai', en: 'Please don\'t take photos' },
+          { jp: '氷を入れないでください', hep: 'kou·ri wo i·re·nai·de ku·da·sai', en: 'No ice please' },
+        ]} />
+        </>
+      )}
+
+      {(group === 'all' || group === 'responses') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Soft Responses</p>}
+      <AccordionRow id="〜ですね" jp="〜ですね" rom="de·su ne" meaning="🕐 Agreement / shared feeling — right?, isn't it?"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'そうですね', hep: 'sou de·su ne', en: 'That\'s right / I agree' },
+          { jp: 'おいしいですね', hep: 'o·i·shii de·su ne', en: 'It\'s delicious, isn\'t it?' },
+          { jp: 'きれいですね', hep: 'ki·rei de·su ne', en: 'It\'s beautiful, isn\'t it?' },
+          { jp: 'いいですね', hep: 'ii de·su ne', en: 'That\'s nice / Sounds good' },
+        ]} />
+      <AccordionRow id="ちょっと…" jp="ちょっと…" rom="chot·to…" meaning="🕐 Soft decline — politely saying no without saying no"
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'ちょっと難しいです', hep: 'chot·to mu·zu·ka·shii de·su', en: 'That\'s a bit difficult (= no)' },
+          { jp: 'ちょっと…すみません', hep: 'chot·to… su·mi·ma·sen', en: 'Umm… sorry (soft refusal)' },
+          { jp: '今日はちょっと…', hep: 'kyou wa chot·to…', en: 'Today is a bit… (= can\'t today)' },
+          { jp: 'ちょっと高いです', hep: 'chot·to ta·kai de·su', en: 'It\'s a bit expensive' },
         ]} />
         </>
       )}
