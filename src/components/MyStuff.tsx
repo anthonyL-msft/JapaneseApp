@@ -3,7 +3,7 @@ import { Star, PenLine, Volume2, Trash2, Pencil, CircleCheck, Copy } from 'lucid
 import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem, SavedAIPhrase } from '../data/types';
 import { PhraseCard } from './PhraseCard';
 import { RefItem } from './Reference';
-import { speak } from '../utils/tts';
+import { speak, getTtsLang } from '../utils/tts';
 import { breakdownKana, markChunkBoundaries, markLengtheners, romajiToHiragana } from '../utils/kana';
 
 interface Props {
@@ -236,7 +236,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                             {tc && <p className="text-base text-slate-500 mt-0.5">{tc}</p>}
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
-                            <button onClick={() => speak(target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
+                            <button onClick={() => speak(target, getTtsLang(phrase.lang || 'ja'))} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
                             <button onClick={() => onDeleteNote(note.id)} className="p-1 rounded-lg active:bg-slate-600"><Trash2 size={18} /></button>
                           </div>
                         </div>
@@ -316,7 +316,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                                   <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
                                   <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
                                 </div>
-                                <button onClick={() => speak(phrase.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 shrink-0"><Volume2 size={18} /></button>
+                                <button onClick={() => speak(phrase.target, getTtsLang(phrase.lang || 'ja'))} className="p-1 rounded-lg active:bg-slate-600 shrink-0"><Volume2 size={18} /></button>
                               </div>
                             </div>
                           )}
@@ -354,7 +354,7 @@ function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: ()
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button onClick={(e) => { e.stopPropagation(); speak(phrase.target, 'ja-JP'); }} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
+            <button onClick={(e) => { e.stopPropagation(); speak(phrase.target, getTtsLang(phrase.lang || 'ja')); }} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
             <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-1 rounded-lg active:bg-slate-600"><Trash2 size={18} /></button>
           </div>
         </div>

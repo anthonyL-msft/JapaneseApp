@@ -303,7 +303,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks, lang = 'ja' }: P
                   <>
                     <p className="text-3xl font-bold text-slate-50 mb-3">{currentVocab.jp}</p>
                     <button
-                      onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, 'ja-JP'); }}
+                      onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, getTtsLang(lang)); }}
                       className="text-2xl mb-4 active:scale-110 transition-transform"
                     ><Volume2 size={20} /></button>
                     <p className="text-base text-slate-500">What does this word mean? Tap to reveal</p>
@@ -318,7 +318,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks, lang = 'ja' }: P
                       Kana: {currentVocab.kanaKey}
                     </p>
                     <button
-                      onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, 'ja-JP'); }}
+                      onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, getTtsLang(lang)); }}
                       className="text-xl mt-3 active:scale-110 transition-transform"
                     ><Volume2 size={20} /></button>
                   </>
@@ -340,7 +340,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks, lang = 'ja' }: P
                   <>
                     <p className="text-7xl font-bold text-slate-50 mb-4">{currentKana.char}</p>
                     <button
-                      onClick={(e) => { e.stopPropagation(); speak(currentKana.char, 'ja-JP'); }}
+                      onClick={(e) => { e.stopPropagation(); speak(currentKana.char, getTtsLang(lang)); }}
                       className="text-2xl mb-4 active:scale-110 transition-transform"
                     ><Volume2 size={20} /></button>
                     <p className="text-base text-slate-500">What sound is this? Tap to reveal</p>
@@ -362,7 +362,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks, lang = 'ja' }: P
                           {currentKana.vocab.slice(0, 3).map((v, i) => (
                             <button
                               key={i}
-                              onClick={(e) => { e.stopPropagation(); speak(v.jp, 'ja-JP'); }}
+                              onClick={(e) => { e.stopPropagation(); speak(v.jp, getTtsLang(lang)); }}
                               className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-700/40 active:bg-slate-600/50 transition text-left"
                             >
                               <span className="text-base text-slate-100">{v.jp}</span>
@@ -373,7 +373,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks, lang = 'ja' }: P
                       </>
                     )}
                     <button
-                      onClick={(e) => { e.stopPropagation(); speak(currentKana.char, 'ja-JP'); }}
+                      onClick={(e) => { e.stopPropagation(); speak(currentKana.char, getTtsLang(lang)); }}
                       className="text-xl mt-3 active:scale-110 transition-transform"
                     ><Volume2 size={20} /></button>
                   </>
