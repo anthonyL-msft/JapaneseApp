@@ -11,7 +11,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Hepburn romanization with syllable chunks for easy pronunciation
 - **Sounds breakdown:** expanded cards show kana-to-romaji mapping with proximity-based grouping — vowel lengtheners (よう), nasal ん, and devoiced す render smaller and tighter to show how characters combine into spoken sounds
 - TTS (Text-to-Speech) with adjustable speed
-- Bookmark ☆ and Mark as Learned ✓
+- Bookmark and Mark as Learned
 - Default Open All with Close All toggle
 
 ### 📚 Quick Reference
@@ -20,7 +20,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - 50 Sounds with voiced/voiceless toggle overlay (dakuten ゛ / handakuten ゜) (JP)
 - Tap any kana → bottom drawer with travel vocab examples
 - Accordion examples with Open All/Close All in header
-- Interactive number converter with currency rates (HKD/CAD)
+- Interactive number converter with currency rates (HKD/CAD) — input-at-bottom layout
 - Tools: Sentence Patterns, Counters, Common Signs, What You'll Hear (29 staff phrases)
 
 ### 🎭 Conversations
@@ -105,30 +105,31 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - AI explanation language: English or 繁體中文; follow-up style: Teacher or Phrase First (in Settings)
 
 ### 📌 My Stuff
-- ✅ Learned items (phrases + reference examples)
-- ⭐ Bookmarked phrases
-- 📚 Reference example bookmarks
-- 🤖 AI translation history with TTS
-- 📝 Personal notes
+- Learned items (phrases + reference examples)
+- Bookmarked phrases
+- Reference example bookmarks
+- AI translation history with TTS
+- Personal notes
 
 ### ☰ Menu (Left Drawer)
-- 📊 My Progress — learned count, category bars, streak, recent activity
-- 🃏 Flashcards — kana recognition, vocab, learned phrases (SRS)
-- 🎮 Quiz — timed multiple choice game
-- 🃏 Match Game — pair Japanese ↔ English speed challenge
-- 🎯 Daily Challenge — learn 3 + review 5 with streak
-- ✏️ Writing Practice — stroke order, dictation, sprint
-- 🔧 Sentence Builder
-- 🌱 Sentence Grow
-- ✅ Sentence Check — AI grammar checker
-- 🔄 Number Converter
-- 📝 Quick Note
-- ⚙️ Settings — light/dark mode, language, speech speed, AI explanation language, AI follow-up style
+- My Progress — learned count, category bars, streak, recent activity
+- Flashcards — kana recognition, vocab, learned phrases (SRS)
+- Quiz — timed multiple choice game
+- Match Game — pair Japanese ↔ English speed challenge
+- Daily Challenge — learn 3 + review 5 with streak
+- Writing Practice — stroke order, dictation, sprint
+- Sentence Builder
+- Sentence Grow
+- Sentence Check — AI grammar checker
+- Number Converter
+- Quick Note
+- Settings — light/dark mode, language, speech speed, AI explanation language, AI follow-up style
 
 ## Tech Stack
 
 - **Frontend:** React 19 + TypeScript + Vite 8
 - **Styling:** Tailwind CSS 4 with light/dark mode
+- **Icons:** Lucide React (action buttons, nav) + emoji (decorative, categories, celebrations)
 - **PWA:** vite-plugin-pwa + Workbox (offline-first)
 - **Storage:** IndexedDB via `idb` (bookmarks, notes, SRS, learned items, ref bookmarks)
 - **TTS:** Web Speech API

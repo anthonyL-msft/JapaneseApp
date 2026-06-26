@@ -671,36 +671,65 @@ export function NumberConverter() {
   const result = !isNaN(num) && num >= 0 ? numberToJapanese(num) : null;
 
   return (
-    <div className="mt-2 space-y-3">
-      <input
-        type="number"
-        inputMode="numeric"
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        placeholder="Type a number (e.g., 3500)"
-        className="w-full bg-slate-700/50 text-base text-slate-200 placeholder-slate-500 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-sakura-400/50"
-      />
-      {result && (
-        <div className="bg-slate-700/40 rounded-xl p-3 space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1">
-              <p className="text-lg font-medium text-slate-50">{result.kanji}</p>
-              <p className="text-base text-sakura-300">{result.romaji}</p>
-              <p className="text-base text-slate-400">{result.reading}</p>
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-slate-800 shrink-0">
+        <h2 className="text-lg font-bold">Number Converter</h2>
+        <p className="text-base text-slate-400">Type a number → kanji + reading</p>
+      </div>
+
+      {/* Result area (scrollable) */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {result && (
+          <div className="space-y-3">
+            {/* Kanji result */}
+            <div className="bg-slate-800/40 rounded-xl p-3.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1">
+                  <p className="text-2xl font-bold text-slate-50 mb-1">{result.kanji}</p>
+                  <p className="text-base text-sakura-300">{result.romaji}</p>
+                  <p className="text-base text-slate-400">{result.reading}</p>
+                </div>
+                <button onClick={() => speak(result.reading, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 shrink-0"><Volume2 size={20} /></button>
+              </div>
             </div>
-            <button onClick={() => speak(result.reading, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0"><Volume2 size={20} /></button>
+
+            {/* Currency conversion */}
+            {!isNaN(num) && num > 0 && (
+              <div className="bg-slate-800/40 rounded-xl p-3.5">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Approximate value</p>
+                <p className="text-base text-slate-300">¥{num.toLocaleString()} ≈ HK${(num * HKD_RATE).toFixed(1)}</p>
+                <p className="text-base text-slate-300 mt-0.5">¥{num.toLocaleString()} ≈ CA${(num * CAD_RATE).toFixed(2)}</p>
+              </div>
+            )}
           </div>
-          {!isNaN(num) && num > 0 && (
-            <div className="mt-1 pt-2 border-t border-slate-700/40 space-y-1">
-              <p className="text-base text-slate-400">¥{num.toLocaleString()} ≈ HK${(num * HKD_RATE).toFixed(1)}</p>
-              <p className="text-base text-slate-400">¥{num.toLocaleString()} ≈ CA${(num * CAD_RATE).toFixed(2)}</p>
-            </div>
-          )}
-        </div>
-      )}
-      {input && !result && (
-        <p className="text-base text-red-400">Enter a number between 0 and 9,999,999</p>
-      )}
+        )}
+
+        {input && !result && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+            <p className="text-sm text-red-400">Enter a number between 0 and 9,999,999</p>
+          </div>
+        )}
+
+        {!input && (
+          <div className="text-center py-8">
+            <p className="text-4xl mb-3">🔢</p>
+            <p className="text-base text-slate-500">Type a number below to see it in Japanese</p>
+          </div>
+        )}
+      </div>
+
+      {/* Input at bottom */}
+      <div className="shrink-0 border-t border-slate-800 px-4 py-3">
+        <input
+          type="number"
+          inputMode="numeric"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="Type a number (e.g., 3500)"
+          className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 py-3 text-base text-slate-100 placeholder-slate-500 outline-none focus:ring-2 focus:ring-sakura-400/50 transition"
+        />
+      </div>
     </div>
   );
 }

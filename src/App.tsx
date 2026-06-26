@@ -231,15 +231,7 @@ function App() {
         {tab === 'writing' && lang === 'ja' && <WritingPractice />}
         {tab === 'check' && <SentenceCheck lang={lang} explainLang={aiExplainLang} />}
         {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} aiTutorMode={aiTutorMode} onAiTutorModeChange={handleAiTutorModeChange} />}
-        {tab === 'converter' && lang === 'ja' && (
-          <div className="scroll-area h-full">
-            <div className="px-4 py-3 border-b border-slate-800">
-              <h2 className="text-lg font-bold">🔄 Number Converter</h2>
-              <p className="text-base text-slate-400">Type a number → kanji + reading</p>
-            </div>
-            <div className="px-3"><NumberConverter /></div>
-          </div>
-        )}
+        {tab === 'converter' && lang === 'ja' && <NumberConverter />}
       </div>
 
       {/* Bottom Navigation */}
