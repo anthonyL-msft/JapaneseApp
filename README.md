@@ -15,8 +15,9 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Default Open All with Close All toggle
 
 ### 📚 Quick Reference
-- **7-Step Learning Framework:** 50 Sounds → Sentence Structure → Particles → Polite Forms → Numbers → Yes/No Questions → Question Words
-- 50 Sounds with voiced/voiceless toggle overlay (dakuten ゛ / handakuten ゜)
+- **Japanese:** 7-Step Learning Framework — 50 Sounds → Sentence Structure → Particles → Polite Forms → Numbers → Yes/No Questions → Question Words
+- **French:** Essentials — Gender & Articles, Pronunciation Tips, Tu vs Vous, Key Verb Forms, Numbers, Common Signs
+- 50 Sounds with voiced/voiceless toggle overlay (dakuten ゛ / handakuten ゜) (JP)
 - Tap any kana → bottom drawer with travel vocab examples
 - Accordion examples with Open All/Close All in header
 - Interactive number converter with currency rates (HKD/CAD)
@@ -39,7 +40,8 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - 4-level rating: Again / Hard / Good / Easy
 
 ### 🎮 Quiz (Timed Multiple Choice)
-- 4 categories: Hiragana, Katakana, Vocab ひらがな, Vocab カタカナ
+- Categories adapt per language: Kana + JP grammar sections shown only for Japanese
+- Phrase-based categories (Power, Travel, Food) available for all languages
 - 10-second countdown timer per question
 - 4 answer choices (1 correct + 3 distractors)
 - 20 questions per round
@@ -47,8 +49,8 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - High score persisted per category
 
 ### 🃏 Match Game
-- Pair Japanese ↔ English by tapping (6 pairs × 3 rounds)
-- Decks: Vocab ひらがな, Vocab カタカナ, Mixed
+- Pair target language ↔ English by tapping (6 pairs × 3 rounds)
+- Decks adapt per language; kana decks shown only for Japanese
 - Timer counts up — speed is the challenge
 - Best time saved per deck
 - Correct matches disappear with TTS pronunciation
@@ -74,7 +76,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Choose from multiple expansion options at each step
 - Save completed sentences to My Stuff
 
-### ✏️ Writing Practice
+### ✏️ Writing Practice (Japanese only)
 - 3 modes: Learn (stroke order), Dictation, Sprint
 - Stroke-order animation for hiragana characters
 - Drawing canvas for tracing practice
@@ -135,11 +137,11 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 
 ## Languages Supported
 
-| Language | Phrases | Scenarios | Reference |
-|----------|---------|-----------|-----------|
-| 🇯🇵 Japanese | 543+ | 46 | Full (7-step + tools) |
-| 🇪🇸 Spanish | Basic | — | — |
-| 🇫🇷 French | AI only | — | — |
+| Language | Phrases | Scenarios | Reference | Sentence Grow |
+|----------|---------|-----------|-----------|---------------|
+| 🇯🇵 Japanese | 543+ | 46 | Full (7-step + tools) | 16 seeds + fallbacks |
+| 🇪🇸 Spanish | 65+ | — | — | — |
+| 🇫🇷 French | 100+ | 4 | Essentials (gender, pronunciation, verbs, signs) | 16 seeds + fallbacks |
 
 ## Development
 
@@ -178,13 +180,14 @@ src/
 │   ├── Progress.tsx     # Learning stats tracker
 │   └── QuickNote.tsx    # Note-taking page
 ├── data/
-│   ├── types.ts         # Shared types (Phrase, Category, etc.)
-│   ├── phrases.ts       # 543+ phrase entries
+│   ├── types.ts         # Shared types (Phrase, Category, LanguageConfig)
+│   ├── phrases.ts       # 543+ Japanese phrase entries
 │   ├── phrases-es.ts    # Spanish phrase entries
-│   ├── sentence-grow.ts # Seed sentences + fallback chains
-│   ├── hiragana-strokes.ts # Stroke order data
-│   ├── kana-data.ts     # Hiragana/katakana data
-│   └── scenarios.ts     # 46 conversation scenarios
+│   ├── phrases-fr.ts    # French phrase entries
+│   ├── sentence-grow.ts # Seed sentences + fallback chains (JP + FR)
+│   ├── hiragana-strokes.ts # Stroke order data (JP only)
+│   ├── kana-data.ts     # Hiragana/katakana data (JP only)
+│   └── scenarios.ts     # 50 conversation scenarios (JP + FR)
 ├── db/                  # IndexedDB (bookmarks, notes, SRS, learned, ref-bookmarks)
 ├── utils/               # TTS, SRS algorithm, slide panel hook
 └── App.tsx              # Root with 5-tab navigation
