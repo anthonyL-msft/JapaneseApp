@@ -16,9 +16,10 @@ interface Props {
   onOpenMatch: () => void;
   onOpenDaily: () => void;
   onOpenWriting: () => void;
+  onOpenCheck: () => void;
 }
 
-export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings, onOpenQuiz, onOpenMatch, onOpenDaily, onOpenWriting }: Props) {
+export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter, onOpenBuilder, onOpenGrow, onOpenNotes, onOpenProgress, onOpenSettings, onOpenQuiz, onOpenMatch, onOpenDaily, onOpenWriting, onOpenCheck }: Props) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnim, setDrawerAnim] = useState('animate-slide-in-left');
@@ -191,6 +192,16 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <div>
                     <p className="text-base text-slate-200">Number Converter</p>
                     <p className="text-sm text-slate-500">Number → kanji + reading</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenCheck(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">✍️</span>
+                  <div>
+                    <p className="text-base text-slate-200">Sentence Check</p>
+                    <p className="text-sm text-slate-500">Check if your writing is correct</p>
                   </div>
                 </button>
               </div>

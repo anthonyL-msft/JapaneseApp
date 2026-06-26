@@ -433,6 +433,93 @@ General rules:
   return { answer, example };
 }
 
+/** Check a user-written sentence for correctness */
+export async function askCheckSentence(
+  sentence: string,
+  lang: string,
+  explainLang: string = 'en',
+): Promise<FollowUpExplanation> {
+  if (!isAIConfigured()) {
+    throw new Error('AI not configured.');
+  }
+
+  const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
+  const replyLang = explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English';
+
+  const systemPrompt = `You are a ${langName} sentence checker. The user writes a sentence in ${langName} and you check if it is correct. IMPORTANT: All explanations MUST be in ${replyLang}.
+
+Return a valid JSON object:
+{
+  "answer": "structured feedback in ${replyLang}",
+  "example": { "target": "corrected sentence in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "translation in ${replyLang}" }
+}
+
+Rules for "answer":
+1. First line: verdict — "✅ Correct!" or "❌ Not quite right."
+2. If incorrect, explain WHAT is wrong in 1-2 sentences (in ${replyLang}).
+3. Show the correction: ❌ [user's sentence] → ✅ [corrected sentence]
+4. Briefly explain WHY — what grammar rule applies (in ${replyLang}).
+5. If mostly correct but unnatural, say "✅ Grammatically OK but more natural: [better version]"
+
+Rules for "example":
+- ALWAYS include — this is the corrected (or confirmed correct) sentence.
+- If the sentence was already correct, include it as-is with its reading.
+
+Keep feedback concise — max 5-6 lines. Be encouraging.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: sentence },
+  ];
+
+  const url = `${ENDPOINT}/openai/deployments/${DEPLOYMENT}/chat/completions?api-version=${API_VERSION}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
+    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 400 }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`AI request failed: ${response.status} ${err}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content?.trim();
+  if (!content) throw new Error('Empty response from AI');
+
+  const jsonStr = content.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  let parsed: Record<string, unknown> | null = null;
+  try { parsed = JSON.parse(jsonStr); } catch {
+    const objMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (objMatch) { try { parsed = JSON.parse(objMatch[0]); } catch { parsed = null; } }
+  }
+
+  if (!parsed || typeof parsed !== 'object') return { answer: content };
+
+  const answer = safeStr(parsed.answer).trim();
+  if (!answer) return { answer: content };
+
+  let example: AIPhrase | undefined;
+  if (parsed.example && typeof parsed.example === 'object') {
+    const ex = parsed.example as Record<string, unknown>;
+    if (ex.target) {
+      example = {
+        target: safeStr(ex.target),
+        romanization: ex.romanization ? safeStr(ex.romanization) : undefined,
+        pronunciation: safeStr(ex.pronunciation),
+        pronunciation_chunks: safeStr(ex.pronunciation_chunks),
+        english: safeStr(ex.english),
+        chinese_tc: safeStr(ex.chinese_tc),
+        notes: safeStr(ex.notes),
+      };
+    }
+  }
+
+  return { answer, example };
+}
+
 /** Send a follow-up that expects multiple phrase examples back */
 export async function askFollowUpMulti(
   originalPhrase: AIPhrase,

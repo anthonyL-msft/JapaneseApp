@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, askGrammarQuestion, isAIConfigured } from '../utils/ai';
+import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, askGrammarQuestion, askCheckSentence, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
 import { speak } from '../utils/tts';
@@ -46,6 +46,8 @@ interface Props {
   onClearAskMore?: () => void;
   aiExplainLang?: string;
   aiTutorMode?: string;
+  checkMode?: boolean;
+  onClearCheckMode?: () => void;
 }
 
 function AISounds({ phrase }: { phrase: AIPhrase }) {
@@ -322,6 +324,7 @@ type FollowUpResult = { query: string; phrase?: AIPhrase; phrases?: AIPhrase[]; 
 
 const TAG_DEFINITIONS = [
   { tag: '@grammar', desc: 'Grammar/usage explanation', mode: 'explain' as const },
+  { tag: '@check', desc: 'Check if my sentence is correct', mode: 'explain' as const },
   { tag: '@translate', desc: 'Translate to Japanese', mode: 'single' as const },
   { tag: '@clarify', desc: 'Compare or clarify differences', mode: 'explain' as const },
   { tag: '@formal', desc: 'More polite/formal version', mode: 'single' as const },
@@ -419,7 +422,7 @@ function clearThread(threadKey: string, legacyTarget?: string) {
   } catch { /* ignore */ }
 }
 
-export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher' }: Props) {
+export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, askMorePhrase, onClearAskMore, aiExplainLang = 'en', aiTutorMode = 'teacher', checkMode, onClearCheckMode }: Props) {
   const [query, setQuery] = useState('');
   const [aiMode, setAiMode] = useState<'translate' | 'grammar'>('translate');
   const [result, setResult] = useState<AIPhrase | null>(null);
@@ -444,6 +447,14 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   const configured = isAIConfigured();
 
   // Auto-open follow-up drawer when askMorePhrase is passed from PhraseCard
+  useEffect(() => {
+    if (checkMode) {
+      setAiMode('grammar');
+      setQuery('@check ');
+      onClearCheckMode?.();
+    }
+  }, [checkMode, onClearCheckMode]);
+
   useEffect(() => {
     if (askMorePhrase) {
       const phrase: AIPhrase = {
@@ -476,16 +487,23 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     const q = query.trim();
     setQuery('');
     try {
+      // Detect @check tag
+      const { tag, cleanQuery } = parseTag(q);
+      const isCheck = tag === '@check';
+
       // Use toggle mode: grammar mode always explains, translate mode always translates
-      if (aiMode === 'grammar') {
-        const resp = await askGrammarQuestion(q, lang, aiExplainLang);
-        const item = { question: q, answer: resp.answer, example: resp.example };
+      if (aiMode === 'grammar' || isCheck) {
+        const resp = isCheck
+          ? await askCheckSentence(cleanQuery || q, lang, aiExplainLang)
+          : await askGrammarQuestion(q, lang, aiExplainLang);
+        const label = isCheck ? `✍️ ${cleanQuery || q}` : q;
+        const item = { question: label, answer: resp.answer, example: resp.example };
         setGrammarResult(item);
         setGrammarThread([]);
         setGrammarFollowUpQuery('');
         setGrammarDrawerOpen(true);
         setGrammarHistory(prev => {
-          const next = [item, ...prev.filter(h => h.question !== q).slice(0, MAX_HISTORY - 1)];
+          const next = [item, ...prev.filter(h => h.question !== label).slice(0, MAX_HISTORY - 1)];
           saveGrammarHistory(next);
           return next;
         });

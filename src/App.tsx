@@ -38,6 +38,7 @@ function App() {
   const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
   const [savedAIPhrases, setSavedAIPhrases] = useState<SavedAIPhrase[]>([]);
   const [askMorePhrase, setAskMorePhrase] = useState<{ target: string; pronunciation: string; pronunciation_chunks: string; english: string } | null>(null);
+  const [checkMode, setCheckMode] = useState(false);
   const [aiExplainLang, setAiExplainLang] = useState(() => localStorage.getItem('aiExplainLang') || 'en');
   const [aiTutorMode, setAiTutorMode] = useState(() => localStorage.getItem('aiTutorMode') || 'teacher');
 
@@ -163,6 +164,7 @@ function App() {
         onOpenNotes={() => setTab('notes')}
         onOpenProgress={() => setTab('progress')}
         onOpenSettings={() => setTab('settings')}
+        onOpenCheck={() => { setCheckMode(true); setTab('ai'); }}
       />
 
       {/* Main Content */}
@@ -207,7 +209,7 @@ function App() {
         </div>
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         <div style={{ display: tab === 'ai' ? 'contents' : 'none' }}>
-          <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} />
+          <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} checkMode={checkMode} onClearCheckMode={() => setCheckMode(false)} />
         </div>
         {tab === 'builder' && <SentenceBuilder onAskMore={(phrase) => {
               setAskMorePhrase({ target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ''), pronunciation_chunks: phrase.rom, english: phrase.en });
