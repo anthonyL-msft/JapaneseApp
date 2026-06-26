@@ -185,16 +185,6 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   </div>
                 </button>
                 <button
-                  onClick={() => { closeDrawer(); onOpenConverter(); }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
-                >
-                  <span className="text-lg">🔄</span>
-                  <div>
-                    <p className="text-base text-slate-200">Number Converter</p>
-                    <p className="text-sm text-slate-500">Number → kanji + reading</p>
-                  </div>
-                </button>
-                <button
                   onClick={() => { closeDrawer(); onOpenCheck(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
@@ -202,6 +192,16 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   <div>
                     <p className="text-base text-slate-200">Sentence Check</p>
                     <p className="text-sm text-slate-500">Check if your writing is correct</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { closeDrawer(); onOpenConverter(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
+                >
+                  <span className="text-lg">🔄</span>
+                  <div>
+                    <p className="text-base text-slate-200">Number Converter</p>
+                    <p className="text-sm text-slate-500">Number → kanji + reading</p>
                   </div>
                 </button>
               </div>

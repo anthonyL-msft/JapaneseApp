@@ -19,6 +19,7 @@ import { Quiz } from './components/Quiz';
 import { MatchGame } from './components/MatchGame';
 import { DailyChallenge } from './components/DailyChallenge';
 import { WritingPractice } from './components/WritingPractice';
+import { SentenceCheck } from './components/SentenceCheck';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'phrases', label: 'Learn', icon: '📖' },
@@ -164,7 +165,7 @@ function App() {
         onOpenNotes={() => setTab('notes')}
         onOpenProgress={() => setTab('progress')}
         onOpenSettings={() => setTab('settings')}
-        onOpenCheck={() => { setCheckMode(true); setTab('ai'); }}
+        onOpenCheck={() => setTab('check')}
       />
 
       {/* Main Content */}
@@ -227,6 +228,7 @@ function App() {
         {tab === 'match' && <MatchGame />}
         {tab === 'daily' && <DailyChallenge phrases={langPhrases} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
         {tab === 'writing' && <WritingPractice />}
+        {tab === 'check' && <SentenceCheck lang={lang} explainLang={aiExplainLang} />}
         {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} aiTutorMode={aiTutorMode} onAiTutorModeChange={handleAiTutorModeChange} />}
         {tab === 'converter' && (
           <div className="scroll-area h-full">

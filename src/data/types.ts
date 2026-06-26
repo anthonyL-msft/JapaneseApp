@@ -118,4 +118,4 @@ export interface SavedAIPhrase {
   createdAt: number;
 }
 
-export type Tab = 'phrases' | 'scenes' | 'cards' | 'bookmarks' | 'notes' | 'reference' | 'ai' | 'builder' | 'progress' | 'settings' | 'converter' | 'grow' | 'quiz' | 'match' | 'daily' | 'writing';
+export type Tab = 'phrases' | 'scenes' | 'cards' | 'bookmarks' | 'notes' | 'reference' | 'ai' | 'builder' | 'progress' | 'settings' | 'converter' | 'grow' | 'quiz' | 'match' | 'daily' | 'writing' | 'check';

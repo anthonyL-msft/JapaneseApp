@@ -125,8 +125,9 @@ function getHighScore(cat: QuizCategory): number {
 }
 
 function setHighScore(cat: QuizCategory, score: number) {
+  const capped = Math.min(score, GAME_ROUNDS);
   const prev = getHighScore(cat);
-  if (score > prev) localStorage.setItem(`quiz_high_${cat}`, String(score));
+  if (capped > prev) localStorage.setItem(`quiz_high_${cat}`, String(capped));
 }
 
 export function Quiz() {
@@ -221,9 +222,9 @@ export function Quiz() {
       else if (isVocab && currentVocab) speak(currentVocab.jp, 'ja-JP');
     }, 300);
     const advanceTimeout = setTimeout(() => {
-      if (gameScore.total >= GAME_ROUNDS) {
+      if (currentIndex + 1 >= GAME_ROUNDS) {
         setGameFinished(true);
-        if (panel.value) setHighScore(panel.value, gameScore.correct);
+        if (panel.value) setHighScore(panel.value, gameScore.correct + (answered === correctAnswer ? 1 : 0));
       } else {
         const nextIdx = currentIndex + 1;
         setCurrentIndex(nextIdx);
@@ -550,15 +551,17 @@ export function Quiz() {
                     <input
                       ref={inputRef}
                       type="text"
+                      inputMode="latin"
+                      autoFocus
                       value={typedAnswer}
-                      onChange={e => setTypedAnswer(e.target.value.toLowerCase())}
+                      onChange={e => { if (!answered) setTypedAnswer(e.target.value.toLowerCase()); }}
                       onKeyDown={e => {
                         if (e.key === 'Enter' && typedAnswer && !answered) {
                           const isCorrect = typedAnswer.trim() === correctAnswer;
                           handleAnswer(isCorrect ? correctAnswer : typedAnswer.trim());
                         }
                       }}
-                      disabled={!!answered}
+                      readOnly={!!answered}
                       placeholder="Type romaji..."
                       autoComplete="off"
                       className={`flex-1 px-4 py-3 rounded-xl text-lg text-center outline-none transition ${

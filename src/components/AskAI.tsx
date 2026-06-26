@@ -366,6 +366,17 @@ function isExplanationQuestion(q: string): boolean {
     || /為什麼|文法|語法|詞性|差別|差異|是什麼|什麼意思|為何|可以用在|能用在|適合用在|一樣嗎|不同/.test(q);
 }
 
+/** Detect if user is asking to check correctness of a sentence */
+function isSentenceCheckQuestion(q: string): boolean {
+  const text = q.toLowerCase().replace(/\s+/g, ' ').trim();
+  return /正確嗎|正确吗|對嗎|对吗|合[っ]?て[る|い]|正しい|間違[っい]/.test(q)
+    || /\b(is\s+(this|it)\s+(correct|right|natural|ok|okay|wrong))\b/.test(text)
+    || /\b(can\s+i\s+say)\b/.test(text)
+    || /\b(is\s+this\s+sentence)\b/.test(text)
+    || /\b(check\s+(this|my))\b/.test(text)
+    || /這樣對嗎|這樣說對嗎|這句對嗎|這樣可以嗎/.test(q);
+}
+
 function getThreadKey(phrase: AIPhrase): string {
   const target = phrase.target.trim().toLowerCase();
   const pron = phrase.pronunciation.trim().toLowerCase();
@@ -489,7 +500,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
     try {
       // Detect @check tag
       const { tag, cleanQuery } = parseTag(q);
-      const isCheck = tag === '@check';
+      const isCheck = tag === '@check' || (aiMode === 'grammar' && isSentenceCheckQuestion(q));
 
       // Use toggle mode: grammar mode always explains, translate mode always translates
       if (aiMode === 'grammar' || isCheck) {
