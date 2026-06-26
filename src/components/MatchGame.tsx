@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Target, Trophy, RefreshCw, X, Type } from 'lucide-react';
+import { Target, Trophy, RefreshCw, X } from 'lucide-react';
 import { speak, getTtsLang } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 import { HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
@@ -19,15 +19,7 @@ const buildCategoryCards = (lang: string, categories: string[]): KanaVocabCard[]
   .filter(p => p.lang === lang && categories.includes(p.category))
   .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
-const VOCAB_WORDS_CARDS = buildPhraseCards('ja', ['Basic nouns', 'Pointing words', 'Colors']);
-const VOCAB_ACTIONS_CARDS = buildPhraseCards('ja', ['Basic verbs', 'Daily actions']);
-const VOCAB_TIME_CARDS = buildPhraseCards('ja', ['Numbers', 'Time', 'Meals', 'Days of the week']);
-const VOCAB_WORLD_CARDS = buildPhraseCards('ja', ['Basic places', 'Directions']);
-const VOCAB_PEOPLE_CARDS = buildPhraseCards('ja', ['People & Family', 'Body & Health', 'Basic adjectives']);
-const PHRASES_POWER_CARDS = buildCategoryCards('ja', ['power']);
-const PHRASES_TRAVEL_CARDS = buildCategoryCards('ja', ['airport', 'directions', 'hotel']);
-const PHRASES_FOOD_CARDS = buildCategoryCards('ja', ['restaurant', 'food', 'drinks']);
-const PHRASE_VOCAB_CARDS = buildCategoryCards('ja', ['vocab']);
+
 
 // Sentence patterns for match
 const PATTERNS_CARDS: KanaVocabCard[] = [

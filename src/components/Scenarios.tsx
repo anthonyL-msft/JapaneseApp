@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Volume2, Search, RefreshCw, X, Square, Play } from 'lucide-react';
+import { Volume2, RefreshCw, X, Square, Play } from 'lucide-react';
 import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
 import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';

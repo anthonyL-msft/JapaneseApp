@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Volume2, Star, Pencil, Trash2, Copy } from 'lucide-react';
+import { Volume2, Star, Pencil, Trash2 } from 'lucide-react';
 import type { Phrase, UserNote } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 import { breakdownKana, markChunkBoundaries, markLengtheners } from '../utils/kana';

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Volume2, Star, Languages, Triangle, Copy, X } from 'lucide-react';
+import { Volume2, Star, Languages, Triangle, X } from 'lucide-react';
 import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, askGrammarQuestion, askCheckSentence, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';

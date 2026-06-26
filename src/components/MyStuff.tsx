@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Star, PenLine, Volume2, Trash2, Pencil, CircleCheck, Copy } from 'lucide-react';
+import { Star, PenLine, Volume2, Trash2, Pencil, CircleCheck } from 'lucide-react';
 import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem, SavedAIPhrase } from '../data/types';
 import { PhraseCard } from './PhraseCard';
 import { RefItem } from './Reference';
@@ -236,7 +236,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                             {tc && <p className="text-base text-slate-500 mt-0.5">{tc}</p>}
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
-                            <button onClick={() => speak(target, getTtsLang(phrase.lang || 'ja'))} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
+                            <button onClick={() => speak(target, getTtsLang('ja'))} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
                             <button onClick={() => onDeleteNote(note.id)} className="p-1 rounded-lg active:bg-slate-600"><Trash2 size={18} /></button>
                           </div>
                         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, Pencil, Paintbrush, RefreshCw, X } from 'lucide-react';
+import { Volume2, Pencil, Paintbrush, RefreshCw } from 'lucide-react';
 import { speak } from '../utils/tts';
 import { HIRAGANA_STROKES } from '../data/hiragana-strokes';
 
