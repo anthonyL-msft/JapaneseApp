@@ -6,8 +6,8 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 ## Features
 
 ### 📖 Phrase Book
-- 418+ travel phrases organized by 12 categories
-- Categories: Greetings, Basics & Vocab, Airport & Transit, Hotel, Restaurant, Food & Drinks, Shopping, Directions, Emergency, Small Talk, Culture, Local Specials
+- 543+ travel phrases organized by 15 categories
+- Categories: Greetings, Basics, Airport & Transit, Hotel, Restaurant, Food, Drinks, Shopping, Directions, Emergency, Small Talk, Culture, Local Specials, Vocab, Power Phrases
 - Hepburn romanization with syllable chunks for easy pronunciation
 - **Sounds breakdown:** expanded cards show kana-to-romaji mapping with proximity-based grouping — vowel lengtheners (よう), nasal ん, and devoiced す render smaller and tighter to show how characters combine into spoken sounds
 - TTS (Text-to-Speech) with adjustable speed
@@ -67,6 +67,26 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Sticky result card with TTS + Copy
 - Smart vocab: noun patterns also show food/drink chips
 
+### 🌱 Sentence Grow
+- Pick a seed sentence → AI expands it step by step
+- 16 seed sentences across multiple groups with fallback expansion chains
+- Visual timeline shows each expansion stage
+- Choose from multiple expansion options at each step
+- Save completed sentences to My Stuff
+
+### ✏️ Writing Practice
+- 3 modes: Learn (stroke order), Dictation, Sprint
+- Stroke-order animation for hiragana characters
+- Drawing canvas for tracing practice
+- Dictation mode: hear a word → write the kana (10 rounds, 10s per word)
+- Sprint mode: write as many kana as possible in 60 seconds
+
+### ✅ Sentence Check
+- Type a sentence in the target language → AI checks grammar and naturalness
+- Returns corrected version with explanation
+- History of recent checks persisted (last 10)
+- TTS playback on corrected sentences
+
 ### 🤖 AI Language Tutor
 - Translate anything to the target language powered by Azure OpenAI
 - Returns target language + romanization + Sounds breakdown + English + Chinese
@@ -95,9 +115,11 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - 🎮 Quiz — timed multiple choice game
 - 🃏 Match Game — pair Japanese ↔ English speed challenge
 - 🎯 Daily Challenge — learn 3 + review 5 with streak
-- 🔄 Number Converter
+- ✏️ Writing Practice — stroke order, dictation, sprint
 - 🔧 Sentence Builder
 - 🌱 Sentence Grow
+- ✅ Sentence Check — AI grammar checker
+- 🔄 Number Converter
 - 📝 Quick Note
 - ⚙️ Settings — light/dark mode, language, speech speed, AI explanation language, AI follow-up style
 
@@ -115,9 +137,9 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 
 | Language | Phrases | Scenarios | Reference |
 |----------|---------|-----------|-----------|
-| 🇯🇵 Japanese | 418+ | 45 | Full (7-step + tools) |
+| 🇯🇵 Japanese | 543+ | 46 | Full (7-step + tools) |
 | 🇪🇸 Spanish | Basic | — | — |
-| 🇫🇷 French | Basic | — | — |
+| 🇫🇷 French | AI only | — | — |
 
 ## Development
 
@@ -146,6 +168,9 @@ src/
 │   ├── Scenarios.tsx    # 10-group conversation practice
 │   ├── Flashcards.tsx   # SRS flashcard game with category picker
 │   ├── SentenceBuilder.tsx # Pattern + vocab → sentence
+│   ├── SentenceGrow.tsx # Progressive sentence expansion
+│   ├── SentenceCheck.tsx # AI grammar checker
+│   ├── WritingPractice.tsx # Stroke order, dictation, sprint
 │   ├── AskAI.tsx        # Azure OpenAI translation
 │   ├── MyStuff.tsx      # Saved items collection
 │   ├── SearchBar.tsx    # Search + hamburger drawer menu
@@ -154,8 +179,12 @@ src/
 │   └── QuickNote.tsx    # Note-taking page
 ├── data/
 │   ├── types.ts         # Shared types (Phrase, Category, etc.)
-│   ├── phrases.ts       # 418+ phrase entries
-│   └── scenarios.ts     # 45 conversation scenarios
+│   ├── phrases.ts       # 543+ phrase entries
+│   ├── phrases-es.ts    # Spanish phrase entries
+│   ├── sentence-grow.ts # Seed sentences + fallback chains
+│   ├── hiragana-strokes.ts # Stroke order data
+│   ├── kana-data.ts     # Hiragana/katakana data
+│   └── scenarios.ts     # 46 conversation scenarios
 ├── db/                  # IndexedDB (bookmarks, notes, SRS, learned, ref-bookmarks)
 ├── utils/               # TTS, SRS algorithm, slide panel hook
 └── App.tsx              # Root with 5-tab navigation

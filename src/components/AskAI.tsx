@@ -753,7 +753,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
       </div>
 
       {showBig && createPortal(
-        <div onClick={() => setShowBig(null)} className="fixed inset-0 z-[90] bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer">
+        <div onClick={() => setShowBig(null)} className="show-big-overlay fixed inset-0 z-[90] bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer">
           <p className="text-4xl font-bold text-white text-center leading-relaxed">{showBig}</p>
           <p className="text-lg text-sakura-300 mt-4 text-center">{result?.pronunciation_chunks || result?.pronunciation}</p>
           <button onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }} className="mt-6 text-4xl active:scale-110 transition-transform">🔊</button>

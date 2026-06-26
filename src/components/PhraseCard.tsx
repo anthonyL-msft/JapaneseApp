@@ -207,7 +207,7 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
       {showBig && (
         <div
           onClick={() => setShowBig(false)}
-          className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer"
+          className="show-big-overlay fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer"
         >
           <p className="text-4xl font-bold text-white text-center leading-relaxed">{phrase.target}</p>
           <p className="text-lg text-sakura-300 mt-4 text-center">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
