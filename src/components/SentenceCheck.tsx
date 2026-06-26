@@ -39,6 +39,7 @@ export function SentenceCheck({ lang, explainLang = 'en' }: Props) {
     setLoading(true);
     setError(null);
     setResult(null);
+    setInput('');
     try {
       const resp = await askCheckSentence(sentence, lang, explainLang);
       const item: CheckResult = { input: sentence, answer: resp.answer, example: resp.example };
