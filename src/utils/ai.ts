@@ -239,12 +239,14 @@ Teaching style requirements:
 - Do not answer with only an alternative phrase; always answer the actual question first.`
     : '';
 
-  const systemPrompt = `You are a travel language tutor. The user asks a grammar/meaning/word-choice question about an existing ${langName} phrase.
+  const replyLang2 = explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English';
+
+  const systemPrompt = `You are a travel language tutor. IMPORTANT: You MUST write all explanations and answers in ${replyLang2}. Never reply in ${langName} except for example phrases. The user asks a grammar/meaning/word-choice question about an existing ${langName} phrase.
 
 Return a valid JSON object:
 {
-  "answer": "structured answer",
-  "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "English translation" }
+  "answer": "structured answer in ${replyLang2}",
+  "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "${explainLang === 'zh-TW' ? 'Chinese translation' : 'English translation'}" }
 }
 
 Rules for "answer" — structure it like a mini-lesson:
@@ -252,13 +254,14 @@ Rules for "answer" — structure it like a mini-lesson:
 2. When explaining a word or usage, include common patterns or combinations if helpful.
 3. If asked for "more examples", give 3-5 example sentences, each on its own line: phrase (romaji) = meaning.
 4. Keep it concise — no more than 6-8 lines total.
+5. The "answer" text MUST be in ${replyLang2}. ${langName} words are OK inline as examples but all explanations in ${replyLang2}.
 
 Rules for "example":
 - OPTIONAL — only include when a single practical travel example directly illustrates the point.
 - Omit if the answer already contains examples or is self-explanatory.
+- "english" field should be in ${replyLang2}.
 
 General:
-- Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'} for the answer.
 - For ${langName === 'Japanese' ? '"romanization" must be the hiragana reading. "pronunciation" must be romaji with spaces between words.' : '"pronunciation" must be phonetic guide.'}
 ${teacherRules}`;
 
@@ -348,12 +351,16 @@ export async function askGrammarQuestion(
 
   const langName = lang === 'ja' ? 'Japanese' : lang === 'es' ? 'Spanish' : 'French';
 
-  const systemPrompt = `You are a travel language tutor for ${langName}. The user asks a grammar, structure, or usage question. They may ask in English, Chinese, or ${langName}. If the question includes "Context:", use that context to give a relevant follow-up answer about the same grammar topic.
+  const replyLang = explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English';
+
+  const systemPrompt = `You are a travel language tutor for ${langName}. IMPORTANT: You MUST write all explanations and answers in ${replyLang}. Never reply in ${langName} except for example phrases.
+
+The user asks a grammar, structure, or usage question. They may ask in English, Chinese, or ${langName}. If the question includes "Context:", use that context to give a relevant follow-up answer about the same grammar topic.
 
 Return a valid JSON object:
 {
-  "answer": "structured answer",
-  "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "English translation" }
+  "answer": "structured answer in ${replyLang}",
+  "example": { "target": "example phrase in ${langName}", "romanization": "hiragana reading", "pronunciation": "romaji with spaces", "english": "${explainLang === 'zh-TW' ? 'Chinese translation' : 'English translation'}" }
 }
 
 Rules for "answer" — structure it like a mini-lesson:
@@ -363,13 +370,14 @@ Rules for "answer" — structure it like a mini-lesson:
    - 2-3 common word combinations (e.g. 暑い夏 = hot summer, 暑い日 = hot day)
 3. If the user asks for "more examples", give 3-5 example sentences, each on its own line: phrase (romaji) = meaning.
 4. Keep it concise — no more than 6-8 lines total.
+5. The "answer" text MUST be in ${replyLang}. ${langName} words are OK inline as examples but all explanations in ${replyLang}.
 
 Rules for "example":
 - OPTIONAL — only include when a single practical travel example directly illustrates the point.
 - Do NOT include for meta questions ("how to memorize", "best way to learn") or when examples are already in the answer text.
+- "english" field should be in ${replyLang}.
 
 General rules:
-- Use ${explainLang === 'zh-TW' ? 'Traditional Chinese (繁體中文)' : 'English'} for the answer.
 - For Japanese: "romanization" = hiragana reading, "pronunciation" = romaji with spaces between words.`;
 
   const messages = [
