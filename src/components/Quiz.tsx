@@ -551,7 +551,7 @@ export function Quiz() {
                     <input
                       ref={inputRef}
                       type="text"
-                      inputMode="latin"
+                      inputMode="text"
                       autoFocus
                       value={typedAnswer}
                       onChange={e => { if (!answered) setTypedAnswer(e.target.value.toLowerCase()); }}
