@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { Volume2, Search, RefreshCw, X, Square, Play } from 'lucide-react';
 import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
 import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';
@@ -163,7 +164,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
   if (isSearching) {
     return (
       <div className="scroll-area h-full p-4">
-        <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
+        <h1 className="text-xl font-bold mb-1">Conversations</h1>
         <p className="text-slate-400 text-base mb-4">
           {langScenarios.length} conversations matching "{search}"
         </p>
@@ -194,7 +195,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
     <div className="h-full relative">
       {/* L1: Group grid */}
       <div className="scroll-area h-full p-4">
-        <h1 className="text-xl font-bold mb-1">🎭 Conversations</h1>
+        <h1 className="text-xl font-bold mb-1">Conversations</h1>
         <p className="text-slate-400 text-base mb-4">
           Practice real {langConfig.name} dialogues step-by-step
         </p>
@@ -272,9 +273,9 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
                         : 'bg-sakura-500/80 text-white active:bg-sakura-600'
                     }`}
                   >
-                    {isAutoPlaying ? '⏹ Stop' : '▶ Play'}
+                    {isAutoPlaying ? <><Square size={14} className="inline-block mr-1" /> Stop</> : <><Play size={14} className="inline-block mr-1" /> Play</>}
                   </button>
-                  <button onClick={handleBack} className="text-xl text-slate-400 p-1">✕</button>
+                  <button onClick={handleBack} className="text-xl text-slate-400 p-1"><X size={20} /></button>
                 </div>
               </div>
             </div>
@@ -484,8 +485,8 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
                 <p className="text-base text-sakura-300 mt-0.5">{displayLine.pronunciation_chunks || displayLine.pronunciation}</p>
               </div>
               {!displayLine.target.startsWith('（') && (
-                <button onClick={handleSpeak} className="text-lg shrink-0 p-1 active:scale-110 transition-transform">
-                  🔊
+                <button onClick={handleSpeak} className="shrink-0 p-1 active:scale-110 transition-transform">
+                  <Volume2 size={18} />
                 </button>
               )}
             </div>
@@ -501,7 +502,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
               <div className="mt-2 pt-2 border-t border-slate-700/40 space-y-2">
                 {line.variables!.map(v => (
                   <div key={v.placeholder}>
-                    <p className="text-base text-slate-500 mb-1">🔄 {v.label}:</p>
+                    <p className="text-base text-slate-500 mb-1 flex items-center gap-1"><RefreshCw size={12} /> {v.label}:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {v.options.map((opt, oi) => {
                         const isSelected = (varSelections[v.placeholder] ?? 0) === oi;
@@ -541,7 +542,7 @@ function ConversationBubble({ line, index, ttsLang }: { line: ConversationLine; 
             {/* Expanded detail */}
             {showDetail && line.note && (
               <div className="mt-2 bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-                <p className="text-base text-amber-400">💡 {line.note}</p>
+                <p className="text-base text-amber-400">{line.note}</p>
               </div>
             )}
           </div>

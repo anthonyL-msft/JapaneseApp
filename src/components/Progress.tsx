@@ -73,7 +73,7 @@ export function Progress({ phrases, learnedItems }: Props) {
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">📊 My Progress</h2>
+        <h2 className="text-lg font-bold">My Progress</h2>
         <p className="text-base text-slate-400">Track your learning journey</p>
       </div>
 

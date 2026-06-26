@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Volume2, Star, Pencil, Trash2, Copy } from 'lucide-react';
 import type { Phrase, UserNote } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 import { breakdownKana, markChunkBoundaries, markLengtheners } from '../utils/kana';
@@ -57,11 +58,11 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600 text-lg" title="Play pronunciation">
-              🔊
+            <button onClick={handleSpeak} className="p-1 rounded-lg active:bg-slate-600" title="Play pronunciation">
+              <Volume2 size={18} />
             </button>
-            <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-              {isBookmarked ? '⭐' : '☆'}
+            <button onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }} className="p-1 rounded-lg active:bg-slate-600">
+              <Star size={18} className={isBookmarked ? 'fill-amber-400 text-amber-400' : ''} />
             </button>
           </div>
         </div>
@@ -126,13 +127,13 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
 
           {phrase.native_hint && (
             <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2">
-              <p className="text-base text-amber-400">🌉 {phrase.native_hint}</p>
+              <p className="text-base text-amber-400">{phrase.native_hint}</p>
             </div>
           )}
 
           {phrase.notes && (
             <div className="bg-slate-700/30 rounded-lg p-2">
-              <p className="text-base text-slate-300">💡 {phrase.notes}</p>
+              <p className="text-base text-slate-300">{phrase.notes}</p>
             </div>
           )}
 
@@ -146,11 +147,11 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
                   <button
                     onClick={() => { setNoteText(n.text); setEditingNoteId(n.id); }}
                     className="text-base text-slate-500 hover:text-slate-300"
-                  >✏️</button>
+                  ><Pencil size={14} /></button>
                   <button
                     onClick={() => onDeleteNote(n.id)}
                     className="text-base text-slate-500 hover:text-red-400"
-                  >🗑️</button>
+                  ><Trash2 size={14} /></button>
                 </div>
               ))}
             </div>
@@ -180,16 +181,16 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
             <button
               onClick={(e) => { e.stopPropagation(); setShowBig(true); }}
               className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition"
-            >📺 Show Big</button>
+            >Show Big</button>
             <button
               onClick={handleCopy}
               className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition"
-            >{copied ? '✓ Copied' : '📋 Copy'}</button>
+            >{copied ? '✓ Copied' : 'Copy'}</button>
             {onAskMore && (
               <button
                 onClick={(e) => { e.stopPropagation(); onAskMore(); }}
                 className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition"
-              >💬 Ask more</button>
+              >Ask more</button>
             )}
           </div>
 
@@ -216,7 +217,7 @@ export function PhraseCard({ phrase, isBookmarked, isLearned, notes, expanded, o
           <button
             onClick={(e) => { e.stopPropagation(); speak(phrase.target, getTtsLang(phrase.lang)); }}
             className="mt-6 text-4xl active:scale-110 transition-transform"
-          >🔊</button>
+          ><Volume2 size={32} /></button>
           <p className="text-base text-slate-600 mt-8">Tap anywhere to close</p>
         </div>
       )}

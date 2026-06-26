@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Volume2, Shuffle } from 'lucide-react';
 import type { Phrase, SRSCard, RefBookmark, Category } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
@@ -12,6 +13,7 @@ interface Props {
   phrases: Phrase[];
   learnedIds: Set<string>;
   refBookmarks: RefBookmark[];
+  lang?: string;
 }
 
 // Convert ref bookmarks to Phrase-compatible objects for the card UI
@@ -43,7 +45,7 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
+export function Flashcards({ phrases, learnedIds, refBookmarks, lang = 'ja' }: Props) {
   const [cards, setCards] = useState<SRSCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -142,12 +144,13 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
       {/* Step 1: Category picker */}
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
-          <h2 className="text-lg font-bold">🃏 Flashcards</h2>
-          <p className="text-base text-slate-400">Practice kana recognition &amp; learned phrases</p>
+          <h2 className="text-lg font-bold">Flashcards</h2>
+          <p className="text-base text-slate-400">{lang === 'ja' ? 'Practice kana recognition & learned phrases' : 'Review your learned phrases'}</p>
         </div>
 
         <div className="p-4 space-y-4">
-          {/* Kana Recognition Section */}
+          {/* Kana Recognition Section — JP only */}
+          {lang === 'ja' && (
           <div>
             <p className="text-sm text-slate-500 mb-2">Kana Recognition</p>
             <div className="grid grid-cols-2 gap-2">
@@ -169,8 +172,10 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
               </button>
             </div>
           </div>
+          )}
 
-          {/* Kana Vocab Section */}
+          {/* Kana Vocab Section — JP only */}
+          {lang === 'ja' && (
           <div>
             <p className="text-sm text-slate-500 mb-2">Kana Vocab Practice</p>
             <div className="grid grid-cols-2 gap-2">
@@ -192,6 +197,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
               </button>
             </div>
           </div>
+          )}
 
           {/* Learned Phrases Section */}
           {totalLearned > 0 && (
@@ -281,7 +287,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                   setCurrentIndex(0); setShowAnswer(false);
                 }}
                 className="text-sm px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700"
-              >🔀 Shuffle</button>
+              ><Shuffle size={14} className="inline-block mr-1" /> Shuffle</button>
             )}
           </div>
 
@@ -299,7 +305,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, 'ja-JP'); }}
                       className="text-2xl mb-4 active:scale-110 transition-transform"
-                    >🔊</button>
+                    ><Volume2 size={20} /></button>
                     <p className="text-base text-slate-500">What does this word mean? Tap to reveal</p>
                   </>
                 ) : (
@@ -314,7 +320,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentVocab.jp, 'ja-JP'); }}
                       className="text-xl mt-3 active:scale-110 transition-transform"
-                    >🔊</button>
+                    ><Volume2 size={20} /></button>
                   </>
                 )}
               </div>
@@ -336,7 +342,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentKana.char, 'ja-JP'); }}
                       className="text-2xl mb-4 active:scale-110 transition-transform"
-                    >🔊</button>
+                    ><Volume2 size={20} /></button>
                     <p className="text-base text-slate-500">What sound is this? Tap to reveal</p>
                   </>
                 ) : (
@@ -369,7 +375,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentKana.char, 'ja-JP'); }}
                       className="text-xl mt-3 active:scale-110 transition-transform"
-                    >🔊</button>
+                    ><Volume2 size={20} /></button>
                   </>
                 )}
               </div>
@@ -401,7 +407,7 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentPhrase!.target, getTtsLang(currentPhrase!.lang)); }}
                       className="text-2xl mb-4 active:scale-110 transition-transform"
-                    >🔊</button>
+                    ><Volume2 size={20} /></button>
                     <p className="text-base text-slate-500">Tap to reveal answer</p>
                   </>
                 ) : (
@@ -417,12 +423,12 @@ export function Flashcards({ phrases, learnedIds, refBookmarks }: Props) {
                       <p className="text-base text-slate-400">{currentPhrase!.chinese_tc}</p>
                     )}
                     {currentPhrase!.native_hint && (
-                      <p className="text-base text-amber-400 mt-2">🌉 {currentPhrase!.native_hint}</p>
+                      <p className="text-base text-amber-400 mt-2">{currentPhrase!.native_hint}</p>
                     )}
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentPhrase!.target, getTtsLang(currentPhrase!.lang)); }}
                       className="text-xl mt-3 active:scale-110 transition-transform"
-                    >🔊</button>
+                    ><Volume2 size={20} /></button>
                   </>
                 )}
               </div>

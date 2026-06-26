@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { Volume2, Star, Languages, Triangle, Copy, X } from 'lucide-react';
 import { askHowToSay, askFollowUp, askFollowUpExplain, askFollowUpMulti, askBreakdown, askGrammarQuestion, askCheckSentence, isAIConfigured } from '../utils/ai';
 import type { AIPhrase, FollowUpMessage, BreakdownBlock } from '../utils/ai';
 import type { SavedAIPhrase } from '../data/types';
@@ -208,8 +209,8 @@ function ExplanationBubble({ text, example, onSpeak, onSave, isSaved, isSavedChe
                   <p className="text-base text-slate-400">{ex.meaning}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    {onSpeak && <button onClick={() => onSpeak(ex.jp)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>}
-                    {onSave && <button onClick={() => onSave(exPhrase)} className="p-1 rounded-lg active:bg-slate-600 text-lg">{exSaved ? '⭐' : '☆'}</button>}
+                    {onSpeak && <button onClick={() => onSpeak(ex.jp)} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>}
+                    {onSave && <button onClick={() => onSave(exPhrase)} className="p-1 rounded-lg active:bg-slate-600"><Star size={18} className={exSaved ? 'fill-amber-400 text-amber-400' : ''} /></button>}
                   </div>
                 </div>
               </div>
@@ -226,8 +227,8 @@ function ExplanationBubble({ text, example, onSpeak, onSave, isSaved, isSavedChe
               <p className="text-base text-slate-400">{example.english}</p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>}
-              {onSave && <button onClick={() => onSave(example)} className="p-1 rounded-lg active:bg-slate-600 text-lg">{isSaved ? '⭐' : '☆'}</button>}
+              {onSpeak && <button onClick={() => onSpeak(example.target)} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>}
+              {onSave && <button onClick={() => onSave(example)} className="p-1 rounded-lg active:bg-slate-600"><Star size={18} className={isSaved ? 'fill-amber-400 text-amber-400' : ''} /></button>}
             </div>
           </div>
         </div>
@@ -250,8 +251,8 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button onClick={(e) => { e.stopPropagation(); onSpeak(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-            <button onClick={(e) => { e.stopPropagation(); onSave(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">{isSaved ? '⭐' : '☆'}</button>
+            <button onClick={(e) => { e.stopPropagation(); onSpeak(); }} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
+            <button onClick={(e) => { e.stopPropagation(); onSave(); }} className="p-1 rounded-lg active:bg-slate-600"><Star size={18} className={isSaved ? 'fill-amber-400 text-amber-400' : ''} /></button>
           </div>
         </div>
         <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
@@ -262,12 +263,12 @@ function AIResultCard({ phrase, lang, onSave, onSpeak, isSaved, defaultExpanded,
           <div className="grid grid-cols-2 gap-2 text-base">
             <div><span className="text-slate-500 text-base">繁體中文</span><p className="text-slate-200">{phrase.chinese_tc}</p></div>
           </div>
-          {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">🌉 {phrase.native_hint}</p></div>}
-          {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">💡 {phrase.notes}</p></div>}
+          {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">{phrase.native_hint}</p></div>}
+          {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">{phrase.notes}</p></div>}
           <div className="flex gap-2 pt-1">
-            {onShowBig && <button onClick={(e) => { e.stopPropagation(); onShowBig(); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">📺 Show Big</button>}
-            <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">{copied ? '✓ Copied' : '📋 Copy'}</button>
-            {onFollowUp && <button onClick={(e) => { e.stopPropagation(); onFollowUp(); }} className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition">💬 Ask more</button>}
+            {onShowBig && <button onClick={(e) => { e.stopPropagation(); onShowBig(); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">Show Big</button>}
+            <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition">{copied ? '✓ Copied' : 'Copy'}</button>
+            {onFollowUp && <button onClick={(e) => { e.stopPropagation(); onFollowUp(); }} className="flex-1 bg-indigo-900/40 text-indigo-300 text-base py-1.5 rounded-lg active:bg-indigo-800/50 transition">Ask more</button>}
           </div>
         </div>
       )}
@@ -671,14 +672,14 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">🤖 AI Language Tutor</h2>
+        <h2 className="text-lg font-bold">AI Language Tutor</h2>
         <p className="text-base text-slate-400">Translate, ask follow-ups, and learn {currentLang.name} naturally</p>
       </div>
       <div className="p-4 space-y-4">
         {/* Mode toggle */}
         <div className="flex gap-1 bg-slate-800/60 p-1 rounded-lg">
-          <button onClick={() => setAiMode('translate')} className={`flex-1 py-1.5 text-sm rounded-md transition ${aiMode === 'translate' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}>🗣️ Translate</button>
-          <button onClick={() => setAiMode('grammar')} className={`flex-1 py-1.5 text-sm rounded-md transition ${aiMode === 'grammar' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}>📐 Grammar</button>
+          <button onClick={() => setAiMode('translate')} className={`flex-1 py-1.5 text-sm rounded-md transition flex items-center justify-center gap-1 ${aiMode === 'translate' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}><Languages size={14} /> Translate</button>
+          <button onClick={() => setAiMode('grammar')} className={`flex-1 py-1.5 text-sm rounded-md transition flex items-center justify-center gap-1 ${aiMode === 'grammar' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 active:bg-slate-700/50'}`}><Triangle size={14} /> Grammar</button>
         </div>
         <div className="flex gap-2">
           <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAsk()} placeholder={aiMode === 'grammar' ? 'e.g., how to use は? / why に not で?' : 'e.g., I want to split the bill'} className="flex-1 bg-slate-800 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-base outline-none focus:ring-2 focus:ring-sakura-400/50 transition" disabled={loading} />
@@ -730,7 +731,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     <p className="text-base text-sakura-300 truncate">{h.pronunciation}</p>
                     <p className="text-base text-slate-500 truncate">{h.english}</p>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                  <button onClick={(e) => { e.stopPropagation(); handleSpeak(h.target); }} className="p-1 rounded-lg active:bg-slate-600 shrink-0"><Volume2 size={18} /></button>
                 </div>
               ))}
             </div>
@@ -756,7 +757,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
         <div onClick={() => setShowBig(null)} className="show-big-overlay fixed inset-0 z-[90] bg-slate-950 flex flex-col items-center justify-center p-8 cursor-pointer">
           <p className="text-4xl font-bold text-white text-center leading-relaxed">{showBig}</p>
           <p className="text-lg text-sakura-300 mt-4 text-center">{result?.pronunciation_chunks || result?.pronunciation}</p>
-          <button onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }} className="mt-6 text-4xl active:scale-110 transition-transform">🔊</button>
+          <button onClick={(e) => { e.stopPropagation(); if (result) handleSpeak(result.target); }} className="mt-6 active:scale-110 transition-transform"><Volume2 size={36} /></button>
           <p className="text-base text-slate-600 mt-8">Tap anywhere to close</p>
         </div>,
         document.body
@@ -778,7 +779,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     {followUpResults.length > 0 && (
                       <button onClick={() => { setFollowUpResults([]); setFollowUpHistory([]); clearThread(getThreadKey(followUpPhrase), followUpPhrase.target); }} className="text-sm text-slate-500 px-2 py-1 rounded-lg active:bg-slate-700 transition">Clear</button>
                     )}
-                    <button onClick={closeFollowUpDrawer} className="text-xl text-slate-400 p-2">✕</button>
+                    <button onClick={closeFollowUpDrawer} className="text-slate-400 p-2"><X size={20} /></button>
                   </div>
                 </div>
               </div>
@@ -879,7 +880,7 @@ export function AskAI({ lang, savedAIPhrases, onSaveAIPhrase, onDeleteAIPhrase, 
                     <p className="text-xs text-indigo-400">Grammar Q&A</p>
                     <p className="text-base font-semibold text-slate-100 truncate">{grammarResult.question}</p>
                   </div>
-                  <button onClick={() => setGrammarDrawerOpen(false)} className="text-xl text-slate-400 p-2">✕</button>
+                  <button onClick={() => setGrammarDrawerOpen(false)} className="text-slate-400 p-2"><X size={20} /></button>
                 </div>
               </div>
             </div>

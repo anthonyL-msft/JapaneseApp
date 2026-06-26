@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Star, PenLine, Volume2, Trash2, Pencil, CircleCheck, Copy } from 'lucide-react';
 import type { Phrase, Bookmark, UserNote, RefBookmark, LearnedItem, SavedAIPhrase } from '../data/types';
 import { PhraseCard } from './PhraseCard';
 import { RefItem } from './Reference';
@@ -72,7 +73,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">📌 My Stuff</h2>
+        <h2 className="text-lg font-bold">My Stuff</h2>
         <p className="text-base text-slate-400">{totalItems} saved items</p>
       </div>
 
@@ -85,7 +86,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
               className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
             >
               <div>
-                <h3 className="text-base font-semibold text-slate-200">✅ Learned</h3>
+                <h3 className="text-base font-semibold text-slate-200">Learned</h3>
                 <p className="text-base text-slate-500">{learnedItems.length} mastered</p>
               </div>
               <span className="text-base text-slate-500">{openSections.has('learned') ? '▲' : '▼'}</span>
@@ -123,7 +124,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                       <div key={item.id} className="bg-slate-700/40 rounded-xl p-3">
                         <div className="flex items-center justify-between">
                           <p className="text-base text-slate-300">{item.id.replace('ref_', '')}</p>
-                          <button onClick={() => onToggleLearned(item.id)} className="p-1 rounded-lg active:bg-slate-600 text-lg">✅</button>
+                          <button onClick={() => onToggleLearned(item.id)} className="p-1 rounded-lg active:bg-slate-600"><CircleCheck size={18} /></button>
                         </div>
                       </div>
                     );
@@ -140,7 +141,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
             className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
           >
             <div>
-              <h3 className="text-base font-semibold text-slate-200">⭐ Bookmarked Phrases</h3>
+              <h3 className="text-base font-semibold text-slate-200">Bookmarked Phrases</h3>
               <p className="text-base text-slate-500">{bookmarkedPhrases.length} phrases</p>
             </div>
             <span className="text-base text-slate-500">{openSections.has('bookmarks') ? '▲' : '▼'}</span>
@@ -148,7 +149,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
           {openSections.has('bookmarks') && (
             <div className="px-2 pb-2 space-y-1.5">
               {bookmarkedPhrases.length === 0 ? (
-                <p className="text-base text-slate-500 text-center py-4">Tap ☆ on any phrase to bookmark it</p>
+                <p className="text-base text-slate-500 text-center py-4">Tap <Star size={14} className="inline-block" /> on any phrase to bookmark it</p>
               ) : (
                 bookmarkedPhrases.map(phrase => (
                   <PhraseCard
@@ -176,7 +177,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
               className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
             >
               <div>
-                <h3 className="text-base font-semibold text-slate-200">📚 Reference Examples</h3>
+                <h3 className="text-base font-semibold text-slate-200">Reference Examples</h3>
                 <p className="text-base text-slate-500">{refBookmarks.length} saved</p>
               </div>
               <span className="text-base text-slate-500">{openSections.has('refbookmarks') ? '▲' : '▼'}</span>
@@ -206,7 +207,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
               className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
             >
               <div>
-                <h3 className="text-base font-semibold text-slate-200">🤖 AI Translations</h3>
+                <h3 className="text-base font-semibold text-slate-200">AI Translations</h3>
                 <p className="text-base text-slate-500">{allAI.length + aiNotes.length} saved</p>
               </div>
               <span className="text-base text-slate-500">{openSections.has('ai') ? '▲' : '▼'}</span>
@@ -235,8 +236,8 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                             {tc && <p className="text-base text-slate-500 mt-0.5">{tc}</p>}
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
-                            <button onClick={() => speak(target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-                            <button onClick={() => onDeleteNote(note.id)} className="p-1 rounded-lg active:bg-slate-600 text-lg">🗑️</button>
+                            <button onClick={() => speak(target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
+                            <button onClick={() => onDeleteNote(note.id)} className="p-1 rounded-lg active:bg-slate-600"><Trash2 size={18} /></button>
                           </div>
                         </div>
                       </div>
@@ -254,7 +255,7 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
             className="w-full flex items-center justify-between px-3 py-3 text-left active:bg-slate-700/50 transition"
           >
             <div>
-              <h3 className="text-base font-semibold text-slate-200">📝 Personal Notes</h3>
+              <h3 className="text-base font-semibold text-slate-200">Personal Notes</h3>
               <p className="text-base text-slate-500">{standaloneNotes.length + phraseNotes.length} notes</p>
             </div>
             <span className="text-base text-slate-500">{openSections.has('notes') ? '▲' : '▼'}</span>
@@ -293,11 +294,11 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                             <button
                               onClick={() => { setEditText(note.text); setEditingId(note.id); }}
                               className="text-base text-slate-500 hover:text-slate-300 shrink-0"
-                            >✏️</button>
+                            ><Pencil size={14} /></button>
                             <button
                               onClick={() => onDeleteNote(note.id)}
                               className="text-base text-slate-500 hover:text-red-400 shrink-0"
-                            >🗑️</button>
+                            ><Trash2 size={14} /></button>
                           </div>
                         )}
                       </div>
@@ -315,16 +316,16 @@ export function MyStuff({ phrases, bookmarks, notes, refBookmarks, learnedItems,
                                   <p className="text-lg font-medium text-slate-50">{phrase.target}</p>
                                   <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
                                 </div>
-                                <button onClick={() => speak(phrase.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                                <button onClick={() => speak(phrase.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 shrink-0"><Volume2 size={18} /></button>
                               </div>
                             </div>
                           )}
                           <div className="p-3 pt-2 flex items-start gap-2">
-                            <p className="text-base text-slate-300 flex-1">📝 {note.text}</p>
+                            <p className="text-base text-slate-300 flex-1 flex items-start gap-1.5"><PenLine size={14} className="shrink-0 mt-0.5" /> {note.text}</p>
                             <button
                               onClick={() => onDeleteNote(note.id)}
                               className="text-base text-slate-500 hover:text-red-400 shrink-0"
-                            >🗑️</button>
+                            ><Trash2 size={14} /></button>
                           </div>
                         </div>
                       );
@@ -353,8 +354,8 @@ function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: ()
             <p className="text-base text-sakura-300 mt-0.5">{phrase.pronunciation_chunks || phrase.pronunciation}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button onClick={(e) => { e.stopPropagation(); speak(phrase.target, 'ja-JP'); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-            <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-1 rounded-lg active:bg-slate-600 text-lg">🗑️</button>
+            <button onClick={(e) => { e.stopPropagation(); speak(phrase.target, 'ja-JP'); }} className="p-1 rounded-lg active:bg-slate-600"><Volume2 size={18} /></button>
+            <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-1 rounded-lg active:bg-slate-600"><Trash2 size={18} /></button>
           </div>
         </div>
         <p className="text-base text-slate-400 mt-0.5">{phrase.english}</p>
@@ -384,13 +385,13 @@ function SavedAICard({ phrase, onDelete }: { phrase: SavedAIPhrase; onDelete: ()
           <div className="grid grid-cols-2 gap-2 text-base">
             <div><span className="text-slate-500 text-base">繁體中文</span><p className="text-slate-200">{phrase.chinese_tc}</p></div>
           </div>
-          {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">🌉 {phrase.native_hint}</p></div>}
-          {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">💡 {phrase.notes}</p></div>}
+          {phrase.native_hint && <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-2"><p className="text-base text-amber-400">{phrase.native_hint}</p></div>}
+          {phrase.notes && <div className="bg-slate-700/30 rounded-lg p-2"><p className="text-base text-slate-300">{phrase.notes}</p></div>}
           <div className="flex gap-2 pt-1">
             <button
               onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${phrase.target}\n${phrase.pronunciation_chunks || phrase.pronunciation}\n${phrase.english}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
               className="flex-1 bg-slate-700/50 text-slate-300 text-base py-1.5 rounded-lg active:bg-slate-600 transition"
-            >{copied ? '✓ Copied' : '📋 Copy'}</button>
+            >{copied ? '✓ Copied' : 'Copy'}</button>
           </div>
           <p className="text-xs text-slate-600">Asked: "{phrase.query}"</p>
         </div>

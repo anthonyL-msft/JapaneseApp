@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { speak } from '../utils/tts';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Target, Trophy, RefreshCw, X, Type } from 'lucide-react';
+import { speak, getTtsLang } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 import { HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
 import type { KanaVocabCard } from '../data/kana-data';
@@ -10,23 +11,23 @@ type MatchCategory = 'vocab-h' | 'vocab-k' | 'mixed' | 'phrases' | 'vocab-words'
 const PAIR_COUNT = 6; // 6 pairs per round
 
 // Build phrase vocab cards by situation groups
-const buildPhraseCards = (situations: string[]): KanaVocabCard[] => phrases
-  .filter(p => p.lang === 'ja' && p.category === 'vocab' && situations.includes(p.situation))
+const buildPhraseCards = (lang: string, situations: string[]): KanaVocabCard[] => phrases
+  .filter(p => p.lang === lang && p.category === 'vocab' && situations.includes(p.situation))
   .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
-const buildCategoryCards = (categories: string[]): KanaVocabCard[] => phrases
-  .filter(p => p.lang === 'ja' && categories.includes(p.category))
+const buildCategoryCards = (lang: string, categories: string[]): KanaVocabCard[] => phrases
+  .filter(p => p.lang === lang && categories.includes(p.category))
   .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
-const VOCAB_WORDS_CARDS = buildPhraseCards(['Basic nouns', 'Pointing words', 'Colors']);
-const VOCAB_ACTIONS_CARDS = buildPhraseCards(['Basic verbs', 'Daily actions']);
-const VOCAB_TIME_CARDS = buildPhraseCards(['Numbers', 'Time', 'Meals', 'Days of the week']);
-const VOCAB_WORLD_CARDS = buildPhraseCards(['Basic places', 'Directions']);
-const VOCAB_PEOPLE_CARDS = buildPhraseCards(['People & Family', 'Body & Health', 'Basic adjectives']);
-const PHRASES_POWER_CARDS = buildCategoryCards(['power']);
-const PHRASES_TRAVEL_CARDS = buildCategoryCards(['airport', 'directions', 'hotel']);
-const PHRASES_FOOD_CARDS = buildCategoryCards(['restaurant', 'food', 'drinks']);
-const PHRASE_VOCAB_CARDS = buildCategoryCards(['vocab']);
+const VOCAB_WORDS_CARDS = buildPhraseCards('ja', ['Basic nouns', 'Pointing words', 'Colors']);
+const VOCAB_ACTIONS_CARDS = buildPhraseCards('ja', ['Basic verbs', 'Daily actions']);
+const VOCAB_TIME_CARDS = buildPhraseCards('ja', ['Numbers', 'Time', 'Meals', 'Days of the week']);
+const VOCAB_WORLD_CARDS = buildPhraseCards('ja', ['Basic places', 'Directions']);
+const VOCAB_PEOPLE_CARDS = buildPhraseCards('ja', ['People & Family', 'Body & Health', 'Basic adjectives']);
+const PHRASES_POWER_CARDS = buildCategoryCards('ja', ['power']);
+const PHRASES_TRAVEL_CARDS = buildCategoryCards('ja', ['airport', 'directions', 'hotel']);
+const PHRASES_FOOD_CARDS = buildCategoryCards('ja', ['restaurant', 'food', 'drinks']);
+const PHRASE_VOCAB_CARDS = buildCategoryCards('ja', ['vocab']);
 
 // Sentence patterns for match
 const PATTERNS_CARDS: KanaVocabCard[] = [
@@ -125,8 +126,22 @@ interface MatchPair {
   hep: string;
 }
 
-export function MatchGame() {
+export function MatchGame({ lang = 'ja' }: { lang?: string }) {
   const panel = useSlidePanel<MatchCategory>();
+
+  // Rebuild card pools when lang changes
+  const langCards = useMemo(() => ({
+    'vocab-words': buildPhraseCards(lang, ['Basic nouns', 'Pointing words', 'Colors']),
+    'vocab-actions': buildPhraseCards(lang, ['Basic verbs', 'Daily actions']),
+    'vocab-time': buildPhraseCards(lang, ['Numbers', 'Time', 'Meals', 'Days of the week']),
+    'vocab-world': buildPhraseCards(lang, ['Basic places', 'Directions']),
+    'vocab-people': buildPhraseCards(lang, ['People & Family', 'Body & Health', 'Basic adjectives']),
+    'phrases-power': buildCategoryCards(lang, ['power']),
+    'phrases-travel': buildCategoryCards(lang, ['airport', 'directions', 'hotel']),
+    'phrases-food': buildCategoryCards(lang, ['restaurant', 'food', 'drinks']),
+    'phrases': buildCategoryCards(lang, ['vocab']),
+    'all-phrases': buildCategoryCards(lang, ['greetings', 'basics', 'airport', 'hotel', 'restaurant', 'food', 'drinks', 'shopping', 'directions', 'emergency', 'smalltalk', 'power']),
+  }), [lang]);
 
   // Game state
   const [pairs, setPairs] = useState<MatchPair[]>([]);
@@ -157,21 +172,21 @@ export function MatchGame() {
       'vocab-h': HIRAGANA_VOCAB_CARDS,
       'vocab-k': KATAKANA_VOCAB_CARDS,
       'mixed': [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS],
-      'phrases': PHRASE_VOCAB_CARDS,
-      'vocab-words': VOCAB_WORDS_CARDS,
-      'vocab-actions': VOCAB_ACTIONS_CARDS,
-      'vocab-time': VOCAB_TIME_CARDS,
-      'vocab-world': VOCAB_WORLD_CARDS,
-      'vocab-people': VOCAB_PEOPLE_CARDS,
-      'phrases-power': PHRASES_POWER_CARDS,
-      'phrases-travel': PHRASES_TRAVEL_CARDS,
-      'phrases-food': PHRASES_FOOD_CARDS,
+      'phrases': langCards['phrases'],
+      'vocab-words': langCards['vocab-words'],
+      'vocab-actions': langCards['vocab-actions'],
+      'vocab-time': langCards['vocab-time'],
+      'vocab-world': langCards['vocab-world'],
+      'vocab-people': langCards['vocab-people'],
+      'phrases-power': langCards['phrases-power'],
+      'phrases-travel': langCards['phrases-travel'],
+      'phrases-food': langCards['phrases-food'],
       'patterns': PATTERNS_CARDS,
       'counters': COUNTERS_CARDS,
       'signs': SIGNS_CARDS,
       'particles': PARTICLES_CARDS,
     };
-    pool = poolMap[category || 'mixed'] || [...HIRAGANA_VOCAB_CARDS, ...KATAKANA_VOCAB_CARDS];
+    pool = poolMap[category || 'mixed'] || langCards['all-phrases'];
 
     const selected = shuffle(pool).slice(0, PAIR_COUNT);
     const newPairs = selected.map((v, i) => ({ id: i, jp: v.jp, en: v.en, hep: v.hep }));
@@ -206,7 +221,7 @@ export function MatchGame() {
       const newMatched = new Set(matched);
       newMatched.add(selectedLeft);
       setMatched(newMatched);
-      speak(pairs.find(p => p.id === selectedLeft)?.jp || '', 'ja-JP');
+      speak(pairs.find(p => p.id === selectedLeft)?.jp || '', getTtsLang(lang));
       setSelectedLeft(null);
       setSelectedRight(null);
 
@@ -259,14 +274,14 @@ export function MatchGame() {
       {/* Landing */}
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
-          <h2 className="text-lg font-bold">🃏 Match Game</h2>
-          <p className="text-base text-slate-400">Match Japanese ↔ English pairs as fast as you can!</p>
+          <h2 className="text-lg font-bold">Match Game</h2>
+          <p className="text-base text-slate-400">Match pairs as fast as you can!</p>
         </div>
 
         <div className="p-4 space-y-4">
           <div className="bg-slate-800/40 rounded-xl p-3">
-            <p className="text-sm text-slate-400">🎯 {PAIR_COUNT} pairs × 3 rounds · Match all pairs to finish</p>
-            <p className="text-sm text-slate-500 mt-1">Tap one Japanese word, then tap its English meaning. Speed counts!</p>
+            <p className="text-sm text-slate-400 flex items-center gap-1"><Target size={14} /> {PAIR_COUNT} pairs × 3 rounds · Match all pairs to finish</p>
+            <p className="text-sm text-slate-500 mt-1">Tap one word, then tap its English meaning. Speed counts!</p>
           </div>
 
           <div>
@@ -275,32 +290,32 @@ export function MatchGame() {
               <button onClick={() => startGame('vocab-words')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">📦</span>
                 <span className="text-base font-semibold text-slate-100">Words</span>
-                <span className="text-sm text-slate-500">{VOCAB_WORDS_CARDS.length} words</span>
-                {getBestTime('vocab-words') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-words')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-words"].length} words</span>
+                {getBestTime('vocab-words') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('vocab-words')!)}</span>}
               </button>
               <button onClick={() => startGame('vocab-actions')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🎯</span>
                 <span className="text-base font-semibold text-slate-100">Actions</span>
-                <span className="text-sm text-slate-500">{VOCAB_ACTIONS_CARDS.length} words</span>
-                {getBestTime('vocab-actions') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-actions')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-actions"].length} words</span>
+                {getBestTime('vocab-actions') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('vocab-actions')!)}</span>}
               </button>
               <button onClick={() => startGame('vocab-time')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🕐</span>
                 <span className="text-base font-semibold text-slate-100">Time</span>
-                <span className="text-sm text-slate-500">{VOCAB_TIME_CARDS.length} words</span>
-                {getBestTime('vocab-time') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-time')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-time"].length} words</span>
+                {getBestTime('vocab-time') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('vocab-time')!)}</span>}
               </button>
               <button onClick={() => startGame('vocab-world')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🌍</span>
                 <span className="text-base font-semibold text-slate-100">World</span>
-                <span className="text-sm text-slate-500">{VOCAB_WORLD_CARDS.length} words</span>
-                {getBestTime('vocab-world') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-world')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-world"].length} words</span>
+                {getBestTime('vocab-world') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('vocab-world')!)}</span>}
               </button>
               <button onClick={() => startGame('vocab-people')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">👥</span>
                 <span className="text-base font-semibold text-slate-100">People</span>
-                <span className="text-sm text-slate-500">{VOCAB_PEOPLE_CARDS.length} words</span>
-                {getBestTime('vocab-people') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('vocab-people')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-people"].length} words</span>
+                {getBestTime('vocab-people') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('vocab-people')!)}</span>}
               </button>
             </div>
           </div>
@@ -311,45 +326,47 @@ export function MatchGame() {
               <button onClick={() => startGame('phrases-power')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">⚡</span>
                 <span className="text-base font-semibold text-slate-100">Power Phrases</span>
-                <span className="text-sm text-slate-500">{PHRASES_POWER_CARDS.length} phrases</span>
-                {getBestTime('phrases-power') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-power')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["phrases-power"].length} phrases</span>
+                {getBestTime('phrases-power') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('phrases-power')!)}</span>}
               </button>
               <button onClick={() => startGame('phrases-travel')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">✈️</span>
                 <span className="text-base font-semibold text-slate-100">Travel</span>
-                <span className="text-sm text-slate-500">{PHRASES_TRAVEL_CARDS.length} phrases</span>
-                {getBestTime('phrases-travel') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-travel')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["phrases-travel"].length} phrases</span>
+                {getBestTime('phrases-travel') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('phrases-travel')!)}</span>}
               </button>
               <button onClick={() => startGame('phrases-food')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🍜</span>
                 <span className="text-base font-semibold text-slate-100">Food</span>
-                <span className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</span>
-                {getBestTime('phrases-food') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('phrases-food')!)}</span>}
+                <span className="text-sm text-slate-500">{langCards["phrases-food"].length} phrases</span>
+                {getBestTime('phrases-food') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('phrases-food')!)}</span>}
               </button>
+              {lang === 'ja' && (<>
               <button onClick={() => startGame('patterns')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">📐</span>
                 <span className="text-base font-semibold text-slate-100">Patterns</span>
                 <span className="text-sm text-slate-500">{PATTERNS_CARDS.length} patterns</span>
-                {getBestTime('patterns') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('patterns')!)}</span>}
+                {getBestTime('patterns') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('patterns')!)}</span>}
               </button>
               <button onClick={() => startGame('counters')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">📏</span>
                 <span className="text-base font-semibold text-slate-100">Counters</span>
                 <span className="text-sm text-slate-500">{COUNTERS_CARDS.length} counters</span>
-                {getBestTime('counters') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('counters')!)}</span>}
+                {getBestTime('counters') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('counters')!)}</span>}
               </button>
               <button onClick={() => startGame('signs')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🪧</span>
                 <span className="text-base font-semibold text-slate-100">Signs</span>
                 <span className="text-sm text-slate-500">{SIGNS_CARDS.length} signs</span>
-                {getBestTime('signs') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('signs')!)}</span>}
+                {getBestTime('signs') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('signs')!)}</span>}
               </button>
               <button onClick={() => startGame('particles')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-2xl">🔤</span>
                 <span className="text-base font-semibold text-slate-100">Particles</span>
                 <span className="text-sm text-slate-500">{PARTICLES_CARDS.length} particles</span>
-                {getBestTime('particles') && <span className="text-xs text-amber-400">🏆 {formatTime(getBestTime('particles')!)}</span>}
+                {getBestTime('particles') && <span className="text-xs text-amber-400"><Trophy size={12} className="inline-block mr-0.5" /> {formatTime(getBestTime('particles')!)}</span>}
               </button>
+              </>)}
             </div>
           </div>
         </div>
@@ -371,7 +388,7 @@ export function MatchGame() {
             <div className="flex items-center gap-2">
               <span className="text-sm text-emerald-400">{matched.size}/{PAIR_COUNT}</span>
               {!finished && (
-                <button onClick={exitGame} className="text-sm px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700">✕</button>
+                <button onClick={exitGame} className="text-sm px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 active:bg-slate-700"><X size={20} /></button>
               )}
             </div>
           </div>
@@ -432,17 +449,17 @@ export function MatchGame() {
           ) : (
             /* End Screen */
             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-              <p className="text-5xl mb-4">⚡</p>
+              <p className="text-5xl mb-4">🎉</p>
               <p className="text-3xl font-bold text-slate-100 mb-2">{formatTime(totalTime)}</p>
               <p className="text-lg text-slate-400 mb-1">3 rounds completed!</p>
               {panel.value && getBestTime(panel.value) && (
-                <p className="text-base text-amber-400 mb-4">🏆 Best: {formatTime(getBestTime(panel.value)!)}</p>
+                <p className="text-base text-amber-400 mb-4 flex items-center justify-center gap-1"><Trophy size={16} /> Best: {formatTime(getBestTime(panel.value)!)}</p>
               )}
               <div className="flex gap-3">
                 <button
                   onClick={() => { setRound(1); setTotalTime(0); startRound(); }}
                   className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base"
-                >🔄 Play Again</button>
+                ><RefreshCw size={14} className="inline-block mr-1" /> Play Again</button>
                 <button
                   onClick={exitGame}
                   className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base"

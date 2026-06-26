@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Volume2 } from 'lucide-react';
 import { LANGUAGES } from '../data/types';
 import { getTtsRate, setTtsRate, speak } from '../utils/tts';
 
@@ -45,7 +46,7 @@ export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangCha
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">⚙️ Settings</h2>
+        <h2 className="text-lg font-bold">Settings</h2>
         <p className="text-base text-slate-400">Customize your experience</p>
       </div>
 
@@ -91,7 +92,7 @@ export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangCha
           <p className="text-base font-semibold text-slate-300 mb-3">Speech</p>
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-base text-slate-400">🔊 Speech Speed</span>
+              <span className="text-base text-slate-400 flex items-center gap-1"><Volume2 size={14} /> Speech Speed</span>
               <span className="text-base text-sakura-300 font-medium">{SPEED_LABELS[String(rate)] || rate.toFixed(1)}</span>
             </div>
             <input
@@ -113,7 +114,7 @@ export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangCha
 
         {/* About */}
         <div className="bg-slate-800/60 rounded-xl p-4">
-          <p className="text-base font-semibold text-slate-300 mb-3">🤖 AI Explanations</p>
+          <p className="text-base font-semibold text-slate-300 mb-3">AI Explanations</p>
           <p className="text-sm text-slate-500 mb-2">Language for notes, tips, and grammar breakdowns</p>
           <div className="flex gap-2">
             {[
@@ -133,7 +134,7 @@ export function Settings({ lang, onLangChange, aiExplainLang, onAiExplainLangCha
         </div>
 
         <div className="bg-slate-800/60 rounded-xl p-4">
-          <p className="text-base font-semibold text-slate-300 mb-3">🧑‍🏫 AI Follow-up Style</p>
+          <p className="text-base font-semibold text-slate-300 mb-3">AI Follow-up Style</p>
           <p className="text-sm text-slate-500 mb-2">How AI answers your Ask more questions</p>
           <div className="space-y-2">
             {[

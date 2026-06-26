@@ -1,5 +1,6 @@
 import type { Phrase } from './types';
 import { spanishPhrases } from './phrases-es';
+import { frenchPhrases } from './phrases-fr';
 
 const japanesePhrases: Phrase[] = [
   // ============================================================
@@ -686,4 +687,4 @@ const japanesePhrases: Phrase[] = [
 const withLevels = (phrases: Phrase[]): Phrase[] =>
   phrases.map(p => p.level ? p : { ...p, level: p.difficulty >= 3 ? 'advanced' as const : p.difficulty >= 2 ? 'intermediate' as const : 'basic' as const });
 
-export const phrases: Phrase[] = [...withLevels(japanesePhrases), ...spanishPhrases];
+export const phrases: Phrase[] = [...withLevels(japanesePhrases), ...spanishPhrases, ...frenchPhrases];

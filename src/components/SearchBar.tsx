@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { Search, X, Target, Gamepad2, Layers as Cards, PenTool, Wrench, Sprout, RefreshCw, BarChart3, PenLine, Settings } from 'lucide-react';
 import { LANGUAGES } from '../data/types';
 
 interface Props {
@@ -57,7 +58,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
 
           {/* Search Input */}
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-base">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"><Search size={16} /></span>
             <input
               type="text"
               value={value}
@@ -99,7 +100,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
             <div className="px-4 py-4 border-b border-slate-800">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-100">{currentLang.flag} {currentLang.nameNative}</h2>
-                <button onClick={closeDrawer} className="text-xl text-slate-400 p-1">✕</button>
+                <button onClick={closeDrawer} className="text-slate-400 p-1"><X size={20} /></button>
               </div>
               <p className="text-sm text-slate-500 mt-0.5">Travel Language Companion</p>
             </div>
@@ -113,7 +114,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenDaily(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🎯</span>
+                  <span className="text-lg"><Target size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Daily Challenge</p>
                     <p className="text-sm text-slate-500">Learn 3 + review 5 daily</p>
@@ -123,7 +124,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenQuiz(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🎮</span>
+                  <span className="text-lg"><Gamepad2 size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Quiz</p>
                     <p className="text-sm text-slate-500">Timed multiple choice</p>
@@ -133,32 +134,34 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenMatch(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🃏</span>
+                  <span className="text-lg"><Cards size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Match Game</p>
-                    <p className="text-sm text-slate-500">Pair Japanese ↔ English</p>
+                    <p className="text-sm text-slate-500">Pair {currentLang.name} ↔ English</p>
                   </div>
                 </button>
                 <button
                   onClick={() => { closeDrawer(); onOpenCards(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">📇</span>
+                  <span className="text-lg"><Cards size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Flashcards</p>
                     <p className="text-sm text-slate-500">SRS review learned items</p>
                   </div>
                 </button>
+                {lang === 'ja' && (
                 <button
                   onClick={() => { closeDrawer(); onOpenWriting(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">✍️</span>
+                  <span className="text-lg"><PenTool size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Writing Practice</p>
                     <p className="text-sm text-slate-500">Stroke order, trace & dictation</p>
                   </div>
                 </button>
+                )}
               </div>
 
               {/* Build & Tools */}
@@ -168,7 +171,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenBuilder(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🔧</span>
+                  <span className="text-lg"><Wrench size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Sentence Builder</p>
                     <p className="text-sm text-slate-500">Pick a pattern, fill the blank</p>
@@ -178,7 +181,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenGrow(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🌱</span>
+                  <span className="text-lg"><Sprout size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Sentence Grow</p>
                     <p className="text-sm text-slate-500">Expand sentences step by step</p>
@@ -188,22 +191,24 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenCheck(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">✍️</span>
+                  <span className="text-lg"><PenTool size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Sentence Check</p>
                     <p className="text-sm text-slate-500">Check if your writing is correct</p>
                   </div>
                 </button>
+                {lang === 'ja' && (
                 <button
                   onClick={() => { closeDrawer(); onOpenConverter(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">🔄</span>
+                  <span className="text-lg"><RefreshCw size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Number Converter</p>
                     <p className="text-sm text-slate-500">Number → kanji + reading</p>
                   </div>
                 </button>
+                )}
               </div>
 
               {/* Track */}
@@ -213,7 +218,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenProgress(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">📊</span>
+                  <span className="text-lg"><BarChart3 size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">My Progress</p>
                     <p className="text-sm text-slate-500">Track your learning</p>
@@ -223,7 +228,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenNotes(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">📝</span>
+                  <span className="text-lg"><PenLine size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Quick Note</p>
                     <p className="text-sm text-slate-500">Jot down anything</p>
@@ -237,7 +242,7 @@ export function SearchBar({ value, onChange, lang, onOpenCards, onOpenConverter,
                   onClick={() => { closeDrawer(); onOpenSettings(); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left active:bg-slate-800 transition"
                 >
-                  <span className="text-lg">⚙️</span>
+                  <span className="text-lg"><Settings size={20} /></span>
                   <div>
                     <p className="text-base text-slate-200">Settings</p>
                     <p className="text-sm text-slate-500">Theme, language, speech</p>

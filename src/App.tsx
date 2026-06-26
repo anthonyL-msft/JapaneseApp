@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { BookOpen, Library, MessageCircle, Bot, Pin } from 'lucide-react';
 import type { Tab, Bookmark, UserNote, RefBookmark, LearnedItem, SavedAIPhrase } from './data/types';
 import { LANGUAGES } from './data/types';
 import { phrases as allPhrases } from './data/phrases';
@@ -21,12 +22,12 @@ import { DailyChallenge } from './components/DailyChallenge';
 import { WritingPractice } from './components/WritingPractice';
 import { SentenceCheck } from './components/SentenceCheck';
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'phrases', label: 'Learn', icon: '📖' },
-  { id: 'reference', label: 'Ref', icon: '📚' },
-  { id: 'scenes', label: 'Scenes', icon: '🎭' },
-  { id: 'ai', label: 'AI', icon: '🤖' },
-  { id: 'bookmarks', label: 'Mine', icon: '📌' },
+const TABS: { id: Tab; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
+  { id: 'phrases', label: 'Learn', icon: BookOpen },
+  { id: 'reference', label: 'Ref', icon: Library },
+  { id: 'scenes', label: 'Scenes', icon: MessageCircle },
+  { id: 'ai', label: 'AI', icon: Bot },
+  { id: 'bookmarks', label: 'Mine', icon: Pin },
 ];
 
 function App() {
@@ -186,7 +187,7 @@ function App() {
           />
         </div>
         {tab === 'cards' && (
-          <Flashcards phrases={langPhrases} learnedIds={new Set(learnedItems.map(l => l.id))} refBookmarks={refBookmarks} />
+          <Flashcards phrases={langPhrases} learnedIds={new Set(learnedItems.map(l => l.id))} refBookmarks={refBookmarks} lang={lang} />
         )}
         {tab === 'bookmarks' && (
           <MyStuff
@@ -206,31 +207,31 @@ function App() {
           />
         )}
         <div style={{ display: tab === 'reference' ? 'contents' : 'none' }}>
-          <Reference refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); }} explainLang={aiExplainLang} />
+          <Reference lang={lang} refBookmarkedIds={new Set(refBookmarks.map(b => b.id))} onToggleRefBookmark={toggleRefBookmark} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} onAskMore={(item) => { setAskMorePhrase({ target: item.jp, pronunciation: item.hep.replace(/·/g, ''), pronunciation_chunks: item.hep, english: item.en }); }} explainLang={aiExplainLang} />
         </div>
         {tab === 'scenes' && <Scenarios lang={lang} langConfig={currentLang} search={search} />}
         <div style={{ display: tab === 'ai' ? 'contents' : 'none' }}>
           <AskAI lang={lang} savedAIPhrases={savedAIPhrases} onSaveAIPhrase={handleSaveAIPhrase} onDeleteAIPhrase={handleDeleteAIPhrase} askMorePhrase={askMorePhrase} onClearAskMore={() => setAskMorePhrase(null)} aiExplainLang={aiExplainLang} aiTutorMode={aiTutorMode} checkMode={checkMode} onClearCheckMode={() => setCheckMode(false)} />
         </div>
-        {tab === 'builder' && <SentenceBuilder onAskMore={(phrase) => {
+        {tab === 'builder' && <SentenceBuilder lang={lang} onAskMore={(phrase) => {
               setAskMorePhrase({ target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ''), pronunciation_chunks: phrase.rom, english: phrase.en });
             }} onSave={(phrase) => {
               const id = `ai_${Date.now()}`;
               handleSaveAIPhrase({ id, lang, target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ' '), pronunciation_chunks: phrase.rom, english: phrase.en, chinese_tc: '', notes: '', query: 'Sentence Builder', createdAt: Date.now() });
             }} />}
-        {tab === 'grow' && <SentenceGrow onSave={(phrase) => {
+        {tab === 'grow' && <SentenceGrow lang={lang} onSave={(phrase) => {
               const id = `ai_${Date.now()}`;
               handleSaveAIPhrase({ id, lang, target: phrase.jp, pronunciation: phrase.rom.replace(/·/g, ' '), pronunciation_chunks: phrase.rom, english: phrase.en, chinese_tc: '', notes: '', query: 'Sentence Grow', createdAt: Date.now() });
             }} />}
         {tab === 'notes' && <QuickNote notes={notes} onSaveNote={handleSaveNote} onDeleteNote={handleDeleteNote} />}
         {tab === 'progress' && <Progress phrases={langPhrases} learnedItems={learnedItems} />}
-        {tab === 'quiz' && <Quiz />}
-        {tab === 'match' && <MatchGame />}
+        {tab === 'quiz' && <Quiz lang={lang} />}
+        {tab === 'match' && <MatchGame lang={lang} />}
         {tab === 'daily' && <DailyChallenge phrases={langPhrases} learnedIds={new Set(learnedItems.map(l => l.id))} onToggleLearned={toggleLearned} />}
-        {tab === 'writing' && <WritingPractice />}
+        {tab === 'writing' && lang === 'ja' && <WritingPractice />}
         {tab === 'check' && <SentenceCheck lang={lang} explainLang={aiExplainLang} />}
         {tab === 'settings' && <Settings lang={lang} onLangChange={setLang} aiExplainLang={aiExplainLang} onAiExplainLangChange={handleAiExplainLangChange} aiTutorMode={aiTutorMode} onAiTutorModeChange={handleAiTutorModeChange} />}
-        {tab === 'converter' && (
+        {tab === 'converter' && lang === 'ja' && (
           <div className="scroll-area h-full">
             <div className="px-4 py-3 border-b border-slate-800">
               <h2 className="text-lg font-bold">🔄 Number Converter</h2>
@@ -253,7 +254,7 @@ function App() {
                 : 'text-slate-500 active:text-slate-300'
             }`}
           >
-            <span className="text-lg mb-0.5">{t.icon}</span>
+            <t.icon size={20} className="mb-0.5" />
             <span>{t.label}</span>
             {t.id === 'bookmarks' && bookmarks.length > 0 && (
               <span className="absolute -mt-1 ml-6 bg-sakura-500 text-white text-base rounded-full w-4 h-4 flex items-center justify-center">

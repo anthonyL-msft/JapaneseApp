@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { speak } from '../utils/tts';
+import { Volume2, Star, Copy } from 'lucide-react';
+import { speak, getTtsLang } from '../utils/tts';
 import { askFollowUpMulti, isAIConfigured } from '../utils/ai';
 import type { AIPhrase } from '../utils/ai';
 
@@ -285,17 +286,17 @@ const VOCAB: Record<SlotType, Vocab[]> = {
 
 // Slot type labels for the chip category headers
 const SLOT_LABELS: Record<SlotType, string> = {
-  noun: '📦 Things',
-  place: '📍 Places',
-  food: '🍜 Food',
-  drink: '🍵 Drinks',
-  quantity: '🔢 Quantities',
-  action: '🎯 Actions',
-  time: '🕐 Time & Events',
-  adjective: '✨ Adjectives',
+  noun: 'Things',
+  place: 'Places',
+  food: 'Food',
+  drink: 'Drinks',
+  quantity: 'Quantities',
+  action: 'Actions',
+  time: 'Time & Events',
+  adjective: 'Adjectives',
 };
 
-export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { jp: string; rom: string; en: string }) => void; onSave?: (phrase: { jp: string; rom: string; en: string }) => void }) {
+export function SentenceBuilder({ lang = 'ja', onAskMore, onSave }: { lang?: string; onAskMore?: (phrase: { jp: string; rom: string; en: string }) => void; onSave?: (phrase: { jp: string; rom: string; en: string }) => void }) {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [result, setResult] = useState<{ jp: string; rom: string; en: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -308,8 +309,8 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
     const built = selectedPattern.build(vocab);
     setResult(built);
     setMoreExamples(null);
-    speak(built.jp, 'ja-JP');
-  }, [selectedPattern]);
+    speak(built.jp, getTtsLang(lang));
+  }, [selectedPattern, lang]);
 
   const handleCopy = useCallback(() => {
     if (!result) return;
@@ -335,12 +336,35 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
     finally { setLoadingMore(false); }
   };
 
+  // Non-Japanese: show coming soon
+  if (lang !== 'ja' && !selectedPattern) {
+    return (
+      <div className="scroll-area h-full">
+        <div className="px-4 py-3 border-b border-slate-800">
+          <h2 className="text-lg font-bold">🔧 Sentence Builder</h2>
+          <p className="text-base text-slate-400">Pick a pattern, fill the blank, speak it!</p>
+        </div>
+        <div className="p-4">
+          <div className="bg-slate-800/40 rounded-xl p-4">
+            <p className="text-base text-slate-300 mb-3">Sentence Builder patterns for {lang === 'fr' ? 'French' : 'this language'} are coming soon!</p>
+            <p className="text-sm text-slate-500">In the meantime, try:</p>
+            <ul className="text-sm text-slate-400 mt-2 space-y-1.5">
+              <li>🌱 <strong>Sentence Grow</strong> — Build sentences step by step with AI</li>
+              <li>✍️ <strong>Sentence Check</strong> — Write a sentence and get feedback</li>
+              <li>🤖 <strong>AI tab</strong> — Ask about any grammar pattern</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Step 1: Pattern picker
   if (!selectedPattern) {
     return (
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
-          <h2 className="text-lg font-bold">🔧 Sentence Builder</h2>
+          <h2 className="text-lg font-bold">Sentence Builder</h2>
           <p className="text-base text-slate-400">Pick a pattern, fill the blank, speak it!</p>
         </div>
         <div className="px-4 pt-3">
@@ -407,22 +431,22 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
                 <p className="text-base text-slate-400 mt-0.5">{result.en}</p>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => speak(result.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
-                {onSave && <button onClick={() => onSave(result)} className="p-1 rounded-lg active:bg-slate-600 text-lg">⭐</button>}
-                <button onClick={handleCopy} className="p-1 rounded-lg active:bg-slate-600 text-base">
-                  {copied ? '✓' : '📋'}
+                <button onClick={() => speak(result.jp, getTtsLang(lang))} className="p-1 rounded-lg active:bg-slate-600 text-lg"><Volume2 size={20} /></button>
+                {onSave && <button onClick={() => onSave(result)} className="p-1 rounded-lg active:bg-slate-600"><Star size={18} className="fill-amber-400 text-amber-400" /></button>}
+                <button onClick={handleCopy} className="p-1 rounded-lg active:bg-slate-600">
+                  {copied ? '✓' : <Copy size={16} />}
                 </button>
               </div>
             </div>
             <div className="flex gap-2 mt-2">
               {isAIConfigured() && (
                 <button onClick={handleMoreExamples} disabled={loadingMore} className="flex-1 bg-indigo-900/40 text-indigo-300 text-sm py-1.5 rounded-lg active:bg-indigo-800/50 transition disabled:opacity-30">
-                  {loadingMore ? '...' : '✨ More like this'}
+                  {loadingMore ? '...' : 'More like this'}
                 </button>
               )}
               {onAskMore && (
                 <button onClick={() => onAskMore(result)} className="flex-1 bg-indigo-900/40 text-indigo-300 text-sm py-1.5 rounded-lg active:bg-indigo-800/50 transition">
-                  💬 Ask more
+                  Ask more
                 </button>
               )}
             </div>
@@ -439,7 +463,7 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
         {/* AI-generated examples */}
         {moreExamples && moreExamples.length > 0 && (
           <div>
-            <p className="text-sm text-slate-500 mb-2">✨ More examples using this pattern</p>
+            <p className="text-sm text-slate-500 mb-2">More examples using this pattern</p>
             <div className="space-y-1.5">
               {moreExamples.map((ex, i) => (
                 <div key={i} className="bg-slate-800/80 rounded-xl p-3 active:bg-slate-700/50 transition">
@@ -449,7 +473,7 @@ export function SentenceBuilder({ onAskMore, onSave }: { onAskMore?: (phrase: { 
                       <p className="text-base text-sakura-300">{ex.pronunciation}</p>
                       <p className="text-base text-slate-400">{ex.english}</p>
                     </div>
-                    <button onClick={() => speak(ex.target, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+                    <button onClick={() => speak(ex.target, getTtsLang(lang))} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0"><Volume2 size={20} /></button>
                   </div>
                 </div>
               ))}

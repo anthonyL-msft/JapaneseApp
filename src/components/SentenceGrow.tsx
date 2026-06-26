@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { speak } from '../utils/tts';
+import { Volume2, Star } from 'lucide-react';
+import { speak, getTtsLang } from '../utils/tts';
 import { askSentenceExpansion, isAIConfigured } from '../utils/ai';
 import type { SentenceExpansion } from '../utils/ai';
-import { SEED_SENTENCES, SEED_GROUPS, FALLBACK_CHAINS } from '../data/sentence-grow';
+import { SEED_SENTENCES, SEED_SENTENCES_FR, SEED_GROUPS, FALLBACK_CHAINS, FALLBACK_CHAINS_FR } from '../data/sentence-grow';
 import type { SeedSentence } from '../data/sentence-grow';
 
 interface TimelineEntry {
@@ -15,10 +16,11 @@ interface TimelineEntry {
 }
 
 interface Props {
+  lang?: string;
   onSave?: (phrase: { jp: string; rom: string; en: string }) => void;
 }
 
-export function SentenceGrow({ onSave }: Props) {
+export function SentenceGrow({ lang = 'ja', onSave }: Props) {
   const [seed, setSeed] = useState<SeedSentence | null>(null);
   const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
   const [options, setOptions] = useState<SentenceExpansion[]>([]);
@@ -63,8 +65,8 @@ export function SentenceGrow({ onSave }: Props) {
     if (configured) {
       loadExpansions(s.target, s.english, []);
     } else {
-      // Use fallback chains
-      const chain = FALLBACK_CHAINS[s.id];
+      const activeChains = lang === 'fr' ? FALLBACK_CHAINS_FR : FALLBACK_CHAINS;
+      const chain = activeChains[s.id];
       if (chain && chain[0]) {
         setOptions(chain[0]);
       }
@@ -112,7 +114,7 @@ export function SentenceGrow({ onSave }: Props) {
     return (
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
-          <h2 className="text-lg font-bold">🌱 Sentence Grow</h2>
+          <h2 className="text-lg font-bold">Sentence Grow</h2>
           <p className="text-base text-slate-400">Start simple, expand step by step</p>
         </div>
 
@@ -122,7 +124,8 @@ export function SentenceGrow({ onSave }: Props) {
           </div>
 
           {SEED_GROUPS.map(group => {
-            const seeds = SEED_SENTENCES.filter(s => s.group === group.id);
+            const activeSeedData = lang === 'fr' ? SEED_SENTENCES_FR : SEED_SENTENCES;
+            const seeds = activeSeedData.filter(s => s.group === group.id);
             if (seeds.length === 0) return null;
             return (
               <div key={group.id}>
@@ -168,7 +171,7 @@ export function SentenceGrow({ onSave }: Props) {
             <button
               onClick={() => onSave({ jp: finalEntry.target, rom: finalEntry.pronunciation_chunks, en: finalEntry.english })}
               className="text-sm px-3 py-1.5 rounded-lg bg-emerald-600/60 text-emerald-100 active:bg-emerald-600/80 transition"
-            >⭐ Save</button>
+            ><Star size={14} className="inline-block mr-1" /> Save</button>
           )}
         </div>
       </div>
@@ -186,9 +189,9 @@ export function SentenceGrow({ onSave }: Props) {
                 <p className="text-sm text-slate-400">{seed.english}</p>
               </div>
               <button
-                onClick={() => speak(seed.target, 'ja-JP')}
+                onClick={() => speak(seed.target, getTtsLang(lang))}
                 className="text-lg p-1 active:scale-110 transition-transform shrink-0"
-              >🔊</button>
+              ><Volume2 size={20} /></button>
             </div>
           </div>
         </div>
@@ -212,9 +215,9 @@ export function SentenceGrow({ onSave }: Props) {
                   <p className="text-sm text-slate-400">{entry.english}</p>
                 </div>
                 <button
-                  onClick={() => speak(entry.target, 'ja-JP')}
+                  onClick={() => speak(entry.target, getTtsLang(lang))}
                   className="text-lg p-1 active:scale-110 transition-transform shrink-0"
-                >🔊</button>
+                ><Volume2 size={20} /></button>
               </div>
             </div>
           </div>

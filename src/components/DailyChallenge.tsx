@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { BookOpen, RefreshCw, Volume2 } from 'lucide-react';
 import type { Phrase } from '../data/types';
 import { speak, getTtsLang } from '../utils/tts';
 
@@ -255,7 +256,7 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
         <div className="px-4 py-3">
           {/* Header */}
           <div className="border-b border-slate-800 pb-3 mb-4">
-            <h2 className="text-lg font-bold">🎯 Daily Challenge</h2>
+            <h2 className="text-lg font-bold">Daily Challenge</h2>
             <p className="text-base text-slate-400">A few minutes a day keeps the language growing!</p>
           </div>
 
@@ -277,7 +278,7 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
               {/* Learn task */}
               <div className={`rounded-xl p-4 border ${learnDone ? 'bg-emerald-900/20 border-emerald-700/30' : 'bg-slate-800/60 border-slate-700/30'}`}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-semibold text-slate-100">📖 Learn New Phrases</p>
+                  <p className="text-base font-semibold text-slate-100 flex items-center gap-1.5"><BookOpen size={16} /> Learn New Phrases</p>
                   <span className={`text-sm px-2 py-0.5 rounded-full ${learnDone ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
                     {learnProgress}/{LEARN_TARGET}
                   </span>
@@ -296,7 +297,7 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
               {/* Review task */}
               <div className={`rounded-xl p-4 border ${reviewDone ? 'bg-emerald-900/20 border-emerald-700/30' : 'bg-slate-800/60 border-slate-700/30'}`}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-semibold text-slate-100">🔄 Review Learned</p>
+                  <p className="text-base font-semibold text-slate-100 flex items-center gap-1.5"><RefreshCw size={16} /> Review Learned</p>
                   <span className={`text-sm px-2 py-0.5 rounded-full ${reviewDone ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
                     {reviewProgress}/{REVIEW_TARGET}
                   </span>
@@ -349,7 +350,7 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                 <>
                   <p className="text-3xl font-bold text-slate-50 mb-3">{currentLearn.target}</p>
                   <p className="text-base text-sakura-300 mb-2">{currentLearn.pronunciation_chunks || currentLearn.pronunciation}</p>
-                  <button onClick={(e) => { e.stopPropagation(); speak(currentLearn.target, getTtsLang(currentLearn.lang)); }} className="text-2xl mb-3 active:scale-110">🔊</button>
+                  <button onClick={(e) => { e.stopPropagation(); speak(currentLearn.target, getTtsLang(currentLearn.lang)); }} className="text-2xl mb-3 active:scale-110"><Volume2 size={24} /></button>
                   <p className="text-base text-slate-500">Tap to see meaning</p>
                 </>
               ) : (
@@ -359,8 +360,8 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                   <div className="border-t border-slate-700 w-full my-3" />
                   <p className="text-lg text-slate-200 mb-1">{currentLearn.english}</p>
                   {currentLearn.chinese_tc && <p className="text-base text-slate-400">{currentLearn.chinese_tc}</p>}
-                  {currentLearn.notes && <p className="text-sm text-amber-400 mt-2">💡 {currentLearn.notes}</p>}
-                  <button onClick={(e) => { e.stopPropagation(); speak(currentLearn.target, getTtsLang(currentLearn.lang)); }} className="text-xl mt-3 active:scale-110">🔊</button>
+                  {currentLearn.notes && <p className="text-sm text-amber-400 mt-2">{currentLearn.notes}</p>}
+                  <button onClick={(e) => { e.stopPropagation(); speak(currentLearn.target, getTtsLang(currentLearn.lang)); }} className="text-xl mt-3 active:scale-110"><Volume2 size={20} /></button>
                 </>
               )}
             </div>
@@ -428,7 +429,7 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                   <div className="border-t border-slate-700 w-full my-3" />
                   <p className="text-base text-slate-200">{currentReview.english}</p>
                   {currentReview.chinese_tc && <p className="text-base text-slate-400">{currentReview.chinese_tc}</p>}
-                  <button onClick={(e) => { e.stopPropagation(); speak(currentReview.target, getTtsLang(currentReview.lang)); }} className="text-xl mt-3 active:scale-110">🔊</button>
+                  <button onClick={(e) => { e.stopPropagation(); speak(currentReview.target, getTtsLang(currentReview.lang)); }} className="text-xl mt-3 active:scale-110"><Volume2 size={20} /></button>
                 </>
               )}
             </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Star, Tag } from 'lucide-react';
 import type { Phrase, UserNote, Category, Level } from '../data/types';
 import { CATEGORY_INFO } from '../data/types';
 import { PhraseCard } from './PhraseCard';
@@ -99,16 +100,16 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
       <div className="scroll-area h-full p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-xl font-bold mb-0.5">📖 Phrase Book</h1>
+            <h1 className="text-xl font-bold mb-0.5">Phrase Book</h1>
             <p className="text-slate-400 text-base">Select a category to start learning</p>
           </div>
           <div className="flex gap-2">
             {onShowCards && (
               <button
                 onClick={onShowCards}
-                className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0"
+                className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0 flex items-center gap-1"
               >
-                🃏 Cards
+                <Tag size={14} /> Cards
               </button>
             )}
           </div>
@@ -140,7 +141,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
                     <p className="text-base text-slate-400 mt-0.5">{catInfo.labelTC}</p>
                     <p className="text-base text-slate-500 mt-1">
                       {catPhrases.length} phrases
-                      {bookmarked > 0 && <span className="text-amber-400"> · ⭐ {bookmarked}</span>}
+                      {bookmarked > 0 && <span className="text-amber-400 flex items-center gap-0.5"> · <Star size={12} className="fill-amber-400" /> {bookmarked}</span>}
                     </p>
                   </button>
                 );

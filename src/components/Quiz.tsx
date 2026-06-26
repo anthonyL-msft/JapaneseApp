@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { speak } from '../utils/tts';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Trophy, Type, RefreshCw, Timer } from 'lucide-react';
+import { speak, getTtsLang } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 import { HIRAGANA_CARDS, KATAKANA_CARDS, HIRAGANA_VOCAB_CARDS, KATAKANA_VOCAB_CARDS } from '../data/kana-data';
 import type { KanaCard, KanaVocabCard } from '../data/kana-data';
@@ -9,25 +10,25 @@ type QuizCategory = 'hiragana' | 'katakana' | 'vocab-h' | 'vocab-k' | 'phrases' 
 type QuizMode = 'easy' | 'reverse' | 'hard';
 
 // Build phrase vocab cards from phrases.ts by situation groups
-const buildPhraseCards = (situations: string[]): KanaVocabCard[] => phrases
-  .filter(p => p.lang === 'ja' && p.category === 'vocab' && situations.includes(p.situation))
+const buildPhraseCards = (lang: string, situations: string[]): KanaVocabCard[] => phrases
+  .filter(p => p.lang === lang && p.category === 'vocab' && situations.includes(p.situation))
   .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
-const buildCategoryCards = (categories: string[]): KanaVocabCard[] => phrases
-  .filter(p => p.lang === 'ja' && categories.includes(p.category))
+const buildCategoryCards = (lang: string, categories: string[]): KanaVocabCard[] => phrases
+  .filter(p => p.lang === lang && categories.includes(p.category))
   .map(p => ({ jp: p.target, hep: p.pronunciation_chunks || p.pronunciation, en: p.english, kanaKey: p.pronunciation.slice(0, 2) }));
 
-// Topic-based vocab pools
-const VOCAB_WORDS_CARDS = buildPhraseCards(['Basic nouns', 'Pointing words', 'Colors']);
-const VOCAB_ACTIONS_CARDS = buildPhraseCards(['Basic verbs', 'Daily actions']);
-const VOCAB_TIME_CARDS = buildPhraseCards(['Numbers', 'Time', 'Meals', 'Days of the week']);
-const VOCAB_WORLD_CARDS = buildPhraseCards(['Basic places', 'Directions']);
-const VOCAB_PEOPLE_CARDS = buildPhraseCards(['People & Family', 'Body & Health', 'Basic adjectives']);
+// Topic-based vocab pools — will be rebuilt per lang inside component
+const VOCAB_WORDS_CARDS = buildPhraseCards('ja', ['Basic nouns', 'Pointing words', 'Colors']);
+const VOCAB_ACTIONS_CARDS = buildPhraseCards('ja', ['Basic verbs', 'Daily actions']);
+const VOCAB_TIME_CARDS = buildPhraseCards('ja', ['Numbers', 'Time', 'Meals', 'Days of the week']);
+const VOCAB_WORLD_CARDS = buildPhraseCards('ja', ['Basic places', 'Directions']);
+const VOCAB_PEOPLE_CARDS = buildPhraseCards('ja', ['People & Family', 'Body & Health', 'Basic adjectives']);
 
-// Phrase category pools
-const PHRASES_POWER_CARDS = buildCategoryCards(['power']);
-const PHRASES_TRAVEL_CARDS = buildCategoryCards(['airport', 'directions', 'hotel']);
-const PHRASES_FOOD_CARDS = buildCategoryCards(['restaurant', 'food', 'drinks']);
+// Phrase category pools — will be rebuilt per lang inside component
+const PHRASES_POWER_CARDS = buildCategoryCards('ja', ['power']);
+const PHRASES_TRAVEL_CARDS = buildCategoryCards('ja', ['airport', 'directions', 'hotel']);
+const PHRASES_FOOD_CARDS = buildCategoryCards('ja', ['restaurant', 'food', 'drinks']);
 
 // Sentence patterns for quiz
 const PATTERNS_CARDS: KanaVocabCard[] = [
@@ -130,10 +131,24 @@ function setHighScore(cat: QuizCategory, score: number) {
   if (capped > prev) localStorage.setItem(`quiz_high_${cat}`, String(capped));
 }
 
-export function Quiz() {
+export function Quiz({ lang = 'ja' }: { lang?: string }) {
   const panel = useSlidePanel<QuizCategory>();
   const [startPage, setStartPage] = useState<'hiragana' | 'katakana' | null>(null);
   const [quizMode, setQuizMode] = useState<QuizMode>('easy');
+
+  // Rebuild card pools when lang changes
+  const langCards = useMemo(() => ({
+    'vocab-words': buildPhraseCards(lang, ['Basic nouns', 'Pointing words', 'Colors']),
+    'vocab-actions': buildPhraseCards(lang, ['Basic verbs', 'Daily actions']),
+    'vocab-time': buildPhraseCards(lang, ['Numbers', 'Time', 'Meals', 'Days of the week']),
+    'vocab-world': buildPhraseCards(lang, ['Basic places', 'Directions']),
+    'vocab-people': buildPhraseCards(lang, ['People & Family', 'Body & Health', 'Basic adjectives']),
+    'phrases-power': buildCategoryCards(lang, ['power']),
+    'phrases-travel': buildCategoryCards(lang, ['airport', 'directions', 'hotel']),
+    'phrases-food': buildCategoryCards(lang, ['restaurant', 'food', 'drinks']),
+    'phrases': buildCategoryCards(lang, ['vocab']),
+    'all-phrases': buildCategoryCards(lang, ['greetings', 'basics', 'airport', 'hotel', 'restaurant', 'food', 'drinks', 'shopping', 'directions', 'emergency', 'smalltalk', 'power']),
+  }), [lang]);
 
   // Game state
   const [kanaCards, setKanaCards] = useState<KanaCard[]>([]);
@@ -218,8 +233,8 @@ export function Quiz() {
   useEffect(() => {
     if (!answered) return;
     const speakTimeout = setTimeout(() => {
-      if (isKana && currentKana) speak(currentKana.char, 'ja-JP');
-      else if (isVocab && currentVocab) speak(currentVocab.jp, 'ja-JP');
+      if (isKana && currentKana) speak(currentKana.char, getTtsLang(lang));
+      else if (isVocab && currentVocab) speak(currentVocab.jp, getTtsLang(lang));
     }, 300);
     const advanceTimeout = setTimeout(() => {
       if (currentIndex + 1 >= GAME_ROUNDS) {
@@ -257,21 +272,21 @@ export function Quiz() {
       const vocabMap: Record<string, KanaVocabCard[]> = {
         'vocab-h': HIRAGANA_VOCAB_CARDS,
         'vocab-k': KATAKANA_VOCAB_CARDS,
-        'phrases': PHRASE_VOCAB_CARDS,
-        'vocab-words': VOCAB_WORDS_CARDS,
-        'vocab-actions': VOCAB_ACTIONS_CARDS,
-        'vocab-time': VOCAB_TIME_CARDS,
-        'vocab-world': VOCAB_WORLD_CARDS,
-        'vocab-people': VOCAB_PEOPLE_CARDS,
-        'phrases-power': PHRASES_POWER_CARDS,
-        'phrases-travel': PHRASES_TRAVEL_CARDS,
-        'phrases-food': PHRASES_FOOD_CARDS,
+        'phrases': langCards['phrases'],
+        'vocab-words': langCards['vocab-words'],
+        'vocab-actions': langCards['vocab-actions'],
+        'vocab-time': langCards['vocab-time'],
+        'vocab-world': langCards['vocab-world'],
+        'vocab-people': langCards['vocab-people'],
+        'phrases-power': langCards['phrases-power'],
+        'phrases-travel': langCards['phrases-travel'],
+        'phrases-food': langCards['phrases-food'],
         'patterns': PATTERNS_CARDS,
         'counters': COUNTERS_CARDS,
         'signs': SIGNS_CARDS,
         'particles': PARTICLES_CARDS,
       };
-      vCards = shuffle(vocabMap[cat] || PHRASE_VOCAB_CARDS);
+      vCards = shuffle(vocabMap[cat] || langCards['all-phrases']);
       setVocabCards(vCards);
     }
 
@@ -303,18 +318,19 @@ export function Quiz() {
       {/* Landing: Category Picker */}
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
-          <h2 className="text-lg font-bold">🎮 Quiz</h2>
+          <h2 className="text-lg font-bold">Quiz</h2>
           <p className="text-base text-slate-400">Timed multiple choice — test your speed!</p>
         </div>
 
         <div className="p-4 space-y-4">
           {/* Info */}
           <div className="bg-slate-800/40 rounded-xl p-3">
-            <p className="text-sm text-slate-400">⏱️ {GAME_TIME}s per question · {GAME_ROUNDS} questions per round</p>
+            <p className="text-sm text-slate-400 flex items-center gap-1"><Timer size={14} /> {GAME_TIME}s per question · {GAME_ROUNDS} questions per round</p>
             <p className="text-sm text-slate-500 mt-1">Pick the correct answer from 4 choices before time runs out!</p>
           </div>
 
           {/* Kana Characters */}
+          {lang === 'ja' && (
           <div>
             <p className="text-sm text-slate-500 mb-2">Kana Characters</p>
             <div className="grid grid-cols-2 gap-2">
@@ -326,7 +342,7 @@ export function Quiz() {
                 <span className="text-base font-semibold text-slate-100">Hiragana</span>
                 <span className="text-sm text-slate-500">{HIRAGANA_CARDS.length} characters</span>
                 {getHighScore('hiragana') > 0 && (
-                  <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('hiragana')}/{GAME_ROUNDS}</span>
+                  <span className="text-xs text-amber-400 mt-1 flex items-center gap-0.5"><Trophy size={12} /> Best: {getHighScore('hiragana')}/{GAME_ROUNDS}</span>
                 )}
               </button>
               <button
@@ -337,48 +353,51 @@ export function Quiz() {
                 <span className="text-base font-semibold text-slate-100">Katakana</span>
                 <span className="text-sm text-slate-500">{KATAKANA_CARDS.length} characters</span>
                 {getHighScore('katakana') > 0 && (
-                  <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('katakana')}/{GAME_ROUNDS}</span>
+                  <span className="text-xs text-amber-400 mt-1 flex items-center gap-0.5"><Trophy size={12} /> Best: {getHighScore('katakana')}/{GAME_ROUNDS}</span>
                 )}
               </button>
             </div>
           </div>
+          )}
 
-          {/* Vocabulary by Topic */}
+          {/* Vocabulary by Topic — only show if this lang has vocab items */}
+          {langCards['vocab-words'].length > 0 && (
           <div>
             <p className="text-sm text-slate-500 mb-2">Vocabulary</p>
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => startGame('vocab-words')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">📦</span>
                 <span className="text-base font-semibold text-slate-100">Words</span>
-                <span className="text-sm text-slate-500">{VOCAB_WORDS_CARDS.length} words</span>
-                {getHighScore('vocab-words') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('vocab-words')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-words"].length} words</span>
+                {getHighScore('vocab-words') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('vocab-words')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('vocab-actions')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">🎯</span>
                 <span className="text-base font-semibold text-slate-100">Actions</span>
-                <span className="text-sm text-slate-500">{VOCAB_ACTIONS_CARDS.length} words</span>
-                {getHighScore('vocab-actions') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('vocab-actions')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-actions"].length} words</span>
+                {getHighScore('vocab-actions') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('vocab-actions')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('vocab-time')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">🕐</span>
                 <span className="text-base font-semibold text-slate-100">Time</span>
-                <span className="text-sm text-slate-500">{VOCAB_TIME_CARDS.length} words</span>
-                {getHighScore('vocab-time') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('vocab-time')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-time"].length} words</span>
+                {getHighScore('vocab-time') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('vocab-time')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('vocab-world')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">🌍</span>
                 <span className="text-base font-semibold text-slate-100">World</span>
-                <span className="text-sm text-slate-500">{VOCAB_WORLD_CARDS.length} words</span>
-                {getHighScore('vocab-world') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('vocab-world')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-world"].length} words</span>
+                {getHighScore('vocab-world') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('vocab-world')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('vocab-people')} className="bg-purple-900/30 border border-purple-700/30 rounded-xl p-4 text-left active:bg-purple-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">👥</span>
                 <span className="text-base font-semibold text-slate-100">People</span>
-                <span className="text-sm text-slate-500">{VOCAB_PEOPLE_CARDS.length} words</span>
-                {getHighScore('vocab-people') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('vocab-people')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["vocab-people"].length} words</span>
+                {getHighScore('vocab-people') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('vocab-people')}/{GAME_ROUNDS}</span>}
               </button>
             </div>
           </div>
+          )}
 
           {/* Phrases */}
           <div>
@@ -387,45 +406,47 @@ export function Quiz() {
               <button onClick={() => startGame('phrases-power')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">⚡</span>
                 <span className="text-base font-semibold text-slate-100">Power Phrases</span>
-                <span className="text-sm text-slate-500">{PHRASES_POWER_CARDS.length} phrases</span>
-                {getHighScore('phrases-power') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('phrases-power')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["phrases-power"].length} phrases</span>
+                {getHighScore('phrases-power') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('phrases-power')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('phrases-travel')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">✈️</span>
                 <span className="text-base font-semibold text-slate-100">Travel</span>
-                <span className="text-sm text-slate-500">{PHRASES_TRAVEL_CARDS.length} phrases</span>
-                {getHighScore('phrases-travel') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('phrases-travel')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["phrases-travel"].length} phrases</span>
+                {getHighScore('phrases-travel') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('phrases-travel')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('phrases-food')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">🍜</span>
                 <span className="text-base font-semibold text-slate-100">Food</span>
-                <span className="text-sm text-slate-500">{PHRASES_FOOD_CARDS.length} phrases</span>
-                {getHighScore('phrases-food') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('phrases-food')}/{GAME_ROUNDS}</span>}
+                <span className="text-sm text-slate-500">{langCards["phrases-food"].length} phrases</span>
+                {getHighScore('phrases-food') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('phrases-food')}/{GAME_ROUNDS}</span>}
               </button>
+              {lang === 'ja' && (<>
               <button onClick={() => startGame('patterns')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">📐</span>
                 <span className="text-base font-semibold text-slate-100">Patterns</span>
                 <span className="text-sm text-slate-500">{PATTERNS_CARDS.length} patterns</span>
-                {getHighScore('patterns') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('patterns')}/{GAME_ROUNDS}</span>}
+                {getHighScore('patterns') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('patterns')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('counters')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">📏</span>
                 <span className="text-base font-semibold text-slate-100">Counters</span>
                 <span className="text-sm text-slate-500">{COUNTERS_CARDS.length} counters</span>
-                {getHighScore('counters') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('counters')}/{GAME_ROUNDS}</span>}
+                {getHighScore('counters') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('counters')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('signs')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">🪧</span>
                 <span className="text-base font-semibold text-slate-100">Signs</span>
                 <span className="text-sm text-slate-500">{SIGNS_CARDS.length} signs</span>
-                {getHighScore('signs') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('signs')}/{GAME_ROUNDS}</span>}
+                {getHighScore('signs') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('signs')}/{GAME_ROUNDS}</span>}
               </button>
               <button onClick={() => startGame('particles')} className="bg-emerald-900/30 border border-emerald-700/30 rounded-xl p-4 text-left active:bg-emerald-800/40 transition flex flex-col gap-1">
                 <span className="text-3xl">🔤</span>
                 <span className="text-base font-semibold text-slate-100">Particles</span>
                 <span className="text-sm text-slate-500">{PARTICLES_CARDS.length} particles</span>
-                {getHighScore('particles') > 0 && <span className="text-xs text-amber-400 mt-1">🏆 Best: {getHighScore('particles')}/{GAME_ROUNDS}</span>}
+                {getHighScore('particles') > 0 && <span className="text-xs text-amber-400 mt-1"><Trophy size={12} className="inline-block mr-0.5" /> Best: {getHighScore('particles')}/{GAME_ROUNDS}</span>}
               </button>
+              </>)}
             </div>
           </div>
         </div>
@@ -620,7 +641,7 @@ export function Quiz() {
                 {Math.round((gameScore.correct / gameScore.total) * 100)}% correct
               </p>
               {panel.value && getHighScore(panel.value) > 0 && (
-                <p className="text-base text-amber-400 mb-2">🏆 Best: {getHighScore(panel.value)}/{GAME_ROUNDS}</p>
+                <p className="text-base text-amber-400 mb-2 flex items-center justify-center gap-1"><Trophy size={16} /> Best: {getHighScore(panel.value)}/{GAME_ROUNDS}</p>
               )}
               <p className="text-base text-slate-500 mb-6">
                 {gameScore.correct >= GAME_ROUNDS * 0.8 ? 'Excellent!' : gameScore.correct >= GAME_ROUNDS * 0.5 ? 'Good effort!' : 'Keep practicing!'}
@@ -629,7 +650,7 @@ export function Quiz() {
                 <button
                   onClick={restartGame}
                   className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base"
-                >🔄 Play Again</button>
+                ><RefreshCw size={14} className="inline-block mr-1" /> Play Again</button>
                 <button
                   onClick={exitGame}
                   className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base"

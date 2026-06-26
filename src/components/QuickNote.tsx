@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Pencil, Trash2, X } from 'lucide-react';
 import type { UserNote } from '../data/types';
 
 interface Props {
@@ -35,7 +36,7 @@ export function QuickNote({ notes, onSaveNote, onDeleteNote }: Props) {
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">📝 Quick Note</h2>
+        <h2 className="text-lg font-bold">Quick Note</h2>
         <p className="text-base text-slate-400">WiFi passwords, restaurant names, reminders</p>
       </div>
 
@@ -80,7 +81,7 @@ export function QuickNote({ notes, onSaveNote, onDeleteNote }: Props) {
                       autoFocus
                     />
                     <button onClick={handleSaveEdit} className="text-base text-emerald-400 px-2">Save</button>
-                    <button onClick={() => setEditingId(null)} className="text-base text-slate-500 px-2">✕</button>
+                    <button onClick={() => setEditingId(null)} className="text-base text-slate-500 px-2"><X size={16} /></button>
                   </div>
                 ) : (
                   <div className="flex items-start justify-between gap-2">
@@ -89,11 +90,11 @@ export function QuickNote({ notes, onSaveNote, onDeleteNote }: Props) {
                       <button
                         onClick={() => { setEditingId(note.id); setEditText(note.text); }}
                         className="p-1 rounded-lg active:bg-slate-600 text-base text-slate-500"
-                      >✏️</button>
+                      ><Pencil size={14} /></button>
                       <button
                         onClick={() => onDeleteNote(note.id)}
                         className="p-1 rounded-lg active:bg-slate-600 text-base text-slate-500"
-                      >🗑️</button>
+                      ><Trash2 size={14} /></button>
                     </div>
                   </div>
                 )}

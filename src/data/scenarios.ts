@@ -1112,4 +1112,82 @@ export const scenarios: Scenario[] = [
       { speaker: 'you', target: '風邪薬をください', pronunciation: 'kaze-gusuri wo kudasai', pronunciation_chunks: 'ka·ze·gu·su·ri wo ku·da·sai', english: 'Cold medicine please.', chinese_tc: '請給我感冒藥', note: 'Useful: 頭痛薬 (headache), 胃薬 (stomach), 解熱剤 (fever reducer)' },
     ],
   },
+
+  // ============================================================
+  // FRENCH SCENARIOS
+  // ============================================================
+  {
+    id: 'fr-sc01', lang: 'fr', group: 'restaurant',
+    title: 'Au Restaurant', titleTC: '法式餐廳',
+    emoji: '🍽️', description: 'Ordering food and drinks at a French restaurant',
+    lines: [
+      { speaker: 'staff', target: 'Bonsoir, vous avez réservé ?', pronunciation: 'bonswar vu zavay rayzervay', pronunciation_chunks: 'bon·swar vu za·vay ray·zer·vay', english: 'Good evening, do you have a reservation?', chinese_tc: '晚上好，有預約嗎？' },
+      { speaker: 'you', target: 'Non, une table pour deux, s\'il vous plaît', pronunciation: 'non un tabl poor duh sil vu pleh', pronunciation_chunks: 'non un ta·bl poor duh sil vu pleh', english: 'No, a table for two, please', chinese_tc: '沒有，請給我們兩位的桌子' },
+      { speaker: 'staff', target: 'Suivez-moi, s\'il vous plaît', pronunciation: 'sweevay mwa sil vu pleh', pronunciation_chunks: 'swee·vay mwa sil vu pleh', english: 'Follow me, please', chinese_tc: '請跟我來' },
+      { speaker: 'you', target: 'La carte, s\'il vous plaît', pronunciation: 'la kart sil vu pleh', pronunciation_chunks: 'la kart sil vu pleh', english: 'The menu, please', chinese_tc: '請給我菜單' },
+      { speaker: 'staff', target: 'Voilà. Vous désirez un apéritif ?', pronunciation: 'vwala vu dayziray un apayritif', pronunciation_chunks: 'vwa·la vu day·zi·ray un a·pay·ri·tif', english: 'Here you go. Would you like an aperitif?', chinese_tc: '給您。要來杯開胃酒嗎？' },
+      { speaker: 'you', target: 'Deux verres de vin rouge, s\'il vous plaît', pronunciation: 'duh vehr duh ven roozh sil vu pleh', pronunciation_chunks: 'duh vehr duh ven roozh sil vu pleh', english: 'Two glasses of red wine, please', chinese_tc: '兩杯紅酒，謝謝', options: [
+        { target: 'Deux verres de vin rouge', pronunciation: 'duh vehr duh ven roozh', english: 'Two glasses of red wine', chinese_tc: '兩杯紅酒' },
+        { target: 'Une carafe d\'eau', pronunciation: 'un karaf do', english: 'A carafe of water', chinese_tc: '一壺水' },
+        { target: 'Deux bières, s\'il vous plaît', pronunciation: 'duh biehr sil vu pleh', english: 'Two beers, please', chinese_tc: '兩杯啤酒' },
+      ] },
+      { speaker: 'you', target: 'Qu\'est-ce que vous recommandez ?', pronunciation: 'kess kuh vu ruhkomanday', pronunciation_chunks: 'kes kuh vu ruh·ko·man·day', english: 'What do you recommend?', chinese_tc: '你推薦什麼？' },
+      { speaker: 'staff', target: 'Le plat du jour est excellent', pronunciation: 'luh pla du zhoor eh eksellont', pronunciation_chunks: 'luh pla du zhoor eh ek·se·lont', english: 'The dish of the day is excellent', chinese_tc: '今日特餐非常好' },
+      { speaker: 'you', target: 'Je prends le plat du jour', pronunciation: 'zhuh pron luh pla du zhoor', pronunciation_chunks: 'zhuh pron luh pla du zhoor', english: "I'll have the dish of the day", chinese_tc: '我要今日特餐' },
+      { speaker: 'you', target: 'L\'addition, s\'il vous plaît', pronunciation: 'ladision sil vu pleh', pronunciation_chunks: 'la·di·sion sil vu pleh', english: 'The bill, please', chinese_tc: '請結帳' },
+    ],
+  },
+  {
+    id: 'fr-sc02', lang: 'fr', group: 'hotel',
+    title: "Check-in à l'Hôtel", titleTC: '飯店入住',
+    emoji: '🏨', description: 'Checking in at a French hotel',
+    lines: [
+      { speaker: 'staff', target: 'Bonjour, bienvenue. Vous avez une réservation ?', pronunciation: 'bonjour bienvenu vu zavay un rayzervahsion', pronunciation_chunks: 'bon·jour bien·ve·nu vu za·vay un ray·zer·vah·sion', english: 'Hello, welcome. Do you have a reservation?', chinese_tc: '你好，歡迎。有預約嗎？' },
+      { speaker: 'you', target: "Oui, j'ai une réservation au nom de ○○", pronunciation: 'wi zhay un rayzervahsion o nom duh', pronunciation_chunks: 'wi zhay un ray·zer·vah·sion o nom duh', english: 'Yes, I have a reservation under ○○', chinese_tc: '有的，我有預約，名字是○○' },
+      { speaker: 'staff', target: 'Votre passeport, s\'il vous plaît', pronunciation: 'votr paspor sil vu pleh', pronunciation_chunks: 'vo·tr pas·por sil vu pleh', english: 'Your passport, please', chinese_tc: '請出示護照' },
+      { speaker: 'staff', target: 'Voici votre clé. Chambre 305, troisième étage', pronunciation: 'vwasi votr klay shombr trwa son sink troazyem etazh', pronunciation_chunks: 'vwa·si vo·tr klay shom·br trwa·zyem e·tazh', english: 'Here is your key. Room 305, third floor', chinese_tc: '這是您的鑰匙。305號房，三樓' },
+      { speaker: 'you', target: 'Le petit-déjeuner est à quelle heure ?', pronunciation: 'luh puhtee dayzhunay eh a kel uhr', pronunciation_chunks: 'luh puh·tee day·zhu·nay eh a kel uhr', english: 'What time is breakfast?', chinese_tc: '早餐是幾點？' },
+      { speaker: 'staff', target: 'De sept heures à dix heures', pronunciation: 'duh set uhr a deez uhr', pronunciation_chunks: 'duh set uhr a deez uhr', english: 'From 7 to 10', chinese_tc: '七點到十點' },
+      { speaker: 'you', target: 'Merci beaucoup', pronunciation: 'mehrsi boku', pronunciation_chunks: 'mehr·si bo·ku', english: 'Thank you very much', chinese_tc: '非常感謝' },
+    ],
+  },
+  {
+    id: 'fr-sc03', lang: 'fr', group: 'train',
+    title: 'À la Gare', titleTC: '火車站',
+    emoji: '🚆', description: 'Buying tickets and navigating a French train station',
+    lines: [
+      { speaker: 'you', target: 'Deux billets pour Lyon, s\'il vous plaît', pronunciation: 'duh biyay poor lion sil vu pleh', pronunciation_chunks: 'duh bi·yay poor lion sil vu pleh', english: 'Two tickets to Lyon, please', chinese_tc: '請給我兩張到里昂的票', variables: [
+        { placeholder: 'Lyon', label: 'Destination', options: [
+          { value: 'Lyon', pronunciation: 'lion', english: 'Lyon' },
+          { value: 'Marseille', pronunciation: 'marsay', english: 'Marseille' },
+          { value: 'Nice', pronunciation: 'nees', english: 'Nice' },
+          { value: 'Bordeaux', pronunciation: 'bordo', english: 'Bordeaux' },
+          { value: 'Strasbourg', pronunciation: 'strazboor', english: 'Strasbourg' },
+        ] },
+      ] },
+      { speaker: 'staff', target: 'Aller simple ou aller-retour ?', pronunciation: 'alay simpl oo alay ruhtoor', pronunciation_chunks: 'a·lay sim·pl oo a·lay ruh·toor', english: 'One-way or round trip?', chinese_tc: '單程還是來回？' },
+      { speaker: 'you', target: 'Aller-retour, s\'il vous plaît', pronunciation: 'alay ruhtoor sil vu pleh', pronunciation_chunks: 'a·lay ruh·toor sil vu pleh', english: 'Round trip, please', chinese_tc: '來回，謝謝', options: [
+        { target: 'Aller-retour', pronunciation: 'alay ruhtoor', english: 'Round trip', chinese_tc: '來回' },
+        { target: 'Aller simple', pronunciation: 'alay simpl', english: 'One-way', chinese_tc: '單程' },
+      ] },
+      { speaker: 'staff', target: 'Le prochain train part à 14h30, voie 7', pronunciation: 'luh proshain tren par a katorzuhr tront vwa set', pronunciation_chunks: 'luh pro·shain tren par a ka·torz·uhr tront vwa set', english: 'The next train leaves at 2:30 PM, platform 7', chinese_tc: '下一班火車14:30出發，第7月台' },
+      { speaker: 'you', target: 'Merci. Où est la voie 7 ?', pronunciation: 'mehrsi oo eh la vwa set', pronunciation_chunks: 'mehr·si oo eh la vwa set', english: 'Thanks. Where is platform 7?', chinese_tc: '謝謝。第7月台在哪裡？' },
+    ],
+  },
+  {
+    id: 'fr-sc04', lang: 'fr', group: 'shopping',
+    title: 'Faire du Shopping', titleTC: '購物',
+    emoji: '🛍️', description: 'Shopping at a French boutique or market',
+    lines: [
+      { speaker: 'staff', target: 'Bonjour, je peux vous aider ?', pronunciation: 'bonjour zhuh puh vu zayday', pronunciation_chunks: 'bon·jour zhuh puh vu zay·day', english: 'Hello, can I help you?', chinese_tc: '你好，需要幫忙嗎？' },
+      { speaker: 'you', target: 'Je regarde, merci', pronunciation: 'zhuh ruhgard mehrsi', pronunciation_chunks: 'zhuh ruh·gard mehr·si', english: "I'm just looking, thanks", chinese_tc: '我只是看看', options: [
+        { target: 'Je regarde, merci', pronunciation: 'zhuh ruhgard mehrsi', english: "I'm just looking, thanks", chinese_tc: '我只是看看' },
+        { target: 'Je cherche un cadeau', pronunciation: 'zhuh shehrsh un kado', english: "I'm looking for a gift", chinese_tc: '我在找禮物' },
+      ] },
+      { speaker: 'you', target: 'C\'est combien ?', pronunciation: 'seh combien', pronunciation_chunks: 'seh com·bien', english: 'How much is it?', chinese_tc: '多少錢？' },
+      { speaker: 'staff', target: 'C\'est vingt-cinq euros', pronunciation: 'seh vent senk uhro', pronunciation_chunks: 'seh vent senk uh·ro', english: "It's twenty-five euros", chinese_tc: '二十五歐元' },
+      { speaker: 'you', target: 'Je le prends', pronunciation: 'zhuh luh pron', pronunciation_chunks: 'zhuh luh pron', english: "I'll take it", chinese_tc: '我要買這個' },
+      { speaker: 'you', target: 'On peut payer par carte ?', pronunciation: 'on puh payay par kart', pronunciation_chunks: 'on puh pay·ay par kart', english: 'Can we pay by card?', chinese_tc: '可以刷卡嗎？' },
+    ],
+  },
 ];

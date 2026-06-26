@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
+import { Volume2, CircleCheck, CircleX } from 'lucide-react';
 import { askCheckSentence, isAIConfigured } from '../utils/ai';
 import type { AIPhrase } from '../utils/ai';
-import { speak } from '../utils/tts';
+import { speak, getTtsLang } from '../utils/tts';
 
 interface Props {
   lang: string;
@@ -69,7 +70,7 @@ export function SentenceCheck({ lang, explainLang = 'en' }: Props) {
             <button onClick={() => { setResult(null); setInput(''); }} className="text-lg text-slate-400 active:text-slate-200 p-1">←</button>
           )}
           <div>
-            <h2 className="text-lg font-bold">✍️ Sentence Check</h2>
+            <h2 className="text-lg font-bold">Sentence Check</h2>
             {!result && <p className="text-sm text-slate-400">Write a sentence and I'll check if it's correct</p>}
           </div>
         </div>
@@ -113,9 +114,9 @@ export function SentenceCheck({ lang, explainLang = 'en' }: Props) {
                     <p className="text-sm text-slate-400 mt-0.5">{result.example.english}</p>
                   </div>
                   <button
-                    onClick={() => speak(result.example!.target, 'ja-JP')}
+                    onClick={() => speak(result.example!.target, getTtsLang(lang))}
                     className="text-lg p-1 active:scale-110 shrink-0"
-                  >🔊</button>
+                  ><Volume2 size={20} /></button>
                 </div>
               </div>
             )}
@@ -134,8 +135,8 @@ export function SentenceCheck({ lang, explainLang = 'en' }: Props) {
                   className="w-full bg-slate-800/40 rounded-xl p-3 text-left active:bg-slate-700/50 transition"
                 >
                   <p className="text-base text-slate-200 truncate">{item.input}</p>
-                  <p className="text-sm text-slate-500 mt-0.5 truncate">
-                    {item.answer.startsWith('✅') ? '✅ Correct' : '❌ Needs correction'}
+                  <p className="text-sm text-slate-500 mt-0.5 truncate flex items-center gap-1">
+                    {item.answer.startsWith('✅') ? <><CircleCheck size={14} className="text-emerald-400" /> Correct</> : <><CircleX size={14} className="text-red-400" /> Needs correction</>}
                   </p>
                 </button>
               ))}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Volume2, Pencil, Paintbrush, RefreshCw, X } from 'lucide-react';
 import { speak } from '../utils/tts';
 import { HIRAGANA_STROKES } from '../data/hiragana-strokes';
 
@@ -120,7 +121,7 @@ function LearningPage({ onBack }: { onBack: () => void }) {
       <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-2">
         <button onClick={onBack} className="text-base text-slate-400 p-1">←</button>
         <div>
-          <h2 className="text-lg font-bold">📖 Learning</h2>
+          <h2 className="text-lg font-bold">Learning</h2>
           <p className="text-sm text-slate-400">Study stroke order & practice tracing</p>
         </div>
       </div>
@@ -159,7 +160,7 @@ function LearningPage({ onBack }: { onBack: () => void }) {
         {/* Controls */}
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">Clear</button>
-          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600">🔊</button>
+          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600"><Volume2 size={20} /></button>
           <button
             onClick={() => setShowGuide(g => !g)}
             className={`px-4 py-2 rounded-lg text-sm ${showGuide ? 'bg-indigo-500/60 text-white' : 'bg-slate-800 text-slate-500'}`}
@@ -167,7 +168,7 @@ function LearningPage({ onBack }: { onBack: () => void }) {
           <button
             onClick={toggleFont}
             className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm active:bg-slate-600"
-          >{fontId === 'klee' ? '✏️ Textbook' : '🖌️ Brush'}</button>
+          >{fontId === 'klee' ? <><Pencil size={14} className="inline-block mr-1" /> Textbook</> : <><Paintbrush size={14} className="inline-block mr-1" /> Brush</>}</button>
         </div>
 
         {/* Character grid */}
@@ -290,7 +291,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base">🔄 Again</button>
+            <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base flex items-center gap-1"><RefreshCw size={14} /> Again</button>
             <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base">← Back</button>
           </div>
         </div>
@@ -312,7 +313,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
           <button
             onClick={handleStart}
             className="px-8 py-3 rounded-xl bg-indigo-500/80 text-white text-lg active:bg-indigo-600 transition"
-          >🔊 Start</button>
+          ><Volume2 size={16} className="inline-block mr-1" />Start</button>
         </div>
       </div>
     );
@@ -343,7 +344,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
         {/* Prompt */}
         <div className="text-center">
           <p className="text-base text-slate-400 mb-1">Listen and draw:</p>
-          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="text-3xl active:scale-110 transition-transform">🔊</button>
+          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="text-3xl active:scale-110 transition-transform"><Volume2 size={20} /></button>
         </div>
 
         {/* Canvas */}
@@ -369,7 +370,7 @@ function DictationPage({ onBack }: { onBack: () => void }) {
         {!revealed ? (
           <div className="flex items-center justify-center gap-2">
             <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm">Clear</button>
-            <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm">🔊 Again</button>
+            <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm flex items-center gap-1"><Volume2 size={14} /> Again</button>
             <button onClick={() => { if (timerRef.current) clearInterval(timerRef.current); setRevealed(true); }} className="px-4 py-2 rounded-lg bg-amber-600/80 text-white text-sm">Check</button>
           </div>
         ) : (
@@ -479,7 +480,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
           <p className="text-lg text-slate-400 mb-1">{total} characters attempted in {SPRINT_TIME}s</p>
           <p className="text-base text-slate-500 mb-4">{score >= total * 0.8 ? 'Excellent speed!' : score >= total * 0.5 ? 'Good pace!' : 'Keep practicing!'}</p>
           <div className="flex gap-3">
-            <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base">🔄 Again</button>
+            <button onClick={restart} className="px-5 py-2.5 rounded-xl bg-amber-900/50 text-amber-300 active:bg-amber-800/60 text-base flex items-center gap-1"><RefreshCw size={14} /> Again</button>
             <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 active:bg-slate-700 text-base">← Back</button>
           </div>
         </div>
@@ -501,7 +502,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
           <button
             onClick={beginSprint}
             className="px-8 py-3 rounded-xl bg-amber-500/80 text-white text-lg active:bg-amber-600 transition"
-          >🔊 Go!</button>
+          ><Volume2 size={16} className="inline-block mr-1" />Go!</button>
         </div>
       </div>
     );
@@ -531,7 +532,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
 
         {/* Prompt */}
         <div className="text-center">
-          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="text-3xl active:scale-110 transition-transform">🔊</button>
+          <button onClick={() => speak(currentChar.char, 'ja-JP')} className="text-3xl active:scale-110 transition-transform"><Volume2 size={20} /></button>
         </div>
 
         {/* Canvas */}
@@ -554,7 +555,7 @@ function SprintPage({ onBack }: { onBack: () => void }) {
         {!revealed ? (
           <div className="flex items-center justify-center gap-2">
             <button onClick={() => clearRef.current?.()} className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-sm">Clear</button>
-            <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm">🔊</button>
+            <button onClick={() => speak(currentChar.char, 'ja-JP')} className="px-4 py-2 rounded-lg bg-indigo-500/80 text-white text-sm"><Volume2 size={20} /></button>
             <button onClick={handleCheck} className="px-4 py-2 rounded-lg bg-amber-600/80 text-white text-sm">Check</button>
           </div>
         ) : (
@@ -584,7 +585,7 @@ export function WritingPractice() {
   return (
     <div className="h-full scroll-area">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">✍️ Writing Practice</h2>
+          <h2 className="text-lg font-bold">Writing Practice</h2>
         <p className="text-base text-slate-400">Learn to write hiragana by hand</p>
       </div>
 

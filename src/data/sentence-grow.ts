@@ -171,3 +171,59 @@ export const SEED_GROUPS: { id: string; label: string; emoji: string }[] = [
   { id: 'social', label: 'Social', emoji: '💬' },
   { id: 'emergency', label: 'Emergency', emoji: '🚨' },
 ];
+
+// === French Seed Sentences ===
+export const SEED_SENTENCES_FR: SeedSentence[] = [
+  { id: 'fr-s1', group: 'travel', target: 'Je suis allé(e)', pronunciation: 'zhuh swee alay', pronunciation_chunks: 'zhuh swee a·lay', english: 'I went' },
+  { id: 'fr-s2', group: 'travel', target: "J'irai", pronunciation: 'zheeray', pronunciation_chunks: 'zhee·ray', english: "I'll go" },
+  { id: 'fr-s3', group: 'food', target: "J'ai mangé", pronunciation: 'zhay monzhay', pronunciation_chunks: 'zhay mon·zhay', english: 'I ate' },
+  { id: 'fr-s4', group: 'food', target: 'Je voudrais manger', pronunciation: 'zhuh voodray monzhay', pronunciation_chunks: 'zhuh voo·dray mon·zhay', english: 'I would like to eat' },
+  { id: 'fr-s5', group: 'shopping', target: "J'ai acheté", pronunciation: 'zhay ashtay', pronunciation_chunks: 'zhay ash·tay', english: 'I bought' },
+  { id: 'fr-s6', group: 'shopping', target: 'Je voudrais acheter', pronunciation: 'zhuh voodray ashtay', pronunciation_chunks: 'zhuh voo·dray ash·tay', english: 'I would like to buy' },
+  { id: 'fr-s7', group: 'activity', target: "J'ai vu", pronunciation: 'zhay vu', pronunciation_chunks: 'zhay vu', english: 'I saw' },
+  { id: 'fr-s8', group: 'activity', target: "J'ai bu", pronunciation: 'zhay bu', pronunciation_chunks: 'zhay bu', english: 'I drank' },
+  { id: 'fr-s9', group: 'hotel', target: "J'ai séjourné", pronunciation: 'zhay sayzhornay', pronunciation_chunks: 'zhay say·zhor·nay', english: 'I stayed' },
+  { id: 'fr-s10', group: 'hotel', target: "J'ai réservé", pronunciation: 'zhay rayzervay', pronunciation_chunks: 'zhay ray·zer·vay', english: 'I reserved' },
+  { id: 'fr-s11', group: 'transport', target: "J'ai pris", pronunciation: 'zhay pree', pronunciation_chunks: 'zhay pree', english: 'I took (transport)' },
+  { id: 'fr-s12', group: 'transport', target: 'Je descends', pronunciation: 'zhuh desond', pronunciation_chunks: 'zhuh de·sond', english: "I'm getting off" },
+  { id: 'fr-s13', group: 'social', target: "J'habite à", pronunciation: 'zhabit a', pronunciation_chunks: 'zha·bit a', english: 'I live in' },
+  { id: 'fr-s14', group: 'social', target: "J'aime", pronunciation: 'zhem', pronunciation_chunks: 'zhem', english: 'I like' },
+  { id: 'fr-s15', group: 'emergency', target: "J'ai un problème", pronunciation: 'zhay un problem', pronunciation_chunks: 'zhay un pro·blem', english: 'I have a problem' },
+  { id: 'fr-s16', group: 'emergency', target: "J'ai perdu", pronunciation: 'zhay perdoo', pronunciation_chunks: 'zhay per·doo', english: 'I lost' },
+];
+
+export const FALLBACK_CHAINS_FR: Record<string, ExpansionStep[][]> = {
+  'fr-s1': [
+    [
+      { label: '+Where', target: 'Je suis allé(e) au musée', pronunciation: 'zhuh swee alay o muzay', pronunciation_chunks: 'zhuh swee a·lay o mu·zay', english: 'I went to the museum', added: 'au musée' },
+      { label: '+Who', target: 'Je suis allé(e) avec des amis', pronunciation: 'zhuh swee alay avek day zamee', pronunciation_chunks: 'zhuh swee a·lay a·vek day za·mee', english: 'I went with friends', added: 'avec des amis' },
+      { label: '+When', target: 'Hier, je suis allé(e)', pronunciation: 'yehr zhuh swee alay', pronunciation_chunks: 'yehr zhuh swee a·lay', english: 'Yesterday I went', added: 'Hier' },
+    ],
+  ],
+  'fr-s3': [
+    [
+      { label: '+What', target: "J'ai mangé des crêpes", pronunciation: 'zhay monzhay day krep', pronunciation_chunks: 'zhay mon·zhay day krep', english: 'I ate crêpes', added: 'des crêpes' },
+      { label: '+Where', target: "J'ai mangé au restaurant", pronunciation: 'zhay monzhay o restoran', pronunciation_chunks: 'zhay mon·zhay o res·to·ran', english: 'I ate at a restaurant', added: 'au restaurant' },
+      { label: '+When', target: "J'ai mangé à midi", pronunciation: 'zhay monzhay a midee', pronunciation_chunks: 'zhay mon·zhay a mi·dee', english: 'I ate at noon', added: 'à midi' },
+    ],
+  ],
+  'fr-s4': [
+    [
+      { label: '+What', target: 'Je voudrais manger un croissant', pronunciation: 'zhuh voodray monzhay un krwason', pronunciation_chunks: 'zhuh voo·dray mon·zhay un krwa·son', english: 'I would like to eat a croissant', added: 'un croissant' },
+      { label: '+Where', target: 'Je voudrais manger dans un café', pronunciation: 'zhuh voodray monzhay don un kafay', pronunciation_chunks: 'zhuh voo·dray mon·zhay don un ka·fay', english: 'I would like to eat at a café', added: 'dans un café' },
+    ],
+  ],
+  'fr-s14': [
+    [
+      { label: '+What', target: "J'aime la cuisine française", pronunciation: 'zhem la kweezeen fronsez', pronunciation_chunks: 'zhem la kwee·zeen fron·sez', english: 'I like French cuisine', added: 'la cuisine française' },
+      { label: '+What', target: "J'aime beaucoup Paris", pronunciation: 'zhem boku paree', pronunciation_chunks: 'zhem bo·ku pa·ree', english: 'I really like Paris', added: 'beaucoup Paris' },
+    ],
+  ],
+  'fr-s16': [
+    [
+      { label: '+What', target: "J'ai perdu mon portefeuille", pronunciation: 'zhay perdoo mon portfuhy', pronunciation_chunks: 'zhay per·doo mon port·fuhy', english: 'I lost my wallet', added: 'mon portefeuille' },
+      { label: '+Where', target: "J'ai perdu dans le métro", pronunciation: 'zhay perdoo don luh metro', pronunciation_chunks: 'zhay per·doo don luh me·tro', english: 'I lost it in the metro', added: 'dans le métro' },
+      { label: '+What', target: "J'ai perdu mon passeport", pronunciation: 'zhay perdoo mon paspor', pronunciation_chunks: 'zhay per·doo mon pas·por', english: 'I lost my passport', added: 'mon passeport' },
+    ],
+  ],
+};

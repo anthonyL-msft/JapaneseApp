@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, createContext, useContext } from 'react';
+import { Volume2, Star, X } from 'lucide-react';
 import { speak } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 
@@ -71,7 +72,7 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
               <h3 className="text-lg font-bold text-slate-100">{data.title}</h3>
               {data.titleRom && <p className="text-base text-sakura-300">{data.titleRom}</p>}
             </div>
-            <button onClick={handleClose} className="text-xl text-slate-400 p-2">✕</button>
+            <button onClick={handleClose} className="text-xl text-slate-400 p-2"><X size={20} /></button>
           </div>
           {data.subtitle && <p className="text-base text-slate-400 mt-0.5">{data.subtitle}</p>}
         </div>
@@ -89,10 +90,10 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
                     <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg"><Volume2 size={20} /></button>
                     {onToggleRefBookmark && (
                       <button onClick={() => onToggleRefBookmark({ ...ex, section: data.title })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-                        {isBm ? '⭐' : '☆'}
+                        <Star size={18} className={isBm ? 'fill-amber-400 text-amber-400' : ''} />
                       </button>
                     )}
                   </div>
@@ -118,6 +119,7 @@ function Drawer({ data, onClose, refBookmarkedIds, onToggleRefBookmark, learnedI
 }
 
 interface RefProps {
+  lang?: string;
   refBookmarkedIds?: Set<string>;
   onToggleRefBookmark?: (item: { jp: string; hep: string; en: string; section: string }) => void;
   learnedIds?: Set<string>;
@@ -145,9 +147,9 @@ export function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onTogg
           <p className="text-xs text-slate-500 mt-0.5">From: {data.title}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 text-lg active:scale-110">🔊</button>
+          <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 text-lg active:scale-110"><Volume2 size={20} /></button>
           {onToggleRefBookmark && (
-            <button onClick={onToggleRefBookmark} className="p-1 text-lg">{isBm ? '⭐' : '☆'}</button>
+            <button onClick={onToggleRefBookmark} className="p-1 text-lg"><Star size={18} className={isBm ? 'fill-amber-400 text-amber-400' : ''} /></button>
           )}
           {onToggleLearned && (
             <button onClick={onToggleLearned} className={`text-xs px-2 py-0.5 rounded-full ${isLearned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600/30 text-slate-500'}`}>
@@ -160,7 +162,7 @@ export function RefItem({ ex, data, isBm, isLearned, onToggleRefBookmark, onTogg
   );
 }
 
-export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, learnedIds = new Set(), onToggleLearned, onAskMore: _onAskMore, explainLang = 'en' }: RefProps) {
+export function Reference({ lang = 'ja', refBookmarkedIds = new Set(), onToggleRefBookmark, learnedIds = new Set(), onToggleLearned, onAskMore: _onAskMore, explainLang = 'en' }: RefProps) {
   const panel = useSlidePanel<Section>();
   const [drawer, setDrawer] = useState<DrawerData>(null);
   const openDrawer = useCallback((d: DrawerData) => setDrawer(d), []);
@@ -175,13 +177,14 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
       {/* L1: Section grid */}
       <div className="scroll-area h-full">
         <div className="px-4 py-3 border-b border-slate-800">
-          <h2 className="text-lg font-bold">📚 Quick Reference</h2>
+          <h2 className="text-lg font-bold">Quick Reference</h2>
           <p className="text-base text-slate-400">Grammar & knowledge for travel</p>
         </div>
 
+        {lang === 'ja' ? (
         <div className="p-4 space-y-4">
           <div>
-            <h3 className="text-base font-semibold text-slate-400 mb-2">📖 Learn — 7 Steps</h3>
+            <h3 className="text-base font-semibold text-slate-400 mb-2">Learn — 7 Steps</h3>
             <div className="grid grid-cols-2 gap-2">
               {LEARN_STEPS.map((sec, i) => (
                 <button
@@ -201,7 +204,7 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
           </div>
 
           <div>
-            <h3 className="text-base font-semibold text-slate-400 mb-2">📚 Knowledge</h3>
+            <h3 className="text-base font-semibold text-slate-400 mb-2">Knowledge</h3>
             <div className="grid grid-cols-2 gap-2">
               {KNOWLEDGE.map(sec => (
                 <button
@@ -217,10 +220,101 @@ export function Reference({ refBookmarkedIds = new Set(), onToggleRefBookmark, l
             </div>
           </div>
         </div>
+        ) : (
+        <div className="p-4 space-y-4">
+          <div className="bg-slate-800/40 rounded-xl p-4">
+            <p className="text-base text-slate-300 mb-3">Quick reference for {lang === 'fr' ? 'French' : lang === 'es' ? 'Spanish' : 'this language'} is coming soon!</p>
+            <p className="text-sm text-slate-500">In the meantime, try these features:</p>
+            <ul className="text-sm text-slate-400 mt-2 space-y-1.5">
+              <li>📖 <strong>Learn tab</strong> — Browse phrases by category</li>
+              <li>🤖 <strong>AI tab</strong> — Ask about grammar, pronunciation, or culture</li>
+              <li>✍️ <strong>Sentence Check</strong> — Check if your sentences are correct</li>
+              <li>🌱 <strong>Sentence Grow</strong> — Build sentences step by step</li>
+            </ul>
+          </div>
+
+          {lang === 'fr' && (
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-slate-400">🇫🇷 French Essentials</h3>
+
+            <div className="bg-slate-800/60 rounded-xl p-4">
+              <h4 className="text-base font-semibold text-slate-200 mb-2">📝 Gender & Articles</h4>
+              <div className="space-y-1.5 text-sm">
+                <p className="text-slate-300"><strong className="text-sakura-300">le</strong> — masculine singular <span className="text-slate-500">(le train, le café)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">la</strong> — feminine singular <span className="text-slate-500">(la gare, la rue)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">les</strong> — plural (both) <span className="text-slate-500">(les billets, les crêpes)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">l'</strong> — before vowels <span className="text-slate-500">(l'hôtel, l'eau)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">un / une</strong> — a (masc / fem) <span className="text-slate-500">(un café, une bière)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">des</strong> — some (plural) <span className="text-slate-500">(des croissants)</span></p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/60 rounded-xl p-4">
+              <h4 className="text-base font-semibold text-slate-200 mb-2">🗣️ Pronunciation Tips</h4>
+              <div className="space-y-1.5 text-sm">
+                <p className="text-slate-300"><strong className="text-sakura-300">r</strong> — French R is from the throat, like gargling</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Silent letters</strong> — Final consonants are usually silent <span className="text-slate-500">(petit → puh-tee)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Nasal vowels</strong> — on, an, in are nasal <span className="text-slate-500">(bon, dans, vin)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Liaison</strong> — Link final consonant to next vowel <span className="text-slate-500">(les amis → lay-za-mee)</span></p>
+                <p className="text-slate-300"><strong className="text-sakura-300">é vs è</strong> — é = "ay", è = "eh" <span className="text-slate-500">(café, crème)</span></p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/60 rounded-xl p-4">
+              <h4 className="text-base font-semibold text-slate-200 mb-2">🎩 Tu vs Vous</h4>
+              <div className="space-y-1.5 text-sm">
+                <p className="text-slate-300"><strong className="text-sakura-300">vous</strong> — Use with strangers, staff, elderly, formal</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">tu</strong> — Use with friends, children, same age after offered</p>
+                <p className="text-slate-400 mt-1">💡 When in doubt, always use <strong>vous</strong>. Wait for the other person to suggest <em>on se tutoie?</em></p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/60 rounded-xl p-4">
+              <h4 className="text-base font-semibold text-slate-200 mb-2">🔧 Key Verb Forms</h4>
+              <div className="space-y-1.5 text-sm">
+                <p className="text-slate-300"><strong className="text-sakura-300">être</strong> (to be): je suis, vous êtes, c'est</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">avoir</strong> (to have): j'ai, vous avez, il y a</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">aller</strong> (to go): je vais, vous allez, on va</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">vouloir</strong> (to want): je voudrais, vous voulez</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">pouvoir</strong> (can): je peux, vous pouvez, on peut</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/60 rounded-xl p-4">
+              <h4 className="text-base font-semibold text-slate-200 mb-2">🔢 Numbers</h4>
+              <div className="grid grid-cols-2 gap-1 text-sm">
+                <p className="text-slate-300"><strong className="text-sakura-300">1</strong> un/une</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">2</strong> deux</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">3</strong> trois</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">4</strong> quatre</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">5</strong> cinq</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">10</strong> dix</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">20</strong> vingt</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">100</strong> cent</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/60 rounded-xl p-4">
+              <h4 className="text-base font-semibold text-slate-200 mb-2">🪧 Common Signs</h4>
+              <div className="space-y-1.5 text-sm">
+                <p className="text-slate-300"><strong className="text-sakura-300">Sortie</strong> — Exit</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Entrée</strong> — Entrance</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Interdit</strong> — Forbidden</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Fermé</strong> — Closed</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Ouvert</strong> — Open</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Gratuit</strong> — Free</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Défense de fumer</strong> — No smoking</p>
+                <p className="text-slate-300"><strong className="text-sakura-300">Soldes</strong> — Sale / Discount</p>
+              </div>
+            </div>
+          </div>
+          )}
+        </div>
+        )}
       </div>
 
-      {/* L2: Full-page slide-in */}
-      {panel.visible && (
+      {/* L2: Full-page slide-in (Japanese only) */}
+      {lang === 'ja' && panel.visible && (
         <div className={`absolute inset-0 bg-slate-950 ${panel.animClass} flex flex-col z-40`}>
           <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 shrink-0">
             <button onClick={() => panel.close()} className="text-lg text-slate-400 active:text-slate-200 p-1">
@@ -269,7 +363,7 @@ function RefRow({ jp, rom, meaning }: { jp: string; rom: string; meaning: string
           </div>
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </div>
-        <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1">🔊</button>
+        <button onClick={() => speak(jp, 'ja-JP')} className="text-lg active:scale-110 transition-transform shrink-0 p-1"><Volume2 size={20} /></button>
       </div>
     </div>
   );
@@ -594,7 +688,7 @@ export function NumberConverter() {
               <p className="text-base text-sakura-300">{result.romaji}</p>
               <p className="text-base text-slate-400">{result.reading}</p>
             </div>
-            <button onClick={() => speak(result.reading, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+            <button onClick={() => speak(result.reading, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0"><Volume2 size={20} /></button>
           </div>
           {!isNaN(num) && num > 0 && (
             <div className="mt-1 pt-2 border-t border-slate-700/40 space-y-1">
@@ -1035,7 +1129,7 @@ function GrammarTermDrawer({ term, onClose, lang = 'en' }: { term: string | null
               <span className="bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-lg text-base font-medium border border-purple-500/30">{term}</span>
               <h3 className="text-lg font-bold text-slate-100">{isTc ? data.title.tc : data.title.en}</h3>
             </div>
-            <button onClick={handleClose} className="text-xl text-slate-400 p-2">✕</button>
+            <button onClick={handleClose} className="text-xl text-slate-400 p-2"><X size={20} /></button>
           </div>
         </div>
         <div className="overflow-y-auto flex-1 min-h-0 p-4 space-y-5">
@@ -1112,7 +1206,7 @@ function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle,
           <p className="text-base text-sakura-300 mt-0.5">{rom}</p>
           <p className="text-base text-slate-400 mt-0.5">{meaning}</p>
         </button>
-        <button onClick={() => speak(jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0">🔊</button>
+        <button onClick={() => speak(jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg shrink-0"><Volume2 size={20} /></button>
         <button onClick={() => toggle(id)} className="text-base text-slate-500 shrink-0 p-1">{isOpen ? '▲' : '▼'}</button>
       </div>
       {isOpen && (
@@ -1162,10 +1256,10 @@ function AccordionRow({ id, jp, rom, meaning, structure, items, openSet, toggle,
                     <p className="text-base text-sakura-300 mt-0.5">{ex.hep}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg">🔊</button>
+                    <button onClick={() => speak(ex.jp, 'ja-JP')} className="p-1 rounded-lg active:bg-slate-600 text-lg"><Volume2 size={20} /></button>
                     {onToggleRefBookmark && (
                       <button onClick={() => onToggleRefBookmark({ ...ex, section: section || id })} className="p-1 rounded-lg active:bg-slate-600 text-lg">
-                        {isBm ? '⭐' : '☆'}
+                        <Star size={18} className={isBm ? 'fill-amber-400 text-amber-400' : ''} />
                       </button>
                     )}
                   </div>
@@ -1881,7 +1975,7 @@ function YesNoRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
               <p className="text-base text-sakura-300">hai</p>
               <p className="text-base text-slate-400">Yes</p>
             </div>
-            <button onClick={() => speak('はい', 'ja-JP')} className="text-lg active:scale-110 p-1">🔊</button>
+            <button onClick={() => speak('はい', 'ja-JP')} className="text-lg active:scale-110 p-1"><Volume2 size={20} /></button>
           </div>
           <div className="flex items-center justify-center gap-2 bg-slate-700/30 rounded-lg p-2">
             <span className="text-red-400 text-base">❌</span>
@@ -1890,7 +1984,7 @@ function YesNoRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
               <p className="text-base text-sakura-300">ii·e</p>
               <p className="text-base text-slate-400">No</p>
             </div>
-            <button onClick={() => speak('いいえ', 'ja-JP')} className="text-lg active:scale-110 p-1">🔊</button>
+            <button onClick={() => speak('いいえ', 'ja-JP')} className="text-lg active:scale-110 p-1"><Volume2 size={20} /></button>
           </div>
         </div>
       </div>

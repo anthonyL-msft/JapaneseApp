@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { Phrase, UserNote } from '../data/types';
 
 interface Props {
@@ -31,7 +32,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
   return (
     <div className="scroll-area h-full">
       <div className="px-4 py-3 border-b border-slate-800">
-        <h2 className="text-lg font-bold">📝 My Notes</h2>
+        <h2 className="text-lg font-bold">My Notes</h2>
         <p className="text-base text-slate-400">{notes.length} total notes</p>
       </div>
 
@@ -62,7 +63,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
         {/* Standalone notes */}
         {standaloneNotes.length > 0 && (
           <div>
-            <h3 className="text-base font-semibold text-slate-300 mb-2">📌 Personal Notes</h3>
+            <h3 className="text-base font-semibold text-slate-300 mb-2">Personal Notes</h3>
             <div className="space-y-2">
               {standaloneNotes
                 .sort((a, b) => b.updatedAt - a.updatedAt)
@@ -72,11 +73,11 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                     <button
                       onClick={() => { setNewNoteText(note.text); setEditingId(note.id); }}
                       className="text-base text-slate-500 hover:text-slate-300 shrink-0"
-                    >✏️</button>
+                    ><Pencil size={14} /></button>
                     <button
                       onClick={() => onDeleteNote(note.id)}
                       className="text-base text-slate-500 hover:text-red-400 shrink-0"
-                    >🗑️</button>
+                    ><Trash2 size={14} /></button>
                   </div>
                 ))}
             </div>
@@ -86,7 +87,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
         {/* Phrase-attached notes */}
         {phraseNotes.length > 0 && (
           <div>
-            <h3 className="text-base font-semibold text-slate-300 mb-2">💬 Phrase Notes</h3>
+            <h3 className="text-base font-semibold text-slate-300 mb-2">Phrase Notes</h3>
             <div className="space-y-2">
               {phraseNotes
                 .sort((a, b) => b.updatedAt - a.updatedAt)
@@ -104,7 +105,7 @@ export function NotesView({ phrases, notes, onSaveNote, onDeleteNote }: Props) {
                         <button
                           onClick={() => onDeleteNote(note.id)}
                           className="text-base text-slate-500 hover:text-red-400 shrink-0"
-                        >🗑️</button>
+                        ><Trash2 size={14} /></button>
                       </div>
                     </div>
                   );
