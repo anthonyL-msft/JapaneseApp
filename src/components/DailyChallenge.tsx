@@ -253,13 +253,14 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
   return (
     <div className="h-full scroll-area">
       {phase === 'overview' && (
-        <div className="px-4 py-3">
+        <div>
           {/* Header */}
-          <div className="border-b border-slate-800 pb-3 mb-4">
+          <div className="px-4 py-3 border-b border-slate-800">
             <h2 className="text-lg font-bold">Daily Challenge</h2>
             <p className="text-base text-slate-400">A few minutes a day keeps the language growing!</p>
           </div>
 
+          <div className="px-4 py-3">
           {/* Streak */}
           <div className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border border-amber-700/30 rounded-xl p-4 mb-4 text-center">
             <p className="text-3xl font-bold text-amber-300">🔥 {allDone ? (displayStreak || streak.current) : displayStreak}</p>
@@ -317,6 +318,7 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
               </div>
             </div>
           )}
+          </div>
         </div>
       )}
 

@@ -97,23 +97,26 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
   return (
     <div className="h-full relative">
       {/* L1: Category grid */}
-      <div className="scroll-area h-full p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold mb-0.5">Phrase Book</h1>
-            <p className="text-slate-400 text-base">Select a category to start learning</p>
-          </div>
-          <div className="flex gap-2">
-            {onShowCards && (
-              <button
-                onClick={onShowCards}
-                className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0 flex items-center gap-1"
-              >
-                <Tag size={14} /> Cards
-              </button>
-            )}
+      <div className="scroll-area h-full">
+        <div className="px-4 py-3 border-b border-slate-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold">Phrase Book</h2>
+              <p className="text-base text-slate-400">Select a category to start learning</p>
+            </div>
+            <div className="flex gap-2">
+              {onShowCards && (
+                <button
+                  onClick={onShowCards}
+                  className="bg-slate-800 text-slate-300 text-base px-3 py-2 rounded-xl active:bg-slate-700 transition shrink-0 flex items-center gap-1"
+                >
+                  <Tag size={14} /> Cards
+                </button>
+              )}
+            </div>
           </div>
         </div>
+        <div className="p-4">
         {/* Grouped category grid */}
         {[
           { title: 'Foundation', cats: ['greetings', 'basics', 'power', 'vocab'] },
@@ -149,6 +152,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* L2: Full-page slide-in for selected category */}

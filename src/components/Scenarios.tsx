@@ -163,12 +163,14 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
   // When searching, show flat list
   if (isSearching) {
     return (
-      <div className="scroll-area h-full p-4">
-        <h1 className="text-xl font-bold mb-1">Conversations</h1>
-        <p className="text-slate-400 text-base mb-4">
-          {langScenarios.length} conversations matching "{search}"
-        </p>
-        <div className="space-y-1.5">
+      <div className="scroll-area h-full">
+        <div className="px-4 py-3 border-b border-slate-800">
+          <h2 className="text-lg font-bold">Conversations</h2>
+          <p className="text-base text-slate-400">
+            {langScenarios.length} conversations matching "{search}"
+          </p>
+        </div>
+        <div className="p-4 space-y-1.5">
           {langScenarios.map(sc => (
             <button
               key={sc.id}
@@ -194,11 +196,14 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
   return (
     <div className="h-full relative">
       {/* L1: Group grid */}
-      <div className="scroll-area h-full p-4">
-        <h1 className="text-xl font-bold mb-1">Conversations</h1>
-        <p className="text-slate-400 text-base mb-4">
-          Practice real {langConfig.name} dialogues step-by-step
-        </p>
+      <div className="scroll-area h-full">
+        <div className="px-4 py-3 border-b border-slate-800">
+          <h2 className="text-lg font-bold">Conversations</h2>
+          <p className="text-base text-slate-400">
+            Practice real {langConfig.name} dialogues step-by-step
+          </p>
+        </div>
+        <div className="p-4">
         <div className="grid grid-cols-2 gap-2">
           {groups.map(g => (
             <button
@@ -211,6 +216,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
               <span className="text-sm text-slate-500">{g.scenarios.length} conversations</span>
             </button>
           ))}
+        </div>
         </div>
       </div>
 
