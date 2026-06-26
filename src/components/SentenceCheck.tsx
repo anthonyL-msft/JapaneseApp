@@ -58,7 +58,6 @@ export function SentenceCheck({ lang, explainLang = 'en' }: Props) {
 
   const handleHistoryTap = (item: CheckResult) => {
     setResult(item);
-    setInput(item.input);
   };
 
   return (
@@ -67,7 +66,7 @@ export function SentenceCheck({ lang, explainLang = 'en' }: Props) {
       <div className="px-4 py-3 border-b border-slate-800 shrink-0">
         <div className="flex items-center gap-2">
           {result && (
-            <button onClick={() => setResult(null)} className="text-lg text-slate-400 active:text-slate-200 p-1">←</button>
+            <button onClick={() => { setResult(null); setInput(''); }} className="text-lg text-slate-400 active:text-slate-200 p-1">←</button>
           )}
           <div>
             <h2 className="text-lg font-bold">✍️ Sentence Check</h2>
