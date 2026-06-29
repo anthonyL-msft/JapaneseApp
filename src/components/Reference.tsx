@@ -2360,6 +2360,7 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
 // ============================================================
 function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
   const [group, setGroup] = useState<'all' | 'ru' | 'u' | 'irregular'>('all');
+  const [showTeRules, setShowTeRules] = useState(false);
 
   const ruKeys = ['食べる','見る','起きる','寝る','教える','開ける','出る'];
   const uKeys = ['行く','飲む','買う','話す','書く','読む','聞く','歩く','作る','待つ','使う','乗る','遊ぶ','泳ぐ'];
@@ -2401,22 +2402,23 @@ function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
             <span className="text-slate-500 ml-auto">する → します</span>
           </div>
         </div>
-        <div className="border-t border-slate-600/30 mt-2.5 pt-2.5">
-          <p className="text-xs text-slate-500 mb-1.5">う-verb て-form patterns (6 types):</p>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-            <span className="text-slate-400">う/つ/る → <span className="text-emerald-300">って</span></span>
-            <span className="text-slate-500">買う→買って</span>
-            <span className="text-slate-400">む/ぶ/ぬ → <span className="text-emerald-300">んで</span></span>
-            <span className="text-slate-500">飲む→飲んで</span>
-            <span className="text-slate-400">く → <span className="text-emerald-300">いて</span></span>
-            <span className="text-slate-500">書く→書いて</span>
-            <span className="text-slate-400">ぐ → <span className="text-emerald-300">いで</span></span>
-            <span className="text-slate-500">泳ぐ→泳いで</span>
-            <span className="text-slate-400">す → <span className="text-emerald-300">して</span></span>
-            <span className="text-slate-500">話す→話して</span>
-            <span className="text-slate-400">行く → <span className="text-amber-300">行って</span></span>
-            <span className="text-slate-500">(exception!)</span>
-          </div>
+        <div className="border-t border-slate-600/30 mt-2.5 pt-2">
+          <button onClick={() => setShowTeRules(prev => !prev)} className="flex items-center gap-1.5 w-full text-left">
+            <span className="text-xs text-slate-500">て-form rules (6 types)</span>
+            <span className="text-xs text-slate-600">{showTeRules ? '▲' : '▼'}</span>
+          </button>
+          {showTeRules && (
+            <table className="w-full mt-1.5 text-xs border-collapse">
+              <tbody>
+                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400 w-1/2">う/つ/る → <span className="text-emerald-300">って</span></td><td className="py-1 text-slate-500">買う → 買って</td></tr>
+                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">む/ぶ/ぬ → <span className="text-emerald-300">んで</span></td><td className="py-1 text-slate-500">飲む → 飲んで</td></tr>
+                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">く → <span className="text-emerald-300">いて</span></td><td className="py-1 text-slate-500">書く → 書いて</td></tr>
+                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">ぐ → <span className="text-emerald-300">いで</span></td><td className="py-1 text-slate-500">泳ぐ → 泳いで</td></tr>
+                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">す → <span className="text-emerald-300">して</span></td><td className="py-1 text-slate-500">話す → 話して</td></tr>
+                <tr><td className="py-1 pr-2 text-slate-400">行く → <span className="text-amber-300">行って</span></td><td className="py-1 text-amber-400/60">⚠ exception</td></tr>
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
