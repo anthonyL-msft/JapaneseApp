@@ -2360,7 +2360,7 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
 // ============================================================
 function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
   const [group, setGroup] = useState<'all' | 'ru' | 'u' | 'irregular'>('all');
-  const [showTeRules, setShowTeRules] = useState(false);
+  const [showTeRules, setShowTeRules] = useState(true);
 
   const ruKeys = ['食べる','見る','起きる','寝る','教える','開ける','出る'];
   const uKeys = ['行く','飲む','買う','話す','書く','読む','聞く','歩く','作る','待つ','使う','乗る','遊ぶ','泳ぐ'];
