@@ -2360,7 +2360,6 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
 // ============================================================
 function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
   const [group, setGroup] = useState<'all' | 'ru' | 'u' | 'irregular'>('all');
-  const [showTeRules, setShowTeRules] = useState(true);
 
   const ruKeys = ['食べる','見る','起きる','寝る','教える','開ける','出る'];
   const uKeys = ['行く','飲む','買う','話す','書く','読む','聞く','歩く','作る','待つ','使う','乗る','遊ぶ','泳ぐ'];
@@ -2385,41 +2384,49 @@ function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
       {/* Quick rule summary */}
       <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
         <p className="text-base text-slate-400 mb-2 text-center">Verb Groups — How to Conjugate</p>
-        <div className="space-y-1.5 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 shrink-0">る-verb</span>
-            <span className="text-slate-400">Drop る, add ending</span>
-            <span className="text-slate-500 ml-auto">食べ<span className="text-red-400/70 line-through">る</span> → 食べます</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">う-verb</span>
-            <span className="text-slate-400">Change last sound to い-row</span>
-            <span className="text-slate-500 ml-auto">飲<span className="text-red-400/70 line-through">む</span> → 飲<span className="text-emerald-400">み</span>ます</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 shrink-0">Irregular</span>
-            <span className="text-slate-400">Memorize these two</span>
-            <span className="text-slate-500 ml-auto">する → します</span>
-          </div>
-        </div>
-        <div className="border-t border-slate-600/30 mt-2.5 pt-2">
-          <button onClick={() => setShowTeRules(prev => !prev)} className="flex items-center gap-1.5 w-full text-left">
-            <span className="text-xs text-slate-500">て-form rules (6 types)</span>
-            <span className="text-xs text-slate-600">{showTeRules ? '▲' : '▼'}</span>
-          </button>
-          {showTeRules && (
-            <table className="w-full mt-1.5 text-xs border-collapse">
-              <tbody>
-                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400 w-1/2">う/つ/る → <span className="text-emerald-300">って</span></td><td className="py-1 text-slate-500">買う → 買って</td></tr>
-                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">む/ぶ/ぬ → <span className="text-emerald-300">んで</span></td><td className="py-1 text-slate-500">飲む → 飲んで</td></tr>
-                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">く → <span className="text-emerald-300">いて</span></td><td className="py-1 text-slate-500">書く → 書いて</td></tr>
-                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">ぐ → <span className="text-emerald-300">いで</span></td><td className="py-1 text-slate-500">泳ぐ → 泳いで</td></tr>
-                <tr className="border-b border-slate-700/30"><td className="py-1 pr-2 text-slate-400">す → <span className="text-emerald-300">して</span></td><td className="py-1 text-slate-500">話す → 話して</td></tr>
-                <tr><td className="py-1 pr-2 text-slate-400">行く → <span className="text-amber-300">行って</span></td><td className="py-1 text-amber-400/60">⚠ exception</td></tr>
-              </tbody>
-            </table>
-          )}
-        </div>
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-slate-600/50">
+              <th className="text-left py-1.5 pr-2 text-slate-500 font-medium text-xs">Group</th>
+              <th className="text-left py-1.5 pr-2 text-slate-500 font-medium text-xs">ます form</th>
+              <th className="text-left py-1.5 text-slate-500 font-medium text-xs">て form</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 pr-2"><span className="bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded text-xs border border-purple-500/30">る</span></td>
+              <td className="py-1.5 pr-2 text-slate-400">食べ<span className="text-red-400/70 line-through">る</span> → 食べ<span className="text-emerald-400">ます</span></td>
+              <td className="py-1.5 text-slate-400">食べ<span className="text-emerald-400">て</span></td>
+            </tr>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 pr-2" rowSpan={6}><span className="bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded text-xs border border-emerald-500/30">う</span></td>
+              <td className="py-1.5 pr-2 text-slate-400" rowSpan={6}>飲<span className="text-red-400/70 line-through">む</span> → 飲<span className="text-emerald-400">み</span>ます</td>
+              <td className="py-1.5 text-slate-500 text-xs">う/つ/る → <span className="text-emerald-300">って</span> <span className="text-slate-600">買って</span></td>
+            </tr>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 text-slate-500 text-xs">む/ぶ/ぬ → <span className="text-emerald-300">んで</span> <span className="text-slate-600">飲んで</span></td>
+            </tr>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 text-slate-500 text-xs">く → <span className="text-emerald-300">いて</span> <span className="text-slate-600">書いて</span></td>
+            </tr>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 text-slate-500 text-xs">ぐ → <span className="text-emerald-300">いで</span> <span className="text-slate-600">泳いで</span></td>
+            </tr>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 text-slate-500 text-xs">す → <span className="text-emerald-300">して</span> <span className="text-slate-600">話して</span></td>
+            </tr>
+            <tr className="border-b border-slate-700/30">
+              <td className="py-1.5 text-xs">
+                <span className="text-amber-300">行く → 行って</span> <span className="text-amber-400/60">⚠</span>
+              </td>
+            </tr>
+            <tr>
+              <td className="py-1.5 pr-2"><span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded text-xs border border-amber-500/30">!!</span></td>
+              <td className="py-1.5 pr-2 text-slate-400">する → <span className="text-emerald-400">し</span>ます</td>
+              <td className="py-1.5 text-slate-400">し<span className="text-emerald-400">て</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div className="flex gap-2 mb-3 overflow-x-auto">
