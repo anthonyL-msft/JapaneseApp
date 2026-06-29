@@ -2362,7 +2362,7 @@ function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
   const [group, setGroup] = useState<'all' | 'ru' | 'u' | 'irregular'>('all');
 
   const ruKeys = ['食べる','見る','起きる','寝る','教える','開ける','出る'];
-  const uKeys = ['行く','飲む','買う','話す','書く','読む','聞く','歩く','作る','待つ','使う','乗る','遊ぶ'];
+  const uKeys = ['行く','飲む','買う','話す','書く','読む','聞く','歩く','作る','待つ','使う','乗る','遊ぶ','泳ぐ'];
   const irregularKeys = ['する','来る'];
 
   const activeKeys = group === 'all' ? [...ruKeys, ...uKeys, ...irregularKeys]
@@ -2708,6 +2708,20 @@ function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
           { jp: '遊べる', hep: 'a·so·be·ru', en: 'can play' },
           { jp: '遊ばせる', hep: 'a·so·ba·se·ru', en: 'let (someone) play' },
           { jp: '遊ぼう', hep: 'a·so·bou', en: "let's play / hang out" },
+        ]} />
+      <AccordionRow id="泳ぐ" jp="泳ぐ" rom="o·yo·gu" meaning="Swim"
+        structure={['う-verb: 泳{ぐ} → 泳ぎ + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '泳ぎます', hep: 'o·yo·gi·ma·su', en: 'swim (polite)' },
+          { jp: '泳ぎません', hep: 'o·yo·gi·ma·sen', en: "don't swim" },
+          { jp: '泳ぎました', hep: 'o·yo·gi·ma·shi·ta', en: 'swam (past)' },
+          { jp: '泳いで', hep: 'o·yoi·de', en: 'swim (te-form)' },
+          { jp: '泳いだ', hep: 'o·yoi·da', en: 'swam (plain)' },
+          { jp: '泳がない', hep: 'o·yo·ga·nai', en: "don't swim (plain)" },
+          { jp: '泳ぎたい', hep: 'o·yo·gi·tai', en: 'want to swim' },
+          { jp: '泳げる', hep: 'o·yo·ge·ru', en: 'can swim' },
+          { jp: '泳がせる', hep: 'o·yo·ga·se·ru', en: 'make (someone) swim' },
+          { jp: '泳ごう', hep: 'o·yo·gou', en: "let's swim" },
         ]} />
         </>
       )}
