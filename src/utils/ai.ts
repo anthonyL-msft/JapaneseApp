@@ -390,7 +390,7 @@ General rules:
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
-    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 400 }),
+    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 800 }),
   });
 
   if (!response.ok) {
@@ -409,7 +409,15 @@ General rules:
     if (objMatch) { try { parsed = JSON.parse(objMatch[0]); } catch { parsed = null; } }
   }
 
-  if (!parsed || typeof parsed !== 'object') return { answer: content };
+  // Fallback: extract "answer" value from truncated/malformed JSON
+  if (!parsed || typeof parsed !== 'object') {
+    const answerMatch = jsonStr.match(/"answer"\s*:\s*"([\s\S]*?)(?:"\s*[,}]|"?\s*$)/);
+    if (answerMatch) {
+      const extracted = answerMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      return { answer: extracted };
+    }
+    return { answer: content };
+  }
 
   const answer = safeStr(parsed.answer).trim();
   if (!answer) return { answer: content };
@@ -477,7 +485,7 @@ Keep feedback concise — max 5-6 lines. Be encouraging.`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'api-key': API_KEY },
-    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 400 }),
+    body: JSON.stringify({ messages, temperature: 0.3, max_tokens: 600 }),
   });
 
   if (!response.ok) {
@@ -496,7 +504,15 @@ Keep feedback concise — max 5-6 lines. Be encouraging.`;
     if (objMatch) { try { parsed = JSON.parse(objMatch[0]); } catch { parsed = null; } }
   }
 
-  if (!parsed || typeof parsed !== 'object') return { answer: content };
+  // Fallback: extract "answer" value from truncated/malformed JSON
+  if (!parsed || typeof parsed !== 'object') {
+    const answerMatch = jsonStr.match(/"answer"\s*:\s*"([\s\S]*?)(?:"\s*[,}]|"?\s*$)/);
+    if (answerMatch) {
+      const extracted = answerMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      return { answer: extracted };
+    }
+    return { answer: content };
+  }
 
   const answer = safeStr(parsed.answer).trim();
   if (!answer) return { answer: content };
