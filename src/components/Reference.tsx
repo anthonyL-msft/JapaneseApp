@@ -2392,13 +2392,30 @@ function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
           </div>
           <div className="flex items-center gap-2">
             <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">う-verb</span>
-            <span className="text-slate-400">Change last sound</span>
-            <span className="text-slate-500 ml-auto">飲<span className="text-red-400/70 line-through">む</span> → 飲みます</span>
+            <span className="text-slate-400">Change last sound to い-row</span>
+            <span className="text-slate-500 ml-auto">飲<span className="text-red-400/70 line-through">む</span> → 飲<span className="text-emerald-400">み</span>ます</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 shrink-0">Irregular</span>
             <span className="text-slate-400">Memorize these two</span>
             <span className="text-slate-500 ml-auto">する → します</span>
+          </div>
+        </div>
+        <div className="border-t border-slate-600/30 mt-2.5 pt-2.5">
+          <p className="text-xs text-slate-500 mb-1.5">う-verb て-form patterns (6 types):</p>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+            <span className="text-slate-400">う/つ/る → <span className="text-emerald-300">って</span></span>
+            <span className="text-slate-500">買う→買って</span>
+            <span className="text-slate-400">む/ぶ/ぬ → <span className="text-emerald-300">んで</span></span>
+            <span className="text-slate-500">飲む→飲んで</span>
+            <span className="text-slate-400">く → <span className="text-emerald-300">いて</span></span>
+            <span className="text-slate-500">書く→書いて</span>
+            <span className="text-slate-400">ぐ → <span className="text-emerald-300">いで</span></span>
+            <span className="text-slate-500">泳ぐ→泳いで</span>
+            <span className="text-slate-400">す → <span className="text-emerald-300">して</span></span>
+            <span className="text-slate-500">話す→話して</span>
+            <span className="text-slate-400">行く → <span className="text-amber-300">行って</span></span>
+            <span className="text-slate-500">(exception!)</span>
           </div>
         </div>
       </div>
