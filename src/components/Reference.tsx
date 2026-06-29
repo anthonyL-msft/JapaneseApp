@@ -5,7 +5,7 @@ import { useSlidePanel } from '../utils/useSlidePanel';
 
 const TermTapContext = createContext<((term: string) => void) | null>(null);
 
-type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening';
+type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening' | 'verbs';
 
 const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'gojuon', label: '50 Sounds', emoji: 'あ', desc: 'Hiragana & Katakana chart' },
@@ -19,6 +19,7 @@ const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[]
 
 const KNOWLEDGE: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'patterns', label: 'Sentence Patterns', emoji: '📐', desc: 'お願いします ありますか etc.' },
+  { id: 'verbs', label: 'Verb Forms', emoji: '🔀', desc: '食べる → ます ない た て forms' },
   { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 (like 量詞)' },
   { id: 'signs', label: 'Common Signs', emoji: '🪧', desc: '入口 出口 禁煙 営業中' },
   { id: 'listening', label: 'What You\'ll Hear', emoji: '👂', desc: 'Common staff phrases to recognize' },
@@ -332,16 +333,17 @@ export function Reference({ lang = 'ja', refBookmarkedIds = new Set(), onToggleR
           </div>
           <div className="scroll-area flex-1 px-3 pb-3">
             {panel.value === 'gojuon' && <GojuonRef openDrawer={openDrawer} />}
-            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} explainLang={explainLang} />}
+            {panel.value === 'grammar' && <GrammarRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} explainLang={explainLang} onNavigateVerbs={() => panel.open('verbs')} />}
             {panel.value === 'numbers' && <NumbersRef />}
             {panel.value === 'particles' && <ParticlesRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'counters' && <CountersRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
-            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} explainLang={explainLang} />}
+            {panel.value === 'patterns' && <PatternsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} explainLang={explainLang} onNavigateVerbs={() => panel.open('verbs')} />}
             {panel.value === 'polite' && <PoliteRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'yesno' && <YesNoRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'signs' && <SignsRef />}
             {panel.value === 'listening' && <ListeningRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'verbs' && <VerbsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
           </div>
         </div>
       )}
@@ -861,6 +863,7 @@ interface RbProps {
   onToggleLearned?: (id: string) => void;
   toggleSignal?: number;
   explainLang?: string;
+  onNavigateVerbs?: () => void;
 }
 
 // Grammar term explanations for purple chips — bilingual (en / zh-TW)
@@ -1123,7 +1126,7 @@ const GRAMMAR_TERMS: Record<string, GrammarTerm> = {
   },
 };
 
-function GrammarTermDrawer({ term, onClose, lang = 'en' }: { term: string | null; onClose: () => void; lang?: string }) {
+function GrammarTermDrawer({ term, onClose, lang = 'en', onNavigateVerbs }: { term: string | null; onClose: () => void; lang?: string; onNavigateVerbs?: () => void }) {
   const [closing, setClosing] = useState(false);
   const data = term ? GRAMMAR_TERMS[term] : null;
   const isTc = lang === 'zh-TW';
@@ -1216,6 +1219,15 @@ function GrammarTermDrawer({ term, onClose, lang = 'en' }: { term: string | null
                 </div>
               ))}
             </div>
+            {/* "More examples" link to Verb Forms section */}
+            {onNavigateVerbs && term && term.startsWith('verb') && (
+              <button
+                onClick={() => { handleClose(); setTimeout(() => onNavigateVerbs(), 250); }}
+                className="mt-3 w-full bg-purple-500/10 border border-purple-500/30 rounded-xl px-4 py-2.5 text-sm text-purple-300 font-medium active:bg-purple-500/20 transition"
+              >
+                {isTc ? '查看更多動詞變化 →' : 'More verb conjugations →'}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -1580,7 +1592,7 @@ function CountersRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
   );
 }
 
-function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, explainLang = 'en' }: RbProps) {
+function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, explainLang = 'en', onNavigateVerbs }: RbProps) {
   const [patternLevel, setPatternLevel] = useState<'all' | 'basic' | 'intermediate' | 'advanced'>('all');
   const [activeTerm, setActiveTerm] = useState<string | null>(null);
 
@@ -1824,7 +1836,7 @@ function PatternsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSig
           {renderAdvanced()}
         </>
       )}
-      <GrammarTermDrawer term={activeTerm} onClose={() => setActiveTerm(null)} lang={explainLang} />
+      <GrammarTermDrawer term={activeTerm} onClose={() => setActiveTerm(null)} lang={explainLang} onNavigateVerbs={onNavigateVerbs} />
     </div>
     </TermTapContext.Provider>
   );
@@ -1971,7 +1983,7 @@ function PoliteRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSigna
 // ============================================================
 // Sentence Structure (Step 2)
 // ============================================================
-function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, explainLang = 'en' }: RbProps) {
+function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal, explainLang = 'en', onNavigateVerbs }: RbProps) {
   const { openSet, toggle } = useAccordion(['O を V ます','V ます','S は O を V ます','Place で V ます','Place に V ます','S は ... です'], toggleSignal);
   const [activeTerm, setActiveTerm] = useState<string | null>(null);
   return (
@@ -2046,7 +2058,7 @@ function GrammarRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSign
           <p className="text-base text-slate-300">✅ ラーメンを食べます <span className="text-slate-500">(natural!)</span></p>
         </div>
       </div>
-      <GrammarTermDrawer term={activeTerm} onClose={() => setActiveTerm(null)} lang={explainLang} />
+      <GrammarTermDrawer term={activeTerm} onClose={() => setActiveTerm(null)} lang={explainLang} onNavigateVerbs={onNavigateVerbs} />
     </div>
     </TermTapContext.Provider>
   );
@@ -2339,6 +2351,276 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '申し訳ございません', hep: 'mou·shi·wa·ke go·zai·ma·sen', en: "I'm very sorry (formal apology)" },
           { jp: 'かしこまりました', hep: 'ka·shi·ko·ma·ri·ma·shi·ta', en: 'Understood / Certainly (formal yes)' },
         ]} />
+    </div>
+  );
+}
+
+// ============================================================
+// Verb Forms (Knowledge)
+// ============================================================
+function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const [group, setGroup] = useState<'all' | 'ru' | 'u' | 'irregular'>('all');
+
+  const ruKeys = ['食べる','見る','起きる','寝る'];
+  const uKeys = ['行く','飲む','買う','話す','書く','読む','聞く','歩く'];
+  const irregularKeys = ['する','来る'];
+
+  const activeKeys = group === 'all' ? [...ruKeys, ...uKeys, ...irregularKeys]
+    : group === 'ru' ? ruKeys
+    : group === 'u' ? uKeys
+    : irregularKeys;
+
+  const { openSet, toggle } = useAccordion(activeKeys, toggleSignal);
+
+  const tabs = [
+    { id: 'all' as const, label: 'All' },
+    { id: 'ru' as const, label: 'る-verb' },
+    { id: 'u' as const, label: 'う-verb' },
+    { id: 'irregular' as const, label: 'Irregular' },
+  ];
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      {/* Quick rule summary */}
+      <div className="bg-slate-700/30 rounded-xl p-3 mb-3">
+        <p className="text-base text-slate-400 mb-2 text-center">Verb Groups — How to Conjugate</p>
+        <div className="space-y-1.5 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 shrink-0">る-verb</span>
+            <span className="text-slate-400">Drop る, add ending</span>
+            <span className="text-slate-500 ml-auto">食べ<span className="text-red-400/70 line-through">る</span> → 食べます</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">う-verb</span>
+            <span className="text-slate-400">Change last sound</span>
+            <span className="text-slate-500 ml-auto">飲<span className="text-red-400/70 line-through">む</span> → 飲みます</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 shrink-0">Irregular</span>
+            <span className="text-slate-400">Memorize these two</span>
+            <span className="text-slate-500 ml-auto">する → します</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-3 overflow-x-auto">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setGroup(tab.id)}
+            className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
+              group === tab.id
+                ? 'bg-sakura-500/60 text-white'
+                : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* る-verbs */}
+      {(group === 'all' || group === 'ru') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-2 mb-1">る-verbs (Group II) — drop る, add ending</p>}
+      <AccordionRow id="食べる" jp="食べる" rom="ta·be·ru" meaning="Eat"
+        structure={['る-verb: 食べ{る} → 食べ + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '食べます', hep: 'ta·be·ma·su', en: 'eat (polite)' },
+          { jp: '食べません', hep: 'ta·be·ma·sen', en: "don't eat" },
+          { jp: '食べました', hep: 'ta·be·ma·shi·ta', en: 'ate (past)' },
+          { jp: '食べて', hep: 'ta·be·te', en: 'eat (te-form / request)' },
+          { jp: '食べた', hep: 'ta·be·ta', en: 'ate (plain past)' },
+          { jp: '食べない', hep: 'ta·be·nai', en: "don't eat (plain)" },
+          { jp: '食べたい', hep: 'ta·be·tai', en: 'want to eat' },
+          { jp: '食べられる', hep: 'ta·be·ra·re·ru', en: 'can eat' },
+          { jp: '食べよう', hep: 'ta·be·you', en: "let's eat" },
+        ]} />
+      <AccordionRow id="見る" jp="見る" rom="mi·ru" meaning="See / Look / Watch"
+        structure={['る-verb: 見{る} → 見 + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '見ます', hep: 'mi·ma·su', en: 'see (polite)' },
+          { jp: '見ません', hep: 'mi·ma·sen', en: "don't see" },
+          { jp: '見ました', hep: 'mi·ma·shi·ta', en: 'saw (past)' },
+          { jp: '見て', hep: 'mi·te', en: 'look (te-form)' },
+          { jp: '見た', hep: 'mi·ta', en: 'saw (plain past)' },
+          { jp: '見ない', hep: 'mi·nai', en: "don't look (plain)" },
+          { jp: '見たい', hep: 'mi·tai', en: 'want to see' },
+          { jp: '見られる', hep: 'mi·ra·re·ru', en: 'can see' },
+          { jp: '見よう', hep: 'mi·you', en: "let's watch" },
+        ]} />
+      <AccordionRow id="起きる" jp="起きる" rom="o·ki·ru" meaning="Wake up / Get up"
+        structure={['る-verb: 起き{る} → 起き + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '起きます', hep: 'o·ki·ma·su', en: 'wake up (polite)' },
+          { jp: '起きません', hep: 'o·ki·ma·sen', en: "don't wake up" },
+          { jp: '起きました', hep: 'o·ki·ma·shi·ta', en: 'woke up (past)' },
+          { jp: '起きて', hep: 'o·ki·te', en: 'wake up (te-form)' },
+          { jp: '起きた', hep: 'o·ki·ta', en: 'woke up (plain)' },
+          { jp: '起きない', hep: 'o·ki·nai', en: "don't wake up (plain)" },
+          { jp: '起きたい', hep: 'o·ki·tai', en: 'want to wake up' },
+          { jp: '起きられる', hep: 'o·ki·ra·re·ru', en: 'can wake up' },
+          { jp: '起きよう', hep: 'o·ki·you', en: "let's get up" },
+        ]} />
+      <AccordionRow id="寝る" jp="寝る" rom="ne·ru" meaning="Sleep / Go to bed"
+        structure={['る-verb: 寝{る} → 寝 + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '寝ます', hep: 'ne·ma·su', en: 'sleep (polite)' },
+          { jp: '寝ません', hep: 'ne·ma·sen', en: "don't sleep" },
+          { jp: '寝ました', hep: 'ne·ma·shi·ta', en: 'slept (past)' },
+          { jp: '寝て', hep: 'ne·te', en: 'sleep (te-form)' },
+          { jp: '寝た', hep: 'ne·ta', en: 'slept (plain)' },
+          { jp: '寝ない', hep: 'ne·nai', en: "don't sleep (plain)" },
+          { jp: '寝たい', hep: 'ne·tai', en: 'want to sleep' },
+          { jp: '寝られる', hep: 'ne·ra·re·ru', en: 'can sleep' },
+          { jp: '寝よう', hep: 'ne·you', en: "let's sleep" },
+        ]} />
+        </>
+      )}
+
+      {/* う-verbs */}
+      {(group === 'all' || group === 'u') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">う-verbs (Group I) — change last sound</p>}
+      <AccordionRow id="行く" jp="行く" rom="i·ku" meaning="Go"
+        structure={['う-verb: 行{く} → 行き + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '行きます', hep: 'i·ki·ma·su', en: 'go (polite)' },
+          { jp: '行きません', hep: 'i·ki·ma·sen', en: "don't go" },
+          { jp: '行きました', hep: 'i·ki·ma·shi·ta', en: 'went (past)' },
+          { jp: '行って', hep: 'it·te', en: 'go (te-form) ⚠️ irregular' },
+          { jp: '行った', hep: 'it·ta', en: 'went (plain) ⚠️ irregular' },
+          { jp: '行かない', hep: 'i·ka·nai', en: "don't go (plain)" },
+          { jp: '行きたい', hep: 'i·ki·tai', en: 'want to go' },
+          { jp: '行ける', hep: 'i·ke·ru', en: 'can go' },
+          { jp: '行こう', hep: 'i·kou', en: "let's go" },
+        ]} />
+      <AccordionRow id="飲む" jp="飲む" rom="no·mu" meaning="Drink"
+        structure={['う-verb: 飲{む} → 飲み + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '飲みます', hep: 'no·mi·ma·su', en: 'drink (polite)' },
+          { jp: '飲みません', hep: 'no·mi·ma·sen', en: "don't drink" },
+          { jp: '飲みました', hep: 'no·mi·ma·shi·ta', en: 'drank (past)' },
+          { jp: '飲んで', hep: 'non·de', en: 'drink (te-form)' },
+          { jp: '飲んだ', hep: 'non·da', en: 'drank (plain)' },
+          { jp: '飲まない', hep: 'no·ma·nai', en: "don't drink (plain)" },
+          { jp: '飲みたい', hep: 'no·mi·tai', en: 'want to drink' },
+          { jp: '飲める', hep: 'no·me·ru', en: 'can drink' },
+          { jp: '飲もう', hep: 'no·mou', en: "let's drink" },
+        ]} />
+      <AccordionRow id="買う" jp="買う" rom="ka·u" meaning="Buy"
+        structure={['う-verb: 買{う} → 買い + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '買います', hep: 'kai·ma·su', en: 'buy (polite)' },
+          { jp: '買いません', hep: 'kai·ma·sen', en: "don't buy" },
+          { jp: '買いました', hep: 'kai·ma·shi·ta', en: 'bought (past)' },
+          { jp: '買って', hep: 'kat·te', en: 'buy (te-form)' },
+          { jp: '買った', hep: 'kat·ta', en: 'bought (plain)' },
+          { jp: '買わない', hep: 'ka·wa·nai', en: "don't buy (plain)" },
+          { jp: '買いたい', hep: 'kai·tai', en: 'want to buy' },
+          { jp: '買える', hep: 'ka·e·ru', en: 'can buy' },
+          { jp: '買おう', hep: 'ka·ou', en: "let's buy" },
+        ]} />
+      <AccordionRow id="話す" jp="話す" rom="ha·na·su" meaning="Speak / Talk"
+        structure={['う-verb: 話{す} → 話し + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '話します', hep: 'ha·na·shi·ma·su', en: 'speak (polite)' },
+          { jp: '話しません', hep: 'ha·na·shi·ma·sen', en: "don't speak" },
+          { jp: '話しました', hep: 'ha·na·shi·ma·shi·ta', en: 'spoke (past)' },
+          { jp: '話して', hep: 'ha·na·shi·te', en: 'speak (te-form)' },
+          { jp: '話した', hep: 'ha·na·shi·ta', en: 'spoke (plain)' },
+          { jp: '話さない', hep: 'ha·na·sa·nai', en: "don't speak (plain)" },
+          { jp: '話したい', hep: 'ha·na·shi·tai', en: 'want to speak' },
+          { jp: '話せる', hep: 'ha·na·se·ru', en: 'can speak' },
+          { jp: '話そう', hep: 'ha·na·sou', en: "let's talk" },
+        ]} />
+      <AccordionRow id="書く" jp="書く" rom="ka·ku" meaning="Write"
+        structure={['う-verb: 書{く} → 書き + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '書きます', hep: 'ka·ki·ma·su', en: 'write (polite)' },
+          { jp: '書きません', hep: 'ka·ki·ma·sen', en: "don't write" },
+          { jp: '書きました', hep: 'ka·ki·ma·shi·ta', en: 'wrote (past)' },
+          { jp: '書いて', hep: 'kai·te', en: 'write (te-form)' },
+          { jp: '書いた', hep: 'kai·ta', en: 'wrote (plain)' },
+          { jp: '書かない', hep: 'ka·ka·nai', en: "don't write (plain)" },
+          { jp: '書きたい', hep: 'ka·ki·tai', en: 'want to write' },
+          { jp: '書ける', hep: 'ka·ke·ru', en: 'can write' },
+          { jp: '書こう', hep: 'ka·kou', en: "let's write" },
+        ]} />
+      <AccordionRow id="読む" jp="読む" rom="yo·mu" meaning="Read"
+        structure={['う-verb: 読{む} → 読み + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '読みます', hep: 'yo·mi·ma·su', en: 'read (polite)' },
+          { jp: '読みません', hep: 'yo·mi·ma·sen', en: "don't read" },
+          { jp: '読みました', hep: 'yo·mi·ma·shi·ta', en: 'read — past (polite)' },
+          { jp: '読んで', hep: 'yon·de', en: 'read (te-form)' },
+          { jp: '読んだ', hep: 'yon·da', en: 'read — past (plain)' },
+          { jp: '読まない', hep: 'yo·ma·nai', en: "don't read (plain)" },
+          { jp: '読みたい', hep: 'yo·mi·tai', en: 'want to read' },
+          { jp: '読める', hep: 'yo·me·ru', en: 'can read' },
+          { jp: '読もう', hep: 'yo·mou', en: "let's read" },
+        ]} />
+      <AccordionRow id="聞く" jp="聞く" rom="ki·ku" meaning="Listen / Ask"
+        structure={['う-verb: 聞{く} → 聞き + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '聞きます', hep: 'ki·ki·ma·su', en: 'listen (polite)' },
+          { jp: '聞きません', hep: 'ki·ki·ma·sen', en: "don't listen" },
+          { jp: '聞きました', hep: 'ki·ki·ma·shi·ta', en: 'listened (past)' },
+          { jp: '聞いて', hep: 'kii·te', en: 'listen (te-form)' },
+          { jp: '聞いた', hep: 'kii·ta', en: 'listened (plain)' },
+          { jp: '聞かない', hep: 'ki·ka·nai', en: "don't listen (plain)" },
+          { jp: '聞きたい', hep: 'ki·ki·tai', en: 'want to ask' },
+          { jp: '聞ける', hep: 'ki·ke·ru', en: 'can listen/ask' },
+          { jp: '聞こう', hep: 'ki·kou', en: "let's listen" },
+        ]} />
+      <AccordionRow id="歩く" jp="歩く" rom="a·ru·ku" meaning="Walk"
+        structure={['う-verb: 歩{く} → 歩き + [ending]']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '歩きます', hep: 'a·ru·ki·ma·su', en: 'walk (polite)' },
+          { jp: '歩きません', hep: 'a·ru·ki·ma·sen', en: "don't walk" },
+          { jp: '歩きました', hep: 'a·ru·ki·ma·shi·ta', en: 'walked (past)' },
+          { jp: '歩いて', hep: 'a·rui·te', en: 'walk (te-form)' },
+          { jp: '歩いた', hep: 'a·rui·ta', en: 'walked (plain)' },
+          { jp: '歩かない', hep: 'a·ru·ka·nai', en: "don't walk (plain)" },
+          { jp: '歩きたい', hep: 'a·ru·ki·tai', en: 'want to walk' },
+          { jp: '歩ける', hep: 'a·ru·ke·ru', en: 'can walk' },
+          { jp: '歩こう', hep: 'a·ru·kou', en: "let's walk" },
+        ]} />
+        </>
+      )}
+
+      {/* Irregular */}
+      {(group === 'all' || group === 'irregular') && (
+        <>
+          {group === 'all' && <p className="text-sm text-slate-500 font-medium mt-4 mb-1">Irregular — memorize these two!</p>}
+      <AccordionRow id="する" jp="する" rom="su·ru" meaning="Do / Make"
+        structure={['Irregular: する changes completely']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'します', hep: 'shi·ma·su', en: 'do (polite)' },
+          { jp: 'しません', hep: 'shi·ma·sen', en: "don't do" },
+          { jp: 'しました', hep: 'shi·ma·shi·ta', en: 'did (past)' },
+          { jp: 'して', hep: 'shi·te', en: 'do (te-form)' },
+          { jp: 'した', hep: 'shi·ta', en: 'did (plain)' },
+          { jp: 'しない', hep: 'shi·nai', en: "don't do (plain)" },
+          { jp: 'したい', hep: 'shi·tai', en: 'want to do' },
+          { jp: 'できる', hep: 'de·ki·ru', en: 'can do' },
+          { jp: 'しよう', hep: 'shi·you', en: "let's do" },
+        ]} />
+      <AccordionRow id="来る" jp="来る" rom="ku·ru" meaning="Come"
+        structure={['Irregular: 来る changes reading too (く→き/こ)']}
+        openSet={openSet} toggle={toggle} refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: '来ます', hep: 'ki·ma·su', en: 'come (polite)' },
+          { jp: '来ません', hep: 'ki·ma·sen', en: "don't come" },
+          { jp: '来ました', hep: 'ki·ma·shi·ta', en: 'came (past)' },
+          { jp: '来て', hep: 'ki·te', en: 'come (te-form)' },
+          { jp: '来た', hep: 'ki·ta', en: 'came (plain)' },
+          { jp: '来ない', hep: 'ko·nai', en: "don't come (plain)" },
+          { jp: '来たい', hep: 'ki·tai', en: 'want to come' },
+          { jp: '来られる', hep: 'ko·ra·re·ru', en: 'can come' },
+          { jp: '来よう', hep: 'ko·you', en: "let's come" },
+        ]} />
+        </>
+      )}
     </div>
   );
 }
