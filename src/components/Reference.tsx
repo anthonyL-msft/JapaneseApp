@@ -2388,8 +2388,14 @@ function VerbsRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal
           <thead>
             <tr className="border-b border-slate-600/50">
               <th className="text-left py-1.5 pr-2 text-slate-500 font-medium text-xs">Group</th>
-              <th className="text-left py-1.5 pr-2 text-slate-500 font-medium text-xs">ます form</th>
-              <th className="text-left py-1.5 text-slate-500 font-medium text-xs">て form</th>
+              <th className="text-left py-1.5 pr-2 text-slate-500 font-medium text-xs">
+                <div>ます form</div>
+                <div className="font-normal text-slate-600 mt-0.5">polite statements</div>
+              </th>
+              <th className="text-left py-1.5 text-slate-500 font-medium text-xs">
+                <div>て form</div>
+                <div className="font-normal text-slate-600 mt-0.5">requests · linking · ongoing</div>
+              </th>
             </tr>
           </thead>
           <tbody>
