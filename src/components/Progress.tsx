@@ -7,6 +7,13 @@ interface Props {
   learnedItems: LearnedItem[];
 }
 
+const PROGRESS_GROUPS: { title: string; cats: Category[] }[] = [
+  { title: 'Getting Started', cats: ['greetings', 'basics', 'power', 'smalltalk', 'vocab'] },
+  { title: 'Travel', cats: ['airport', 'directions', 'hotel', 'stays'] },
+  { title: 'Food & Shopping', cats: ['restaurant', 'food', 'drinks', 'shopping'] },
+  { title: 'Culture & Safety', cats: ['culture', 'local', 'emergency'] },
+];
+
 export function Progress({ phrases, learnedItems }: Props) {
   const learnedIds = useMemo(() => new Set(learnedItems.map(l => l.id)), [learnedItems]);
 
@@ -115,12 +122,7 @@ export function Progress({ phrases, learnedItems }: Props) {
         <div className="bg-slate-800/60 rounded-xl p-3">
           <p className="text-base text-slate-300 mb-3">By Category</p>
           <div className="space-y-4">
-            {[
-              { title: 'Getting Started', cats: ['greetings', 'basics', 'smalltalk', 'vocab'] },
-              { title: 'Travel', cats: ['airport', 'directions', 'hotel'] },
-              { title: 'Food & Shopping', cats: ['restaurant', 'food', 'drinks', 'shopping'] },
-              { title: 'Culture & Safety', cats: ['culture', 'local', 'emergency'] },
-            ].map(group => (
+            {PROGRESS_GROUPS.map(group => (
               <div key={group.title}>
                 <p className="text-sm text-slate-500 mb-1.5">{group.title}</p>
                 <div className="space-y-2.5">

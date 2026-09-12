@@ -65,6 +65,10 @@ function isYesterday(dateStr: string): boolean {
 const LEARN_TARGET = 3;
 const REVIEW_TARGET = 5;
 
+function shuffledSubset(items: Phrase[], limit: number): Phrase[] {
+  return [...items].sort(() => Math.random() - 0.5).slice(0, limit);
+}
+
 export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) {
   const [daily, setDaily] = useState<DailyState>(loadDaily);
   const [streak, setStreak] = useState<StreakState>(loadStreak);
@@ -81,18 +85,28 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
   const reviewDone = reviewProgress >= REVIEW_TARGET;
   const allDone = daily.completed;
 
-  // Build queues on mount
-  useEffect(() => {
-    // Learn queue: phrases NOT yet learned, shuffled, pick extra for skipping
-    const unlearned = phrases.filter(p => !learnedIds.has(p.id) && !daily.learnedToday.includes(p.id));
-    const shuffled = [...unlearned].sort(() => Math.random() - 0.5);
-    setLearnQueue(shuffled.slice(0, Math.max(LEARN_TARGET * 3, 9)));
+  const availableLearnCount = phrases.filter(
+    phrase => !learnedIds.has(phrase.id) && !daily.learnedToday.includes(phrase.id),
+  ).length;
+  const availableReviewCount = phrases.filter(
+    phrase => learnedIds.has(phrase.id) && !daily.reviewedToday.includes(phrase.id),
+  ).length;
 
-    // Review queue: phrases already learned, shuffled, pick extra for skipping
+  const startLearning = useCallback(() => {
+    const unlearned = phrases.filter(p => !learnedIds.has(p.id) && !daily.learnedToday.includes(p.id));
+    setLearnQueue(shuffledSubset(unlearned, Math.max(LEARN_TARGET * 3, 9)));
+    setPhase('learn');
+    setCurrentIndex(0);
+    setShowAnswer(false);
+  }, [phrases, learnedIds, daily.learnedToday]);
+
+  const startReview = useCallback(() => {
     const learned = phrases.filter(p => learnedIds.has(p.id) && !daily.reviewedToday.includes(p.id));
-    const shuffledReview = [...learned].sort(() => Math.random() - 0.5);
-    setReviewQueue(shuffledReview.slice(0, Math.max(REVIEW_TARGET * 3, 15)));
-  }, []);
+    setReviewQueue(shuffledSubset(learned, Math.max(REVIEW_TARGET * 3, 15)));
+    setPhase('review');
+    setCurrentIndex(0);
+    setShowAnswer(false);
+  }, [phrases, learnedIds, daily.reviewedToday]);
 
   const markLearnComplete = useCallback(() => {
     const current = learnQueue[currentIndex];
@@ -287,11 +301,14 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                 <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
                   <div className="h-full bg-sakura-500 rounded-full transition-all" style={{ width: `${(learnProgress / LEARN_TARGET) * 100}%` }} />
                 </div>
-                {!learnDone && (
+                {!learnDone && availableLearnCount > 0 && (
                   <button
-                    onClick={() => { setPhase('learn'); setCurrentIndex(0); setShowAnswer(false); }}
+                    onClick={startLearning}
                     className="w-full py-2.5 rounded-lg bg-sakura-500/80 text-white text-base active:bg-sakura-600 transition mt-1"
                   >Start Learning</button>
+                )}
+                {!learnDone && availableLearnCount === 0 && (
+                  <p className="text-sm text-slate-500 mt-1">All available phrases are already learned.</p>
                 )}
               </div>
 
@@ -306,13 +323,13 @@ export function DailyChallenge({ phrases, learnedIds, onToggleLearned }: Props) 
                 <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
                   <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${(reviewProgress / REVIEW_TARGET) * 100}%` }} />
                 </div>
-                {!reviewDone && learnedIds.size > 0 && (
+                {!reviewDone && availableReviewCount > 0 && (
                   <button
-                    onClick={() => { setPhase('review'); setCurrentIndex(0); setShowAnswer(false); }}
+                    onClick={startReview}
                     className="w-full py-2.5 rounded-lg bg-indigo-500/80 text-white text-base active:bg-indigo-600 transition mt-1"
                   >Start Review</button>
                 )}
-                {!reviewDone && learnedIds.size === 0 && (
+                {!reviewDone && availableReviewCount === 0 && (
                   <p className="text-sm text-slate-500 mt-1">Learn some phrases first!</p>
                 )}
               </div>
