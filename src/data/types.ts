@@ -37,6 +37,7 @@ export type Category =
   | 'basics'
   | 'airport'
   | 'hotel'
+  | 'stays'
   | 'restaurant'
   | 'food'
   | 'drinks'
@@ -54,6 +55,7 @@ export const CATEGORY_INFO: Record<Category, { label: string; emoji: string; lab
   basics:     { label: 'Basics',                  emoji: '🗣️', labelTC: '基本用語' },
   airport:    { label: 'Airport & Transit',       emoji: '✈️', labelTC: '機場與交通' },
   hotel:      { label: 'Hotel',                   emoji: '🏨', labelTC: '飯店住宿' },
+  stays:      { label: 'Ryokan & Local Stays',    emoji: '🛖', labelTC: '旅館與特色住宿' },
   restaurant: { label: 'Restaurant',               emoji: '🍜', labelTC: '餐廳用餐' },
   food:       { label: 'Food',                      emoji: '🍱', labelTC: '食物' },
   drinks:     { label: 'Drinks',                    emoji: '🍵', labelTC: '飲品' },

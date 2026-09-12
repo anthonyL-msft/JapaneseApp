@@ -120,7 +120,7 @@ export function PhraseBook({ phrases, bookmarkedIds, notes, onToggleBookmark, on
         {/* Grouped category grid */}
         {[
           { title: 'Foundation', cats: ['greetings', 'basics', 'power', 'vocab'] },
-          { title: 'Travel & Stay', cats: ['airport', 'directions', 'hotel'] },
+          { title: 'Travel & Stay', cats: ['airport', 'directions', 'hotel', 'stays'] },
           { title: 'Food & Drinks', cats: ['restaurant', 'food', 'drinks'] },
           { title: 'Shopping & Daily', cats: ['shopping', 'smalltalk', 'emergency'] },
           { title: 'Culture & Local', cats: ['culture', 'local'] },

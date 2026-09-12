@@ -6,8 +6,8 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 ## Features
 
 ### 📖 Phrase Book
-- 543+ travel phrases organized by 15 categories
-- Categories: Greetings, Basics, Airport & Transit, Hotel, Restaurant, Food, Drinks, Shopping, Directions, Emergency, Small Talk, Culture, Local Specials, Vocab, Power Phrases
+- 625 travel phrases organized by 16 categories
+- Categories: Greetings, Basics, Airport & Transit, Hotel, Ryokan & Local Stays, Restaurant, Food, Drinks, Shopping, Directions, Emergency, Small Talk, Culture, Local Specials, Vocab, Power Phrases
 - Hepburn romanization with syllable chunks for easy pronunciation
 - **Sounds breakdown:** expanded cards show kana-to-romaji mapping with proximity-based grouping — vowel lengtheners (よう), nasal ん, and devoiced す render smaller and tighter to show how characters combine into spoken sounds
 - TTS (Text-to-Speech) with adjustable speed
@@ -21,11 +21,12 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - Tap any kana → bottom drawer with travel vocab examples
 - Accordion examples with Open All/Close All in header
 - Interactive number converter with currency rates (HKD/CAD) — input-at-bottom layout
-- Tools: Sentence Patterns, Counters, Common Signs, What You'll Hear (29 staff phrases)
+- Tools: Sentence Patterns, Counters, Common Signs, What You'll Hear (55 staff phrases)
+- Travel Toolkit: 112 itinerary terms and question patterns for tickets, routes, buses, place names, local stays, meal plans, onsen, regional food, and airport departure
 
 ### 🎭 Conversations
-- 46 real-world dialogue scenarios across 10 groups
-- Groups: Airport, Train, Bus & Taxi, Hotel, Restaurant, Food Spots, Shopping, Daily Life, Activities, Trouble
+- 60 real-world Japanese dialogue scenarios across 11 groups
+- Groups: Airport, Train, Bus & Taxi, Hotel, Ryokan & Local Stay, Restaurant, Food Spots, Shopping, Daily Life, Activities, Trouble
 - Step-by-step reveal with auto-play TTS (pauses at choice points)
 - Variable swap (change destinations, times, party sizes, durations in conversations)
 - Chinese translations update dynamically when swapping variables
@@ -140,7 +141,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 
 | Language | Phrases | Scenarios | Reference | Sentence Grow |
 |----------|---------|-----------|-----------|---------------|
-| 🇯🇵 Japanese | 543+ | 46 | Full (7-step + tools) | 16 seeds + fallbacks |
+| 🇯🇵 Japanese | 625 | 60 | Full (7-step + tools) | 16 seeds + fallbacks |
 | 🇪🇸 Spanish | 65+ | — | — | — |
 | 🇫🇷 French | 100+ | 4 | Essentials (gender, pronunciation, verbs, signs) | 16 seeds + fallbacks |
 
@@ -188,7 +189,7 @@ src/
 │   ├── sentence-grow.ts # Seed sentences + fallback chains (JP + FR)
 │   ├── hiragana-strokes.ts # Stroke order data (JP only)
 │   ├── kana-data.ts     # Hiragana/katakana data (JP only)
-│   └── scenarios.ts     # 50 conversation scenarios (JP + FR)
+│   └── scenarios.ts     # 56 conversation scenarios (52 JP + 4 FR)
 ├── db/                  # IndexedDB (bookmarks, notes, SRS, learned, ref-bookmarks)
 ├── utils/               # TTS, SRS algorithm, slide panel hook
 └── App.tsx              # Root with 5-tab navigation

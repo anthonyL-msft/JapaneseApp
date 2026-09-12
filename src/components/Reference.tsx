@@ -5,7 +5,7 @@ import { useSlidePanel } from '../utils/useSlidePanel';
 
 const TermTapContext = createContext<((term: string) => void) | null>(null);
 
-type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening' | 'verbs';
+type Section = 'gojuon' | 'grammar' | 'particles' | 'polite' | 'numbers' | 'counters' | 'yesno' | 'whquestions' | 'patterns' | 'signs' | 'listening' | 'travel' | 'verbs';
 
 const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[] = [
   { id: 'gojuon', label: '50 Sounds', emoji: 'あ', desc: 'Hiragana & Katakana chart' },
@@ -23,6 +23,7 @@ const KNOWLEDGE: { id: Section; label: string; emoji: string; desc: string }[] =
   { id: 'counters', label: 'Counters', emoji: '📏', desc: 'つ 人 枚 本 杯 (like 量詞)' },
   { id: 'signs', label: 'Common Signs', emoji: '🪧', desc: '入口 出口 禁煙 営業中' },
   { id: 'listening', label: 'What You\'ll Hear', emoji: '👂', desc: 'Common staff phrases to recognize' },
+  { id: 'travel', label: 'Travel Toolkit', emoji: '🧭', desc: 'Routes, local stays, onsen, regional food' },
 ];
 
 const ALL_SECTIONS = [...LEARN_STEPS, ...KNOWLEDGE];
@@ -343,6 +344,7 @@ export function Reference({ lang = 'ja', refBookmarkedIds = new Set(), onToggleR
             {panel.value === 'whquestions' && <WHQuestionsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'signs' && <SignsRef />}
             {panel.value === 'listening' && <ListeningRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
+            {panel.value === 'travel' && <TravelRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
             {panel.value === 'verbs' && <VerbsRef rbIds={refBookmarkedIds} onRbToggle={onToggleRefBookmark} learnedIds={learnedIds} onToggleLearned={onToggleLearned} toggleSignal={refToggleAll} />}
           </div>
         </div>
@@ -2298,8 +2300,169 @@ function SignsRef() {
   );
 }
 
+function TravelRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
+  const { openSet, toggle } = useAccordion(['tickets', 'routes', 'directions', 'buses', 'places', 'stays', 'mealplans', 'onsen', 'localfood', 'departure'], toggleSignal);
+  const sharedProps = {
+    openSet,
+    toggle,
+    section: 'travel',
+    refBookmarkedIds: rbIds,
+    onToggleRefBookmark: onRbToggle,
+    learnedIds,
+    onToggleLearned,
+  };
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      <p className="text-base text-slate-500 mb-2">Fast vocabulary for your Nagoya, Kanazawa, Nagano, and Narita route</p>
+
+      <AccordionRow id="tickets" jp="🎫 Tickets & Passes" rom="" meaning="Know what each ticket covers" {...sharedProps} items={[
+        { jp: '乗車券', hep: 'jou·sha·ken', en: 'Basic fare ticket' },
+        { jp: '特急券', hep: 'tok·kyuu·ken', en: 'Limited express ticket' },
+        { jp: '指定席券', hep: 'shi·tei·se·ki·ken', en: 'Reserved-seat ticket' },
+        { jp: '自由席', hep: 'ji·yuu·se·ki', en: 'Non-reserved seating' },
+        { jp: '往復乗車券', hep: 'ou·fu·ku jou·sha·ken', en: 'Round-trip ticket' },
+        { jp: '一日乗車券', hep: 'i·chi·ni·chi jou·sha·ken', en: 'One-day travel pass' },
+        { jp: '対象区間', hep: 'tai·shou ku·kan', en: 'Covered travel area' },
+        { jp: '有効期間', hep: 'yuu·kou ki·kan', en: 'Validity period' },
+        { jp: '乗換改札', hep: 'no·ri·ka·e kai·sa·tsu', en: 'Transfer ticket gate' },
+        { jp: '券売機', hep: 'ken·bai·ki', en: 'Ticket machine' },
+      ]} />
+
+      <AccordionRow id="routes" jp="🚆 Trains on This Trip" rom="" meaning="Service names and transfer vocabulary" {...sharedProps} items={[
+        { jp: 'ミュースカイ', hep: 'myuu su·kai', en: 'Meitetsu airport limited express' },
+        { jp: '特急しらさぎ', hep: 'tok·kyuu shi·ra·sa·gi', en: 'Limited Express Shirasagi: Nagoya to Tsuruga' },
+        { jp: '北陸新幹線', hep: 'ho·ku·ri·ku shin·kan·sen', en: 'Hokuriku Shinkansen' },
+        { jp: '特急しなの', hep: 'tok·kyuu shi·na·no', en: 'Limited Express Shinano' },
+        { jp: '成田線', hep: 'na·ri·ta sen', en: 'JR Narita Line' },
+        { jp: '乗り換え', hep: 'no·ri·ka·e', en: 'Transfer / change trains' },
+        { jp: '接続時間', hep: 'se·tsu·zo·ku ji·kan', en: 'Connection time' },
+        { jp: '何番線', hep: 'nan·ban·sen', en: 'Which platform / track number' },
+        { jp: '始発', hep: 'shi·ha·tsu', en: 'First service of the day' },
+        { jp: '最終電車', hep: 'sai·shuu den·sha', en: 'Last train' },
+      ]} />
+
+      <AccordionRow id="directions" jp="🧭 Train & Bus Directions" rom="" meaning="Confirm the route, stop, platform, and transfer" {...sharedProps} items={[
+        { jp: 'この電車は○○方面に行きますか？', hep: 'ko·no den·sha wa ○○ hou·men ni i·ki·ma·su ka', en: 'Does this train go toward ○○?' },
+        { jp: 'この電車は○○に停まりますか？', hep: 'ko·no den·sha wa ○○ ni to·ma·ri·ma·su ka', en: 'Does this train stop at ○○?' },
+        { jp: '乗り換えなしで行けますか？', hep: 'no·ri·ka·e na·shi de i·ke·ma·su ka', en: 'Can I get there without transferring?' },
+        { jp: 'どの駅で乗り換えますか？', hep: 'do·no e·ki de no·ri·ka·e·ma·su ka', en: 'At which station do I transfer?' },
+        { jp: 'このホームで合っていますか？', hep: 'ko·no hoo·mu de at·te i·ma·su ka', en: 'Am I on the correct platform?' },
+        { jp: 'あと何駅ですか？', hep: 'a·to nan e·ki de·su ka', en: 'How many stops are left?' },
+        { jp: '着いたら教えてください', hep: 'tsui·ta·ra o·shi·e·te ku·da·sai', en: 'Please tell me when we arrive' },
+        { jp: '帰りの乗り場はどこですか？', hep: 'ka·e·ri no no·ri·ba wa do·ko de·su ka', en: 'Where is the stop for the return journey?' },
+      ]} />
+
+      <AccordionRow id="buses" jp="🚌 Bus Essentials" rom="" meaning="Stops, fares, and return services" {...sharedProps} items={[
+        { jp: 'バス乗り場', hep: 'ba·su no·ri·ba', en: 'Bus boarding area' },
+        { jp: '降り場', hep: 'o·ri·ba', en: 'Drop-off area' },
+        { jp: '整理券', hep: 'sei·ri·ken', en: 'Numbered fare ticket taken when boarding' },
+        { jp: '運賃箱', hep: 'un·chin·ba·ko', en: 'Fare box' },
+        { jp: '降車ボタン', hep: 'kou·sha bo·tan', en: 'Stop-request button' },
+        { jp: '時刻表', hep: 'ji·ko·ku·hyou', en: 'Timetable' },
+        { jp: '最終バス', hep: 'sai·shuu ba·su', en: 'Last bus' },
+        { jp: '運休', hep: 'un·kyuu', en: 'Service cancelled / suspended' },
+        { jp: '遅延', hep: 'chi·en', en: 'Delay' },
+        { jp: '道路状況', hep: 'dou·ro jou·kyou', en: 'Road conditions' },
+      ]} />
+
+      <AccordionRow id="places" jp="📍 Place Names" rom="" meaning="Recognize the stops and sights in the itinerary" {...sharedProps} items={[
+        { jp: '中部国際空港', hep: 'chuu·bu ko·ku·sai kuu·kou', en: 'Chubu Centrair International Airport' },
+        { jp: '名鉄名古屋', hep: 'mei·te·tsu na·go·ya', en: 'Meitetsu Nagoya Station' },
+        { jp: '犬山城', hep: 'i·nu·ya·ma jou', en: 'Inuyama Castle' },
+        { jp: '近江町市場', hep: 'ou·mi·chou i·chi·ba', en: 'Omicho Market' },
+        { jp: '兼六園', hep: 'ken·ro·ku·en', en: 'Kenrokuen Garden' },
+        { jp: 'ひがし茶屋街', hep: 'hi·ga·shi cha·ya·gai', en: 'Higashi Chaya District' },
+        { jp: '戸隠神社', hep: 'to·ga·ku·shi jin·ja', en: 'Togakushi Shrine' },
+        { jp: '戸隠奥社入口', hep: 'to·ga·ku·shi o·ku·sha i·ri·gu·chi', en: 'Togakushi Okusha Iriguchi bus stop' },
+        { jp: '地獄谷野猿公苑', hep: 'ji·go·ku·da·ni ya·en kou·en', en: 'Jigokudani Snow Monkey Park' },
+        { jp: '湯田中', hep: 'yu·da·na·ka', en: 'Yudanaka' },
+        { jp: '善光寺', hep: 'zen·kou·ji', en: 'Zenkoji Temple' },
+        { jp: '松本城', hep: 'ma·tsu·mo·to jou', en: 'Matsumoto Castle' },
+        { jp: '奈良井宿', hep: 'na·rai·ju·ku', en: 'Narai-juku' },
+        { jp: '成田空港', hep: 'na·ri·ta kuu·kou', en: 'Narita International Airport' },
+      ]} />
+
+      <AccordionRow id="stays" jp="🛖 Ryokan & Local Stays" rom="" meaning="Traditional rooms, meals, facilities, and house rules" {...sharedProps} items={[
+        { jp: '旅館', hep: 'ryo·kan', en: 'Traditional Japanese inn' },
+        { jp: '民宿', hep: 'min·shu·ku', en: 'Small family-run guesthouse' },
+        { jp: '宿坊', hep: 'shu·ku·bou', en: 'Temple lodging' },
+        { jp: '和室', hep: 'wa·shi·tsu', en: 'Japanese-style room' },
+        { jp: '畳', hep: 'ta·ta·mi', en: 'Tatami mat' },
+        { jp: '布団', hep: 'fu·ton', en: 'Japanese floor bedding' },
+        { jp: '食事処', hep: 'sho·ku·ji·do·ko·ro', en: 'Shared dining room' },
+        { jp: '共同', hep: 'kyou·dou', en: 'Shared / communal facility' },
+        { jp: '門限', hep: 'mon·gen', en: 'Curfew' },
+        { jp: '朝のお勤め', hep: 'a·sa no o·tsu·to·me', en: 'Morning temple prayer service' },
+      ]} />
+
+      <AccordionRow id="mealplans" jp="🍱 One Night, Two Meals" rom="ip·pa·ku ni·sho·ku" meaning="Booking plans, meal arrangements, and dietary needs" {...sharedProps} items={[
+        { jp: '一泊二食', hep: 'ip·pa·ku ni·sho·ku', en: 'One-night stay with dinner and breakfast' },
+        { jp: '一泊二食付き', hep: 'ip·pa·ku ni·sho·ku tsu·ki', en: 'Dinner and breakfast included' },
+        { jp: '朝食付き', hep: 'chou·sho·ku tsu·ki', en: 'Breakfast included' },
+        { jp: '素泊まり', hep: 'su·do·ma·ri', en: 'Room only, without meals' },
+        { jp: '夕食と朝食が含まれていますか？', hep: 'yuu·sho·ku to chou·sho·ku ga fu·ku·ma·re·te i·ma·su ka', en: 'Are dinner and breakfast included?' },
+        { jp: '夕食は何時からですか？', hep: 'yuu·sho·ku wa nan·ji ka·ra de·su ka', en: 'What time does dinner start?' },
+        { jp: '食事はどこでいただきますか？', hep: 'sho·ku·ji wa do·ko de i·ta·da·ki·ma·su ka', en: 'Where will we have our meals?' },
+        { jp: '食物アレルギー', hep: 'sho·ku·mo·tsu a·re·ru·gii', en: 'Food allergy' },
+        { jp: '生ものが食べられません', hep: 'na·ma·mo·no ga ta·be·ra·re·ma·sen', en: 'I cannot eat raw food' },
+        { jp: '飲み物は別料金ですか？', hep: 'no·mi·mo·no wa be·tsu·ryou·kin de·su ka', en: 'Are drinks charged separately?' },
+      ]} />
+
+      <AccordionRow id="onsen" jp="♨️ Onsen Essentials" rom="" meaning="Bath types, facilities, fees, and etiquette" {...sharedProps} items={[
+        { jp: '大浴場', hep: 'dai·yo·ku·jou', en: 'Large communal bath' },
+        { jp: '露天風呂', hep: 'ro·ten·bu·ro', en: 'Open-air bath' },
+        { jp: '貸切風呂', hep: 'ka·shi·ki·ri·bu·ro', en: 'Private reservable bath' },
+        { jp: '日帰り入浴', hep: 'hi·ga·e·ri nyuu·yo·ku', en: 'Day-use bathing without an overnight stay' },
+        { jp: '入浴料', hep: 'nyuu·yo·ku·ryou', en: 'Bathing fee' },
+        { jp: '入湯税', hep: 'nyuu·tou·zei', en: 'Local bathing tax' },
+        { jp: '脱衣所', hep: 'da·tsu·i·jo', en: 'Changing room' },
+        { jp: '洗い場', hep: 'a·rai·ba', en: 'Washing area beside the baths' },
+        { jp: '貴重品ロッカー', hep: 'ki·chou·hin rok·kaa', en: 'Locker for valuables' },
+        { jp: '浴衣', hep: 'yu·ka·ta', en: 'Light cotton robe' },
+        { jp: '入浴時間', hep: 'nyuu·yo·ku ji·kan', en: 'Bath opening hours' },
+        { jp: '男湯', hep: 'o·to·ko·yu', en: "Men's bath" },
+        { jp: '女湯', hep: 'on·na·yu', en: "Women's bath" },
+        { jp: 'かけ湯', hep: 'ka·ke·yu', en: 'Rinsing the body before entering' },
+        { jp: 'タオルを浴槽に入れない', hep: 'ta·o·ru wo yo·ku·sou ni i·re·nai', en: 'Do not put the towel in the bath' },
+      ]} />
+
+      <AccordionRow id="localfood" jp="🍜 Regional Specialties" rom="" meaning="Local foods along the itinerary" {...sharedProps} items={[
+        { jp: 'ひつまぶし', hep: 'hi·tsu·ma·bu·shi', en: 'Nagoya grilled eel over rice' },
+        { jp: '味噌カツ', hep: 'mi·so ka·tsu', en: 'Nagoya pork cutlet with red-miso sauce' },
+        { jp: '手羽先', hep: 'te·ba·sa·ki', en: 'Nagoya seasoned chicken wings' },
+        { jp: 'きしめん', hep: 'ki·shi·men', en: 'Nagoya flat noodles' },
+        { jp: '海鮮丼', hep: 'kai·sen·don', en: 'Seafood rice bowl' },
+        { jp: 'のどぐろ', hep: 'no·do·gu·ro', en: 'Blackthroat seaperch, a Hokuriku specialty' },
+        { jp: '金沢おでん', hep: 'ka·na·za·wa o·den', en: 'Kanazawa-style oden' },
+        { jp: '治部煮', hep: 'ji·bu·ni', en: 'Traditional Kaga duck or chicken stew' },
+        { jp: '加賀棒茶', hep: 'ka·ga bou·cha', en: 'Kaga roasted stem tea' },
+        { jp: '信州そば', hep: 'shin·shuu so·ba', en: 'Nagano buckwheat noodles' },
+        { jp: 'おやき', hep: 'o·ya·ki', en: 'Nagano stuffed dumpling' },
+        { jp: '野沢菜', hep: 'no·za·wa·na', en: 'Nagano pickled greens' },
+        { jp: '山賊焼き', hep: 'san·zo·ku ya·ki', en: 'Matsumoto-style fried chicken' },
+        { jp: '五平餅', hep: 'go·hei mo·chi', en: 'Kiso grilled rice cake with savory-sweet sauce' },
+        { jp: '成田のうなぎ', hep: 'na·ri·ta no u·na·gi', en: 'Narita grilled eel' },
+      ]} />
+
+      <AccordionRow id="departure" jp="🛫 Airport Departure" rom="" meaning="Check-in, baggage, security, and boarding" {...sharedProps} items={[
+        { jp: '出発ロビー', hep: 'shup·pa·tsu ro·bii', en: 'Departure lobby' },
+        { jp: 'チェックインカウンター', hep: 'chek·ku·in kaun·taa', en: 'Check-in counter' },
+        { jp: '預け荷物', hep: 'a·zu·ke ni·mo·tsu', en: 'Checked baggage' },
+        { jp: '機内持ち込み手荷物', hep: 'ki·nai mo·chi·ko·mi te·ni·mo·tsu', en: 'Carry-on baggage' },
+        { jp: '保安検査', hep: 'ho·an ken·sa', en: 'Security screening' },
+        { jp: '出国審査', hep: 'shuk·ko·ku shin·sa', en: 'Departure immigration' },
+        { jp: '搭乗券', hep: 'tou·jou·ken', en: 'Boarding pass' },
+        { jp: '搭乗口', hep: 'tou·jou·gu·chi', en: 'Boarding gate' },
+        { jp: '搭乗開始', hep: 'tou·jou kai·shi', en: 'Boarding begins' },
+        { jp: '最終搭乗案内', hep: 'sai·shuu tou·jou an·nai', en: 'Final boarding call' },
+      ]} />
+    </div>
+  );
+}
+
 function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSignal }: RbProps) {
-  const { openSet, toggle } = useAccordion(['shops', 'restaurants', 'trains', 'hotels', 'general'], toggleSignal);
+  const { openSet, toggle } = useAccordion(['shops', 'restaurants', 'trains', 'buses', 'airports', 'hotels', 'general'], toggleSignal);
   return (
     <div className="mt-2 space-y-1.5">
       <p className="text-base text-slate-500 mb-2">Phrases you'll hear from staff — learn to recognize, not produce</p>
@@ -2333,14 +2496,49 @@ function ListeningRef({ rbIds, onRbToggle, learnedIds, onToggleLearned, toggleSi
           { jp: '次は○○駅です', hep: 'tsu·gi wa ○○ e·ki de·su', en: 'Next stop is ○○ station' },
           { jp: 'お忘れ物のないようご注意ください', hep: 'o·wa·su·re·mo·no no nai you go·chuu·i ku·da·sai', en: 'Please check you have all belongings' },
           { jp: 'この電車は○○行きです', hep: 'ko·no den·sha wa ○○ i·ki de·su', en: 'This train goes to ○○' },
+          { jp: '敦賀で北陸新幹線にお乗り換えです', hep: 'tsu·ru·ga de ho·ku·ri·ku shin·kan·sen ni o·no·ri·ka·e de·su', en: 'Transfer to the Hokuriku Shinkansen at Tsuruga' },
+          { jp: '乗り換え時間はおよそ十分です', hep: 'no·ri·ka·e ji·kan wa o·yo·so jup·pun de·su', en: 'The connection time is approximately 10 minutes' },
+          { jp: '自由席は○号車です', hep: 'ji·yuu·se·ki wa ○ gou·sha de·su', en: 'Non-reserved seating is in car ○' },
+          { jp: '雪の影響により、列車が遅れています', hep: 'yu·ki no ei·kyou ni yo·ri res·sha ga o·ku·re·te i·ma·su', en: 'The train is delayed due to snow' },
         ]} />
 
-      <AccordionRow id="hotels" jp="🏨 Hotels" rom="" meaning="Check-in, passport, room, breakfast, farewell"
+      <AccordionRow id="buses" jp="🚌 Buses" rom="" meaning="Stops, fare payment, delays, final service"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'ご乗車の際に整理券をお取りください', hep: 'go·jou·sha no sai ni sei·ri·ken wo o·to·ri ku·da·sai', en: 'Please take a numbered ticket when boarding' },
+          { jp: '次は戸隠奥社入口です', hep: 'tsu·gi wa to·ga·ku·shi o·ku·sha i·ri·gu·chi de·su', en: 'Next stop is Togakushi Okusha Iriguchi' },
+          { jp: 'お降りの方はボタンを押してください', hep: 'o·o·ri no ka·ta wa bo·tan wo o·shi·te ku·da·sai', en: 'Passengers getting off, please press the button' },
+          { jp: '運賃は降りる時にお支払いください', hep: 'un·chin wa o·ri·ru to·ki ni o·shi·ha·rai ku·da·sai', en: 'Please pay the fare when getting off' },
+          { jp: 'この便が長野駅行きの最終バスです', hep: 'ko·no bin ga na·ga·no e·ki i·ki no sai·shuu ba·su de·su', en: 'This is the last bus bound for Nagano Station' },
+          { jp: '道路状況により到着が遅れる場合があります', hep: 'dou·ro jou·kyou ni yo·ri tou·cha·ku ga o·ku·re·ru ba·ai ga a·ri·ma·su', en: 'Arrival may be delayed due to road conditions' },
+        ]} />
+
+      <AccordionRow id="airports" jp="🛫 Airport & Boarding" rom="" meaning="Security, gate changes, boarding groups, final calls"
+        openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
+          { jp: 'パスポートと搭乗券をご用意ください', hep: 'pa·su·poo·to to tou·jou·ken wo go·you·i ku·da·sai', en: 'Please have your passport and boarding pass ready' },
+          { jp: '保安検査場が混雑しています', hep: 'ho·an ken·sa·jou ga kon·za·tsu shi·te i·ma·su', en: 'The security checkpoint is crowded' },
+          { jp: '搭乗口が変更になりました', hep: 'tou·jou·gu·chi ga hen·kou ni na·ri·ma·shi·ta', en: 'The boarding gate has changed' },
+          { jp: 'ただいまより優先搭乗を開始します', hep: 'ta·da·i·ma yo·ri yuu·sen tou·jou wo kai·shi shi·ma·su', en: 'Priority boarding will now begin' },
+          { jp: '後方の座席のお客様からご案内します', hep: 'kou·hou no za·se·ki no o·kyaku·sa·ma ka·ra go·an·nai shi·ma·su', en: 'We will board passengers seated toward the rear first' },
+          { jp: 'まもなく搭乗を締め切ります', hep: 'ma·mo·na·ku tou·jou wo shi·me·ki·ri·ma·su', en: 'Boarding will close shortly' },
+          { jp: 'こちらは最終搭乗案内です', hep: 'ko·chi·ra wa sai·shuu tou·jou an·nai de·su', en: 'This is the final boarding call' },
+        ]} />
+
+      <AccordionRow id="hotels" jp="🏨 Hotels, Ryokan & Onsen" rom="" meaning="Check-in, house rules, meals, baths, and farewell"
         openSet={openSet} toggle={toggle} section="listening" refBookmarkedIds={rbIds} onToggleRefBookmark={onRbToggle} learnedIds={learnedIds} onToggleLearned={onToggleLearned} items={[
           { jp: 'チェックインでございますか？', hep: 'chek·ku·in de go·zai·ma·su ka', en: 'Are you checking in?' },
           { jp: 'パスポートをお見せください', hep: 'pa·su·poo·to wo o·mi·se ku·da·sai', en: 'Please show your passport' },
           { jp: 'お部屋は○○号室です', hep: 'o·he·ya wa ○○ gou·shi·tsu de·su', en: 'Your room is number ○○' },
           { jp: '朝食は○時から○時までです', hep: 'chou·sho·ku wa ○·ji ka·ra ○·ji ma·de de·su', en: 'Breakfast is from ○ to ○' },
+          { jp: 'こちらで靴を脱いでください', hep: 'ko·chi·ra de ku·tsu wo nui·de ku·da·sai', en: 'Please remove your shoes here' },
+          { jp: '夕食は六時からです', hep: 'yuu·sho·ku wa ro·ku·ji ka·ra de·su', en: 'Dinner starts at 6pm' },
+          { jp: 'お食事中に布団を敷きます', hep: 'o·sho·ku·ji·chuu ni fu·ton wo shi·ki·ma·su', en: 'We will lay out your futon while you eat' },
+          { jp: 'タオルは別料金です', hep: 'ta·o·ru wa be·tsu·ryou·kin de·su', en: 'Towels cost extra' },
+          { jp: '入浴前に体を洗ってください', hep: 'nyuu·yo·ku mae ni ka·ra·da wo a·rat·te ku·da·sai', en: 'Please wash before entering the bath' },
+          { jp: '一泊二食付きのプランでございます', hep: 'ip·pa·ku ni·sho·ku tsu·ki no pu·ran de go·zai·ma·su', en: 'Your plan includes one night, dinner, and breakfast' },
+          { jp: '夕食と朝食が含まれております', hep: 'yuu·sho·ku to chou·sho·ku ga fu·ku·ma·re·te o·ri·ma·su', en: 'Dinner and breakfast are included' },
+          { jp: 'お飲み物は別料金です', hep: 'o·no·mi·mo·no wa be·tsu·ryou·kin de·su', en: 'Drinks are charged separately' },
+          { jp: '食べられないものはございますか？', hep: 'ta·be·ra·re·nai mo·no wa go·zai·ma·su ka', en: 'Are there any foods you cannot eat?' },
+          { jp: '夕食に間に合わない場合はご連絡ください', hep: 'yuu·sho·ku ni ma·ni·a·wa·nai ba·ai wa go·ren·ra·ku ku·da·sai', en: 'Please contact us if you will not arrive in time for dinner' },
           { jp: 'ごゆっくりお過ごしください', hep: 'go·yuk·ku·ri o·su·go·shi ku·da·sai', en: 'Please enjoy your stay' },
         ]} />
 
