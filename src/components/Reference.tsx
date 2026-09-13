@@ -12,7 +12,7 @@ const LEARN_STEPS: { id: Section; label: string; emoji: string; desc: string }[]
   { id: 'grammar', label: 'Sentence Structure', emoji: '📝', desc: 'S は O を V ます word order' },
   { id: 'particles', label: 'Key Particles', emoji: '🔤', desc: 'は が を に で の and more' },
   { id: 'polite', label: 'Polite Forms', emoji: '🎩', desc: 'ます ません ました です' },
-  { id: 'numbers', label: 'Numbers', emoji: '🔢', desc: 'Counting, prices, time' },
+  { id: 'numbers', label: 'Numbers', emoji: '🔢', desc: 'Counting, calendar, prices & time' },
   { id: 'yesno', label: 'Yes/No Questions', emoji: '❓', desc: 'Statement + か = question' },
   { id: 'whquestions', label: 'Question Words', emoji: '🔍', desc: '何 どこ いつ いくら どう' },
 ];
@@ -739,27 +739,29 @@ export function NumberConverter() {
 }
 
 function NumbersRef() {
-  const [numTab, setNumTab] = useState<string>('basic');
+  const [numGroup, setNumGroup] = useState<'basics' | 'calendar' | 'time' | 'travel'>('basics');
+  const [basicsTab, setBasicsTab] = useState<'basic' | 'things'>('basic');
+  const [calendarTab, setCalendarTab] = useState<'dates' | 'months' | 'weekdays' | 'relative'>('dates');
+  const [timeTab, setTimeTab] = useState<'hours' | 'minutes'>('hours');
+  const [travelTab, setTravelTab] = useState<'prices' | 'people' | 'nights'>('prices');
 
   const tabs = [
-    { id: 'basic', label: '1-10' },
-    { id: 'prices', label: 'Prices' },
-    { id: 'hours', label: 'Hours' },
-    { id: 'minutes', label: 'Minutes' },
-    { id: 'nights', label: 'Nights' },
-    { id: 'people', label: 'People' },
-  ];
+    { id: 'basics', label: 'Basics' },
+    { id: 'calendar', label: 'Calendar' },
+    { id: 'time', label: 'Time' },
+    { id: 'travel', label: 'Travel' },
+  ] as const;
 
   return (
     <div className="mt-2">
-      {/* Tab strip */}
+      {/* Group tabs */}
       <div className="flex gap-1 overflow-x-auto pb-2 mb-2">
         {tabs.map(t => (
           <button
             key={t.id}
-            onClick={() => setNumTab(t.id)}
+            onClick={() => setNumGroup(t.id)}
             className={`px-3 py-1.5 rounded-lg text-base whitespace-nowrap transition ${
-              numTab === t.id
+              numGroup === t.id
                 ? 'bg-sakura-500/60 text-white'
                 : 'bg-slate-700/50 text-slate-400 active:bg-slate-600'
             }`}
@@ -767,7 +769,71 @@ function NumbersRef() {
         ))}
       </div>
 
-      {numTab === 'basic' && (
+      {numGroup === 'basics' && (
+        <div className="flex gap-1.5 mb-2 overflow-x-auto pb-1">
+          {([
+            { id: 'basic', label: '1-10' },
+            { id: 'things', label: 'Things' },
+          ] as const).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setBasicsTab(tab.id)}
+              className={`px-2.5 py-1.5 rounded-lg text-sm whitespace-nowrap transition ${
+                basicsTab === tab.id
+                  ? 'bg-sky-500/50 text-white'
+                  : 'bg-slate-700/40 text-slate-400 active:bg-slate-600'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {numGroup === 'time' && (
+        <div className="flex gap-1.5 mb-2 overflow-x-auto pb-1">
+          {([
+            { id: 'hours', label: 'Hours' },
+            { id: 'minutes', label: 'Minutes' },
+          ] as const).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setTimeTab(tab.id)}
+              className={`px-2.5 py-1.5 rounded-lg text-sm whitespace-nowrap transition ${
+                timeTab === tab.id
+                  ? 'bg-sky-500/50 text-white'
+                  : 'bg-slate-700/40 text-slate-400 active:bg-slate-600'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {numGroup === 'travel' && (
+        <div className="flex gap-1.5 mb-2 overflow-x-auto pb-1">
+          {([
+            { id: 'prices', label: 'Prices' },
+            { id: 'people', label: 'People' },
+            { id: 'nights', label: 'Nights' },
+          ] as const).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setTravelTab(tab.id)}
+              className={`px-2.5 py-1.5 rounded-lg text-sm whitespace-nowrap transition ${
+                travelTab === tab.id
+                  ? 'bg-sky-500/50 text-white'
+                  : 'bg-slate-700/40 text-slate-400 active:bg-slate-600'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {numGroup === 'basics' && basicsTab === 'basic' && (
         <div>
           <RefRow jp="一" rom="i·chi" meaning="1" />
           <RefRow jp="二" rom="ni" meaning="2" />
@@ -790,7 +856,144 @@ function NumbersRef() {
         </div>
       )}
 
-      {numTab === 'prices' && (
+      {numGroup === 'basics' && basicsTab === 'things' && (
+        <div>
+          <div className="bg-sakura-500/10 border border-sakura-500/20 rounded-xl px-3 py-2.5 mb-2">
+            <p className="text-sm font-medium text-sakura-300">Memory line</p>
+            <p className="text-base text-slate-200 mt-0.5">ひ・ふ・み・よ・いつ・む・なな・や・ここ・とお</p>
+            <p className="text-sm text-slate-500 mt-1">Use these native readings with 〜つ for general things.</p>
+          </div>
+          <RefRow jp="ひとつ" rom="hi·to·tsu" meaning="1 thing" />
+          <RefRow jp="ふたつ" rom="fu·ta·tsu" meaning="2 things" />
+          <RefRow jp="みっつ" rom="mit·tsu" meaning="3 things" />
+          <RefRow jp="よっつ" rom="yot·tsu" meaning="4 things" />
+          <RefRow jp="いつつ" rom="i·tsu·tsu" meaning="5 things" />
+          <RefRow jp="むっつ" rom="mut·tsu" meaning="6 things" />
+          <RefRow jp="ななつ" rom="na·na·tsu" meaning="7 things" />
+          <RefRow jp="やっつ" rom="yat·tsu" meaning="8 things" />
+          <RefRow jp="ここのつ" rom="ko·ko·no·tsu" meaning="9 things" />
+          <RefRow jp="とお" rom="to·o" meaning="10 things (no 〜つ)" />
+        </div>
+      )}
+
+      {numGroup === 'calendar' && (
+        <div>
+          <div className="flex gap-1.5 mb-2 overflow-x-auto pb-1">
+            {([
+              { id: 'dates', label: 'Dates' },
+              { id: 'months', label: 'Months' },
+              { id: 'weekdays', label: 'Weekdays' },
+              { id: 'relative', label: 'Relative' },
+            ] as const).map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setCalendarTab(tab.id)}
+                className={`px-2.5 py-1.5 rounded-lg text-sm whitespace-nowrap transition ${
+                  calendarTab === tab.id
+                    ? 'bg-sky-500/50 text-white'
+                    : 'bg-slate-700/40 text-slate-400 active:bg-slate-600'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {calendarTab === 'dates' && (
+            <div>
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl px-3 py-2.5 mb-2">
+                <p className="text-sm font-medium text-sky-300">Same pattern, different endings</p>
+                <p className="text-base text-slate-200 mt-0.5">ひ→ついたち · ふ→ふつか · み→みっか</p>
+                <p className="text-sm text-slate-500 mt-1">Dates 1–10 use special readings. Most later dates use the number + にち.</p>
+              </div>
+              <RefRow jp="1日" rom="tsu·i·ta·chi" meaning="1st — special reading, not based on ひ" />
+              <RefRow jp="2日" rom="fu·tsu·ka" meaning="2nd" />
+              <RefRow jp="3日" rom="mik·ka" meaning="3rd" />
+              <RefRow jp="4日" rom="yok·ka" meaning="4th" />
+              <RefRow jp="5日" rom="i·tsu·ka" meaning="5th" />
+              <RefRow jp="6日" rom="mu·i·ka" meaning="6th" />
+              <RefRow jp="7日" rom="na·no·ka" meaning="7th" />
+              <RefRow jp="8日" rom="you·ka" meaning="8th" />
+              <RefRow jp="9日" rom="ko·ko·no·ka" meaning="9th" />
+              <RefRow jp="10日" rom="to·o·ka" meaning="10th" />
+              <div className="mt-2 pt-2 border-t border-slate-700/40">
+                <p className="text-sm font-medium text-amber-300 px-1 pb-1">Remember these later exceptions</p>
+                <RefRow jp="14日" rom="juu·yok·ka" meaning="14th" />
+                <RefRow jp="20日" rom="ha·tsu·ka" meaning="20th" />
+                <RefRow jp="24日" rom="ni·juu·yok·ka" meaning="24th" />
+                <RefRow jp="11日" rom="juu·i·chi·ni·chi" meaning="11th — regular number + にち pattern" />
+              </div>
+            </div>
+          )}
+
+          {calendarTab === 'months' && (
+            <div>
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl px-3 py-2.5 mb-2">
+                <p className="text-sm font-medium text-sky-300">Number + 月 (がつ)</p>
+                <p className="text-sm text-slate-500 mt-1">Watch the special number readings for April, July, and September.</p>
+              </div>
+              <RefRow jp="1月" rom="i·chi·ga·tsu" meaning="January" />
+              <RefRow jp="2月" rom="ni·ga·tsu" meaning="February" />
+              <RefRow jp="3月" rom="san·ga·tsu" meaning="March" />
+              <RefRow jp="4月" rom="shi·ga·tsu" meaning="April — NOT よんがつ" />
+              <RefRow jp="5月" rom="go·ga·tsu" meaning="May" />
+              <RefRow jp="6月" rom="ro·ku·ga·tsu" meaning="June" />
+              <RefRow jp="7月" rom="shi·chi·ga·tsu" meaning="July — NOT なながつ" />
+              <RefRow jp="8月" rom="ha·chi·ga·tsu" meaning="August" />
+              <RefRow jp="9月" rom="ku·ga·tsu" meaning="September — NOT きゅうがつ" />
+              <RefRow jp="10月" rom="juu·ga·tsu" meaning="October" />
+              <RefRow jp="11月" rom="juu·i·chi·ga·tsu" meaning="November" />
+              <RefRow jp="12月" rom="juu·ni·ga·tsu" meaning="December" />
+              <div className="mt-2 pt-2 border-t border-slate-700/40">
+                <RefRow jp="何月ですか？" rom="nan·ga·tsu de·su ka" meaning="What month is it?" />
+              </div>
+            </div>
+          )}
+
+          {calendarTab === 'weekdays' && (
+            <div>
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl px-3 py-2.5 mb-2">
+                <p className="text-sm font-medium text-sky-300">Nature kanji + 曜日 (ようび)</p>
+                <p className="text-sm text-slate-500 mt-1">Moon · fire · water · wood · gold · earth · sun</p>
+              </div>
+              <RefRow jp="月曜日" rom="ge·tsu·you·bi" meaning="Monday — moon" />
+              <RefRow jp="火曜日" rom="ka·you·bi" meaning="Tuesday — fire" />
+              <RefRow jp="水曜日" rom="sui·you·bi" meaning="Wednesday — water" />
+              <RefRow jp="木曜日" rom="mo·ku·you·bi" meaning="Thursday — wood" />
+              <RefRow jp="金曜日" rom="kin·you·bi" meaning="Friday — gold" />
+              <RefRow jp="土曜日" rom="do·you·bi" meaning="Saturday — earth" />
+              <RefRow jp="日曜日" rom="ni·chi·you·bi" meaning="Sunday — sun" />
+              <div className="mt-2 pt-2 border-t border-slate-700/40">
+                <RefRow jp="何曜日ですか？" rom="nan·you·bi de·su ka" meaning="What day of the week is it?" />
+              </div>
+            </div>
+          )}
+
+          {calendarTab === 'relative' && (
+            <div>
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl px-3 py-2.5 mb-2">
+                <p className="text-sm font-medium text-sky-300">Useful schedule words</p>
+                <p className="text-sm text-slate-500 mt-1">Use these when asking about bookings, departures, and opening days.</p>
+              </div>
+              <RefRow jp="今日" rom="kyou" meaning="Today" />
+              <RefRow jp="明日" rom="a·shi·ta" meaning="Tomorrow" />
+              <RefRow jp="昨日" rom="ki·nou" meaning="Yesterday" />
+              <div className="mt-2 pt-2 border-t border-slate-700/40">
+                <RefRow jp="今週" rom="kon·shuu" meaning="This week" />
+                <RefRow jp="来週" rom="rai·shuu" meaning="Next week" />
+                <RefRow jp="先週" rom="sen·shuu" meaning="Last week" />
+              </div>
+              <div className="mt-2 pt-2 border-t border-slate-700/40">
+                <RefRow jp="今月" rom="kon·ge·tsu" meaning="This month" />
+                <RefRow jp="来月" rom="rai·ge·tsu" meaning="Next month" />
+                <RefRow jp="先月" rom="sen·ge·tsu" meaning="Last month" />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {numGroup === 'travel' && travelTab === 'prices' && (
         <div>
           <RefRow jp="150円" rom="hya·ku go·juu en" meaning="¥150 (convenience store onigiri)" />
           <RefRow jp="500円" rom="go·hya·ku en" meaning="¥500 (lunch set, goshuin stamp)" />
@@ -802,7 +1005,7 @@ function NumbersRef() {
         </div>
       )}
 
-      {numTab === 'hours' && (
+      {numGroup === 'time' && timeTab === 'hours' && (
         <div>
           <RefRow jp="1時" rom="i·chi·ji" meaning="1 o'clock" />
           <RefRow jp="2時" rom="ni·ji" meaning="2 o'clock" />
@@ -819,7 +1022,7 @@ function NumbersRef() {
         </div>
       )}
 
-      {numTab === 'minutes' && (
+      {numGroup === 'time' && timeTab === 'minutes' && (
         <div>
           <RefRow jp="1分" rom="ip·pun" meaning="1 min ⚠️" />
           <RefRow jp="2分" rom="ni·fun" meaning="2 min" />
@@ -833,7 +1036,7 @@ function NumbersRef() {
         </div>
       )}
 
-      {numTab === 'nights' && (
+      {numGroup === 'travel' && travelTab === 'nights' && (
         <div>
           <RefRow jp="一泊" rom="ip·pa·ku" meaning="1 night ⚠️" />
           <RefRow jp="二泊" rom="ni·ha·ku" meaning="2 nights" />
@@ -843,7 +1046,7 @@ function NumbersRef() {
         </div>
       )}
 
-      {numTab === 'people' && (
+      {numGroup === 'travel' && travelTab === 'people' && (
         <div>
           <RefRow jp="ひとり" rom="hi·to·ri" meaning="1 person (NOT ichi·nin)" />
           <RefRow jp="ふたり" rom="fu·ta·ri" meaning="2 people (NOT ni·nin) ← your default!" />
