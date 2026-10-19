@@ -12,6 +12,19 @@ export function setTtsRate(rate: number): void {
   localStorage.setItem(RATE_KEY, String(rate));
 }
 
+export function prepareSpeechPlayback(): void {
+  if (!('audioSession' in navigator)) return;
+  const session = navigator.audioSession;
+  if (typeof session !== 'object' || session === null || !('type' in session)) return;
+
+  // Request media playback rather than audio muted by iOS Silent Mode.
+  try {
+    session.type = 'playback';
+  } catch (error) {
+    console.error('Could not configure speech for playback in Silent Mode.', error);
+  }
+}
+
 export function speak(text: string, lang = 'ja-JP'): void {
   if (!('speechSynthesis' in window)) {
     console.error('Text-to-speech is not supported by this browser.');
@@ -53,6 +66,7 @@ export function speak(text: string, lang = 'ja-JP'): void {
   };
 
   // Start in the tap handler's call stack so iOS can authorize playback.
+  prepareSpeechPlayback();
   synth.speak(utterance);
   if (synth.paused) synth.resume();
 }

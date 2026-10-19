@@ -144,6 +144,13 @@ the tap handler for Safari's user-activation requirements; do not defer it with 
 timer or wait for voices to load. If voices are not yet listed, the app lets the
 browser select a voice for the requested language.
 
+Before speech starts, the app requests `navigator.audioSession.type = "playback"`
+when the experimental Audio Session API is available. This is intended to allow
+speech in Silent Mode and also applies to conversation autoplay. It may interrupt
+music or podcasts, and media volume still controls loudness. Browsers without
+this API retain their default audio behavior; turn Silent Mode off if necessary.
+Speech playback in Silent Mode must be confirmed on the target iOS device.
+
 If playback is silent, check the device volume and audio output, then try a
 speaker button in Safari as well as the installed PWA. After an app update,
 reopen the app while online to allow its offline cache to update. Actual iOS

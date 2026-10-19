@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { runInNewContext } from 'node:vm';
 import ts from 'typescript';
 
-function loadTts({ voices = [], supported = true } = {}) {
+function loadTts({ voices = [], supported = true, audioSession } = {}) {
   const calls = [];
   const errors = [];
   const storage = new Map();
@@ -19,6 +19,7 @@ function loadTts({ voices = [], supported = true } = {}) {
   };
   const context = {
     window: supported ? { speechSynthesis: synth } : {},
+    navigator: audioSession === undefined ? {} : { audioSession },
     SpeechSynthesisUtterance: class {
       constructor(text) { this.text = text; }
     },
@@ -120,4 +121,51 @@ test('reports unsupported browsers instead of silently ignoring taps', () => {
   api.speak('こんにちは');
   assert.equal(calls.length, 0);
   assert.deepEqual(errors, ['Text-to-speech is not supported by this browser.']);
+});
+
+test('requests playback before speaking without changing the session on load', () => {
+  let type = 'auto';
+  const audioSession = {
+    get type() { return type; },
+    set type(value) { type = value; },
+  };
+  const { api, synth, calls } = loadTts({ audioSession });
+  assert.equal(type, 'auto');
+  synth.speak = utterance => {
+    assert.equal(type, 'playback');
+    calls.push(utterance);
+  };
+  api.speak('こんにちは');
+  assert.equal(calls.length, 1);
+});
+
+test('conversation playback can request the same audio session independently', () => {
+  const audioSession = { type: 'auto' };
+  const { api, calls } = loadTts({ audioSession });
+  api.prepareSpeechPlayback();
+  assert.equal(audioSession.type, 'playback');
+  assert.equal(calls.length, 0);
+});
+
+test('logs rejected audio session changes and still attempts speech', () => {
+  const audioSession = {
+    get type() { return 'auto'; },
+    set type(value) {
+      assert.equal(value, 'playback');
+      throw new Error('Audio session unavailable');
+    },
+  };
+  const { api, calls, errors } = loadTts({ audioSession });
+  api.speak('こんにちは');
+  assert.equal(calls.length, 1);
+  assert.deepEqual(errors, ['Could not configure speech for playback in Silent Mode.']);
+});
+
+test('unavailable audio sessions preserve normal speech playback', () => {
+  for (const audioSession of [undefined, null]) {
+    const { api, calls, errors } = loadTts({ audioSession });
+    api.speak('こんにちは');
+    assert.equal(calls.length, 1);
+    assert.equal(errors.length, 0);
+  }
 });

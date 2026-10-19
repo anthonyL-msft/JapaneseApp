@@ -5,7 +5,7 @@ import { scenarios, SCENARIO_GROUPS } from '../data/scenarios';
 import type { Scenario, ConversationLine, ScenarioGroup } from '../data/scenarios';
 import type { LanguageConfig } from '../data/types';
 
-import { speak } from '../utils/tts';
+import { speak, prepareSpeechPlayback } from '../utils/tts';
 import { useSlidePanel } from '../utils/useSlidePanel';
 
 interface Props {
@@ -87,6 +87,7 @@ export function Scenarios({ lang, langConfig, search = '' }: Props) {
       return;
     }
 
+    prepareSpeechPlayback();
     setIsAutoPlaying(true);
     autoPlayRef.current = true;
     const startFrom = revealedCount;
