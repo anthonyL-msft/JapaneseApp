@@ -1,6 +1,7 @@
 import { LANGUAGES } from '../data/types';
 
 const RATE_KEY = 'tts-rate';
+let activeUtterance: SpeechSynthesisUtterance | null = null;
 
 export function getTtsRate(): number {
   const stored = localStorage.getItem(RATE_KEY);
@@ -12,13 +13,13 @@ export function setTtsRate(rate: number): void {
 }
 
 export function speak(text: string, lang = 'ja-JP'): void {
-  if (!('speechSynthesis' in window)) return;
+  if (!('speechSynthesis' in window)) {
+    console.error('Text-to-speech is not supported by this browser.');
+    return;
+  }
 
-  // iOS fix: cancel can leave synth in a broken state, resume first
   const synth = window.speechSynthesis;
-  synth.cancel();
-  // iOS requires a resume after cancel to unstick the queue
-  synth.resume();
+  if (synth.speaking || synth.pending) synth.cancel();
 
   // For single kana characters, extend with vowel mark for clarity
   let speakText = text;
@@ -38,10 +39,22 @@ export function speak(text: string, lang = 'ja-JP'): void {
   const voice = voices.find(v => v.lang.startsWith(langPrefix));
   if (voice) utterance.voice = voice;
 
-  // iOS workaround: small delay before speaking after cancel
-  setTimeout(() => {
-    synth.speak(utterance);
-  }, 10);
+  // Keep the utterance alive until Safari finishes delivering its events.
+  activeUtterance = utterance;
+  const release = () => {
+    if (activeUtterance === utterance) activeUtterance = null;
+  };
+  utterance.onend = release;
+  utterance.onerror = (event) => {
+    release();
+    if (event.error !== 'canceled' && event.error !== 'interrupted') {
+      console.error(`Text-to-speech failed (${lang}): ${event.error}`);
+    }
+  };
+
+  // Start in the tap handler's call stack so iOS can authorize playback.
+  synth.speak(utterance);
+  if (synth.paused) synth.resume();
 }
 
 /** Get TTS language code from phrase lang code */

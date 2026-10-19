@@ -137,6 +137,20 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 - **AI:** Azure OpenAI (gpt-4.1-mini)
 - **Deployment:** GitHub Pages (auto-deploy via GitHub Actions)
 
+### Speech on iPhone / iPad
+
+Tap a speaker button to start speech. Speech startup must stay synchronous with
+the tap handler for Safari's user-activation requirements; do not defer it with a
+timer or wait for voices to load. If voices are not yet listed, the app lets the
+browser select a voice for the requested language.
+
+If playback is silent, check the device volume and audio output, then try a
+speaker button in Safari as well as the installed PWA. After an app update,
+reopen the app while online to allow its offline cache to update. Actual iOS
+compatibility needs device testing; desktop tests cannot verify audible output.
+Speech API errors are reported in the browser console (except expected
+cancellation when another phrase is tapped).
+
 ## Languages Supported
 
 | Language | Phrases | Scenarios | Reference | Sentence Grow |
@@ -151,6 +165,7 @@ An offline-first PWA for learning and using foreign languages while traveling. B
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # Production build
+node --test tests/tts.test.mjs # Speech regression tests
 ```
 
 ### AI Setup (optional)
